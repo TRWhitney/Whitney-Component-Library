@@ -13,11 +13,7 @@ export interface AppearanceProviderProps {
 }
 type ProviderStyles = CSSProperties & Record<`--wcl-${string}`, string>;
 
-export function AppearanceProvider({
-  accent,
-  appearance,
-  children,
-}: AppearanceProviderProps) {
+export function AppearanceProvider({accent, appearance, children}: AppearanceProviderProps) {
   const roles = deriveAccentRoles(accent, appearance);
   const styles: ProviderStyles = {
     '--wcl-accent': roles.accent,

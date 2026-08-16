@@ -53,7 +53,9 @@ async function assertBrowserSafeDistribution(directory) {
     const source = await readFile(file, 'utf8');
     assertNoNodeReferences(source, file);
     if (findStyleImports(source).length > 0) {
-      throw new Error(`JavaScript imports static styles instead of using the CSS subpath in ${file}.`);
+      throw new Error(
+        `JavaScript imports static styles instead of using the CSS subpath in ${file}.`,
+      );
     }
   }
 
@@ -99,10 +101,7 @@ async function verifyConsumer({
       2,
     )}\n`,
   );
-  await writeFile(
-    resolve(workspace, 'verify.mjs'),
-    createConsumerVerificationSource(packageName),
-  );
+  await writeFile(resolve(workspace, 'verify.mjs'), createConsumerVerificationSource(packageName));
   await writeFile(
     resolve(workspace, 'index.html'),
     '<!doctype html><html><body><div id="root"></div><script type="module" src="/main.jsx"></script></body></html>\n',
@@ -144,9 +143,7 @@ async function verifyConsumer({
 
   const browserFiles = await walk(resolve(workspace, 'dist'));
   const builtStyles = await Promise.all(
-    browserFiles
-      .filter((file) => file.endsWith('.css'))
-      .map((file) => readFile(file, 'utf8')),
+    browserFiles.filter((file) => file.endsWith('.css')).map((file) => readFile(file, 'utf8')),
   );
   if (!builtStyles.some((styles) => styles.includes('--wcl-canvas'))) {
     throw new Error('The clean browser consumer did not load the explicit stylesheet subpath.');

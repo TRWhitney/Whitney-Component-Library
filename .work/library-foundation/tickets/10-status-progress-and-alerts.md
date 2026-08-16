@@ -9,11 +9,11 @@ spinner exports with independent semantic tones and live-region behavior.
 **Status:** blocked
 
 - [ ] Success, warning or in-progress, danger, neutral, and accent roles remain semantically
-  distinct in light and dark appearance.
+      distinct in light and dark appearance.
 - [ ] Status changes use appropriate live announcements without duplicating labels or overwhelming
-  assistive technology.
+      assistive technology.
 - [ ] Determinate progress, indeterminate progress, bounded meter values, and generic busy state
-  remain distinct concepts and contracts.
+      remain distinct concepts and contracts.
 - [ ] Labels, values, units, thresholds, and completion meaning are programmatically available.
 - [ ] Warning and error treatments do not shift adjacent layout.
 - [ ] Activity animation persists only while active and settles under reduced motion.

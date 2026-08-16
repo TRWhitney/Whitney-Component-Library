@@ -10,17 +10,17 @@ filtering, sorting, selecting, comparing, charting, and inspecting data.
 **Status:** blocked
 
 - [ ] The construct coordinates filter/query state, collection state, chart state, selection, and
-  detail inspection through explicit public state rather than hidden application coupling.
+      detail inspection through explicit public state rather than hidden application coupling.
 - [ ] Table and chart selection can coordinate while retaining their separate roles and focus.
 - [ ] Loading, empty, no-results, partial, stale, and error states preserve context and recovery.
 - [ ] Responsive reflow keeps dense analysis usable without decorative chart identity or lost data.
 - [ ] Keyboard and screen-reader users can perform the same search, selection, comparison, and
-  inspection tasks.
+      inspection tasks.
 - [ ] A clean packed-package fixture implements the complete slice with no private imports or
-  external substitute component.
+      external substitute component.
 - [ ] Contracts guide agents to the workspace construct and appropriate chart types.
 - [ ] Theme, accent, semantic colors, reduced motion, browsers, SSR, hydration, types, and generated
-  guidance pass.
+      guidance pass.
 
 ## Accepted sources
 

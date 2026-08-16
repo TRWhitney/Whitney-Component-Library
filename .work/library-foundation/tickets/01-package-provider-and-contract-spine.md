@@ -9,12 +9,12 @@ canonical contract schema, and generated manifest and agent index working end to
 
 - [x] A clean consumer can install the packed artifact and import the provider from the root entry.
 - [x] The provider applies typed light/dark appearance and an application accent while deriving
-  internal accent roles without exposing general token replacement.
+      internal accent roles without exposing general token replacement.
 - [x] Static styles load only through the documented explicit stylesheet subpath.
 - [x] The package exposes only `.`, `./styles.css`, `./manifest.json`, and `./agent-index.md`.
 - [x] React and React DOM are external peers at the accepted range; React Aria remains private.
 - [x] One canonical provider contract generates valid human-facing data, manifest data, and the
-  compact agent index without hand-maintained duplication.
+      compact agent index without hand-maintained duplication.
 - [x] Contract validation rejects missing required guidance and invalid export references.
 - [x] React 18.3 and 19 can server-render and hydrate the provider without warnings or mismatches.
 - [x] Public declarations compile under TypeScript 5.9, 6, and 7.
@@ -60,7 +60,7 @@ The repeated review found the browser-safety gate still omitted valid template-l
 several Node globals, and the Vite-emitted browser bundle; private-type inspection stopped at the
 root declaration facade; and the declared Node floor was lower than Vite 8's supported Node 22
 floor. The final correction scans all declarations, covers the valid Node import/global forms,
-  inspects Vite bundles for retained or externalized Node modules, and declares Node `>=22.12.0`.
+inspects Vite bundles for retained or externalized Node modules, and declares Node `>=22.12.0`.
 The last review cycle also aligned `jsdom` with that Node floor, extended text and focus contrast
 across every owned surface, covered Node globals inside template expressions, verified forced-color
 and reduced-motion rules, and compiled the packed declarations against both React type majors.

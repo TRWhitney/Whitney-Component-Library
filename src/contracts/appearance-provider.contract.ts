@@ -86,9 +86,7 @@ export const appearanceProviderContract = {
     'The provider renders no localized content and does not alter the locale inherited by its children.',
   ],
   name: 'AppearanceProvider',
-  parts: [
-    'The provider exposes one children region and no named parts or slots.',
-  ],
+  parts: ['The provider exposes one children region and no named parts or slots.'],
   preferredAlternatives: [
     'Use the component semantic tone API for status meaning.',
     'Use supported component variants instead of replacing internal design tokens.',

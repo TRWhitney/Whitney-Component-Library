@@ -9,15 +9,15 @@ collection model with consistent loading, empty, partial, and error states.
 **Status:** blocked
 
 - [ ] Static content lists, key/value description lists, selectable list boxes, and grouped cards
-  retain distinct semantics and contracts.
+      retain distinct semantics and contracts.
 - [ ] Dynamic collections require stable keys and support insertion, removal, reordering updates,
-  and preserved focus where applicable.
+      and preserved focus where applicable.
 - [ ] Single, multiple, none, and disabled selection semantics are typed rather than inferred.
 - [ ] Loading, empty, no-results, partial, and error states use shared feedback components without
-  destroying collection context.
+      destroying collection context.
 - [ ] Keyboard navigation, typeahead, focus versus selection, and touch interaction pass.
 - [ ] Cards cannot silently become interactive containers without the appropriate nested action or
-  selection contract.
+      selection contract.
 - [ ] Locale, directionality, theme, compact density, SSR, hydration, and types pass.
 
 ## Accepted sources

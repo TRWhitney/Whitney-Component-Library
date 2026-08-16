@@ -258,16 +258,10 @@ function isGuardedReference(node, name) {
   let child = node;
   for (let parent = node.parent; parent; parent = parent.parent) {
     if (ts.isConditionalExpression(parent)) {
-      if (
-        child === parent.whenTrue &&
-        conditionGuarantees(parent.condition, name, true)
-      ) {
+      if (child === parent.whenTrue && conditionGuarantees(parent.condition, name, true)) {
         return true;
       }
-      if (
-        child === parent.whenFalse &&
-        conditionGuarantees(parent.condition, name, false)
-      ) {
+      if (child === parent.whenFalse && conditionGuarantees(parent.condition, name, false)) {
         return true;
       }
     }
@@ -317,19 +311,13 @@ function conditionGuarantees(condition, name, whenTruthy) {
   }
   if (!ts.isBinaryExpression(condition)) return false;
 
-  if (
-    condition.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken &&
-    whenTruthy
-  ) {
+  if (condition.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken && whenTruthy) {
     return (
       conditionGuarantees(condition.left, name, true) ||
       conditionGuarantees(condition.right, name, true)
     );
   }
-  if (
-    condition.operatorToken.kind === ts.SyntaxKind.BarBarToken &&
-    !whenTruthy
-  ) {
+  if (condition.operatorToken.kind === ts.SyntaxKind.BarBarToken && !whenTruthy) {
     return (
       conditionGuarantees(condition.left, name, false) ||
       conditionGuarantees(condition.right, name, false)

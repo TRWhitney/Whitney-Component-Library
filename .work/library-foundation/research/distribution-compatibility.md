@@ -81,8 +81,7 @@ only the newest compiler.
   coverage. Downstream browsers are mapped best-effort and still need testing when material.
   [Baseline supported browsers](https://web-platform-dx.github.io/web-features/supported-browsers/)
 - TypeScript 6 is the stable compatibility bridge to the native TypeScript 7 compiler. TypeScript
-  7 is released, but some embedded-language and programmatic-API tooling still relies on TypeScript
-  6. [TypeScript 6 release](https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/),
+  7 is released, but some embedded-language and programmatic-API tooling still relies on TypeScript 6. [TypeScript 6 release](https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/),
   [TypeScript 7 release](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/)
 
 ## Conflicts and Limitations

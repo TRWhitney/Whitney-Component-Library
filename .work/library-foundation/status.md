@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Novel-work implementation: Ticket 01 is delivered; Ticket 02 is the ready frontier and has not
-started.
+Novel-work implementation: the repository quality prerequisite is delivered, Ticket 01 remains
+delivered, and Ticket 02 is the ready frontier and has not started.
 
 ## Progress
 
@@ -43,6 +43,12 @@ Node-specific globals in owned output, reject retained/externalized Node modules
 and align the tooling contract with Node `>=22.12.0`. [Ticket
 02](tickets/02-layout-and-surface-primitives.md) is now ready for implementation.
 
+Repository-wide quality gates now run before the existing type, test, generated-artifact, and
+compatibility checks. Prettier owns formatting for authored files, ESLint applies type-informed
+TypeScript and React Hooks rules alongside JavaScript checks, and Stylelint applies the standard
+CSS rule set. Generated component documentation, npm's lockfile, build output, coverage output,
+and installed dependencies remain owned by their respective generators rather than Prettier.
+
 ## Frontier
 
 See the [decision map](map.md).
@@ -68,11 +74,13 @@ See the [decision map](map.md).
 
 ## Verification
 
-- `npm run check`: source types, 73 focused and regression tests, generated documentation, exact
-  contract coverage, and canonical examples compiled under TypeScript 5.9.3, 6.0.3, and 7.0.2.
+- `npm run check`: repository formatting, zero-warning code and style linting, source types, 73
+  focused and regression tests, generated documentation, exact contract coverage, and canonical
+  examples compiled under TypeScript 5.9.3, 6.0.3, and 7.0.2.
 - `npm run verify:package`: the actual artifact installed, server-rendered, and hydrated without
   warnings in clean React 18.3.1 and 19.2.8 consumers; both consumers also completed Vite browser
   builds that imported the public stylesheet and emitted its theme rules.
+- `npm audit --audit-level=high`: zero known vulnerabilities in the installed dependency graph.
 - Browser output passed the full Node built-in/global exclusion scan; public subpaths,
   encapsulation, and private React Aria declarations passed.
 - Accent contrast, accent text, and focus contrast passed their thresholds across six
@@ -85,7 +93,7 @@ See the [decision map](map.md).
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
 Begin [Ticket 02](tickets/02-layout-and-surface-primitives.md) in the next request.
 
-Current branch: `master` (`[Feature] Establish package spine`).
+Current branch: `master` (`[Chore] Enforce repository quality gates`).
 
 Owned uncommitted paths: none.
 

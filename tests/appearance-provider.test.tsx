@@ -34,32 +34,32 @@ describe('AppearanceProvider', () => {
       ),
     ),
   )('derives readable roles in %s appearance for the %s accent', (appearance, accent) => {
-      const {container} = render(
-        <AppearanceProvider appearance={appearance} accent={accent}>
-          <span />
-        </AppearanceProvider>,
-      );
-      const provider = container.firstElementChild as HTMLElement;
-      const surfaces =
-        appearance === 'light'
-          ? ['#e9edef', '#ffffff', '#edf1f3']
-          : ['#11171b', '#182126', '#202b31', '#243138'];
+    const {container} = render(
+      <AppearanceProvider appearance={appearance} accent={accent}>
+        <span />
+      </AppearanceProvider>,
+    );
+    const provider = container.firstElementChild as HTMLElement;
+    const surfaces =
+      appearance === 'light'
+        ? ['#e9edef', '#ffffff', '#edf1f3']
+        : ['#11171b', '#182126', '#202b31', '#243138'];
 
+    expect(
+      contrastRatio(
+        provider.style.getPropertyValue('--wcl-accent'),
+        provider.style.getPropertyValue('--wcl-accent-contrast'),
+      ),
+    ).toBeGreaterThanOrEqual(4.5);
+    for (const surface of surfaces) {
       expect(
-        contrastRatio(
-          provider.style.getPropertyValue('--wcl-accent'),
-          provider.style.getPropertyValue('--wcl-accent-contrast'),
-        ),
+        contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-text')),
       ).toBeGreaterThanOrEqual(4.5);
-      for (const surface of surfaces) {
-        expect(
-          contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-text')),
-        ).toBeGreaterThanOrEqual(4.5);
-        expect(
-          contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-focus')),
-        ).toBeGreaterThanOrEqual(3);
-      }
-    });
+      expect(
+        contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-focus')),
+      ).toBeGreaterThanOrEqual(3);
+    }
+  });
 
   it('updates the scoped appearance without mutating the document root', () => {
     const {getByTestId, rerender} = render(
@@ -109,12 +109,16 @@ describe('AppearanceProvider', () => {
         recoverableErrors.push(error);
       },
     });
-    await act(async () => undefined);
+    await act(async () => {
+      await Promise.resolve();
+    });
 
     expect(recoverableErrors).toEqual([]);
     expect(container.querySelector('[data-wcl-provider]')?.textContent).toBe('Profile');
 
-    await act(async () => root.unmount());
+    act(() => {
+      root.unmount();
+    });
   });
 
   it('rejects accent values outside the documented six-digit hex boundary', () => {
@@ -130,12 +134,12 @@ describe('AppearanceProvider', () => {
 
 function contrastRatio(first: string, second: string): number {
   const luminance = (color: string) => {
-    const channels = [1, 3, 5].map((offset) => Number.parseInt(color.slice(offset, offset + 2), 16));
+    const channels = [1, 3, 5].map((offset) =>
+      Number.parseInt(color.slice(offset, offset + 2), 16),
+    );
     const [red = 0, green = 0, blue = 0] = channels.map((channel) => {
       const normalized = channel / 255;
-      return normalized <= 0.04045
-        ? normalized / 12.92
-        : ((normalized + 0.055) / 1.055) ** 2.4;
+      return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
     });
     return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
   };

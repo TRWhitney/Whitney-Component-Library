@@ -9,15 +9,15 @@ field exports with stable validation layout and shared labeling conventions.
 **Status:** blocked
 
 - [ ] Label, description, requirement, validation, and error relationships are accessible and
-  deterministic.
+      deterministic.
 - [ ] Validation feedback never raises, resizes, or misaligns an adjacent equivalent control.
 - [ ] Text, multiline, numeric, and search semantics remain distinct in their public APIs and
-  contracts.
+      contracts.
 - [ ] Number entry owns formatting, stepping, locale, bounds, and invalid intermediate input.
 - [ ] Controlled, uncontrolled, read-only, disabled, required, invalid, pending, and form-reset
-  behavior is covered.
+      behavior is covered.
 - [ ] Field groups and sections provide bounded composition without becoming generic styling
-  containers.
+      containers.
 - [ ] Adjacent equivalent fields maintain consistent control dimensions in every state.
 - [ ] Keyboard, touch, screen-reader, directionality, theme, SSR, hydration, and type checks pass.
 

@@ -10,16 +10,16 @@ previewing, navigating wiki links, inserting assets, invoking commands, and coor
 **Status:** blocked
 
 - [ ] The workspace coordinates editor, metadata fields, toolbar/commands, link navigation, asset
-  state, and preview through bounded public composition.
+      state, and preview through bounded public composition.
 - [ ] It demonstrates unsaved, saving, saved, invalid, read-only, locked, asset-pending, and error
-  states without owning persistence or collaborative transport.
+      states without owning persistence or collaborative transport.
 - [ ] Source, Live Preview, and read-only flows remain keyboard and screen-reader operable.
 - [ ] Compact and wide layouts preserve authoring focus, supporting metadata, and commands.
 - [ ] A clean packed-package fixture implements the complete slice with no private import or
-  external substitute component.
+      external substitute component.
 - [ ] Contracts guide agents to the authoring construct without implying a notes vault.
 - [ ] Representative document workloads, browsers, theme, SSR, hydration, types, accessibility,
-  and generated guidance pass.
+      and generated guidance pass.
 
 ## Accepted sources
 

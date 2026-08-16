@@ -9,13 +9,13 @@ paste where applicable, and drag/drop file acquisition without owning upload or 
 **Status:** blocked
 
 - [ ] Accepted file types, multiplicity, size guidance, disabled, invalid, pending, and rejection
-  behavior are explicit.
+      behavior are explicit.
 - [ ] Keyboard and pointer users can open the native picker through correctly named actions.
 - [ ] Drag enter, leave, drop, rejection, and focus states are distinct without color-only meaning.
 - [ ] File objects remain consumer-owned and no upload or persistence behavior is implied.
 - [ ] Form, reset, validation, and announcement behavior is deterministic.
 - [ ] The APIs compose with the Markdown asset-insertion callback without specializing themselves
-  to Markdown.
+      to Markdown.
 - [ ] Touch, keyboard, screen-reader, theme, forced-color, SSR, hydration, and type checks pass.
 
 ## Accepted sources

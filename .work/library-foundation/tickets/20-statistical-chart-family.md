@@ -8,15 +8,15 @@ with appropriate statistical and distribution semantics.
 **Status:** blocked
 
 - [ ] Scatter and bubble charts define quantitative axes, point identity, optional magnitude, and
-  overlap behavior.
+      overlap behavior.
 - [ ] Histograms distinguish raw observations from pre-binned data and never masquerade as an
-  ordinary categorical bar chart.
+      ordinary categorical bar chart.
 - [ ] Box plots define quartile, median, whisker, and outlier inputs and expose those meanings
-  programmatically.
+      programmatically.
 - [ ] Missing, invalid, non-finite, and out-of-domain data has explicit handling.
 - [ ] Tooltips and summaries express values, units, bins, and statistical meaning accurately.
 - [ ] Dense points remain usable through bounded highlighting or selection without color-only
-  meaning.
+      meaning.
 - [ ] Responsive, theme, accent, forced-color, reduced-motion, SSR, hydration, and type checks pass.
 - [ ] Contracts provide counterexamples and preferred alternatives for unsuitable data.
 

@@ -8,14 +8,14 @@ formatting, keyboard behavior, and stable adjacent-thumb interaction.
 **Status:** blocked
 
 - [ ] Min, max, step, orientation, formatted value, and controlled or uncontrolled state are
-  explicit and valid.
+      explicit and valid.
 - [ ] Range values cannot cross or become structurally invalid according to the chosen contract.
 - [ ] Keyboard, pointer, and touch changes produce the same bounded value semantics.
 - [ ] Labels, descriptions, current values, and validation are available to assistive technology.
 - [ ] Multiple thumbs remain distinguishable and operable at small separations.
 - [ ] Read-only, disabled, invalid, and directionality behavior passes.
 - [ ] Accent, semantic state, forced-color, reduced-motion, SSR, hydration, and public-type checks
-  pass.
+      pass.
 
 ## Accepted sources
 

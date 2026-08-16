@@ -8,12 +8,12 @@ their less precise or reduced-context uses.
 **Status:** blocked
 
 - [ ] Pie and donut charts enforce part-to-whole semantics and guide against excessive categories
-  or precision claims.
+      or precision claims.
 - [ ] Radar charts require comparable dimensions on a shared normalized interpretation and guide
-  against precise comparison, negative values, or excessive series and axes.
+      against precise comparison, negative values, or excessive series and axes.
 - [ ] Heatmaps expose row, column, value, scale, missing-cell, and color-independent meaning.
 - [ ] Sparklines retain an accessible label, summary, range, and trend meaning despite reduced
-  chrome.
+      chrome.
 - [ ] Labels, legends, tooltips, patterns or marks, and structured alternatives remain available.
 - [ ] Responsive sizing avoids illegible labels and defines compact fallback behavior.
 - [ ] Theme, semantic color, forced-color, reduced-motion, SSR, hydration, types, and contracts pass.

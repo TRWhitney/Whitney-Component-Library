@@ -23,10 +23,7 @@ const LIGHT_TEXT = parseHexUnchecked('#f2f6f8');
 const BLACK = parseHexUnchecked('#000000');
 const WHITE = parseHexUnchecked('#ffffff');
 
-export function deriveAccentRoles(
-  accent: AccentColor,
-  appearance: 'light' | 'dark',
-): AccentRoles {
+export function deriveAccentRoles(accent: AccentColor, appearance: 'light' | 'dark'): AccentRoles {
   const parsedAccent = parseHexColor(accent);
   const surfaces = appearance === 'light' ? LIGHT_SURFACES : DARK_SURFACES;
   const themeText = appearance === 'light' ? DARK_TEXT : LIGHT_TEXT;
@@ -37,9 +34,7 @@ export function deriveAccentRoles(
   const guaranteedContrast =
     contrastRatio(parsedAccent, BLACK) >= contrastRatio(parsedAccent, WHITE) ? BLACK : WHITE;
   const contrast =
-    contrastRatio(parsedAccent, preferredContrast) >= 4.5
-      ? preferredContrast
-      : guaranteedContrast;
+    contrastRatio(parsedAccent, preferredContrast) >= 4.5 ? preferredContrast : guaranteedContrast;
 
   return {
     accent: accent.toLowerCase() as AccentColor,
@@ -79,9 +74,7 @@ function contrastRatio(first: Rgb, second: Rgb): number {
 function relativeLuminance(color: Rgb): number {
   const [red, green, blue] = [color.red, color.green, color.blue].map((channel) => {
     const normalized = channel / 255;
-    return normalized <= 0.04045
-      ? normalized / 12.92
-      : ((normalized + 0.055) / 1.055) ** 2.4;
+    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
   });
 
   return 0.2126 * (red ?? 0) + 0.7152 * (green ?? 0) + 0.0722 * (blue ?? 0);

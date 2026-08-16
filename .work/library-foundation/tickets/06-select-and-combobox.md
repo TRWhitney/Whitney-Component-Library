@@ -9,17 +9,17 @@ static, dynamic, filterable, and asynchronous option behavior without exposing t
 **Status:** blocked
 
 - [ ] Contracts distinguish bounded selection from editable autocomplete and direct agents to the
-  simpler control whenever appropriate.
+      simpler control whenever appropriate.
 - [ ] Labeling, descriptions, validation, required, disabled, read-only, loading, empty, and error
-  behavior is defined.
+      behavior is defined.
 - [ ] Keyboard focus, typeahead, filtering, selection, dismissal, and focus restoration pass.
 - [ ] Static, dynamic, and asynchronous collections preserve stable keys and selected values.
 - [ ] Controlled and uncontrolled input and selection state cannot produce contradictory public
-  combinations.
+      combinations.
 - [ ] Overlay placement and compact reflow remain reachable without viewport overflow.
 - [ ] Form values and reset behavior are deterministic.
 - [ ] Pointer, touch, keyboard, screen-reader, locale, directionality, SSR, hydration, and type
-  checks pass.
+      checks pass.
 
 ## Accepted sources
 

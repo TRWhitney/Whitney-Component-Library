@@ -9,18 +9,18 @@ contracts, four slices, and quality gates are ready for Whitney's explicit compa
 
 - [ ] Every preceding ticket is complete with linked, reproducible completion evidence.
 - [ ] Every accepted public export exists, is documented by one canonical contract, and appears in
-  generated human guidance, manifest, and agent index without drift.
+      generated human guidance, manifest, and agent index without drift.
 - [ ] All four integration slices consume only the packed public API and no external substitute
-  component.
+      component.
 - [ ] No unresolved public API, visual, behavior, accessibility, composition, package,
-  compatibility, or performance decision remains.
+      compatibility, or performance decision remains.
 - [ ] Prerelease migration notes account for every breaking `0.x` change that affects the stable
-  public surface.
+      public surface.
 - [ ] The stable semantic-versioning boundary and default package tag are prepared but not applied
-  without explicit authorization.
+      without explicit authorization.
 - [ ] The evidence explicitly excludes agent-output evaluation and does not imply it was performed.
 - [ ] Whitney receives the stable-candidate evidence and explicitly accepts or returns the work to
-  the earliest responsible planning or implementation ticket.
+      the earliest responsible planning or implementation ticket.
 
 ## Accepted sources
 

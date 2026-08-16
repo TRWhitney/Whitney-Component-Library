@@ -12,9 +12,10 @@ import {
 
 describe('canonical component contracts', () => {
   it('derives human and machine guidance from the provider contract', () => {
-    const contracts = validateComponentContracts([appearanceProviderContract], [
-      'AppearanceProvider',
-    ]);
+    const contracts = validateComponentContracts(
+      [appearanceProviderContract],
+      ['AppearanceProvider'],
+    );
 
     expect(toComponentManifest(contracts)).toMatchObject({
       schemaVersion: 1,
@@ -25,9 +26,7 @@ describe('canonical component contracts', () => {
     );
     expect(
       renderContractDocumentation(appearanceProviderContract, 'component-library-under-test'),
-    ).toContain(
-      '## Do not use for',
-    );
+    ).toContain('## Do not use for');
   });
 
   it('rejects a contract with missing required guidance', () => {
@@ -98,10 +97,7 @@ describe('canonical component contracts', () => {
       name: 'ApplicationAppearanceProvider',
     } satisfies ComponentContract;
     expect(() =>
-      validateComponentContracts(
-        [appearanceProviderContract, duplicate],
-        ['AppearanceProvider'],
-      ),
+      validateComponentContracts([appearanceProviderContract, duplicate], ['AppearanceProvider']),
     ).toThrow(/AppearanceProvider.*more than one/i);
   });
 

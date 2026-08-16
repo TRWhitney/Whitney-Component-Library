@@ -9,18 +9,18 @@ navigation, sorting, expansion, selection, and stable data-state behavior.
 **Status:** blocked
 
 - [ ] Tables support typed columns, headers, rows, sorting, row selection, empty/loading/error
-  states, and responsive overflow without implying spreadsheet editing.
+      states, and responsive overflow without implying spreadsheet editing.
 - [ ] Trees support hierarchy, expansion, selection where enabled, stable keys, and focus recovery
-  after dynamic changes.
+      after dynamic changes.
 - [ ] Search and filter controls produce explicit query state and applied-filter summaries that can
-  coordinate with collections without owning data fetching.
+      coordinate with collections without owning data fetching.
 - [ ] Keyboard interaction, focus persistence, selection versus activation, and embedded row
-  actions are unambiguous.
+      actions are unambiguous.
 - [ ] Dense content remains legible in light, dark, compact, forced-color, and zoomed layouts.
 - [ ] Async updates preserve announcements and do not reset user context unnecessarily.
 - [ ] SSR, hydration, localization, directionality, public types, and canonical contracts pass.
 - [ ] Virtualization remains an internal option or later expansion and does not leak into ordinary
-  collection APIs.
+      collection APIs.
 
 ## Accepted sources
 

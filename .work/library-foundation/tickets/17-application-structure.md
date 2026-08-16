@@ -9,13 +9,13 @@ layout, navigation, actions, identity, status, and responsive regions without ow
 **Status:** blocked
 
 - [ ] Split views provide bounded pane sizing, minimums, collapse behavior, keyboard resizing, and
-  responsive fallback.
+      responsive fallback.
 - [ ] Application shell provides explicit navigation, primary workspace, utility, and transient
-  feedback regions without an arbitrary slot free-for-all.
+      feedback regions without an arbitrary slot free-for-all.
 - [ ] Workspace/page headers coordinate identity, status, breadcrumbs, and actions while keeping
-  their semantics distinct.
+      their semantics distinct.
 - [ ] Route uses flexible meaningful space without crossing labels, duplicating status, or adding
-  endpoint halos.
+      endpoint halos.
 - [ ] Compact reflow preserves region ownership and does not insert arbitrary dividers.
 - [ ] Focus order remains coherent as panes collapse, resize, or move.
 - [ ] Theme, accent, directionality, zoom, reduced motion, SSR, hydration, and type checks pass.

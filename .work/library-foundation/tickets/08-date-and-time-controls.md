@@ -9,14 +9,14 @@ internationalized segmented entry and calendar selection.
 **Status:** blocked
 
 - [ ] Public value types distinguish calendar dates, times, and ranges without leaking private
-  React Aria types.
+      React Aria types.
 - [ ] Locale, calendar, time zone where applicable, formatting, and directionality are explicit.
 - [ ] Segment keyboard editing and pointer or touch selection remain synchronized.
 - [ ] Calendar overlays own focus, dismissal, unavailable dates, min/max bounds, and range meaning.
 - [ ] Labeling, descriptions, validation, required, read-only, disabled, and form behavior pass.
 - [ ] Server and client locale agreement produces deterministic hydration.
 - [ ] Contracts distinguish direct date/time entry from picker use and warn against unnecessary
-  calendar interaction.
+      calendar interaction.
 - [ ] Theme, compact layout, forced-color, reduced-motion, SSR, hydration, and type checks pass.
 
 ## Accepted sources

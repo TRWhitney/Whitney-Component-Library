@@ -11,21 +11,21 @@ validating, reviewing, executing, and monitoring an operation.
 **Status:** blocked
 
 - [ ] The construct owns identity/status Route, configuration, review, stages, actions, progress,
-  and responsive configuration/status relationships through a bounded public composition API.
+      and responsive configuration/status relationships through a bounded public composition API.
 - [ ] Ready, invalid, disabled, review, running, success, warning, and failure states are coherent
-  and do not produce layout shifts.
+      and do not produce layout shifts.
 - [ ] Starting work produces the accepted one-shot momentum while active-stage motion persists only
-  for the running duration.
+      for the running duration.
 - [ ] Semantic status remains independent from accent and meets contrast requirements.
 - [ ] Wide and compact modes preserve wrapper-owned atmosphere, opaque panel separation, no
-  arbitrary divider, and no overflow.
+      arbitrary divider, and no overflow.
 - [ ] The accepted prototype's profile-selection, review-dialog, validation, and running flows are
-  reproduced through public components rather than copied application markup.
+      reproduced through public components rather than copied application markup.
 - [ ] A clean packed-package fixture implements the slice with no private import or external
-  substitute component.
+      substitute component.
 - [ ] Contracts guide agents to the higher-level construct when its use case matches.
 - [ ] Behavior, accessibility, theme, browser, SSR, hydration, public type, and generated-guidance
-  checks pass.
+      checks pass.
 
 ## Accepted sources
 

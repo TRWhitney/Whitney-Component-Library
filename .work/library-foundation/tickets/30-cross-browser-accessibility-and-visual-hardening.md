@@ -8,18 +8,18 @@ assistive-technology, appearance, responsive, and motion matrix after the catalo
 **Status:** blocked
 
 - [ ] Chromium, Firefox, and WebKit pass representative behavior across every public family under
-  the fixed Baseline 2023 contract.
+      the fixed Baseline 2023 contract.
 - [ ] Focused screen-reader exercises cover compound fields, select/combobox, overlays, collections,
-  navigation, charts, Markdown editing, and all four higher-level constructs.
+      navigation, charts, Markdown editing, and all four higher-level constructs.
 - [ ] Keyboard-only and touch flows complete every supported slice without an inaccessible
-  substitute path.
+      substitute path.
 - [ ] Light, dark, multiple accents, compact/wide, zoom, forced-color, reduced-motion, loading,
-  empty, partial, error, pending, disabled, and read-only states pass documented checks.
+      empty, partial, error, pending, disabled, and read-only states pass documented checks.
 - [ ] Visual comparison catches unintended drift in binding visual relationships while allowing
-  documented flexible constants.
+      documented flexible constants.
 - [ ] Semantic status contrast and non-color meaning pass across all applicable components.
 - [ ] No accepted responsive layout clips, overflows, loses focus, or introduces arbitrary dividers
-  and decorative hard stops.
+      and decorative hard stops.
 - [ ] Findings are fixed at the owning component seam and do not become test-only exceptions.
 
 ## Accepted sources

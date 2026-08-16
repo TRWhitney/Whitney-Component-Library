@@ -9,11 +9,11 @@ placement behavior that complements rather than duplicates inline alerts and sta
 **Status:** blocked
 
 - [ ] Skeletons preserve the eventual region's approximate layout and are hidden appropriately
-  from assistive technology.
+      from assistive technology.
 - [ ] Empty states distinguish no data, no results, and unavailable content and support one bounded
-  recovery action where appropriate.
+      recovery action where appropriate.
 - [ ] Notifications have typed semantic tone, title/content constraints, dismissal, timeout, pause,
-  queuing, and maximum-visible behavior.
+      queuing, and maximum-visible behavior.
 - [ ] Urgent and non-urgent announcements use appropriate live-region behavior.
 - [ ] Notification timing never creates the only path to recover or inspect important information.
 - [ ] Focus is not stolen when notifications arrive, and keyboard dismissal remains available.

@@ -137,9 +137,7 @@ export function validateComponentContracts(
   return contracts;
 }
 
-export function toComponentManifest(
-  contracts: readonly ComponentContract[],
-): ComponentManifest {
+export function toComponentManifest(contracts: readonly ComponentContract[]): ComponentManifest {
   return {schemaVersion: 1, exports: contracts};
 }
 

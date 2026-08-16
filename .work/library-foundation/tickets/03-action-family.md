@@ -10,11 +10,11 @@ clear command, navigation, and persistent-selection semantics.
 
 - [ ] Command buttons and navigation links cannot be confused through a polymorphic escape hatch.
 - [ ] Icon-only actions require an accessible name and provide consistent tooltip guidance where
-  appropriate.
+      appropriate.
 - [ ] Toggle actions expose pressed state distinctly from ordinary activation and disabled state.
 - [ ] Button groups and toolbars own applicable grouping and keyboard-navigation semantics.
 - [ ] Hover, focus, press, pending, disabled, and reduced-motion behavior follows the visual
-  contract without layout movement or adjacent overlap.
+      contract without layout movement or adjacent overlap.
 - [ ] Public APIs translate rather than extend React Aria prop types.
 - [ ] Form submission and reset behavior remains native and explicit.
 - [ ] Contracts direct agents among button, link, toggle, group, and toolbar alternatives.

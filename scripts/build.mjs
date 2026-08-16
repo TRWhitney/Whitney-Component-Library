@@ -19,7 +19,10 @@ execFileSync(
   {cwd: projectRoot, stdio: 'inherit'},
 );
 
-await copyFile(resolve(projectRoot, 'src', 'styles.css'), resolve(distributionDirectory, 'styles.css'));
+await copyFile(
+  resolve(projectRoot, 'src', 'styles.css'),
+  resolve(distributionDirectory, 'styles.css'),
+);
 
 const contractModule = await import(
   pathToFileURL(resolve(distributionDirectory, 'contracts', 'index.js')).href
@@ -41,9 +44,7 @@ await writeFile(
 );
 
 await mkdir(documentationDirectory, {recursive: true});
-const expectedDocumentationNames = contracts.map(
-  (contract) => `${toKebabCase(contract.name)}.md`,
-);
+const expectedDocumentationNames = contracts.map((contract) => `${toKebabCase(contract.name)}.md`);
 const existingDocumentationNames = await readdir(documentationDirectory);
 const unexpectedDocumentationNames = findUnexpectedGeneratedDocumentation(
   existingDocumentationNames,
@@ -62,10 +63,7 @@ if (!checkGenerated) {
   );
 }
 for (const contract of contracts) {
-  const documentationPath = resolve(
-    documentationDirectory,
-    `${toKebabCase(contract.name)}.md`,
-  );
+  const documentationPath = resolve(documentationDirectory, `${toKebabCase(contract.name)}.md`);
   const generatedDocumentation = contractModule.renderContractDocumentation(
     contract,
     packageJson.name,

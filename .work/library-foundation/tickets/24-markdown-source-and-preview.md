@@ -10,15 +10,15 @@ shared field state, deterministic rendering, and a private editor engine.
 
 - [ ] Markdown text is the only canonical public value in controlled and uncontrolled use.
 - [ ] Source editing preserves selection, undo/redo, clipboard behavior, form integration, and
-  invalid intermediate content.
+      invalid intermediate content.
 - [ ] Read-only preview safely renders the accepted built-in syntax with raw HTML disabled by
-  default.
+      default.
 - [ ] Required, invalid, read-only, disabled, loading, and collaborative-lock states use shared
-  field conventions.
+      field conventions.
 - [ ] Labels, descriptions, validation, cursor context, and mode are programmatically meaningful.
 - [ ] The editor engine and its document/state types do not appear in public declarations.
 - [ ] Large-document server rendering, hydration, theme, forced-color, type, and basic
-  responsiveness checks pass.
+      responsiveness checks pass.
 - [ ] Ordinary component bundles do not include editor-engine JavaScript.
 
 ## Accepted sources

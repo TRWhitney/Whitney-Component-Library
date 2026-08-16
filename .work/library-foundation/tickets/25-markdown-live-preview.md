@@ -8,17 +8,17 @@ markup around the active cursor or selection while preserving a stable Markdown 
 **Status:** blocked
 
 - [ ] Headings, emphasis, links, images, lists, task lists, blockquotes, fenced code, tables,
-  horizontal rules, footnotes, and wiki links render in place outside the active edit context.
+      horizontal rules, footnotes, and wiki links render in place outside the active edit context.
 - [ ] Moving the cursor or changing selection reveals only the syntax needed to edit the active
-  construct without causing disorienting scroll or layout jumps.
+      construct without causing disorienting scroll or layout jumps.
 - [ ] Typing, deletion, multiline selection, composition input, undo/redo, and clipboard actions
-  preserve a valid canonical Markdown value.
+      preserve a valid canonical Markdown value.
 - [ ] Live Preview, source, and read-only mode transitions preserve value and a reasonable selection
-  or focus location.
+      or focus location.
 - [ ] Syntax and rendered meaning remain available to screen-reader users without duplicate noisy
-  announcements.
+      announcements.
 - [ ] Tables, code blocks, long lines, bidirectional text, zoom, and compact containers remain
-  editable and reachable.
+      editable and reachable.
 - [ ] Theme, accent, forced-color, reduced-motion, SSR, hydration, types, and contracts pass.
 - [ ] Representative large documents meet a recorded interaction-responsiveness budget.
 

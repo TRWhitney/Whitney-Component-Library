@@ -10,15 +10,15 @@ composition layer across every accepted named chart.
 
 - [ ] Pointer and keyboard tooltips expose the same series, category, value, and unit information.
 - [ ] Highlighting, legend toggling, and point/category selection remain available without color-only
-  state.
+      state.
 - [ ] Pan, zoom, and brush are enabled only for meaningful chart domains and provide keyboard and
-  reset paths.
+      reset paths.
 - [ ] Explicit shared state coordinates compatible charts without hidden global coupling.
 - [ ] Interactive marks have stable focus order and meaningful accessible names at representative
-  data sizes.
+      data sizes.
 - [ ] Data transitions communicate change, never loop idly, and settle under reduced motion.
 - [ ] The advanced API composes compatible series, scales, annotations, and coordinated views while
-  keeping renderer objects private.
+      keeping renderer objects private.
 - [ ] Structured data alternatives update with filters and selection.
 - [ ] Representative data workloads meet an explicit recorded responsiveness budget.
 

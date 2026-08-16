@@ -3,8 +3,8 @@
 @layer wcl.theme {
   [data-wcl-provider] {
     --wcl-canvas: #e9edef;
-    --wcl-surface: #ffffff;
-    --wcl-surface-raised: #ffffff;
+    --wcl-surface: #fff;
+    --wcl-surface-raised: #fff;
     --wcl-surface-subtle: #edf1f3;
     --wcl-text: #152027;
     --wcl-text-muted: #69767f;
@@ -20,8 +20,8 @@
     --wcl-control-radius: 8px;
     --wcl-space: 8px;
     --wcl-shadow: 0 18px 48px rgb(23 32 39 / 11%);
-    --wcl-font-body: "IBM Plex Sans", Inter, ui-sans-serif, system-ui, sans-serif;
-    --wcl-font-utility: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+    --wcl-font-body: 'IBM Plex Sans', inter, ui-sans-serif, system-ui, sans-serif;
+    --wcl-font-utility: 'IBM Plex Mono', 'SFMono-Regular', consolas, monospace;
     --wcl-motion-duration: 150ms;
     --wcl-motion-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
 
@@ -48,6 +48,7 @@
     color-scheme: dark;
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
   @layer wcl.theme {
     [data-wcl-provider] {

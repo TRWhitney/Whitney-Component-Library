@@ -9,12 +9,12 @@ scroll-region primitives that express the accepted spatial grammar without arbit
 
 - [ ] Each primitive has a narrow typed API and complete canonical contract.
 - [ ] Spacing and responsive choices come from bounded semantic options rather than arbitrary
-  consumer token or class injection.
+      consumer token or class injection.
 - [ ] Adjacent equivalent content can maintain consistent dimensions and alignment.
 - [ ] Surfaces and sections preserve rounded containment, density, and continuity rules.
 - [ ] Scroll regions preserve keyboard access, visible focus, and content reachability.
 - [ ] Light, dark, accent, compact, wide, forced-color, and reduced-motion checks pass where
-  applicable.
+      applicable.
 - [ ] Server output and hydration are deterministic under both supported React majors.
 - [ ] Focused examples compile and demonstrate appropriate and inappropriate composition.
 

@@ -13,7 +13,7 @@ describe('browser package safety', () => {
     ["import {execFile} from 'child_process';", 'child_process'],
     ["export {promisify} from 'util';", 'util'],
     ["const module = await import('module');", 'module'],
-    ["const module = await import(`node:module`);", 'node:module'],
+    ['const module = await import(`node:module`);', 'node:module'],
     ["const fs = await import('node:fs', {with: {type: 'json'}});", 'node:fs'],
     ['const value = process.env.VALUE;', 'process'],
     ['const runtime = process;', 'process'],
@@ -37,9 +37,7 @@ describe('browser package safety', () => {
   });
 
   it('detects Node imports with comments before their specifiers', () => {
-    expect(findNodeOnlyReferences("import /* bundler hint */ 'node:fs';")).toContain(
-      'node:fs',
-    );
+    expect(findNodeOnlyReferences("import /* bundler hint */ 'node:fs';")).toContain('node:fs');
   });
 
   it.each([
@@ -52,7 +50,9 @@ describe('browser package safety', () => {
 
   it('does not reject ordinary browser ESM', () => {
     expect(
-      findNodeOnlyReferences("import {jsx} from 'react/jsx-runtime'; export const value = jsx('p', {});"),
+      findNodeOnlyReferences(
+        "import {jsx} from 'react/jsx-runtime'; export const value = jsx('p', {});",
+      ),
     ).toEqual([]);
   });
 
