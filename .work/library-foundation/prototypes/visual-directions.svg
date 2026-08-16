@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#172027" flood-opacity="0.09"/>
+    </filter>
+    <style>
+      .board-title { font: 700 34px Arial, sans-serif; fill: #11181d; letter-spacing: -0.6px; }
+      .board-copy { font: 400 16px Arial, sans-serif; fill: #59646b; }
+      .kicker { font: 700 11px Arial, sans-serif; letter-spacing: 1.6px; }
+      .title { font: 650 25px Arial, sans-serif; letter-spacing: -0.35px; }
+      .body { font: 400 14px Arial, sans-serif; }
+      .small { font: 500 12px Arial, sans-serif; }
+      .label { font: 700 11px Arial, sans-serif; letter-spacing: 0.75px; }
+      .button { font: 650 13px Arial, sans-serif; }
+      .mono { font: 500 11px "Courier New", monospace; letter-spacing: 0.55px; }
+      .caption { font: 400 12px Arial, sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1200" fill="#e9edef"/>
+  <text x="38" y="54" class="board-title">Visual direction study</text>
+  <text x="38" y="84" class="board-copy">One component language, tested against the same simulator workflow. Accent shown in blue, green, and orange only to make propagation visible.</text>
+  <line x1="38" y1="112" x2="1762" y2="112" stroke="#c4ccd1"/>
+
+  <!-- A: Calibrated instrument -->
+  <g transform="translate(36 148)">
+    <rect width="552" height="1008" rx="8" fill="#f4f6f7" stroke="#c8d0d5" filter="url(#shadow)"/>
+    <rect width="8" height="1008" rx="4" fill="#2474ff"/>
+    <text x="34" y="42" class="kicker" fill="#2474ff">A · CALIBRATED INSTRUMENT</text>
+    <text x="34" y="78" class="title" fill="#152027">Precision without severity</text>
+    <text x="34" y="105" class="body" fill="#69767f">Dense, aligned, and explicit. Controls feel measured.</text>
+
+    <g transform="translate(28 136)">
+      <rect width="496" height="520" rx="4" fill="#ffffff" stroke="#c8d0d5"/>
+      <rect x="0" y="0" width="496" height="44" rx="4" fill="#edf1f3"/>
+      <line x1="0" y1="44" x2="496" y2="44" stroke="#c8d0d5"/>
+      <circle cx="22" cy="22" r="5" fill="#2474ff"/>
+      <text x="38" y="27" class="mono" fill="#445159">RUN / 0284</text>
+      <rect x="394" y="12" width="84" height="20" rx="2" fill="#dce8ff"/>
+      <text x="408" y="26" class="label" fill="#1556c9">STABLE</text>
+
+      <text x="22" y="86" class="label" fill="#69767f">THERMAL ENVELOPE</text>
+      <text x="22" y="119" class="title" fill="#152027">North chamber</text>
+      <text x="22" y="145" class="body" fill="#69767f">Evaluate the 18-minute ramp profile.</text>
+
+      <text x="22" y="187" class="label" fill="#445159">SOLVER</text>
+      <rect x="22" y="198" width="220" height="42" rx="3" fill="#ffffff" stroke="#9eabb3"/>
+      <text x="36" y="224" class="body" fill="#152027">Adaptive mesh</text>
+      <path d="M218 215 l7 7 7-7" fill="none" stroke="#445159" stroke-width="1.5"/>
+
+      <text x="258" y="187" class="label" fill="#445159">TOLERANCE</text>
+      <rect x="258" y="198" width="216" height="42" rx="3" fill="#ffffff" stroke="#9eabb3"/>
+      <text x="272" y="224" class="body" fill="#152027">0.0025</text>
+      <text x="432" y="224" class="mono" fill="#69767f">K</text>
+
+      <text x="22" y="282" class="label" fill="#445159">PROFILE</text>
+      <g transform="translate(22 294)">
+        <rect width="452" height="38" rx="3" fill="#edf1f3" stroke="#c8d0d5"/>
+        <rect x="2" y="2" width="148" height="34" rx="2" fill="#ffffff" stroke="#2474ff"/>
+        <text x="48" y="24" class="button" fill="#1556c9">Conservative</text>
+        <text x="190" y="24" class="button" fill="#59666e">Balanced</text>
+        <text x="352" y="24" class="button" fill="#59666e">Fast</text>
+      </g>
+
+      <line x1="22" y1="362" x2="474" y2="362" stroke="#d9dfe2"/>
+      <circle cx="31" cy="394" r="7" fill="#2474ff"/>
+      <line x1="31" y1="401" x2="31" y2="472" stroke="#a9c5ff" stroke-width="2"/>
+      <circle cx="31" cy="433" r="5" fill="#ffffff" stroke="#2474ff" stroke-width="2"/>
+      <circle cx="31" cy="472" r="5" fill="#ffffff" stroke="#9eabb3" stroke-width="2"/>
+      <text x="52" y="399" class="small" fill="#152027">Geometry validated</text>
+      <text x="52" y="419" class="caption" fill="#69767f">12 surfaces · no open edges</text>
+      <text x="52" y="438" class="small" fill="#152027">Boundary pass</text>
+      <text x="52" y="458" class="caption" fill="#69767f">4 of 6 conditions resolved</text>
+      <text x="52" y="477" class="small" fill="#69767f">Solve pending</text>
+
+      <rect x="321" y="458" width="153" height="40" rx="3" fill="#2474ff"/>
+      <text x="357" y="483" class="button" fill="#ffffff">Run profile</text>
+    </g>
+
+    <g transform="translate(28 684)">
+      <text x="0" y="16" class="label" fill="#445159">SYSTEM</text>
+      <text x="0" y="45" class="body" fill="#152027">IBM Plex Sans + Plex Mono</text>
+      <text x="0" y="69" class="caption" fill="#69767f">4px geometry · 4/8px spacing rhythm · visible rules</text>
+      <text x="0" y="103" class="label" fill="#445159">COLOR</text>
+      <g transform="translate(0 114)">
+        <rect width="52" height="28" rx="2" fill="#f4f6f7" stroke="#c8d0d5"/><rect x="60" width="52" height="28" rx="2" fill="#ffffff" stroke="#c8d0d5"/><rect x="120" width="52" height="28" rx="2" fill="#152027"/><rect x="180" width="52" height="28" rx="2" fill="#69767f"/><rect x="240" width="52" height="28" rx="2" fill="#c8d0d5"/><rect x="300" width="52" height="28" rx="2" fill="#2474ff"/>
+      </g>
+      <text x="0" y="181" class="label" fill="#445159">MOTION</text>
+      <text x="0" y="207" class="caption" fill="#69767f">120ms, direct state changes; progress moves on measured rails.</text>
+      <text x="0" y="248" class="label" fill="#2474ff">SIGNATURE · ACCENT CALIBRATION RAIL</text>
+      <text x="0" y="274" class="caption" fill="#69767f">Accent marks focus, selection, progress, and the active edge.</text>
+    </g>
+  </g>
+
+  <!-- B: Quiet utility -->
+  <g transform="translate(624 148)">
+    <rect width="552" height="1008" rx="18" fill="#fbfaf7" stroke="#dedcd4" filter="url(#shadow)"/>
+    <text x="34" y="42" class="kicker" fill="#006e5f">B · QUIET UTILITY</text>
+    <text x="34" y="78" class="title" fill="#272823">Clarity with breathing room</text>
+    <text x="34" y="105" class="body" fill="#74756d">Calm surfaces, forgiving rhythm, gentle hierarchy.</text>
+
+    <g transform="translate(28 136)">
+      <rect width="496" height="520" rx="14" fill="#f2f0ea"/>
+      <text x="22" y="37" class="small" fill="#74756d">Run 0284</text>
+      <rect x="398" y="19" width="76" height="28" rx="14" fill="#d6ebe6"/>
+      <circle cx="414" cy="33" r="4" fill="#006e5f"/>
+      <text x="425" y="37" class="small" fill="#00584c">Stable</text>
+
+      <text x="22" y="91" class="label" fill="#74756d">THERMAL ENVELOPE</text>
+      <text x="22" y="126" class="title" fill="#272823">North chamber</text>
+      <text x="22" y="153" class="body" fill="#74756d">Evaluate the 18-minute ramp profile.</text>
+
+      <text x="22" y="197" class="small" fill="#4f514b">Solver</text>
+      <rect x="22" y="208" width="220" height="44" rx="9" fill="#fbfaf7" stroke="#dedcd4"/>
+      <text x="37" y="235" class="body" fill="#272823">Adaptive mesh</text>
+      <path d="M217 225 l7 7 7-7" fill="none" stroke="#74756d" stroke-width="1.5"/>
+
+      <text x="258" y="197" class="small" fill="#4f514b">Tolerance</text>
+      <rect x="258" y="208" width="216" height="44" rx="9" fill="#fbfaf7" stroke="#dedcd4"/>
+      <text x="273" y="235" class="body" fill="#272823">0.0025 K</text>
+
+      <text x="22" y="296" class="small" fill="#4f514b">Profile</text>
+      <g transform="translate(22 307)">
+        <rect width="452" height="42" rx="11" fill="#e8e6df"/>
+        <rect x="3" y="3" width="146" height="36" rx="9" fill="#fbfaf7"/>
+        <text x="44" y="26" class="button" fill="#006e5f">Conservative</text>
+        <text x="191" y="26" class="button" fill="#74756d">Balanced</text>
+        <text x="352" y="26" class="button" fill="#74756d">Fast</text>
+      </g>
+
+      <rect x="22" y="380" width="452" height="76" rx="10" fill="#fbfaf7"/>
+      <circle cx="45" cy="403" r="6" fill="#006e5f"/>
+      <text x="63" y="408" class="small" fill="#272823">Ready to solve</text>
+      <text x="45" y="434" class="caption" fill="#74756d">Geometry is valid. Four boundary conditions are resolved.</text>
+
+      <text x="22" y="493" class="button" fill="#006e5f">Review conditions</text>
+      <rect x="327" y="468" width="147" height="42" rx="10" fill="#006e5f"/>
+      <text x="365" y="494" class="button" fill="#ffffff">Run profile</text>
+    </g>
+
+    <g transform="translate(28 684)">
+      <text x="0" y="16" class="label" fill="#4f514b">SYSTEM</text>
+      <text x="0" y="45" class="body" fill="#272823">Source Sans 3 + tabular numerals</text>
+      <text x="0" y="69" class="caption" fill="#74756d">8–14px geometry · 4/8px rhythm · layered fields</text>
+      <text x="0" y="103" class="label" fill="#4f514b">COLOR</text>
+      <g transform="translate(0 114)">
+        <rect width="52" height="28" rx="7" fill="#fbfaf7" stroke="#dedcd4"/><rect x="60" width="52" height="28" rx="7" fill="#f2f0ea"/><rect x="120" width="52" height="28" rx="7" fill="#272823"/><rect x="180" width="52" height="28" rx="7" fill="#74756d"/><rect x="240" width="52" height="28" rx="7" fill="#dedcd4"/><rect x="300" width="52" height="28" rx="7" fill="#006e5f"/>
+      </g>
+      <text x="0" y="181" class="label" fill="#4f514b">MOTION</text>
+      <text x="0" y="207" class="caption" fill="#74756d">160ms ease-out; surfaces settle without overshoot.</text>
+      <text x="0" y="248" class="label" fill="#006e5f">SIGNATURE · ACCENT TINTED STATE SURFACE</text>
+      <text x="0" y="274" class="caption" fill="#74756d">Accent appears as a quiet field around the current state.</text>
+    </g>
+  </g>
+
+  <!-- C: Workshop ledger -->
+  <g transform="translate(1212 148)">
+    <rect width="552" height="1008" fill="#f6f2ea" stroke="#1b1b1b" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="552" height="12" fill="#e24a2a"/>
+    <text x="28" y="50" class="kicker" fill="#e24a2a">C · WORKSHOP LEDGER</text>
+    <text x="28" y="86" class="title" fill="#1b1b1b">Constructive and legible</text>
+    <text x="28" y="113" class="body" fill="#6e675c">Strong grouping, exposed sequence, decisive controls.</text>
+
+    <g transform="translate(28 136)">
+      <rect width="496" height="520" fill="#fffcf6" stroke="#1b1b1b"/>
+      <rect width="496" height="48" fill="#1b1b1b"/>
+      <text x="18" y="30" class="mono" fill="#ffffff">SIM / THERMAL / 0284</text>
+      <rect x="398" y="12" width="80" height="24" fill="#e24a2a"/>
+      <text x="414" y="28" class="label" fill="#ffffff">STABLE</text>
+
+      <text x="18" y="84" class="mono" fill="#e24a2a">01 / DEFINE</text>
+      <text x="18" y="119" class="title" fill="#1b1b1b">North chamber</text>
+      <line x1="18" y1="136" x2="478" y2="136" stroke="#1b1b1b"/>
+
+      <text x="18" y="169" class="label" fill="#1b1b1b">SOLVER</text>
+      <rect x="18" y="180" width="224" height="44" fill="#fffcf6" stroke="#1b1b1b"/>
+      <text x="31" y="207" class="body" fill="#1b1b1b">Adaptive mesh</text>
+      <path d="M216 197 l7 7 7-7" fill="none" stroke="#1b1b1b" stroke-width="2"/>
+
+      <text x="254" y="169" class="label" fill="#1b1b1b">TOLERANCE</text>
+      <rect x="254" y="180" width="224" height="44" fill="#fffcf6" stroke="#1b1b1b"/>
+      <text x="267" y="207" class="body" fill="#1b1b1b">0.0025 K</text>
+
+      <text x="18" y="264" class="mono" fill="#e24a2a">02 / TUNE</text>
+      <g transform="translate(18 278)">
+        <rect width="460" height="40" fill="#fffcf6" stroke="#1b1b1b"/>
+        <rect width="154" height="40" fill="#e24a2a"/>
+        <text x="34" y="25" class="button" fill="#ffffff">Conservative</text>
+        <line x1="154" y1="0" x2="154" y2="40" stroke="#1b1b1b"/>
+        <line x1="307" y1="0" x2="307" y2="40" stroke="#1b1b1b"/>
+        <text x="197" y="25" class="button" fill="#1b1b1b">Balanced</text>
+        <text x="367" y="25" class="button" fill="#1b1b1b">Fast</text>
+      </g>
+
+      <text x="18" y="361" class="mono" fill="#e24a2a">03 / VERIFY</text>
+      <line x1="18" y1="375" x2="478" y2="375" stroke="#1b1b1b"/>
+      <rect x="18" y="389" width="20" height="20" fill="#1b1b1b"/>
+      <path d="M23 399 l4 4 7-9" fill="none" stroke="#ffffff" stroke-width="2"/>
+      <text x="49" y="404" class="small" fill="#1b1b1b">Geometry validated</text>
+      <rect x="18" y="423" width="20" height="20" fill="#e24a2a"/>
+      <text x="24" y="438" class="mono" fill="#ffffff">4</text>
+      <text x="49" y="438" class="small" fill="#1b1b1b">Boundary conditions resolved</text>
+
+      <rect x="18" y="466" width="174" height="38" fill="#fffcf6" stroke="#1b1b1b"/>
+      <text x="43" y="490" class="button" fill="#1b1b1b">Review conditions</text>
+      <rect x="312" y="466" width="166" height="38" fill="#1b1b1b"/>
+      <rect x="312" y="466" width="8" height="38" fill="#e24a2a"/>
+      <text x="353" y="490" class="button" fill="#ffffff">Run profile</text>
+    </g>
+
+    <g transform="translate(28 684)">
+      <text x="0" y="16" class="label" fill="#1b1b1b">SYSTEM</text>
+      <text x="0" y="45" class="body" fill="#1b1b1b">Space Grotesk + IBM Plex Mono</text>
+      <text x="0" y="69" class="caption" fill="#6e675c">Square geometry · 6/12px rhythm · sectional rules</text>
+      <text x="0" y="103" class="label" fill="#1b1b1b">COLOR</text>
+      <g transform="translate(0 114)">
+        <rect width="52" height="28" fill="#f6f2ea" stroke="#1b1b1b"/><rect x="60" width="52" height="28" fill="#fffcf6" stroke="#1b1b1b"/><rect x="120" width="52" height="28" fill="#1b1b1b"/><rect x="180" width="52" height="28" fill="#6e675c"/><rect x="240" width="52" height="28" fill="#d2cabd"/><rect x="300" width="52" height="28" fill="#e24a2a"/>
+      </g>
+      <text x="0" y="181" class="label" fill="#1b1b1b">MOTION</text>
+      <text x="0" y="207" class="caption" fill="#6e675c">100ms snap; section completion advances in discrete steps.</text>
+      <text x="0" y="248" class="label" fill="#e24a2a">SIGNATURE · NUMBERED WORK RAIL</text>
+      <text x="0" y="274" class="caption" fill="#6e675c">Accent marks the active operation within a visible sequence.</text>
+    </g>
+  </g>
+</svg>

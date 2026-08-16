@@ -1,0 +1,61 @@
+{
+  "name": "@trwhitney/component-library",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A React component, style, and behavior library for consistent application interfaces.",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./manifest.json": "./dist/manifest.json",
+    "./agent-index.md": "./dist/agent-index.md"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "browserslist": [
+    "baseline 2023"
+  ],
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "check": "npm run typecheck && npm test && npm run check:generated && npm run typecheck:matrix",
+    "check:generated": "node ./scripts/build.mjs --check",
+    "prepack": "npm run build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck:matrix": "npm run build && node ./scripts/typecheck-matrix.mjs",
+    "verify:package": "node ./scripts/verify-package.mjs"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "dependencies": {
+    "react-aria-components": "1.20.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "16.3.2",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "jsdom": "27.0.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "typescript": "5.9.3",
+    "typescript-6": "npm:typescript@6.0.3",
+    "typescript-7": "npm:typescript@7.0.2",
+    "vite": "8.2.1",
+    "vitest": "4.1.10"
+  }
+}
