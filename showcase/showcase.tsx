@@ -15,11 +15,12 @@ import {
   Surface,
   ToggleButton,
   Toolbar,
+  type AccentColor,
   type Appearance,
 } from '../src/index.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
 
-const accent = '#2878ff';
+const defaultAccent: AccentColor = '#2878ff';
 
 interface SpecimenProps {
   readonly children: ReactNode;
@@ -40,6 +41,20 @@ function Specimen({children, description, name}: SpecimenProps) {
       </header>
       <div className="showcase-specimen-stage">{children}</div>
     </article>
+  );
+}
+
+interface ExampleProps {
+  readonly children: ReactNode;
+  readonly label: string;
+}
+
+function Example({children, label}: ExampleProps) {
+  return (
+    <figure className="showcase-example">
+      <figcaption data-showcase-example-label="">{label}</figcaption>
+      {children}
+    </figure>
   );
 }
 
@@ -177,15 +192,27 @@ function ActionSpecimens() {
         description="Issue a command with explicit emphasis, state, and native form behavior."
         name="Button"
       >
-        <InlineGroup gap="tight" wrap>
-          <Button variant="primary">Run profile</Button>
-          <Button variant="secondary">Review</Button>
-          <Button variant="quiet">Save draft</Button>
-          <Button variant="danger">Discard</Button>
-          <Button isPending pendingLabel="Running thermal profile">
-            Run profile
-          </Button>
-          <Button isDisabled>Unavailable</Button>
+        <InlineGroup gap="regular" wrap>
+          <Example label="Primary Button">
+            <Button variant="primary">Run profile</Button>
+          </Example>
+          <Example label="Secondary Button">
+            <Button variant="secondary">Review</Button>
+          </Example>
+          <Example label="Quiet Button">
+            <Button variant="quiet">Save draft</Button>
+          </Example>
+          <Example label="Danger Button">
+            <Button variant="danger">Discard</Button>
+          </Example>
+          <Example label="Pending Button">
+            <Button isPending pendingLabel="Running thermal profile">
+              Run profile
+            </Button>
+          </Example>
+          <Example label="Disabled Button">
+            <Button isDisabled>Unavailable</Button>
+          </Example>
         </InlineGroup>
       </Specimen>
 
@@ -193,16 +220,22 @@ function ActionSpecimens() {
         description="Present a compact icon-only command with one required accessible label and matching tooltip."
         name="IconButton"
       >
-        <InlineGroup gap="tight">
-          <IconButton label="Add condition">
-            <AddIcon />
-          </IconButton>
-          <IconButton label="Advance to result" variant="quiet">
-            <ArrowIcon />
-          </IconButton>
-          <IconButton isDisabled label="Add condition unavailable">
-            <AddIcon />
-          </IconButton>
+        <InlineGroup gap="regular">
+          <Example label="Secondary IconButton">
+            <IconButton label="Add condition">
+              <AddIcon />
+            </IconButton>
+          </Example>
+          <Example label="Quiet IconButton">
+            <IconButton label="Advance to result" variant="quiet">
+              <ArrowIcon />
+            </IconButton>
+          </Example>
+          <Example label="Disabled IconButton">
+            <IconButton isDisabled label="Add condition unavailable">
+              <AddIcon />
+            </IconButton>
+          </Example>
         </InlineGroup>
       </Specimen>
 
@@ -211,13 +244,19 @@ function ActionSpecimens() {
         name="Link"
       >
         <InlineGroup gap="regular" wrap>
-          <Link current="page" href="#link">
-            Component showcase
-          </Link>
-          <Link href="#toolbar">Toolbar specimen</Link>
-          <Link href="#link" isDisabled>
-            Archived guide
-          </Link>
+          <Example label="Current-page Link">
+            <Link current="page" href="#link">
+              Component showcase
+            </Link>
+          </Example>
+          <Example label="Destination Link">
+            <Link href="#toolbar">Toolbar specimen</Link>
+          </Example>
+          <Example label="Disabled Link">
+            <Link href="#link" isDisabled>
+              Archived guide
+            </Link>
+          </Example>
         </InlineGroup>
       </Specimen>
 
@@ -225,14 +264,20 @@ function ActionSpecimens() {
         description="Control a persistent binary choice whose selected state remains visible through the rail."
         name="ToggleButton"
       >
-        <InlineGroup gap="tight" wrap>
-          <ToggleButton isSelected={isPinned} onChange={setPinned}>
-            Pin result
-          </ToggleButton>
-          <ToggleButton defaultSelected={false} variant="quiet">
-            Show mesh
-          </ToggleButton>
-          <ToggleButton isDisabled>Lock scale</ToggleButton>
+        <InlineGroup gap="regular" wrap>
+          <Example label={`${isPinned ? 'Selected' : 'Unselected'} ToggleButton`}>
+            <ToggleButton isSelected={isPinned} onChange={setPinned}>
+              Pin result
+            </ToggleButton>
+          </Example>
+          <Example label="Quiet ToggleButton">
+            <ToggleButton defaultSelected={false} variant="quiet">
+              Show mesh
+            </ToggleButton>
+          </Example>
+          <Example label="Disabled ToggleButton">
+            <ToggleButton isDisabled>Lock scale</ToggleButton>
+          </Example>
         </InlineGroup>
       </Specimen>
 
@@ -240,27 +285,31 @@ function ActionSpecimens() {
         description="Keep a small set of ordinary commands adjacent while preserving every tab stop."
         name="ButtonGroup"
       >
-        <ButtonGroup equalItems label="Result commands">
-          <Button>Duplicate</Button>
-          <Button>Export</Button>
-          <IconButton label="Add result">
-            <AddIcon />
-          </IconButton>
-        </ButtonGroup>
+        <Example label="2 secondary Buttons + IconButton">
+          <ButtonGroup equalItems label="Result commands">
+            <Button>Duplicate</Button>
+            <Button>Export</Button>
+            <IconButton label="Add result">
+              <AddIcon />
+            </IconButton>
+          </ButtonGroup>
+        </Example>
       </Specimen>
 
       <Specimen
         description="Coordinate related commands with orientation-aware arrow-key navigation."
         name="Toolbar"
       >
-        <Toolbar label="Profile tools">
-          <Button variant="quiet">Undo</Button>
-          <Button variant="quiet">Redo</Button>
-          <ToggleButton defaultSelected>Snap</ToggleButton>
-          <IconButton label="Add step" variant="quiet">
-            <AddIcon />
-          </IconButton>
-        </Toolbar>
+        <Example label="2 quiet Buttons + ToggleButton + IconButton">
+          <Toolbar label="Profile tools">
+            <Button variant="quiet">Undo</Button>
+            <Button variant="quiet">Redo</Button>
+            <ToggleButton defaultSelected>Snap</ToggleButton>
+            <IconButton label="Add step" variant="quiet">
+              <AddIcon />
+            </IconButton>
+          </Toolbar>
+        </Example>
       </Specimen>
     </>
   );
@@ -268,6 +317,7 @@ function ActionSpecimens() {
 
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
+  const [accent, setAccent] = useState<AccentColor>(defaultAccent);
 
   return (
     <AppearanceProvider accent={accent} appearance={appearance}>
@@ -292,14 +342,32 @@ export function Showcase() {
         <div className="showcase-frame">
           <aside className="showcase-index">
             <div className="showcase-index-controls">
-              <span className="showcase-index-label">Appearance</span>
-              <ToggleButton
-                isSelected={appearance === 'dark'}
-                onChange={(selected) => setAppearance(selected ? 'dark' : 'light')}
-                size="compact"
-              >
-                Dark
-              </ToggleButton>
+              <div className="showcase-index-control">
+                <span className="showcase-index-label">Appearance</span>
+                <ToggleButton
+                  isSelected={appearance === 'dark'}
+                  onChange={(selected) => setAppearance(selected ? 'dark' : 'light')}
+                  size="compact"
+                >
+                  Dark
+                </ToggleButton>
+              </div>
+              <div className="showcase-index-control">
+                <label className="showcase-index-label" htmlFor="showcase-accent">
+                  Accent
+                </label>
+                <div className="showcase-accent-control">
+                  <input
+                    aria-describedby="showcase-accent-value"
+                    className="showcase-accent-input"
+                    id="showcase-accent"
+                    onChange={(event) => setAccent(event.currentTarget.value as AccentColor)}
+                    type="color"
+                    value={accent}
+                  />
+                  <code id="showcase-accent-value">{accent}</code>
+                </div>
+              </div>
             </div>
             <nav aria-label="Component catalog">
               {showcaseGroups.map((group) => (

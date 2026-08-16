@@ -15,6 +15,11 @@ ticks and the selected ToggleButton rail's curved inset treatment are corrected 
 and current repository, package, and direct Chromium, Firefox, and WebKit validation. The correction
 has clean independent intent and engineering review axes and is preserved in the current HEAD.
 Ticket 04 has not started.
+The showcase now has a validated live accent selector and explicit action-example labels.
+Independent delivery review found a stale controlled-ToggleButton caption after interaction and an
+invalid cross-engine color-swatch selector list. Both are corrected with current repository,
+showcase-build, and direct three-engine evidence. Fresh repeat intent and engineering review axes
+report no findings, and the change is preserved in the current HEAD.
 
 ## Progress
 
@@ -91,7 +96,10 @@ compares rendered specimens with the canonical component contracts so catalog dr
 repository checks. The local `AGENTS.md` requires the showcase to change with public components.
 Showcase specimen stages no longer carry an unexplained calibration tick. Selected ToggleButtons
 now use a dedicated full-width bottom rail that meets the control's rounded perimeter without
-curving upward; hover and pressed feedback remain separate from the selection rail.
+curving upward; hover and pressed feedback remain separate from the selection rail. A native color
+selector now propagates an arbitrary six-digit accent through the live showcase and displays its
+exact value. Action examples identify each rendered variant, state, or composite child makeup
+directly above the relevant control.
 
 Repository-wide quality gates now run before the existing type, test, generated-artifact, and
 compatibility checks. Prettier owns formatting for authored files, ESLint applies type-informed
@@ -202,12 +210,39 @@ See the [decision map](map.md).
   guidance already defines a rail-only selected state whose hover preserves the rail, so no
   consumer-facing documentation change is required; the showcase and this work record contain the
   complete documentation impact.
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict types, generated
+  artifacts, the TypeScript 5.9/6/7 matrix, and 118 tests after adding the showcase evaluation aids
+  and review regressions.
+  `npm run showcase:build`, `npm audit --audit-level=high`, and `git diff --check` pass. Packed-package
+  verification was not repeated because no public package source or artifact changed.
+- Fresh Chromium, Firefox, and WebKit operation focused the Accent input, changed it from `#2878ff`
+  to `#d934c3`, and confirmed the exact input value, provider custom property, and rendered primary
+  Button fill updated in every engine. Structural inspection found all 17 action example captions.
+  Dark wide control screenshots and light compact action screenshots show a visible input focus
+  ring, legible exact hex value, direct variant/component labels, orderly wrapping, and no clipping
+  or style leakage. Every 390px presentation retained zero document overflow. Temporary scripts,
+  screenshots, and build artifacts were moved to Trash.
+- Delivery review found that toggling the controlled `Pin result` example off left its caption as
+  `Selected ToggleButton`, and that combining WebKit and Mozilla color-swatch pseudo-elements could
+  invalidate their shared rule. The caption now derives from the live selected state, the vendor
+  selectors are separate, and focused interaction and static-selector regressions pass. Earlier
+  browser, repository, and review evidence is invalidated where these corrections could affect it.
+- Repeated Chromium, Firefox, and WebKit operation changes the accent to `#d934c3`, then toggles
+  `Pin result` off. Every engine reports the exact input and provider accent, the same derived
+  primary fill, `aria-pressed="false"`, an `Unselected ToggleButton` caption, 17 total captions, and
+  zero compact document overflow. Inspected dark wide control and light compact action screenshots
+  show consistent rounded native swatches, visible focus, accurate live state labeling, orderly
+  wrapping, and no clipping or style leakage. Temporary validation artifacts were moved to Trash.
+- Fresh repeat independent intent and engineering reviews examined the corrected complete change
+  from HEAD `26d9ff2` through the working tree and reported no findings. The showcase is the owning
+  human documentation surface, and no public component API or generated consumer guidance changed;
+  this status record completes the durable documentation impact.
 
 ## Continuation
 
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-The showcase selection-detail correction is delivered. Begin Ticket 04 only when Whitney explicitly
-requests the next ticket.
+The accent-selector and example-label showcase change is delivered. Begin Ticket 04 only when
+Whitney explicitly requests the next ticket.
 
 Current branch: `master`.
 

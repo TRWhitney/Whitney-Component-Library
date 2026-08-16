@@ -130,12 +130,55 @@
   }
 
   .showcase-index-controls {
+    display: grid;
+    gap: 1rem;
+    padding-block-end: 1.5rem;
+    border-block-end: 1px solid var(--wcl-border);
+  }
+
+  .showcase-index-control,
+  .showcase-accent-control {
     display: flex;
     gap: 0.75rem;
     align-items: center;
     justify-content: space-between;
-    padding-block-end: 1.5rem;
-    border-block-end: 1px solid var(--wcl-border);
+  }
+
+  .showcase-accent-control code {
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.75rem;
+  }
+
+  .showcase-accent-input {
+    inline-size: 2.125rem;
+    block-size: 2.125rem;
+    padding: 0.15rem;
+    overflow: hidden;
+    border: 1px solid var(--wcl-border-strong);
+    border-radius: var(--wcl-control-radius);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    background: var(--wcl-surface-subtle);
+    cursor: pointer;
+  }
+
+  .showcase-accent-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  .showcase-accent-input::-webkit-color-swatch {
+    border: 0;
+    border-radius: calc(var(--wcl-control-radius) - 3px);
+  }
+
+  .showcase-accent-input::-moz-color-swatch {
+    border: 0;
+    border-radius: calc(var(--wcl-control-radius) - 3px);
+  }
+
+  .showcase-accent-input:focus-visible {
+    outline-color: var(--wcl-accent-focus);
   }
 
   .showcase-index nav,
@@ -248,6 +291,25 @@
     background: var(--wcl-surface);
   }
 
+  .showcase-example {
+    display: grid;
+    gap: 0.45rem;
+    align-content: start;
+    justify-items: start;
+    min-inline-size: 0;
+    margin: 0;
+  }
+
+  .showcase-example figcaption {
+    color: var(--wcl-text-muted);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
   .showcase-measure {
     padding: 0.55rem 0.75rem;
     border-inline-start: 3px solid var(--wcl-accent-rail);
@@ -318,6 +380,10 @@
       border-block-end: 1px solid var(--wcl-border);
     }
 
+    .showcase-index-controls {
+      grid-template-columns: repeat(2, minmax(10rem, 15rem));
+    }
+
     .showcase-index nav {
       display: flex;
       gap: 1rem;
@@ -339,6 +405,10 @@
 
     .showcase-status {
       justify-items: start;
+    }
+
+    .showcase-index-controls {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .showcase-specimen {

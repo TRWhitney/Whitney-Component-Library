@@ -112,6 +112,16 @@ describe('static appearance styles', () => {
     expect(stage).not.toContain('linear-gradient');
   });
 
+  it('styles each native color swatch through an engine-valid selector', async () => {
+    const styles = await readFile('showcase/styles.css', 'utf8');
+
+    expect(styles).toMatch(/\.showcase-accent-input::-webkit-color-swatch\s*\{/);
+    expect(styles).toMatch(/\.showcase-accent-input::-moz-color-swatch\s*\{/);
+    expect(styles).not.toMatch(
+      /\.showcase-accent-input::-webkit-color-swatch\s*,\s*\.showcase-accent-input::-moz-color-swatch/,
+    );
+  });
+
   it('owns group, toolbar, link, tooltip, and forced-color action treatments', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const primaryHover = styles.match(
