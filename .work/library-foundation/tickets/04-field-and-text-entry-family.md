@@ -4,9 +4,10 @@
 field exports with stable validation layout and shared labeling conventions.
 
 **Blocked by:** [Package, Provider, and Contract Spine](01-package-provider-and-contract-spine.md),
-[Layout and Surface Primitives](02-layout-and-surface-primitives.md)
+[Layout and Surface Primitives](02-layout-and-surface-primitives.md),
+[Accent Fidelity and Support Roles](03a-accent-fidelity-and-support-roles.md)
 
-**Status:** blocked
+**Status:** ready-for-agent
 
 - [ ] Label, description, requirement, validation, and error relationships are accessible and
       deterministic.

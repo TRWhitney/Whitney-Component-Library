@@ -40,7 +40,7 @@ Link exposes a real navigation destination through native anchor semantics.
 
 ## Accessibility
 
-- Link renders a native anchor with a visible underline, recognizable link color, and focus outline.
+- Link renders a native anchor with a visible accent-bearing underline and focus outline, so neutral label color does not hide its navigation role.
 - current exposes the active destination through aria-current, and newWindow applies safe opener isolation.
 
 ## Keyboard, labeling, localization, and direction
@@ -52,12 +52,12 @@ Link exposes a real navigation destination through native anchor semantics.
 
 ## Appearance and responsive behavior
 
-- Link paints accent text and an underline without a control surface; current, hover, focus, and disabled treatments remain distinct in both appearances.
+- Link paints neutral text with an accent-bearing underline and no resting control surface; current, hover, focus, and disabled treatments remain distinct in both appearances.
 - Link remains inline with surrounding content and follows normal text wrapping at compact widths.
 
 ## Accent, forced colors, and reduced motion
 
-- Link text, focus, hover, and the stronger current-destination underline use the application accent without borrowing status colors.
+- Link text stays neutral while its resting underline, focus, hover tint, and stronger current-destination underline use exact or saturated same-hue accent structure without borrowing status colors.
 - Forced-color mode uses the system link color and focus highlight while preserving native underline and current-destination emphasis.
 - Reduced motion removes link color and underline transitions without removing any navigation state.
 

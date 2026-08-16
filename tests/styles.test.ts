@@ -19,6 +19,9 @@ describe('static appearance styles', () => {
     expect(forcedColors?.[1]).toContain('--wcl-accent: Highlight !important');
     expect(forcedColors?.[1]).toContain('--wcl-accent-contrast: HighlightText !important');
     expect(forcedColors?.[1]).toContain('--wcl-accent-fill: Highlight !important');
+    expect(forcedColors?.[1]).toContain('--wcl-accent-fill-boundary: Highlight !important');
+    expect(forcedColors?.[1]).toContain('--wcl-accent-hover-contrast: HighlightText !important');
+    expect(forcedColors?.[1]).toContain('--wcl-accent-hover-edge: Highlight !important');
     expect(forcedColors?.[1]).toContain('--wcl-accent-rail: Highlight !important');
     expect(forcedColors?.[1]).toContain('--wcl-surface: Canvas');
     expect(forcedColors?.[1]).toContain('--wcl-text: CanvasText');
@@ -74,11 +77,87 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('supports literal primary fills with a conditional surface boundary', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const primary = styles.match(
+      /:is\(\[data-wcl-button\], \[data-wcl-icon-button\], \[data-wcl-toggle-button\]\)\[data-variant='primary'\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(primary).toContain('background: var(--wcl-accent-fill)');
+    expect(primary).toContain('border-color: var(--wcl-accent-fill-boundary)');
+  });
+
+  it('selects accent roles for the provider canvas and each owned Surface variant', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const provider = styles.match(/\[data-wcl-provider\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(provider).toContain(
+      '--wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-canvas)',
+    );
+    for (const surface of ['base', 'raised', 'subtle']) {
+      const rules = styles.match(
+        new RegExp(`\\[data-wcl-surface\\]\\[data-variant='${surface}'\\]\\s*\\{([^}]*)\\}`),
+      )?.[1];
+      expect(rules).toContain(
+        `--wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-${surface})`,
+      );
+      expect(rules).toContain(`--wcl-accent-focus: var(--wcl-accent-focus-on-${surface})`);
+      expect(rules).toContain(`--wcl-accent-rail: var(--wcl-accent-rail-on-${surface})`);
+      expect(rules).toContain(`--wcl-accent-soft: var(--wcl-accent-soft-on-${surface})`);
+    }
+
+    const toolbar = styles.match(/\[data-wcl-toolbar\]\s*\{([^}]*)\}/)?.[1];
+    expect(toolbar).toContain(
+      '--wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-subtle)',
+    );
+    expect(toolbar).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-subtle)');
+    expect(toolbar).toContain(
+      '--wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle)',
+    );
+    expect(toolbar).toContain('--wcl-accent-muted: var(--wcl-accent-muted-on-subtle)');
+    expect(toolbar).toContain('--wcl-accent-rail: var(--wcl-accent-rail-on-subtle)');
+    expect(toolbar).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
+
+    const scrollRegion = styles.match(/\[data-wcl-scroll-region\]\s*\{([^}]*)\}/)?.[1];
+    expect(scrollRegion).toContain(
+      '--wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-subtle)',
+    );
+    expect(scrollRegion).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-subtle)');
+    expect(scrollRegion).toContain(
+      '--wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle)',
+    );
+    expect(scrollRegion).toContain('--wcl-accent-muted: var(--wcl-accent-muted-on-subtle)');
+    expect(scrollRegion).toContain('--wcl-accent-rail: var(--wcl-accent-rail-on-subtle)');
+    expect(scrollRegion).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
+  });
+
+  it('keeps resting content neutral and uses accent roles for interaction structure', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const hover = styles.match(
+      /:is\(\[data-wcl-button\], \[data-wcl-icon-button\], \[data-wcl-toggle-button\]\)\[data-hovered\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const selected = styles.match(/\[data-wcl-toggle-button\]\[data-selected\]\s*\{([^}]*)\}/)?.[1];
+    const link = styles.match(/\[data-wcl-link\]\s*\{([^}]*)\}/)?.[1];
+    const linkHover = styles.match(/\[data-wcl-link\]\[data-hovered\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(hover).toContain('background: var(--wcl-accent-soft)');
+    expect(hover).toContain('border-color: var(--wcl-accent-muted)');
+    expect(hover).toContain('color: var(--wcl-accent-hover-contrast)');
+    expect(selected).toContain('color: var(--wcl-text)');
+    expect(link).toContain('color: var(--wcl-text)');
+    expect(link).toContain('text-decoration-color: var(--wcl-accent-muted)');
+    expect(linkHover).toContain('color: var(--wcl-accent-hover-contrast)');
+    expect(styles).not.toContain('var(--wcl-accent-text)');
+  });
+
   it('uses a rail-only toggle selection and a purposeful pending rail', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const selected = styles.match(/\[data-wcl-toggle-button\]\[data-selected\]\s*\{([^}]*)\}/)?.[1];
     const selectedRail = styles.match(
       /\[data-wcl-toggle-button\]\[data-selected\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+    const selectedHover = styles.match(
+      /\[data-wcl-toggle-button\]\[data-selected\]\[data-hovered\]\s*\{([^}]*)\}/,
     )?.[1];
     const selectedPressed = styles.match(
       /\[data-wcl-toggle-button\]\[data-selected\]\[data-pressed\]\s*\{([^}]*)\}/,
@@ -92,6 +171,9 @@ describe('static appearance styles', () => {
     expect(selectedRail).toContain('block-size: 3px');
     expect(selectedRail).toContain('border-radius: 3px 3px 0 0');
     expect(selectedRail).toContain('background: var(--wcl-accent-rail)');
+    expect(selectedHover).toContain('background: var(--wcl-accent-soft)');
+    expect(selectedHover).toContain('color: var(--wcl-accent-hover-contrast)');
+    expect(selectedPressed).toContain('color: var(--wcl-accent-hover-contrast)');
     expect(selectedPressed).toContain('inset 0 2px 4px');
     expect(selectedPressed).not.toContain('inset 0 -3px var(--wcl-accent-rail)');
     expect(pending).toContain('var(--wcl-warning)');
@@ -109,6 +191,8 @@ describe('static appearance styles', () => {
     const stage = stageRules.at(-1)?.[1];
 
     expect(stage).toContain('background: var(--wcl-surface)');
+    expect(stage).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-base)');
+    expect(stage).toContain('--wcl-accent-rail: var(--wcl-accent-rail-on-base)');
     expect(stage).not.toContain('linear-gradient');
   });
 
@@ -141,6 +225,8 @@ describe('static appearance styles', () => {
       /\[data-variant='primary'\][\s\S]*?background:\s*var\(--wcl-accent-fill\)/,
     );
     expect(primaryHover).toContain('background: var(--wcl-accent-fill)');
+    expect(primaryHover).toContain('border-color: var(--wcl-accent-hover-edge)');
+    expect(primaryHover).toContain('box-shadow: inset 0 0 0 1px var(--wcl-accent-hover-edge)');
     expect(primaryHover).not.toContain('color-mix');
     expect(currentLink).toContain('font-weight: 700');
     expect(currentLink).toContain('var(--wcl-accent-rail)');

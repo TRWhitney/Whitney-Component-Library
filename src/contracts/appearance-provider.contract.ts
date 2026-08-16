@@ -3,10 +3,15 @@ import type {ComponentContract} from './component-contract.js';
 export const appearanceProviderContract = {
   accentBehavior: [
     'The application accent feeds focus, selection, progress, active structure, and relationship rails.',
-    'The provider derives a surface-distinct primary fill plus contrast-safe accent text, focus, and rail roles instead of applying the raw accent indiscriminately.',
+    'The provider preserves the exact application accent for primary fill and other identity-bearing uses.',
+    'Rich hover tint preserves the chosen hue while ordinary content text remains neutral.',
+    'Focus, rail, edge, underline, and conditional-boundary roles use the exact accent when it is visible and otherwise derive a saturated same-hue signal.',
   ],
   accessibility: [
-    'Choose an accent freely; the provider derives separate contrast-safe fill, text, focus, and rail roles, including readable accent text on the accent-soft hover surface.',
+    'Choose an accent freely; primary fill retains it exactly while readable foreground content is selected independently.',
+    'When the exact primary fill is too close to its actual surrounding surface, the library adds saturated same-hue structural support instead of recoloring the accent.',
+    'Contrast applies to the specific surface a structural role actually meets; filled rest and hover states choose readable foreground content independently.',
+    'Black and white accents use neutral structural support because they have no hue to preserve.',
     'Do not use the application accent in place of success, warning, or danger meaning.',
   ],
   appearance: [

@@ -18,7 +18,8 @@ application.
 - [Supported consumption model](decisions/01-consumption-model.md): Target web applications using
   React and TypeScript, without requiring framework-agnostic distribution in the first release.
 - [Style and theme contract](decisions/02-style-and-theme-contract.md): Ship library-owned static
-  CSS and expose only typed accent and appearance configuration in the first release.
+  CSS and expose only typed accent and appearance configuration in the first release, preserving
+  the literal accent for suitable identity-bearing uses while deriving role-specific support hues.
 - [Behavior and accessibility foundation](decisions/03-behavior-foundation.md): Use React Aria
   privately while owning this library's public API, compositions, styles, and behavior tests.
 - [Agent-facing contract](decisions/04-agent-contract.md): Pair narrow TypeScript APIs with

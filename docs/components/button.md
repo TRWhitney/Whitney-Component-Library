@@ -59,7 +59,8 @@ Button initiates a command while preserving native button and form semantics.
 
 ## Accent, forced colors, and reduced motion
 
-- Primary emphasis uses a surface-distinct fill derived from the application accent; focus and interactive feedback retain accent identity, danger keeps its semantic color, and pending uses warning rather than accent.
+- Primary emphasis uses the exact application accent with an independently readable foreground and a saturated same-hue supporting boundary only when the fill is too close to its surrounding surface.
+- Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary labels stay neutral. Danger keeps its semantic color, and pending uses warning rather than accent.
 - Forced-color mode maps the button boundary, label, focus outline, and pending rail to system colors.
 - Reduced motion stops the traveling pending rail and removes state transitions while keeping a static warning rail and every state boundary.
 

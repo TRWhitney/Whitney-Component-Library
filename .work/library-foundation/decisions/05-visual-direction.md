@@ -67,7 +67,7 @@ indicator, and the route itself remains still while other motion communicates st
 - Focus Field is the strongest study so far. Continuum's transient hover fill and rail-only
   selected state are accepted as the segmented-control behavior.
 - A selected segment does not retain a filled or elevated surface merely to indicate selection;
-  the bottom rail and accent label are sufficient.
+  the bottom rail carries the accent while its label remains neutral.
 - An active-stage pulse continues throughout the running state and disappears when running stops.
   One-shot motion remains appropriate for discrete transitions such as a rail sweep or field bloom.
 - Focus Field and Continuum's accepted segmented selection combine as **Focus + Rail**, the

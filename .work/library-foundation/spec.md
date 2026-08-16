@@ -88,6 +88,19 @@ interaction states, and semantic token relationships. The provider exposes only 
 dark appearance and application accent configuration in the stable contract; arbitrary consumer
 token replacement is excluded.
 
+The provider preserves the normalized six-digit application accent exactly for primary filled
+emphasis and other identity-bearing uses where the full color is appropriate. Rich hover tint also
+preserves that hue. Ordinary content remains neutral rather than becoming a washed-out accent.
+Focus, selection rails, accent-bearing edges and underlines, and conditional boundaries use the
+exact accent when it is already visible on the surface they actually meet; otherwise they use a
+deliberately saturated same-hue signal. Contrast applies to those real role/surface pairings, not to
+every accent-bearing role against every owned surface. A primary fill that is too close to its
+surrounding surface gains this structural support while retaining its exact color; filled content
+chooses a readable foreground independently for both rest and hover. Achromatic accents use neutral
+support because they have no hue to preserve. Deep accents must remain available in dark appearance,
+light accents must remain available in light appearance, and semantic success, warning, and danger
+colors remain independent.
+
 The visual direction is Focus + Rail + Momentum + Route under **continuity without conflation**:
 space, alignment, rails, fields, and motion reveal how distinct elements participate in one
 process without erasing their separate roles.

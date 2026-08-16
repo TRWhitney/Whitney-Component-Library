@@ -36,6 +36,7 @@ describe('component showcase', () => {
 
     const provider = container.querySelector('[data-wcl-provider]');
     expect(provider?.getAttribute('style')).toContain('--wcl-accent: #ff0000');
+    expect(provider?.getAttribute('style')).toContain('--wcl-accent-fill: #ff0000');
     expect(getByText('#ff0000')).toBeTruthy();
   });
 

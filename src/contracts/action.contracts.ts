@@ -35,7 +35,8 @@ function withinAppearanceProvider(lines: readonly string[]): string {
 export const buttonContract = {
   ...commonActionGuidance,
   accentBehavior: [
-    'Primary emphasis uses a surface-distinct fill derived from the application accent; focus and interactive feedback retain accent identity, danger keeps its semantic color, and pending uses warning rather than accent.',
+    'Primary emphasis uses the exact application accent with an independently readable foreground and a saturated same-hue supporting boundary only when the fill is too close to its surrounding surface.',
+    'Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary labels stay neutral. Danger keeps its semantic color, and pending uses warning rather than accent.',
   ],
   accessibility: [
     'The rendered element is a native button with a stable visible label and visible focus indication.',
@@ -142,7 +143,7 @@ export const buttonContract = {
 export const iconButtonContract = {
   ...commonActionGuidance,
   accentBehavior: [
-    'Focus and interactive feedback use the application accent; danger keeps its semantic color.',
+    'Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary icon content stays neutral. Danger keeps its semantic color.',
   ],
   accessibility: [
     'The required label supplies the native button accessible name and the same text appears in an automatic hover and focus tooltip.',
@@ -237,15 +238,15 @@ export const iconButtonContract = {
 export const linkContract = {
   ...commonActionGuidance,
   accentBehavior: [
-    'Link text, focus, hover, and the stronger current-destination underline use the application accent without borrowing status colors.',
+    'Link text stays neutral while its resting underline, focus, hover tint, and stronger current-destination underline use exact or saturated same-hue accent structure without borrowing status colors.',
   ],
   accessibility: [
-    'Link renders a native anchor with a visible underline, recognizable link color, and focus outline.',
+    'Link renders a native anchor with a visible accent-bearing underline and focus outline, so neutral label color does not hide its navigation role.',
     'current exposes the active destination through aria-current, and newWindow applies safe opener isolation.',
   ],
   appropriateUses: ['activation navigates to a URL, resource, page, or in-page destination'],
   appearance: [
-    'Link paints accent text and an underline without a control surface; current, hover, focus, and disabled treatments remain distinct in both appearances.',
+    'Link paints neutral text with an accent-bearing underline and no resting control surface; current, hover, focus, and disabled treatments remain distinct in both appearances.',
   ],
   composition: [
     'Render Link inside AppearanceProvider and place it in prose, navigation, or a region that owns the surrounding destination context.',
@@ -327,7 +328,7 @@ export const linkContract = {
 export const toggleButtonContract = {
   ...commonActionGuidance,
   accentBehavior: [
-    'Focus, hover feedback, and the persistent selected under-rail use the application accent without implying semantic status.',
+    'Ordinary label text stays neutral; hover tint preserves the accent hue, while focus and the persistent selected under-rail use exact or saturated same-hue accent structure without implying semantic status.',
   ],
   accessibility: [
     'ToggleButton renders a button with aria-pressed so selected, disabled, focus, and press state remain distinct.',

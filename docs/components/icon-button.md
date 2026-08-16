@@ -57,7 +57,7 @@ IconButton presents a familiar icon-only command with required accessible guidan
 
 ## Accent, forced colors, and reduced motion
 
-- Focus and interactive feedback use the application accent; danger keeps its semantic color.
+- Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary icon content stays neutral. Danger keeps its semantic color.
 - Forced-color mode maps the control boundary, icon, focus outline, and tooltip to system colors.
 - Reduced motion removes control and tooltip transitions while preserving hover, focus, press, disabled, and tooltip meaning.
 

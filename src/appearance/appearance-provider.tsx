@@ -3,7 +3,12 @@
 import {UNSAFE_PortalProvider} from 'react-aria/PortalProvider';
 import {useRef, type CSSProperties, type ReactNode} from 'react';
 
-import {deriveAccentRoles, type AccentColor} from './accent.js';
+import {
+  deriveAccentRoles,
+  type AccentColor,
+  type AccentSurface,
+  type SurfaceAccentRoles,
+} from './accent.js';
 
 export type Appearance = 'light' | 'dark';
 
@@ -21,11 +26,11 @@ export function AppearanceProvider({accent, appearance, children}: AppearancePro
     '--wcl-accent': roles.accent,
     '--wcl-accent-contrast': roles.contrast,
     '--wcl-accent-fill': roles.fill,
-    '--wcl-accent-focus': roles.focus,
-    '--wcl-accent-muted': roles.muted,
-    '--wcl-accent-rail': roles.rail,
-    '--wcl-accent-soft': roles.soft,
-    '--wcl-accent-text': roles.text,
+    '--wcl-accent-hover-edge': roles.hoverEdge,
+    ...surfaceRoleStyles('base', roles.on.base),
+    ...surfaceRoleStyles('canvas', roles.on.canvas),
+    ...surfaceRoleStyles('raised', roles.on.raised),
+    ...surfaceRoleStyles('subtle', roles.on.subtle),
   };
 
   return (
@@ -35,4 +40,15 @@ export function AppearanceProvider({accent, appearance, children}: AppearancePro
       </div>
     </UNSAFE_PortalProvider>
   );
+}
+
+function surfaceRoleStyles(surface: AccentSurface, roles: SurfaceAccentRoles): ProviderStyles {
+  return {
+    [`--wcl-accent-fill-boundary-on-${surface}`]: roles.fillBoundary,
+    [`--wcl-accent-focus-on-${surface}`]: roles.focus,
+    [`--wcl-accent-hover-contrast-on-${surface}`]: roles.hoverContrast,
+    [`--wcl-accent-muted-on-${surface}`]: roles.muted,
+    [`--wcl-accent-rail-on-${surface}`]: roles.rail,
+    [`--wcl-accent-soft-on-${surface}`]: roles.soft,
+  };
 }

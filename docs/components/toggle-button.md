@@ -57,7 +57,7 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 
 ## Accent, forced colors, and reduced motion
 
-- Focus, hover feedback, and the persistent selected under-rail use the application accent without implying semantic status.
+- Ordinary label text stays neutral; hover tint preserves the accent hue, while focus and the persistent selected under-rail use exact or saturated same-hue accent structure without implying semantic status.
 - Forced-color mode maps the button boundary, label, focus outline, and selected rail to system colors.
 - Reduced motion removes state transitions while preserving hover, focus, press, selected, and disabled boundaries.
 

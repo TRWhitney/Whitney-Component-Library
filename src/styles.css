@@ -2,6 +2,12 @@
 
 @layer wcl.theme {
   [data-wcl-provider] {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-canvas);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-canvas);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-canvas);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-canvas);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-canvas);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-canvas);
     --wcl-canvas: #e9edef;
     --wcl-surface: #fff;
     --wcl-surface-raised: #fff;
@@ -178,15 +184,36 @@
   }
 
   [data-wcl-surface][data-variant='base'] {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-base);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-base);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-base);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-base);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-base);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-base);
+
     background: var(--wcl-surface);
   }
 
   [data-wcl-surface][data-variant='raised'] {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-raised);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-raised);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-raised);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-raised);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-raised);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-raised);
+
     background: var(--wcl-surface-raised);
     box-shadow: var(--wcl-shadow);
   }
 
   [data-wcl-surface][data-variant='subtle'] {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-subtle);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-subtle);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-subtle);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-subtle);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-subtle);
+
     background: var(--wcl-surface-subtle);
   }
 
@@ -253,6 +280,13 @@
   }
 
   [data-wcl-scroll-region] {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-subtle);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-subtle);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-subtle);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-subtle);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-subtle);
+
     max-block-size: 20rem;
     min-inline-size: 0;
     padding: calc(var(--wcl-space) * 1.5);
@@ -343,6 +377,7 @@
   }
 
   :is([data-wcl-button], [data-wcl-icon-button], [data-wcl-toggle-button])[data-variant='primary'] {
+    border-color: var(--wcl-accent-fill-boundary);
     background: var(--wcl-accent-fill);
     color: var(--wcl-accent-contrast);
   }
@@ -359,15 +394,15 @@
   :is([data-wcl-button], [data-wcl-icon-button], [data-wcl-toggle-button])[data-hovered] {
     border-color: var(--wcl-accent-muted);
     background: var(--wcl-accent-soft);
-    color: var(--wcl-accent-text);
+    color: var(--wcl-accent-hover-contrast);
     box-shadow: inset 0 0 0 1px var(--wcl-accent-muted);
   }
 
   :is([data-wcl-button], [data-wcl-icon-button])[data-variant='primary'][data-hovered] {
-    border-color: var(--wcl-accent-contrast);
+    border-color: var(--wcl-accent-hover-edge);
     background: var(--wcl-accent-fill);
     color: var(--wcl-accent-contrast);
-    box-shadow: inset 0 0 0 1px var(--wcl-accent-contrast);
+    box-shadow: inset 0 0 0 1px var(--wcl-accent-hover-edge);
   }
 
   :is([data-wcl-button], [data-wcl-icon-button])[data-variant='danger'][data-hovered] {
@@ -414,7 +449,7 @@
   [data-wcl-toggle-button][data-selected] {
     border-color: transparent;
     background: transparent;
-    color: var(--wcl-accent-text);
+    color: var(--wcl-text);
     box-shadow: none;
   }
 
@@ -433,11 +468,13 @@
   [data-wcl-toggle-button][data-selected][data-hovered] {
     border-color: var(--wcl-accent-muted);
     background: var(--wcl-accent-soft);
+    color: var(--wcl-accent-hover-contrast);
     box-shadow: inset 0 0 0 1px var(--wcl-accent-muted);
   }
 
   [data-wcl-toggle-button][data-selected][data-pressed] {
     background: var(--wcl-accent-soft);
+    color: var(--wcl-accent-hover-contrast);
     box-shadow: inset 0 2px 4px rgb(0 0 0 / 22%);
   }
 
@@ -473,6 +510,13 @@
   }
 
   [data-wcl-toolbar] {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-subtle);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-subtle);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-subtle);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-subtle);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-subtle);
+
     display: flex;
     gap: calc(var(--wcl-space) * 0.5);
     align-items: center;
@@ -494,7 +538,7 @@
     border-radius: calc(var(--wcl-control-radius) * 0.5);
     outline: 2px solid transparent;
     outline-offset: 2px;
-    color: var(--wcl-accent-text);
+    color: var(--wcl-text);
     font-family: var(--wcl-font-body);
     font-weight: 600;
     text-decoration-color: var(--wcl-accent-muted);
@@ -510,7 +554,7 @@
 
   [data-wcl-link][data-hovered] {
     background: var(--wcl-accent-soft);
-    color: var(--wcl-accent-text);
+    color: var(--wcl-accent-hover-contrast);
     text-decoration-color: currentcolor;
   }
 
@@ -519,7 +563,7 @@
   }
 
   [data-wcl-link][aria-current] {
-    color: var(--wcl-accent-text);
+    color: var(--wcl-text);
     font-weight: 700;
     text-decoration-color: var(--wcl-accent-rail);
     text-decoration-thickness: 0.16em;
@@ -609,11 +653,13 @@
       --wcl-accent: Highlight !important;
       --wcl-accent-contrast: HighlightText !important;
       --wcl-accent-fill: Highlight !important;
+      --wcl-accent-fill-boundary: Highlight !important;
       --wcl-accent-focus: Highlight !important;
+      --wcl-accent-hover-contrast: HighlightText !important;
+      --wcl-accent-hover-edge: Highlight !important;
       --wcl-accent-muted: GrayText !important;
       --wcl-accent-rail: Highlight !important;
       --wcl-accent-soft: Canvas !important;
-      --wcl-accent-text: LinkText !important;
       --wcl-border: GrayText;
       --wcl-border-strong: CanvasText;
       --wcl-canvas: Canvas;
@@ -627,6 +673,13 @@
 
   @layer wcl.components {
     [data-wcl-surface] {
+      --wcl-accent-fill-boundary: Highlight;
+      --wcl-accent-focus: Highlight;
+      --wcl-accent-hover-contrast: HighlightText;
+      --wcl-accent-muted: GrayText;
+      --wcl-accent-rail: Highlight;
+      --wcl-accent-soft: Canvas;
+
       border-color: CanvasText;
       background: Canvas;
       box-shadow: none;

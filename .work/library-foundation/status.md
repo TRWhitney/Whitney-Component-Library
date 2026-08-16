@@ -9,7 +9,7 @@ propagated application accent.
 
 ## Current state
 
-Novel-work implementation: Tickets 01 through 03 are delivered. The requested repository-local
+Novel-work implementation: Tickets 01 through 03A are delivered. The requested repository-local
 component showcase is delivered with its maintenance instruction. Its unexplained specimen-stage
 ticks and the selected ToggleButton rail's curved inset treatment are corrected with focused tests
 and current repository, package, and direct Chromium, Firefox, and WebKit validation. The correction
@@ -20,6 +20,13 @@ Independent delivery review found a stale controlled-ToggleButton caption after 
 invalid cross-engine color-swatch selector list. Both are corrected with current repository,
 showcase-build, and direct three-engine evidence. Fresh repeat intent and engineering review axes
 report no findings, and the change is preserved in the current HEAD.
+Ticket 03A's first implementation preserved literal fills but derived washed-out support colors.
+Whitney's showcase evaluation invalidated that visual acceptance, and the subsequent
+[accent-family prototype](prototypes/accent-family-exploration.md) established the replacement:
+exact identity, rich same-hue tint, neutral content, and saturated same-hue structure. The first
+production correction reached delivery, where independent review exposed missing per-surface roles,
+an absent primary-hover delta for some accents, and one stale visual-direction sentence. The final
+correction is complete, and Ticket 04 is ready but has not started.
 
 ## Progress
 
@@ -40,7 +47,7 @@ Wayfinding is complete with fourteen resolved decisions, zero visible decisions,
 in-scope fog. The library remains pre-adoption through the four `0.x` slices and stabilizes only
 after the broad catalog and accepted quality gates receive explicit review.
 
-An accepted [canonical specification](spec.md) and 32 dependency-ordered [implementation
+An accepted [canonical specification](spec.md) and 33 dependency-ordered [implementation
 tickets](tickets/) cover the package and contract spine, conventional catalog, operational
 workflow, chart system, data analysis, Markdown editor and authoring, workbench, forward-expansion
 probes, and stable-candidate evidence. [Ticket 01](tickets/01-package-provider-and-contract-spine.md)
@@ -88,6 +95,17 @@ and saturated-accent hover contrast defects; those corrections now have current 
 engineering review found that Toolbar navigation used the global DOM realm. A focused iframe
 regression now passes with event targets resolved from the Toolbar's owning window, and its affected
 completion gates passed on repetition.
+
+[Ticket 03A](tickets/03a-accent-fidelity-and-support-roles.md) corrects an over-constrained accent
+strategy exposed by direct showcase evaluation. Exact primary fills preserve the consumer's chosen
+color, including deep purple in dark appearance, while readable foregrounds, derived support hues,
+and conditional boundaries retain the accessibility and state distinctions required by the
+library. The provider exposes the conditional edge as a private CSS role consumed by filled actions
+and the showcase swatch; no public prop or package export changes. Canonical contracts and generated
+provider and Button guidance describe literal and derived roles separately. This refines the
+existing bounded-theme decision without exposing arbitrary tokens or making accent a semantic
+status color. Prior completion evidence that required every primary fill itself to contrast against
+every owned surface is superseded for this correction.
 
 The repository now includes a runnable human-facing showcase for every contracted public component.
 It uses the library's accepted visual language, provides working light and dark examples at wide
@@ -237,12 +255,157 @@ See the [decision map](map.md).
   from HEAD `26d9ff2` through the working tree and reported no findings. The showcase is the owning
   human documentation surface, and no public component API or generated consumer guidance changed;
   this status record completes the durable documentation impact.
+- Ticket 03A established focused red evidence at the provider, stylesheet, showcase, and canonical
+  contract seams: the prior implementation recolored exact fills, exposed no conditional boundary,
+  and described no literal-versus-derived distinction. The focused green run passes 64 tests plus
+  strict type checking and zero-warning linting. Chromium implementation inspection confirms
+  `#2b0a64` remains the primary fill in dark appearance and `#ffffff` remains the primary fill in
+  light appearance, each with a readable foreground and a conditional contrasting edge. The same
+  screenshots show related derived links and rails without clipping or layout regressions. Generated
+  component guidance is current.
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict types, generated
+  artifacts, the TypeScript 5.9/6/7 matrix, and 122 tests for the complete Ticket 03A change.
+  `npm run showcase:build`, `npm run verify:package`, `npm audit --audit-level=high`, and
+  `git diff --check` pass. Packed React 18.3.1 and React 19.2.8 consumers pass SSR, hydration,
+  public-type, and browser-build verification, and the audit reports zero vulnerabilities.
+- Direct Chromium, Firefox, and WebKit operation changed the accent to deep purple `#2b0a64` in
+  dark appearance and white `#ffffff` in light appearance. Every engine reports the exact provider
+  and primary-fill roles and renders the literal primary fill with independently readable content
+  and a conditional contrasting boundary; default blue retains a transparent boundary. Derived
+  links, selected rails, and keyboard focus remain visible, danger styling does not change with the
+  accent, and 390px presentations have zero document overflow. Inspected wide and compact
+  screenshots show clean rounded treatments, orderly wrapping, and no clipping or style leakage.
+  Temporary validation scripts, screenshots, and build artifacts were moved to Trash.
+- Independent intent review reported no findings. Independent engineering review found that the
+  muted role could collapse into an owned surface for extreme accents, erasing a Link's resting
+  underline and weakening muted boundaries. A focused provider-matrix regression failed for all 16
+  appearance/accent combinations before the muted role began deriving to 3:1 against its owned
+  surfaces and soft state; the affected 32 tests, strict types, and linters now pass. Prior complete
+  validation and both review conclusions are invalidated where this correction could affect them.
+- Renewed `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict types,
+  generated artifacts, the TypeScript 5.9/6/7 matrix, and 122 tests. Renewed showcase build,
+  packed-package verification for React 18.3.1 and 19.2.8, dependency audit, and diff checks pass.
+  Direct Chromium, Firefox, and WebKit repetition confirms literal deep-purple and white fills,
+  conditional boundaries, readable foregrounds, related derived links and rails, visible keyboard
+  focus, accent-independent danger treatment, and zero 390px overflow. The specific resting
+  destination-link underline now visibly and structurally uses the corrected muted role in every
+  inspected engine and extreme appearance. All renewed screenshots were inspected and temporary
+  artifacts moved to Trash.
+- Repeat engineering review reported no findings. Repeat intent review found that IconButton, Link,
+  and ToggleButton guidance still said their support treatments “use the application accent,” which
+  could direct agents toward literal rather than derived hues. A focused canonical-contract test
+  failed before all three descriptions explicitly named role-specific derived hues, then 48 affected
+  tests, generated guidance, strict types, and linters passed. Browser evidence remains current
+  because this correction changes only canonical and generated guidance; repository, generation,
+  and package evidence was invalidated until repeated below.
+- After the action-guidance correction, `npm run check` again passes formatting, zero-warning
+  linters, strict types, 122 tests, generated-artifact checks, and the TypeScript 5.9/6/7 matrix.
+  The showcase build, packed React 18.3.1 and 19.2.8 consumer verification, dependency audit, and
+  diff check also pass. Generated IconButton, Link, and ToggleButton guides contain the corrected
+  role-specific derived-hue language. Existing three-engine rendering evidence remains current
+  because no rendered behavior or CSS changed in this correction.
+- Final fresh independent intent and engineering review axes examined the complete corrected Ticket
+  03A change from HEAD `874d534` through the working tree and reported no findings. Documentation
+  impact is resolved in the existing ADR, style/theme decision, canonical specification and
+  contracts, generated component guides, ticket, and this status record.
+- Whitney's post-delivery evaluation of `#2d0548` invalidates the visual conclusions above. Current
+  derivation mixes support roles toward neutral theme text to satisfy contrast against every owned
+  surface, yielding rail `#847096`, muted `#787685`, text `#9f90ae`, and a near-white fill boundary
+  `#f2f6f8`. The numeric checks proved visibility but not preservation of hue, accent-bearing hover
+  feedback, or a boundary treatment consistent with the accepted visual language. Repository and
+  package checks remain historical evidence only; visual completion must be redesigned and
+  revalidated.
+- The non-production accent-family prototype's first hue-preserving revision was rejected because
+  constant chroma at higher lightness produced pastel lavender structure and text. The revised
+  comparison keeps text neutral, uses exact accent for identity and a rich hover tint, and assigns
+  only visibility-bearing structure a high-chroma same-hue signal. Direct Chromium inspection
+  covers deep purple in both appearances, selected hover, forced hover, focus, primary hover, link,
+  swatch, white-on-light, black-on-dark, and a 390px compact presentation with zero overflow. For
+  `#2d0548` dark, the candidate now uses hover tint `#2b0b43` and saturated boundary, rail, focus,
+  and edge `#aa2aff`. Whitney accepted this second revision as the binding production direction:
+  exact identity, rich same-hue tint, neutral content, and saturated same-hue structure.
+- Focused provider, stylesheet, contract, and showcase regressions failed against the prior
+  neutral-directed implementation, then 65 tests passed after the provider adopted role-local OKLCH
+  derivation and actions adopted neutral resting text, rich hover tint, and saturated structural
+  roles. Strict types, zero-warning linters, formatting, generation, and diff checks pass.
+- Direct Chromium inspection of the production showcase matches the accepted deep-purple reference:
+  `#2d0548` exact fill, `#2b0b43` hover tint, `#aa2afe` structural signal, and neutral resting text.
+  Selected hover retains its full-width rail, the primary hover and keyboard focus use saturated
+  purple edges, light appearance keeps the exact dark-purple rail, and the 390px layout has zero
+  document overflow. Initial three-engine structural inspection reported the same derived roles and
+  zero compact overflow; the validation evidence below supersedes this pre-correction inspection.
+- Renewed validation passes the complete 123-test repository check, generated-artifact and
+  TypeScript 5.9/6/7 matrices, packed React 18.3.1 and React 19.2.8 SSR/hydration/type/browser
+  consumers, showcase production build, zero-vulnerability dependency audit, and diff check. Direct
+  Chromium, Firefox, and WebKit operation and screenshot inspection cover deep-purple selected
+  hover, primary hover, keyboard focus, link hover, light compact reflow, and exact role values;
+  Chromium also covers white-on-light and black-on-dark. All rendered states match the accepted
+  contract, semantic danger and pending treatments remain independent, and compact overflow is zero.
+- Documentation impact is resolved in the canonical style and theme ADR, foundation specification,
+  style/theme decision, provider and action contracts, generated component guidance, accepted
+  prototype record, Ticket 03A, and this status index. All relative Markdown links resolve. Ticket
+  03A had reached delivery and Ticket 04 was ready for a future request.
+- Independent intent review then found three objective defects: primary fills with a transparent
+  resting boundary can lack any hover delta; one base-surface derivation cannot honor the accepted
+  actual-surface rule across canvas, base, raised, and subtle placements; and the visual-direction
+  decision still called the selected label accent-colored. Ticket 03A returned to implementation,
+  and all affected validation and review evidence was invalidated.
+- The correction now derives support independently for canvas, base, raised, and subtle surfaces;
+  each library Surface activates its matching role set, and showcase-owned base and subtle regions
+  do the same. Primary fills use a separately derived hover edge even when their resting boundary is
+  transparent, and the selected-label guidance is neutral. The focused regressions pass, including
+  contrast checks against the serialized six-digit colors consumers actually receive; the complete
+  127-test repository check, strict types, linters, formatting, generated artifacts, and TypeScript
+  5.9/6/7 declaration matrix are green. Direct validation and fresh review remain outstanding.
+- Current package and direct validation now pass. React 18.3.1 and 19.2.8 packed consumers pass SSR,
+  hydration, types, and browser builds; the production showcase build and dependency audit pass.
+  Chromium, Firefox, and WebKit render the corrected deep-purple hover, selection, focus, link, and
+  compact states consistently, surface variants activate their own derived roles, and every compact
+  document has zero horizontal overflow. Chromium also confirms white-on-light and black-on-dark.
+  All screenshots were inspected and discarded with the temporary harness.
+- Fresh independent delivery review invalidated the affected evidence. Intent and engineering both
+  found that Toolbar's owned subtle background does not activate the subtle-surface roles for its
+  direct action children. Engineering also found that selected ToggleButton press feedback uses the
+  accent-soft background without its readable foreground, which can erase the label for light
+  accents. These are objective implementation defects; Ticket 03A must return to implementation,
+  then repeat affected validation and both review axes.
+- Focused regressions failed for both accepted findings, then passed after Toolbar selected every
+  subtle-surface role and selected press feedback adopted the accent-soft readable foreground. The
+  affected 53 tests and complete 127-test repository check pass with strict types, zero-warning
+  linters, formatting, generated artifacts, the TypeScript 5.9/6/7 declaration matrix, and a clean
+  diff. Renewed direct and package validation remain outstanding.
+- Renewed direct Chromium, Firefox, and WebKit operation confirms all Toolbar active roles equal its
+  derived subtle-surface roles for `#5f6b72`; keyboard focus is visible on a direct Toolbar child;
+  and a selected ToggleButton held pressed under white-on-dark renders its light soft background
+  with black readable content. All screenshots were inspected and discarded with the harness.
+  The production showcase build, packed React 18/19 consumers, and zero-vulnerability audit pass.
+- Repeat intent review reports no findings. Repeat engineering review invalidated the affected
+  evidence again: ScrollRegion also owns a subtle background and accepts composed descendants but
+  does not activate subtle-surface roles. A complete stylesheet inventory confirms it is the only
+  remaining library-owned compositional surface missing explicit role selection. Ticket 03A must
+  return to implementation for a focused regression and correction, then repeat affected validation
+  and both review axes.
+- A focused ScrollRegion scoping regression failed against the reviewed code, then passed after the
+  region activated all six subtle-surface roles. The complete stylesheet inventory now accounts for
+  every production owner of an application surface. The affected 35 tests and complete 127-test
+  repository check pass with strict types, zero-warning linters, formatting, generated artifacts,
+  TypeScript 5.9/6/7 declarations, and a clean diff. Direct and package validation must be renewed.
+- Renewed direct Chromium, Firefox, and WebKit operation confirms ScrollRegion's active boundary,
+  focus, and rail match its subtle-surface roles for `#5f6b72`; keyboard focus is visibly saturated
+  without clipping or style leakage. All screenshots were inspected and discarded. The production
+  showcase build, packed React 18/19 consumers, and zero-vulnerability audit pass after correction.
+- Final fresh independent intent and engineering review axes examined the complete corrected change
+  from HEAD `d8725d6` through the working tree and report no findings. Documentation impact is
+  resolved in the style/theme ADR and decision, foundation specification, visual-direction decision,
+  provider and action contracts, generated component guidance, future segmented-control constraint,
+  accepted prototype record, Ticket 03A, and this status index. All relative Markdown links resolve.
 
 ## Continuation
 
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-The accent-selector and example-label showcase change is delivered. Begin Ticket 04 only when
-Whitney explicitly requests the next ticket.
+The page-scrollbar question is resolved without a repository change: the showcase remains normally
+scrollable and leaves native scrollbar presentation to the browser. Ticket 03A is delivered. Begin
+Ticket 04 only when Whitney explicitly requests the next ticket.
 
 Current branch: `master`.
 
@@ -254,6 +417,5 @@ as a real responsive track with distinct shadow-free endpoints in wide and compa
 semantic endpoint changes with status without becoming a duplicate status indicator. Exact command
 is recorded in the prototype test source.
 
-At planning completion, artifact verification found 32 tickets, exactly one `ready-for-agent`
-frontier ticket, 31 blocked tickets, and no missing local Markdown links across the work record,
-ADRs, or context.
+Current planning contains 33 tickets: four delivered or complete, Ticket 04 as the sole
+`ready-for-agent` frontier ticket, and 28 blocked tickets. All local Markdown links resolve.

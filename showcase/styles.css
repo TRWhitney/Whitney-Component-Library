@@ -25,6 +25,13 @@
   }
 
   .showcase-masthead {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-base);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-base);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-base);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-base);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-base);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-base);
+
     display: grid;
     grid-template-columns: minmax(16rem, auto) minmax(4rem, 1fr) auto;
     gap: 1.5rem;
@@ -216,7 +223,7 @@
     border-inline-start-color: var(--wcl-accent-rail);
     outline: none;
     background: var(--wcl-accent-soft);
-    color: var(--wcl-accent-text);
+    color: var(--wcl-accent-hover-contrast);
   }
 
   .showcase-content {
@@ -272,7 +279,7 @@
   }
 
   .showcase-specimen-header code {
-    color: var(--wcl-accent-text);
+    color: var(--wcl-text);
     font-family: var(--wcl-font-utility);
     font-size: 0.8125rem;
     font-weight: 700;
@@ -286,6 +293,13 @@
   }
 
   .showcase-specimen-stage {
+    --wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-base);
+    --wcl-accent-focus: var(--wcl-accent-focus-on-base);
+    --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-base);
+    --wcl-accent-muted: var(--wcl-accent-muted-on-base);
+    --wcl-accent-rail: var(--wcl-accent-rail-on-base);
+    --wcl-accent-soft: var(--wcl-accent-soft-on-base);
+
     display: grid;
     align-content: center;
     background: var(--wcl-surface);
@@ -311,6 +325,8 @@
   }
 
   .showcase-measure {
+    --wcl-accent-rail: var(--wcl-accent-rail-on-subtle);
+
     padding: 0.55rem 0.75rem;
     border-inline-start: 3px solid var(--wcl-accent-rail);
     background: var(--wcl-surface-subtle);
@@ -332,7 +348,7 @@
     flex: none;
     inline-size: 2.75rem;
     block-size: 2.75rem;
-    border: 1px solid var(--wcl-accent-muted);
+    border: 1px solid var(--wcl-accent-fill-boundary);
     border-radius: var(--wcl-control-radius);
     background: var(--wcl-accent-fill);
     box-shadow: inset 0 -3px var(--wcl-accent-rail);

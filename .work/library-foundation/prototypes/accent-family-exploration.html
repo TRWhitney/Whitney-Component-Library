@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en" data-appearance="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accent family exploration</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --page: #11171b;
+        --surface: #182126;
+        --surface-subtle: #202b31;
+        --surface-elevated: #243138;
+        --border: #33434c;
+        --text: #f2f6f8;
+        --text-muted: #aebbc2;
+        --danger: #ffaaa7;
+        --danger-surface: #4a2325;
+      }
+
+      :root[data-appearance='light'] {
+        color-scheme: light;
+        --page: #e9edef;
+        --surface: #ffffff;
+        --surface-subtle: #edf1f3;
+        --surface-elevated: #f7f9fa;
+        --border: #c6d0d5;
+        --text: #152027;
+        --text-muted: #62737d;
+        --danger: #b42318;
+        --danger-surface: #fde7e5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 2rem));
+        margin-inline: auto;
+        padding-block: 1.5rem 3rem;
+      }
+
+      .controls,
+      .control,
+      .role-strip,
+      .examples {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+      }
+
+      .controls {
+        position: sticky;
+        z-index: 10;
+        top: 0;
+        justify-content: space-between;
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--page) 90%, transparent);
+        backdrop-filter: blur(12px);
+      }
+
+      .control-label,
+      .eyebrow,
+      .example-label,
+      .role-name {
+        color: var(--text-muted);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      input[type='color'] {
+        inline-size: 2.5rem;
+        block-size: 2.5rem;
+        padding: 0.15rem;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--surface-subtle);
+      }
+
+      code {
+        min-inline-size: 5.25rem;
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+
+      .theme-button {
+        min-block-size: 2.5rem;
+        padding-inline: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--surface-subtle);
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      header h1 {
+        max-inline-size: 18ch;
+        margin: 2.25rem 0 0.5rem;
+        font-size: clamp(2rem, 6vw, 4rem);
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+      }
+
+      header p {
+        max-inline-size: 65ch;
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.55;
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        margin-block-start: 2rem;
+      }
+
+      .direction {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
+      }
+
+      .direction > header {
+        min-block-size: 8.5rem;
+        padding: 1.25rem;
+        border-block-end: 1px solid var(--border);
+        background: var(--surface-subtle);
+      }
+
+      .direction h2 {
+        margin: 0.25rem 0 0.4rem;
+        font-size: 1.35rem;
+      }
+
+      .direction header p {
+        font-size: 0.9rem;
+      }
+
+      .specimen {
+        padding: 1.5rem;
+      }
+
+      .identity {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        align-items: center;
+        min-block-size: 4.75rem;
+        margin-block-end: 1.5rem;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--surface-subtle);
+      }
+
+      .swatch {
+        inline-size: 3rem;
+        block-size: 3rem;
+        border: 1px solid var(--accent-boundary);
+        border-radius: 10px;
+        background: var(--accent-fill);
+        box-shadow: inset 0 -3px var(--accent-rail);
+      }
+
+      .identity strong,
+      .identity span {
+        display: block;
+      }
+
+      .identity span {
+        margin-block-start: 0.2rem;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+      }
+
+      .examples {
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+
+      .example {
+        display: grid;
+        gap: 0.45rem;
+        min-inline-size: 8.5rem;
+      }
+
+      .action,
+      .toggle {
+        position: relative;
+        min-block-size: 2.75rem;
+        padding-inline: 1rem;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        background: var(--surface-subtle);
+        color: var(--text);
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background-color 150ms ease,
+          border-color 150ms ease,
+          box-shadow 150ms ease,
+          color 150ms ease;
+      }
+
+      .action.primary {
+        border-color: var(--accent-boundary);
+        background: var(--accent-fill);
+        color: var(--accent-contrast);
+      }
+
+      .action.primary.hovered,
+      .action.primary:hover {
+        border-color: var(--accent-boundary);
+        background: var(--accent-fill);
+        color: var(--accent-contrast);
+        box-shadow: inset 0 0 0 1px var(--accent-boundary);
+      }
+
+      .action.hovered,
+      .action:not(.primary):hover,
+      .toggle:hover {
+        border-color: var(--accent-muted);
+        background: var(--accent-soft);
+        color: var(--accent-text);
+        box-shadow: inset 0 0 0 1px var(--accent-muted);
+      }
+
+      .proposed :is(.action.hovered, .action:not(.primary):hover, .toggle:hover) {
+        color: var(--accent-hover-contrast);
+      }
+
+      .proposed :is(.action.primary.hovered, .action.primary:hover) {
+        color: var(--accent-contrast);
+      }
+
+      .action.focused {
+        outline-color: var(--accent-focus);
+      }
+
+      .toggle {
+        background: transparent;
+        color: var(--accent-text);
+      }
+
+      .toggle::after {
+        position: absolute;
+        inset-inline: 0;
+        inset-block-end: 0;
+        block-size: 3px;
+        border-radius: 3px 3px 0 0;
+        background: var(--accent-rail);
+        content: '';
+      }
+
+      .link {
+        align-self: center;
+        padding: 0.25rem;
+        border-radius: 5px;
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        color: var(--accent-text);
+        font-weight: 700;
+        text-decoration-color: var(--accent-muted);
+        text-decoration-thickness: 0.08em;
+        text-underline-offset: 0.18em;
+      }
+
+      .link:hover {
+        background: var(--accent-soft);
+        text-decoration-color: currentcolor;
+      }
+
+      .proposed .link:hover {
+        color: var(--accent-hover-contrast);
+      }
+
+      .role-strip {
+        flex-wrap: wrap;
+        margin-block-start: 1.5rem;
+        padding-block-start: 1rem;
+        border-block-start: 1px solid var(--border);
+      }
+
+      .role {
+        display: grid;
+        grid-template-columns: 1rem auto;
+        gap: 0.4rem;
+        align-items: center;
+      }
+
+      .role-color {
+        inline-size: 1rem;
+        block-size: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--role-color);
+      }
+
+      @media (max-width: 760px) {
+        .comparison {
+          grid-template-columns: 1fr;
+        }
+
+        .controls {
+          align-items: stretch;
+        }
+
+        .control {
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-width: 430px) {
+        .shell {
+          width: min(100% - 1rem, 1120px);
+          padding-block-start: 0.5rem;
+        }
+
+        .controls {
+          position: static;
+          flex-direction: column;
+        }
+
+        .control {
+          justify-content: space-between;
+        }
+
+        .example {
+          min-inline-size: calc(50% - 0.5rem);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="controls">
+        <div class="control">
+          <label class="control-label" for="accent">Accent</label>
+          <input id="accent" type="color" value="#2d0548" />
+          <code id="accent-value">#2d0548</code>
+        </div>
+        <div class="control">
+          <span class="control-label">Appearance</span>
+          <button class="theme-button" id="theme" type="button">Dark</button>
+        </div>
+      </div>
+
+      <header>
+        <p class="eyebrow">Ticket 03A · non-production comparison</p>
+        <h1>Keep the accent’s character</h1>
+        <p>
+          Compare the current neutral-directed contrast roles with a saturated structural accent.
+          Hover the selected control and destination link; the forced hover and focus examples keep
+          the important states visible without interaction.
+        </p>
+      </header>
+
+      <main class="comparison">
+        <section class="direction current" data-direction="current">
+          <header>
+            <p class="eyebrow">Current</p>
+            <h2>Neutral-directed contrast</h2>
+            <p>Every constrained role moves toward theme text, which can drain the chosen hue.</p>
+          </header>
+          <div class="specimen"></div>
+        </section>
+
+        <section class="direction proposed" data-direction="proposed">
+          <header>
+            <p class="eyebrow">Proposed</p>
+            <h2>Saturated structural accent</h2>
+            <p>
+              Text stays neutral; exact accent tints surfaces; a high-chroma related signal carries
+              rails, focus, and edges.
+            </p>
+          </header>
+          <div class="specimen"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="specimen-template">
+      <div class="identity">
+        <span class="swatch" aria-hidden="true"></span>
+        <div>
+          <strong>Application accent</strong>
+          <span>Exact fill with a supporting edge and rail</span>
+        </div>
+      </div>
+      <div class="examples">
+        <div class="example">
+          <span class="example-label">Selected</span>
+          <button class="toggle" type="button">Pin result</button>
+        </div>
+        <div class="example">
+          <span class="example-label">Hover</span>
+          <button class="action hovered" type="button">Review</button>
+        </div>
+        <div class="example">
+          <span class="example-label">Focus</span>
+          <button class="action focused" type="button">Inspect</button>
+        </div>
+        <div class="example">
+          <span class="example-label">Primary hover</span>
+          <button class="action primary hovered" type="button">Run profile</button>
+        </div>
+        <div class="example">
+          <span class="example-label">Destination</span>
+          <a class="link" href="#comparison">View details</a>
+        </div>
+      </div>
+      <div class="role-strip" aria-label="Derived accent roles"></div>
+    </template>
+
+    <script>
+      const darkSurfaces = ['#11171b', '#182126', '#202b31', '#243138'];
+      const lightSurfaces = ['#e9edef', '#ffffff', '#edf1f3'];
+      const template = document.querySelector('#specimen-template');
+
+      for (const specimen of document.querySelectorAll('.specimen')) {
+        specimen.append(template.content.cloneNode(true));
+      }
+
+      const accentInput = document.querySelector('#accent');
+      const accentValue = document.querySelector('#accent-value');
+      const themeButton = document.querySelector('#theme');
+
+      accentInput.addEventListener('input', render);
+      themeButton.addEventListener('click', () => {
+        const next = document.documentElement.dataset.appearance === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.appearance = next;
+        themeButton.textContent = next === 'dark' ? 'Dark' : 'Light';
+        render();
+      });
+
+      function render() {
+        const accent = accentInput.value.toLowerCase();
+        const appearance = document.documentElement.dataset.appearance;
+        accentValue.textContent = accent;
+        applyRoles(
+          document.querySelector('[data-direction="current"]'),
+          currentRoles(accent, appearance),
+        );
+        applyRoles(
+          document.querySelector('[data-direction="proposed"]'),
+          proposedRoles(accent, appearance),
+        );
+      }
+
+      function applyRoles(element, roles) {
+        for (const [name, value] of Object.entries(roles)) {
+          element.style.setProperty(`--accent-${name}`, value);
+        }
+        const strip = element.querySelector('.role-strip');
+        strip.replaceChildren();
+        for (const name of ['fill', 'boundary', 'soft', 'muted', 'text', 'focus', 'rail']) {
+          const role = document.createElement('span');
+          role.className = 'role';
+          role.innerHTML = `<span class="role-color" style="--role-color:${roles[name]}"></span><span class="role-name">${name}</span>`;
+          strip.append(role);
+        }
+      }
+
+      function currentRoles(accent, appearance) {
+        const source = parseHex(accent);
+        const surfaces = (appearance === 'light' ? lightSurfaces : darkSurfaces).map(parseHex);
+        const themeText = parseHex(appearance === 'light' ? '#152027' : '#f2f6f8');
+        const black = parseHex('#000000');
+        const white = parseHex('#ffffff');
+        const contrast =
+          contrastRatio(source, black) >= contrastRatio(source, white) ? black : white;
+        const soft = mixRgb(surfaces[1] ?? surfaces[0], source, 0.13);
+        return {
+          fill: accent,
+          boundary: surfaces.some((surface) => contrastRatio(source, surface) < 3)
+            ? toHex(themeText)
+            : 'transparent',
+          contrast: toHex(contrast),
+          soft: toHex(soft),
+          'hover-contrast': toHex(ensureRgbContrast(source, [...surfaces, soft], themeText, 4.5)),
+          muted: toHex(
+            ensureRgbContrast(
+              mixRgb(surfaces[1] ?? surfaces[0], source, 0.33),
+              [...surfaces, soft],
+              themeText,
+              3,
+            ),
+          ),
+          text: toHex(ensureRgbContrast(source, [...surfaces, soft], themeText, 4.5)),
+          focus: toHex(ensureRgbContrast(source, surfaces, themeText, 3)),
+          rail: toHex(ensureRgbContrast(source, [...surfaces, soft], themeText, 3)),
+        };
+      }
+
+      function proposedRoles(accent, appearance) {
+        const sourceRgb = parseHex(accent);
+        const source = rgbToOklch(sourceRgb);
+        const surfaceRgb = parseHex(appearance === 'light' ? '#ffffff' : '#182126');
+        const surface = rgbToOklch(surfaceRgb);
+        const neutralText = appearance === 'light' ? '#152027' : '#f2f6f8';
+        const direction = appearance === 'light' ? 'darker' : 'lighter';
+        const signal = vividOklchContrast(source, [surfaceRgb], 3, direction);
+        const soft = gamutMappedOklch({
+          l: surface.l + (source.l - surface.l) * 0.72,
+          c: source.c * 0.88,
+          h: source.h,
+        });
+        const softRgb = oklchToRgb(soft);
+        const needsBoundary = contrastRatio(sourceRgb, surfaceRgb) < 3;
+        const boundary = needsBoundary
+          ? vividOklchContrast(source, [surfaceRgb, sourceRgb], 3, direction)
+          : null;
+        const black = parseHex('#000000');
+        const white = parseHex('#ffffff');
+        return {
+          fill: accent,
+          boundary: boundary ? toHex(oklchToRgb(boundary)) : 'transparent',
+          contrast: toHex(
+            contrastRatio(sourceRgb, black) >= contrastRatio(sourceRgb, white) ? black : white,
+          ),
+          soft: toHex(softRgb),
+          'hover-contrast': toHex(
+            contrastRatio(softRgb, black) >= contrastRatio(softRgb, white) ? black : white,
+          ),
+          muted: toHex(oklchToRgb(signal)),
+          text: neutralText,
+          focus: toHex(oklchToRgb(signal)),
+          rail: contrastRatio(sourceRgb, surfaceRgb) >= 3 ? accent : toHex(oklchToRgb(signal)),
+        };
+      }
+
+      function vividOklchContrast(source, backgrounds, ratio, direction) {
+        const sourceRgb = oklchToRgb(source);
+        if (backgrounds.every((background) => contrastRatio(sourceRgb, background) >= ratio))
+          return source;
+        const base = findOklchContrast(source, backgrounds, ratio, direction);
+        if (source.c < 0.015) return base;
+        const lightness = clamp(base.l + (direction === 'lighter' ? 0.06 : -0.06));
+
+        for (let chroma = 0.4; chroma >= source.c; chroma -= 0.002) {
+          const candidate = {l: lightness, c: chroma, h: source.h};
+          const raw = oklchToRgbRaw(candidate);
+          if (
+            isInGamut(raw) &&
+            backgrounds.every((background) => contrastRatio(raw, background) >= ratio)
+          )
+            return candidate;
+        }
+
+        return {...base, l: lightness};
+      }
+
+      function findOklchContrast(source, backgrounds, ratio, direction) {
+        const steps = Array.from({length: 501}, (_, index) => index / 500);
+        const ordered = steps
+          .filter((lightness) =>
+            direction === 'lighter' ? lightness >= source.l : lightness <= source.l,
+          )
+          .sort((first, second) => Math.abs(first - source.l) - Math.abs(second - source.l));
+        for (const lightness of ordered) {
+          const candidate = gamutMappedOklch({...source, l: lightness});
+          const rgb = oklchToRgb(candidate);
+          if (backgrounds.every((background) => contrastRatio(rgb, background) >= ratio))
+            return candidate;
+        }
+        return gamutMappedOklch({...source, l: direction === 'lighter' ? 1 : 0, c: 0});
+      }
+
+      function gamutMappedOklch(color) {
+        let chroma = Number.isFinite(color.c) ? color.c : 0;
+        const hue = Number.isFinite(color.h) ? color.h : 0;
+        for (let index = 0; index < 40; index += 1) {
+          const candidate = {l: clamp(color.l), c: chroma, h: hue};
+          const rgb = oklchToRgbRaw(candidate);
+          if ([rgb.red, rgb.green, rgb.blue].every((channel) => channel >= 0 && channel <= 1))
+            return candidate;
+          chroma *= 0.94;
+        }
+        return {l: clamp(color.l), c: 0, h: hue};
+      }
+
+      function isInGamut(rgb) {
+        return [rgb.red, rgb.green, rgb.blue].every((channel) => channel >= 0 && channel <= 1);
+      }
+
+      function parseHex(hex) {
+        return {
+          red: Number.parseInt(hex.slice(1, 3), 16) / 255,
+          green: Number.parseInt(hex.slice(3, 5), 16) / 255,
+          blue: Number.parseInt(hex.slice(5, 7), 16) / 255,
+        };
+      }
+
+      function toHex(rgb) {
+        const channel = (value) =>
+          Math.round(clamp(value) * 255)
+            .toString(16)
+            .padStart(2, '0');
+        return `#${channel(rgb.red)}${channel(rgb.green)}${channel(rgb.blue)}`;
+      }
+
+      function mixRgb(from, to, amount) {
+        return {
+          red: from.red + (to.red - from.red) * amount,
+          green: from.green + (to.green - from.green) * amount,
+          blue: from.blue + (to.blue - from.blue) * amount,
+        };
+      }
+
+      function ensureRgbContrast(color, backgrounds, target, ratio) {
+        if (backgrounds.every((background) => contrastRatio(color, background) >= ratio))
+          return color;
+        let lower = 0;
+        let upper = 1;
+        for (let index = 0; index < 16; index += 1) {
+          const amount = (lower + upper) / 2;
+          const candidate = mixRgb(color, target, amount);
+          if (backgrounds.every((background) => contrastRatio(candidate, background) >= ratio))
+            upper = amount;
+          else lower = amount;
+        }
+        return mixRgb(color, target, upper);
+      }
+
+      function contrastRatio(first, second) {
+        const firstLuminance = luminance(first);
+        const secondLuminance = luminance(second);
+        return (
+          (Math.max(firstLuminance, secondLuminance) + 0.05) /
+          (Math.min(firstLuminance, secondLuminance) + 0.05)
+        );
+      }
+
+      function luminance(rgb) {
+        const linear = [rgb.red, rgb.green, rgb.blue].map((channel) =>
+          channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
+        );
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+      }
+
+      function rgbToOklch(rgb) {
+        const [red, green, blue] = [rgb.red, rgb.green, rgb.blue].map((channel) =>
+          channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
+        );
+        const lRoot = Math.cbrt(0.4122214708 * red + 0.5363325363 * green + 0.0514459929 * blue);
+        const mRoot = Math.cbrt(0.2119034982 * red + 0.6806995451 * green + 0.1073969566 * blue);
+        const sRoot = Math.cbrt(0.0883024619 * red + 0.2817188376 * green + 0.6299787005 * blue);
+        const lightness = 0.2104542553 * lRoot + 0.793617785 * mRoot - 0.0040720468 * sRoot;
+        const a = 1.9779984951 * lRoot - 2.428592205 * mRoot + 0.4505937099 * sRoot;
+        const b = 0.0259040371 * lRoot + 0.7827717662 * mRoot - 0.808675766 * sRoot;
+        return {l: lightness, c: Math.hypot(a, b), h: Math.atan2(b, a)};
+      }
+
+      function oklchToRgb(color) {
+        const raw = oklchToRgbRaw(gamutMappedOklch(color));
+        return {red: clamp(raw.red), green: clamp(raw.green), blue: clamp(raw.blue)};
+      }
+
+      function oklchToRgbRaw(color) {
+        const a = color.c * Math.cos(color.h);
+        const b = color.c * Math.sin(color.h);
+        const lRoot = color.l + 0.3963377774 * a + 0.2158037573 * b;
+        const mRoot = color.l - 0.1055613458 * a - 0.0638541728 * b;
+        const sRoot = color.l - 0.0894841775 * a - 1.291485548 * b;
+        const l = lRoot ** 3;
+        const m = mRoot ** 3;
+        const s = sRoot ** 3;
+        const linear = {
+          red: 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+          green: -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+          blue: -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+        };
+        const encode = (channel) =>
+          channel <= 0.0031308 ? 12.92 * channel : 1.055 * channel ** (1 / 2.4) - 0.055;
+        return {red: encode(linear.red), green: encode(linear.green), blue: encode(linear.blue)};
+      }
+
+      const clamp = (value) => Math.min(1, Math.max(0, value));
+      render();
+    </script>
+  </body>
+</html>

@@ -12,64 +12,152 @@ import {AppearanceProvider} from '../src/index.js';
 afterEach(cleanup);
 
 describe('AppearanceProvider', () => {
-  it('applies appearance, accent, and accessible derived accent roles', () => {
+  it('keeps deep-purple identity rich while structural roles stay saturated and visible', () => {
     const {getByTestId} = render(
-      <AppearanceProvider appearance="light" accent="#f5d90a">
+      <AppearanceProvider appearance="dark" accent="#2d0548">
         <span data-testid="child">Ready</span>
       </AppearanceProvider>,
     );
 
     const provider = getByTestId('child').parentElement;
+    if (!provider) throw new Error('Expected an appearance provider boundary.');
+    const fill = provider.style.getPropertyValue('--wcl-accent-fill');
+    const boundary = provider.style.getPropertyValue('--wcl-accent-fill-boundary-on-base');
+    const focus = provider.style.getPropertyValue('--wcl-accent-focus-on-base');
+    const muted = provider.style.getPropertyValue('--wcl-accent-muted-on-base');
+    const rail = provider.style.getPropertyValue('--wcl-accent-rail-on-base');
+    const soft = provider.style.getPropertyValue('--wcl-accent-soft-on-base');
+    const source = oklch(fill);
 
-    expect(provider?.getAttribute('data-wcl-appearance')).toBe('light');
-    expect(provider?.style.getPropertyValue('--wcl-accent')).toBe('#f5d90a');
-    expect(provider?.style.getPropertyValue('--wcl-accent-contrast')).toBe('#152027');
-    expect(provider?.style.getPropertyValue('--wcl-accent-text')).not.toBe('#f5d90a');
+    expect(provider.getAttribute('data-wcl-appearance')).toBe('dark');
+    expect(provider.style.getPropertyValue('--wcl-accent')).toBe('#2d0548');
+    expect(fill).toBe('#2d0548');
+    expect(soft).not.toBe('#1b1d2a');
+    expect(hueDistance(oklch(soft).hue, source.hue)).toBeLessThanOrEqual(6);
+    expect(oklch(soft).chroma).toBeGreaterThanOrEqual(source.chroma * 0.7);
+
+    for (const structuralRole of [boundary, focus, muted, rail]) {
+      const role = oklch(structuralRole);
+      expect(hueDistance(role.hue, source.hue)).toBeLessThanOrEqual(6);
+      expect(role.chroma).toBeGreaterThan(source.chroma);
+      expect(contrastRatio(structuralRole, '#182126')).toBeGreaterThanOrEqual(3);
+    }
+    expect(contrastRatio(boundary, fill)).toBeGreaterThanOrEqual(3);
+    expect(
+      contrastRatio(soft, provider.style.getPropertyValue('--wcl-accent-hover-contrast-on-base')),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(provider.style.getPropertyValue('--wcl-accent-text')).toBe('');
   });
 
-  it.each(
-    (['light', 'dark'] as const).flatMap((appearance) =>
-      (['#2474ff', '#ff0000', '#777777', '#949494', '#f5d90a', '#ffffff', '#000000'] as const).map(
-        (accent) => [appearance, accent] as const,
-      ),
-    ),
-  )('derives readable roles in %s appearance for the %s accent', (appearance, accent) => {
+  it('derives support against each owned surface instead of one shared approximation', () => {
     const {container} = render(
-      <AppearanceProvider appearance={appearance} accent={accent}>
+      <AppearanceProvider appearance="dark" accent="#5f6b72">
         <span />
       </AppearanceProvider>,
     );
     const provider = container.firstElementChild as HTMLElement;
-    const surfaces =
-      appearance === 'light'
-        ? ['#e9edef', '#ffffff', '#edf1f3']
-        : ['#11171b', '#182126', '#202b31', '#243138'];
 
+    expect(provider.style.getPropertyValue('--wcl-accent-fill-boundary-on-canvas')).toBe(
+      'transparent',
+    );
+    expect(provider.style.getPropertyValue('--wcl-accent-fill-boundary-on-base')).not.toBe(
+      'transparent',
+    );
+    expect(provider.style.getPropertyValue('--wcl-accent-fill-boundary-on-raised')).not.toBe(
+      'transparent',
+    );
+    expect(provider.style.getPropertyValue('--wcl-accent-fill-boundary-on-subtle')).not.toBe(
+      'transparent',
+    );
+  });
+
+  it('gives every literal primary fill a distinct hover edge', () => {
+    const {container} = render(
+      <AppearanceProvider appearance="dark" accent="#2474ff">
+        <span />
+      </AppearanceProvider>,
+    );
+    const provider = container.firstElementChild as HTMLElement;
     const fill = provider.style.getPropertyValue('--wcl-accent-fill');
-    const soft = provider.style.getPropertyValue('--wcl-accent-soft');
+    const hoverEdge = provider.style.getPropertyValue('--wcl-accent-hover-edge');
 
-    expect(
-      contrastRatio(fill, provider.style.getPropertyValue('--wcl-accent-contrast')),
-    ).toBeGreaterThanOrEqual(4.5);
-    for (const surface of surfaces) {
-      expect(contrastRatio(surface, fill)).toBeGreaterThanOrEqual(3);
+    expect(provider.style.getPropertyValue('--wcl-accent-fill-boundary-on-base')).toBe(
+      'transparent',
+    );
+    expect(hoverEdge).not.toBe('');
+    expect(hoverEdge).not.toBe('transparent');
+    expect(contrastRatio(fill, hoverEdge)).toBeGreaterThanOrEqual(3);
+  });
+
+  it.each(
+    (['light', 'dark'] as const).flatMap((appearance) =>
+      (
+        [
+          '#2474ff',
+          '#2b0a64',
+          '#ff0000',
+          '#777777',
+          '#949494',
+          '#f5d90a',
+          '#ffffff',
+          '#000000',
+        ] as const
+      ).map((accent) => [appearance, accent] as const),
+    ),
+  )(
+    'preserves the %s appearance fill and derives support for the %s accent',
+    (appearance, accent) => {
+      const {container} = render(
+        <AppearanceProvider appearance={appearance} accent={accent}>
+          <span />
+        </AppearanceProvider>,
+      );
+      const provider = container.firstElementChild as HTMLElement;
+      const fill = provider.style.getPropertyValue('--wcl-accent-fill');
+      const surfaces =
+        appearance === 'light'
+          ? {base: '#ffffff', canvas: '#e9edef', raised: '#ffffff', subtle: '#edf1f3'}
+          : {base: '#182126', canvas: '#11171b', raised: '#202b31', subtle: '#243138'};
+
+      expect(fill).toBe(accent);
       expect(
-        contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-text')),
+        contrastRatio(fill, provider.style.getPropertyValue('--wcl-accent-contrast')),
       ).toBeGreaterThanOrEqual(4.5);
       expect(
-        contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-focus')),
+        contrastRatio(fill, provider.style.getPropertyValue('--wcl-accent-hover-edge')),
       ).toBeGreaterThanOrEqual(3);
-      expect(
-        contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-rail')),
-      ).toBeGreaterThanOrEqual(3);
-    }
-    expect(
-      contrastRatio(soft, provider.style.getPropertyValue('--wcl-accent-rail')),
-    ).toBeGreaterThanOrEqual(3);
-    expect(
-      contrastRatio(soft, provider.style.getPropertyValue('--wcl-accent-text')),
-    ).toBeGreaterThanOrEqual(4.5);
-  });
+
+      for (const [surfaceName, componentSurface] of Object.entries(surfaces)) {
+        const fillBoundary = provider.style.getPropertyValue(
+          `--wcl-accent-fill-boundary-on-${surfaceName}`,
+        );
+        const muted = provider.style.getPropertyValue(`--wcl-accent-muted-on-${surfaceName}`);
+        const soft = provider.style.getPropertyValue(`--wcl-accent-soft-on-${surfaceName}`);
+        const focus = provider.style.getPropertyValue(`--wcl-accent-focus-on-${surfaceName}`);
+        const rail = provider.style.getPropertyValue(`--wcl-accent-rail-on-${surfaceName}`);
+
+        expect(
+          contrastRatio(
+            soft,
+            provider.style.getPropertyValue(`--wcl-accent-hover-contrast-on-${surfaceName}`),
+          ),
+        ).toBeGreaterThanOrEqual(4.5);
+
+        const needsBoundary = contrastRatio(componentSurface, fill) < 3;
+        if (needsBoundary) {
+          expect(fillBoundary).not.toBe('transparent');
+          expect(contrastRatio(fill, fillBoundary)).toBeGreaterThanOrEqual(3);
+          expect(contrastRatio(componentSurface, fillBoundary)).toBeGreaterThanOrEqual(3);
+        } else {
+          expect(fillBoundary).toBe('transparent');
+        }
+        expect(contrastRatio(componentSurface, focus)).toBeGreaterThanOrEqual(3);
+        expect(contrastRatio(componentSurface, rail)).toBeGreaterThanOrEqual(3);
+        expect(contrastRatio(componentSurface, muted)).toBeGreaterThanOrEqual(3);
+      }
+      expect(provider.style.getPropertyValue('--wcl-accent-text')).toBe('');
+    },
+  );
 
   it('updates the scoped appearance without mutating the document root', () => {
     const {getByTestId, rerender} = render(
@@ -155,4 +243,33 @@ function contrastRatio(first: string, second: string): number {
   };
   const values = [luminance(first), luminance(second)].sort((a, b) => b - a);
   return ((values[0] ?? 0) + 0.05) / ((values[1] ?? 0) + 0.05);
+}
+
+function oklch(color: string): {chroma: number; hue: number; lightness: number} {
+  const [red, green, blue] = [1, 3, 5]
+    .map((offset) => Number.parseInt(color.slice(offset, offset + 2), 16) / 255)
+    .map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4));
+  const lRoot = Math.cbrt(
+    0.4122214708 * (red ?? 0) + 0.5363325363 * (green ?? 0) + 0.0514459929 * (blue ?? 0),
+  );
+  const mRoot = Math.cbrt(
+    0.2119034982 * (red ?? 0) + 0.6806995451 * (green ?? 0) + 0.1073969566 * (blue ?? 0),
+  );
+  const sRoot = Math.cbrt(
+    0.0883024619 * (red ?? 0) + 0.2817188376 * (green ?? 0) + 0.6299787005 * (blue ?? 0),
+  );
+  const lightness = 0.2104542553 * lRoot + 0.793617785 * mRoot - 0.0040720468 * sRoot;
+  const a = 1.9779984951 * lRoot - 2.428592205 * mRoot + 0.4505937099 * sRoot;
+  const b = 0.0259040371 * lRoot + 0.7827717662 * mRoot - 0.808675766 * sRoot;
+
+  return {
+    chroma: Math.hypot(a, b),
+    hue: (Math.atan2(b, a) * 180) / Math.PI,
+    lightness,
+  };
+}
+
+function hueDistance(first: number, second: number): number {
+  const difference = Math.abs(first - second) % 360;
+  return Math.min(difference, 360 - difference);
 }

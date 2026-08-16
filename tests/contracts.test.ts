@@ -1,3 +1,5 @@
+import {readFile} from 'node:fs/promises';
+
 import {describe, expect, it} from 'vitest';
 
 import {
@@ -84,6 +86,36 @@ describe('canonical component contracts', () => {
     expect(contractFor('ToggleButton')?.contentRules.join(' ')).toMatch(
       /secondary.*standalone.*quiet.*toolbar/i,
     );
+  });
+
+  it('distinguishes literal accent identity from derived support roles', () => {
+    const button = componentContracts.find((contract) => contract.exportName === 'Button');
+    const providerGuidance = [
+      ...appearanceProviderContract.accentBehavior,
+      ...appearanceProviderContract.accessibility,
+    ].join(' ');
+
+    expect(providerGuidance).toMatch(/exact|literal/i);
+    expect(providerGuidance).toMatch(/primary fill/i);
+    expect(providerGuidance).toMatch(/neutral.*(?:text|content)/i);
+    expect(providerGuidance).toMatch(/saturated.*same-hue/i);
+    expect(providerGuidance).toMatch(/actual|specific|role.local/i);
+    expect(button?.accentBehavior.join(' ')).toMatch(/exact.*accent/i);
+    expect(button?.accentBehavior.join(' ')).toMatch(/boundary/i);
+    for (const exportName of ['IconButton', 'Link', 'ToggleButton']) {
+      const contract = componentContracts.find((candidate) => candidate.exportName === exportName);
+      expect(contract?.accentBehavior.join(' ')).toMatch(/saturated|same-hue|role-specific/i);
+    }
+  });
+
+  it('keeps selected-label color neutral in every accepted visual source', async () => {
+    const visualDirection = await readFile(
+      '.work/library-foundation/decisions/05-visual-direction.md',
+      'utf8',
+    );
+
+    expect(visualDirection).not.toMatch(/bottom rail and accent label/i);
+    expect(visualDirection).toMatch(/bottom rail.*label.*neutral|neutral.*label.*bottom rail/i);
   });
 
   it('places every layout example inside its required appearance provider', () => {
