@@ -245,9 +245,7 @@
   .showcase-specimen-stage {
     display: grid;
     align-content: center;
-    background:
-      linear-gradient(var(--wcl-border), var(--wcl-border)) 1rem 1rem / 1rem 1px no-repeat,
-      var(--wcl-surface);
+    background: var(--wcl-surface);
   }
 
   .showcase-measure {

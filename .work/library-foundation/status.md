@@ -10,8 +10,11 @@ propagated application accent.
 ## Current state
 
 Novel-work implementation: Tickets 01 through 03 are delivered. The requested repository-local
-component showcase has current completion evidence, clean final independent review axes, and is
-preserved in the current HEAD with its maintenance instruction. Ticket 04 has not started.
+component showcase is delivered with its maintenance instruction. Its unexplained specimen-stage
+ticks and the selected ToggleButton rail's curved inset treatment are corrected with focused tests
+and current repository, package, and direct Chromium, Firefox, and WebKit validation. The correction
+has clean independent intent and engineering review axes and is preserved in the current HEAD.
+Ticket 04 has not started.
 
 ## Progress
 
@@ -86,6 +89,9 @@ It uses the library's accepted visual language, provides working light and dark 
 and compact widths, and derives its catalog from an explicit specimen inventory. A focused test
 compares rendered specimens with the canonical component contracts so catalog drift fails the
 repository checks. The local `AGENTS.md` requires the showcase to change with public components.
+Showcase specimen stages no longer carry an unexplained calibration tick. Selected ToggleButtons
+now use a dedicated full-width bottom rail that meets the control's rounded perimeter without
+curving upward; hover and pressed feedback remain separate from the selection rail.
 
 Repository-wide quality gates now run before the existing type, test, generated-artifact, and
 compatibility checks. Prettier owns formatting for authored files, ESLint applies type-informed
@@ -180,12 +186,28 @@ See the [decision map](map.md).
   screenshots, scripts, and build artifacts were moved to Trash.
 - Final independent intent and engineering review axes passed with no findings after navigation
   catalog coverage was enforced separately from rendered-specimen coverage.
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict types, generated
+  artifacts, the TypeScript 5.9/6/7 matrix, and 114 tests after the showcase detail correction.
+  `npm run showcase:build` and `npm run verify:package` pass, including clean React 18.3.1 and
+  React 19.2.8 consumers. `npm audit --audit-level=high` reports zero vulnerabilities and
+  `git diff --check` passes.
+- Fresh Chromium, Firefox, and WebKit operation hovered the selected standalone ToggleButton and
+  inspected its rendered rail. In every engine the rail remains a flat 3px bottom element spanning
+  both inline edges and meeting the rounded perimeter without curving upward; hover feedback does
+  not replace it. Dark action screenshots and light foundation screenshots show no clipping,
+  overlap, style leakage, or unexplained specimen-stage ticks. Structural inspection confirms all
+  14 specimen stages have no background image. Temporary inspection artifacts were moved to Trash.
+- Fresh independent intent and engineering review axes examined the complete correction from HEAD
+  `4b1eea4` through the working tree and reported no findings. Existing generated ToggleButton
+  guidance already defines a rail-only selected state whose hover preserves the rail, so no
+  consumer-facing documentation change is required; the showcase and this work record contain the
+  complete documentation impact.
 
 ## Continuation
 
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-The showcase addition is delivered. Begin Ticket 04 only when Whitney explicitly requests the next
-ticket.
+The showcase selection-detail correction is delivered. Begin Ticket 04 only when Whitney explicitly
+requests the next ticket.
 
 Current branch: `master`.
 

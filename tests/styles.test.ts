@@ -77,15 +77,23 @@ describe('static appearance styles', () => {
   it('uses a rail-only toggle selection and a purposeful pending rail', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const selected = styles.match(/\[data-wcl-toggle-button\]\[data-selected\]\s*\{([^}]*)\}/)?.[1];
+    const selectedRail = styles.match(
+      /\[data-wcl-toggle-button\]\[data-selected\]::after\s*\{([^}]*)\}/,
+    )?.[1];
     const selectedPressed = styles.match(
       /\[data-wcl-toggle-button\]\[data-selected\]\[data-pressed\]\s*\{([^}]*)\}/,
     )?.[1];
     const pending = styles.match(/\[data-wcl-button\]\[data-pending\]::after\s*\{([^}]*)\}/)?.[1];
 
     expect(selected).toContain('background: transparent');
-    expect(selected).toContain('inset 0 -3px var(--wcl-accent-rail)');
+    expect(selected).not.toContain('inset 0 -3px var(--wcl-accent-rail)');
+    expect(selectedRail).toContain('inset-inline: 0');
+    expect(selectedRail).toContain('inset-block-end: 0');
+    expect(selectedRail).toContain('block-size: 3px');
+    expect(selectedRail).toContain('border-radius: 3px 3px 0 0');
+    expect(selectedRail).toContain('background: var(--wcl-accent-rail)');
     expect(selectedPressed).toContain('inset 0 2px 4px');
-    expect(selectedPressed).toContain('inset 0 -3px var(--wcl-accent-rail)');
+    expect(selectedPressed).not.toContain('inset 0 -3px var(--wcl-accent-rail)');
     expect(pending).toContain('var(--wcl-warning)');
     expect(pending).toContain('var(--wcl-warning-surface)');
     expect(pending).not.toContain('transparent');
@@ -93,6 +101,15 @@ describe('static appearance styles', () => {
     expect(styles).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-button\]\[data-pending\]::after[\s\S]*animation:\s*none/,
     );
+  });
+
+  it('does not decorate showcase specimens with an unexplained calibration tick', async () => {
+    const styles = await readFile('showcase/styles.css', 'utf8');
+    const stageRules = [...styles.matchAll(/\.showcase-specimen-stage\s*\{([^}]*)\}/g)];
+    const stage = stageRules.at(-1)?.[1];
+
+    expect(stage).toContain('background: var(--wcl-surface)');
+    expect(stage).not.toContain('linear-gradient');
   });
 
   it('owns group, toolbar, link, tooltip, and forced-color action treatments', async () => {
