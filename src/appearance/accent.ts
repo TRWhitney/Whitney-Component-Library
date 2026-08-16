@@ -9,8 +9,10 @@ interface Rgb {
 export interface AccentRoles {
   readonly accent: AccentColor;
   readonly contrast: string;
+  readonly fill: string;
   readonly focus: string;
   readonly muted: string;
+  readonly rail: string;
   readonly soft: string;
   readonly text: string;
 }
@@ -27,22 +29,24 @@ export function deriveAccentRoles(accent: AccentColor, appearance: 'light' | 'da
   const parsedAccent = parseHexColor(accent);
   const surfaces = appearance === 'light' ? LIGHT_SURFACES : DARK_SURFACES;
   const themeText = appearance === 'light' ? DARK_TEXT : LIGHT_TEXT;
+  const fill = ensureContrast(parsedAccent, surfaces, themeText, 3);
   const preferredContrast =
-    contrastRatio(parsedAccent, DARK_TEXT) >= contrastRatio(parsedAccent, LIGHT_TEXT)
-      ? DARK_TEXT
-      : LIGHT_TEXT;
+    contrastRatio(fill, DARK_TEXT) >= contrastRatio(fill, LIGHT_TEXT) ? DARK_TEXT : LIGHT_TEXT;
   const guaranteedContrast =
-    contrastRatio(parsedAccent, BLACK) >= contrastRatio(parsedAccent, WHITE) ? BLACK : WHITE;
+    contrastRatio(fill, BLACK) >= contrastRatio(fill, WHITE) ? BLACK : WHITE;
   const contrast =
-    contrastRatio(parsedAccent, preferredContrast) >= 4.5 ? preferredContrast : guaranteedContrast;
+    contrastRatio(fill, preferredContrast) >= 4.5 ? preferredContrast : guaranteedContrast;
+  const soft = mix(surfaces[1] ?? surfaces[0] ?? themeText, parsedAccent, 0.13);
 
   return {
     accent: accent.toLowerCase() as AccentColor,
     contrast: toHex(contrast),
+    fill: toHex(fill),
     focus: toHex(ensureContrast(parsedAccent, surfaces, themeText, 3)),
     muted: toHex(mix(surfaces[1] ?? surfaces[0] ?? themeText, parsedAccent, 0.33)),
-    soft: toHex(mix(surfaces[1] ?? surfaces[0] ?? themeText, parsedAccent, 0.13)),
-    text: toHex(ensureContrast(parsedAccent, surfaces, themeText, 4.5)),
+    rail: toHex(ensureContrast(parsedAccent, [...surfaces, soft], themeText, 3)),
+    soft: toHex(soft),
+    text: toHex(ensureContrast(parsedAccent, [...surfaces, soft], themeText, 4.5)),
   };
 }
 

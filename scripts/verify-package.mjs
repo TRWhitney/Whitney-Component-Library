@@ -188,13 +188,19 @@ function createTypeConsumerSource(packageName) {
   return `
 import {
   AppearanceProvider,
+  Button,
+  ButtonGroup,
   Divider,
+  IconButton,
   InlineGroup,
+  Link,
   ResponsiveGrid,
   ScrollRegion,
   Section,
   Stack,
   Surface,
+  ToggleButton,
+  Toolbar,
   type AccentColor,
   type LayoutGap,
 } from '${packageName}';
@@ -221,6 +227,17 @@ export const provider = (
             </ScrollRegion>
           </Stack>
         </ResponsiveGrid>
+        <Link href="/runs/0284">Open run</Link>
+        <ButtonGroup label="Profile actions" equalItems>
+          <Button>Review conditions</Button>
+          <Button variant="primary" type="submit">Run profile</Button>
+        </ButtonGroup>
+        <Toolbar label="Inspector commands">
+          <IconButton label="More actions" variant="quiet">
+            <span aria-hidden="true">•••</span>
+          </IconButton>
+          <ToggleButton defaultSelected variant="quiet">Pin inspector</ToggleButton>
+        </Toolbar>
       </Section>
     </Surface>
   </AppearanceProvider>
@@ -241,7 +258,18 @@ function createBrowserConsumerSource(packageName) {
   return `
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {AppearanceProvider, ResponsiveGrid, Section, Surface} from '${packageName}';
+import {
+  AppearanceProvider,
+  Button,
+  ButtonGroup,
+  IconButton,
+  Link,
+  ResponsiveGrid,
+  Section,
+  Surface,
+  ToggleButton,
+  Toolbar,
+} from '${packageName}';
 import '${packageName}/styles.css';
 
 createRoot(document.getElementById('root')).render(
@@ -254,12 +282,17 @@ createRoot(document.getElementById('root')).render(
       React.createElement(
         Section,
         {title: 'Thermal envelope'},
-        React.createElement(
-          ResponsiveGrid,
-          {minimumItemWidth: 'compact'},
+        React.createElement(ResponsiveGrid, {minimumItemWidth: 'compact'},
           React.createElement('span', null, 'Solver'),
-          React.createElement('span', null, 'Adaptive mesh'),
-        ),
+          React.createElement('span', null, 'Adaptive mesh')),
+        React.createElement(Link, {href: '/runs/0284'}, 'Open run'),
+        React.createElement(ButtonGroup, {label: 'Profile actions', equalItems: true},
+          React.createElement(Button, null, 'Review conditions'),
+          React.createElement(Button, {variant: 'primary'}, 'Run profile')),
+        React.createElement(Toolbar, {label: 'Inspector commands'},
+          React.createElement(IconButton, {label: 'More actions'},
+            React.createElement('span', {'aria-hidden': true}, '•••')),
+          React.createElement(ToggleButton, {defaultSelected: true}, 'Pin inspector')),
       ),
     ),
   ),

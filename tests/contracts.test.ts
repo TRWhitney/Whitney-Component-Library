@@ -30,22 +30,60 @@ describe('canonical component contracts', () => {
     ).toContain('## Do not use for');
   });
 
-  it('covers every layout primitive with one canonical contract', () => {
+  it('covers every public component with one canonical contract', () => {
     const exportNames = [
       'AppearanceProvider',
+      'Button',
+      'ButtonGroup',
       'Divider',
+      'IconButton',
       'InlineGroup',
+      'Link',
       'ResponsiveGrid',
       'ScrollRegion',
       'Section',
       'Stack',
       'Surface',
+      'ToggleButton',
+      'Toolbar',
     ];
 
     expect(validateComponentContracts(componentContracts, exportNames)).toHaveLength(
       exportNames.length,
     );
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+  });
+
+  it('directs agents among command, navigation, selection, and composite action semantics', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Button')?.appropriateUses.join(' ')).toMatch(/command|submit/i);
+    expect(contractFor('Button')?.preferredAlternatives.join(' ')).toMatch(/Link.*navigation/i);
+    expect(contractFor('Link')?.appropriateUses.join(' ')).toMatch(/navigat/i);
+    expect(contractFor('ToggleButton')?.appropriateUses.join(' ')).toMatch(/persistent|binary/i);
+    expect(contractFor('IconButton')?.labeling.join(' ')).toMatch(/tooltip/i);
+    expect(contractFor('ButtonGroup')?.keyboardBehavior.join(' ')).toMatch(/tab/i);
+    expect(contractFor('Toolbar')?.keyboardBehavior.join(' ')).toMatch(/arrow/i);
+    expect(contractFor('ButtonGroup')?.composition.join(' ')).toMatch(/consumer component/i);
+    expect(contractFor('Toolbar')?.composition.join(' ')).toMatch(/consumer component/i);
+    expect(contractFor('Button')?.examples[0]?.code).toContain(
+      '<Button variant="primary" isPending',
+    );
+    expect(contractFor('Button')?.examples[0]?.code).not.toContain('isPending={false}');
+    expect(contractFor('Link')?.responsiveBehavior.join(' ')).not.toMatch(/control height/i);
+    expect(contractFor('ButtonGroup')?.appearance.join(' ')).toMatch(/group.*geometry|layout/i);
+    expect(contractFor('ButtonGroup')?.appearance.join(' ')).not.toMatch(/danger|pending/i);
+    expect(contractFor('Toolbar')?.accentBehavior.join(' ')).toMatch(/children|descendant/i);
+    expect(contractFor('Button')?.contentRules.join(' ')).toMatch(
+      /secondary.*standard.*quiet.*supporting/i,
+    );
+    expect(contractFor('IconButton')?.contentRules.join(' ')).toMatch(
+      /secondary.*boundary.*quiet.*containment.*danger.*destructive/i,
+    );
+    expect(contractFor('ToggleButton')?.contentRules.join(' ')).toMatch(
+      /secondary.*standalone.*quiet.*toolbar/i,
+    );
   });
 
   it('places every layout example inside its required appearance provider', () => {

@@ -29,7 +29,7 @@ describe('AppearanceProvider', () => {
 
   it.each(
     (['light', 'dark'] as const).flatMap((appearance) =>
-      (['#2474ff', '#777777', '#949494', '#f5d90a', '#ffffff', '#000000'] as const).map(
+      (['#2474ff', '#ff0000', '#777777', '#949494', '#f5d90a', '#ffffff', '#000000'] as const).map(
         (accent) => [appearance, accent] as const,
       ),
     ),
@@ -45,20 +45,30 @@ describe('AppearanceProvider', () => {
         ? ['#e9edef', '#ffffff', '#edf1f3']
         : ['#11171b', '#182126', '#202b31', '#243138'];
 
+    const fill = provider.style.getPropertyValue('--wcl-accent-fill');
+    const soft = provider.style.getPropertyValue('--wcl-accent-soft');
+
     expect(
-      contrastRatio(
-        provider.style.getPropertyValue('--wcl-accent'),
-        provider.style.getPropertyValue('--wcl-accent-contrast'),
-      ),
+      contrastRatio(fill, provider.style.getPropertyValue('--wcl-accent-contrast')),
     ).toBeGreaterThanOrEqual(4.5);
     for (const surface of surfaces) {
+      expect(contrastRatio(surface, fill)).toBeGreaterThanOrEqual(3);
       expect(
         contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-text')),
       ).toBeGreaterThanOrEqual(4.5);
       expect(
         contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-focus')),
       ).toBeGreaterThanOrEqual(3);
+      expect(
+        contrastRatio(surface, provider.style.getPropertyValue('--wcl-accent-rail')),
+      ).toBeGreaterThanOrEqual(3);
     }
+    expect(
+      contrastRatio(soft, provider.style.getPropertyValue('--wcl-accent-rail')),
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      contrastRatio(soft, provider.style.getPropertyValue('--wcl-accent-text')),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it('updates the scoped appearance without mutating the document root', () => {

@@ -9,8 +9,10 @@ propagated application accent.
 
 ## Current state
 
-Novel-work implementation: Tickets 01 and 02 are delivered. Ticket 03 is ready for an agent and
-remains unstarted.
+Novel-work implementation: Tickets 01 through 03 are delivered. Ticket 03 has current repository,
+package, and direct-browser evidence, and its final independent intent and engineering review axes
+are clean. Its complete action-family outcome is preserved in the current HEAD. Ticket 04 has not
+started.
 
 ## Progress
 
@@ -55,8 +57,30 @@ library-owned Stack rhythm. Final release-review corrections make generated snip
 related component they use, describe ScrollRegion's subtle surface accurately, and make Stack own
 direct-child block rhythm instead of inheriting browser margins. Surface guidance now distinguishes
 unnamed visual containment from the nested Section that supplies a visible semantic name.
-Both final independent delivery review axes passed with no findings. Ticket 03 is now the sole
-ready frontier.
+Ticket 02's final independent delivery review axes passed with no findings.
+
+[Ticket 03](tickets/03-action-family.md) now provides Button, IconButton, Link, ToggleButton,
+ButtonGroup, and Toolbar through narrow semantic APIs. Commands remain native buttons with explicit
+form behavior; navigation remains a native destination; pressed state represents persistent binary
+selection; ordinary groups preserve each tab stop; and toolbars own orientation-aware arrow
+navigation. Icon-only commands require one accessible label and reuse it in a provider-scoped
+tooltip. Stable pending labels retain focus and announce localized progress while a warning rail
+communicates motion without replacing the application accent. The visual treatment preserves
+rail-only selection, consistent adjacent dimensions, wrapping without compact clipping,
+non-moving hover and press feedback, and forced-color and reduced-motion meaning. Canonical action
+contracts direct agents among every alternative without exposing the private React Aria foundation.
+Ticket 03 delivery review found that inherited RTL navigation, pending and disabled state
+ownership, pending announcement structure, arbitrary-accent state visibility, forced-color
+selection, and variant-use guidance were not yet fully enforced. Focused regressions are green
+after correcting those boundaries. Complete repository, package, and direct-browser validation
+passed before repeat independent review found that JSX erases the concrete child identities claimed
+by the composite TypeScript types. The accepted correction preserves ordinary JSX and consumer
+components that render valid direct action DOM children, while behavior-owning composites validate
+the resulting DOM relationship at runtime. Review also found untested white-accent primary emphasis
+and saturated-accent hover contrast defects; those corrections now have current evidence. A later
+engineering review found that Toolbar navigation used the global DOM realm. A focused iframe
+regression now passes with event targets resolved from the Toolbar's owning window; the affected
+completion gates remain to be repeated.
 
 Repository-wide quality gates now run before the existing type, test, generated-artifact, and
 compatibility checks. Prettier owns formatting for authored files, ESLint applies type-informed
@@ -80,6 +104,7 @@ See the [decision map](map.md).
 - [Architecture decision: Own a Markdown Editing Surface](../../docs/adr/0007-own-a-markdown-editing-surface.md)
 - [Architecture decision: Own an Accessible Chart Family](../../docs/adr/0008-own-an-accessible-chart-family.md)
 - [Architecture decision: Stabilize After Broad Prerelease Validation](../../docs/adr/0009-stabilize-after-broad-prerelease-validation.md)
+- [Architecture decision: Preserve Consumer Composition Boundaries](../../docs/adr/0010-preserve-consumer-composition-boundaries.md)
 - [Component Library Context](../../CONTEXT.md)
 - [Research: Accessible React Behavior Foundations](research/behavior-foundations.md)
 
@@ -89,19 +114,20 @@ See the [decision map](map.md).
 
 ## Verification
 
-- `npm run check`: repository formatting, zero-warning code and style linting, source types, 87
-  focused and regression tests, generated documentation, exact contract coverage, and canonical
-  examples compiled under TypeScript 5.9.3, 6.0.3, and 7.0.2.
+- `npm run check`: repository formatting, zero-warning code and style linting, strict source types,
+  111 focused and regression tests, generated documentation, exact contract coverage, and public
+  examples under TypeScript 5.9.3, 6.0.3, and 7.0.2.
 - `npm run verify:package`: the actual artifact installed, server-rendered, and hydrated without
   warnings in clean React 18.3.1 and 19.2.8 consumers; both consumers also completed Vite browser
   builds that imported the public stylesheet and emitted its theme rules.
 - `npm audit --audit-level=high`: zero known vulnerabilities in the installed dependency graph.
 - Browser output passed the full Node built-in/global exclusion scan; public subpaths,
   encapsulation, and private React Aria declarations passed.
-- Accent contrast, accent text, and focus contrast passed their thresholds across six
-  representative accents and every owned surface in both appearances. Forced-color and
-  reduced-motion rules are covered. Packed declarations compile against React 18 and React 19
-  types. `git diff --check` passed and no `Any` usage was found in source, tests, or tooling.
+- Accent fill, contrast, accent text, focus, and rail roles passed their thresholds across seven
+  representative accents, every owned surface, and the accent-soft hover surface in both
+  appearances. Forced-color and reduced-motion rules are covered. Packed declarations compile
+  against React 18 and React 19 types. `git diff --check` passed and no `Any` usage was found in
+  source, tests, or tooling.
 - Chromium, Firefox, and WebKit keyboard inspection reached the final inline content of horizontal
   and two-axis ScrollRegions; the two-axis case also reached its final block content and retained a
   visible focus ring without clipping or overflow leakage.
@@ -111,15 +137,37 @@ See the [decision map](map.md).
   Section heading/action placement, and horizontal keyboard scrolling to final inline content.
   The declaration matrix also accepts a runtime boolean for InlineGroup equal sizing while
   rejecting ineffective alignment combinations.
+- Direct Chromium, Firefox, and WebKit action-family inspection passed in light wide, dark compact,
+  reduced-motion, and forced-color presentations. It exercised pending transitions, stable labels,
+  warning-matching accents, surface-matching selection accents, provider-scoped tooltip focus,
+  vertical navigation, and inherited DOM RTL navigation under an English browser locale. Structure
+  and screenshots confirmed readable forced-color labels, visible pending and selected rails,
+  stable adjacent dimensions, wrapping without clipping, and no overflow. Temporary validation
+  artifacts were removed.
+- Fresh Chromium, Firefox, and WebKit inspection confirms that white-on-light and black-on-dark
+  accents retain distinct primary emphasis, saturated-red selected hover remains readable with its
+  rail visible, and consumer components can contribute wrapper-free action bundles without changing
+  direct DOM geometry, arrow navigation, equal sizing, compact wrapping, or overflow behavior.
+- Fresh Chromium, Firefox, and WebKit operation confirms privately registered consumer actions
+  retain direct geometry and arrow navigation, a consumer bundle that later introduces a wrapper
+  reaches the application error boundary, and forged public styling markers are rejected. The
+  resulting valid and rejected screens were inspected for wrapping, clipping, overflow, and style
+  leakage, then the temporary fixture was moved to Trash.
+- Installed-package verification passes with `MutationObserver` resolved from the composite's
+  owning DOM window in both React 18.3.1 and React 19.2.8 consumers.
+- Direct Chromium, Firefox, and WebKit operation of a Toolbar rendered into an RTL iframe confirms
+  that `ArrowLeft` moves focus from Undo to Redo in the owning document. Structural inspection
+  confirms two direct button children, equal heights, inherited RTL direction, and no overflow;
+  screenshots show a visible focus indicator without clipping in every engine. Temporary validation
+  artifacts were moved to Trash.
+- Final independent intent and engineering review axes passed with no findings.
 
 ## Continuation
 
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-Begin Ticket 03 in the next request; do not start a later ticket first.
+Ticket 03 is delivered. Begin Ticket 04 only when Whitney explicitly requests the next ticket.
 
-Current branch: `master` (`[Feature] Add layout primitives`).
-
-Owned uncommitted paths: none. No unrelated uncommitted paths are present.
+Current branch: `master`.
 
 Prototype browser inspection passed for appearance, viewport, accent, error, disabled, dialog,
 review, progress, segmented adjacency, the normalized field-to-Profile gap, the gliding rail,

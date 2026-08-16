@@ -1,5 +1,13 @@
 export {appearanceProviderContract} from './appearance-provider.contract.js';
 export {
+  buttonContract,
+  buttonGroupContract,
+  iconButtonContract,
+  linkContract,
+  toggleButtonContract,
+  toolbarContract,
+} from './action.contracts.js';
+export {
   dividerContract,
   inlineGroupContract,
   responsiveGridContract,
@@ -21,6 +29,14 @@ export {
 
 import {appearanceProviderContract} from './appearance-provider.contract.js';
 import {
+  buttonContract,
+  buttonGroupContract,
+  iconButtonContract,
+  linkContract,
+  toggleButtonContract,
+  toolbarContract,
+} from './action.contracts.js';
+import {
   dividerContract,
   inlineGroupContract,
   responsiveGridContract,
@@ -32,11 +48,17 @@ import {
 
 export const componentContracts = [
   appearanceProviderContract,
+  buttonContract,
+  buttonGroupContract,
   dividerContract,
+  iconButtonContract,
   inlineGroupContract,
+  linkContract,
   responsiveGridContract,
   scrollRegionContract,
   sectionContract,
   stackContract,
   surfaceContract,
+  toggleButtonContract,
+  toolbarContract,
 ] as const;

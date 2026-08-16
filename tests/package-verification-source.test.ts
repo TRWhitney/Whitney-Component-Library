@@ -29,4 +29,22 @@ describe('packed consumer verification source', () => {
     expect(source).toContain('data-wcl-responsive-grid');
     expect(source).toContain("label: 'Run history'");
   });
+
+  it('exercises every action primitive and its packed semantics', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of [
+      'Button',
+      'ButtonGroup',
+      'IconButton',
+      'Link',
+      'ToggleButton',
+      'Toolbar',
+    ]) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-toolbar');
+    expect(source).toContain('aria-pressed');
+    expect(source).toContain("type: 'submit'");
+  });
 });

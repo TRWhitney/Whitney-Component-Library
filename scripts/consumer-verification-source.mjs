@@ -5,13 +5,19 @@ import {JSDOM} from 'jsdom';
 import {renderToString} from 'react-dom/server';
 import {
   AppearanceProvider,
+  Button,
+  ButtonGroup,
   Divider,
+  IconButton,
   InlineGroup,
+  Link,
   ResponsiveGrid,
   ScrollRegion,
   Section,
   Stack,
   Surface,
+  ToggleButton,
+  Toolbar,
 } from '${packageName}';
 
 const manifest = (await import('${packageName}/manifest.json', {with: {type: 'json'}})).default;
@@ -47,28 +53,53 @@ const view = React.createElement(
       Section,
       {title: 'Thermal envelope'},
       React.createElement(
-        ResponsiveGrid,
-        {minimumItemWidth: 'compact', equalItems: true},
+        Stack,
+        {gap: 'regular'},
         React.createElement(
-          Stack,
-          {gap: 'tight'},
-          React.createElement('strong', null, 'Solver'),
-          React.createElement('span', null, 'Adaptive mesh'),
+          ResponsiveGrid,
+          {minimumItemWidth: 'compact', equalItems: true},
+          React.createElement(
+            Stack,
+            {gap: 'tight'},
+            React.createElement('strong', null, 'Solver'),
+            React.createElement('span', null, 'Adaptive mesh'),
+          ),
+          React.createElement(
+            Stack,
+            {gap: 'tight'},
+            React.createElement(
+              InlineGroup,
+              {equalItems: true},
+              React.createElement('span', null, 'Ready'),
+              React.createElement('span', null, 'Review'),
+            ),
+            React.createElement(Divider),
+            React.createElement(
+              ScrollRegion,
+              {label: 'Run history', size: 'compact'},
+              React.createElement('span', null, 'Iteration 0284'),
+            ),
+          ),
+        ),
+        React.createElement(Link, {href: '/runs/0284'}, 'Open run'),
+        React.createElement(
+          ButtonGroup,
+          {label: 'Profile actions', equalItems: true},
+          React.createElement(Button, {variant: 'secondary'}, 'Review conditions'),
+          React.createElement(Button, {variant: 'primary', type: 'submit'}, 'Run profile'),
         ),
         React.createElement(
-          Stack,
-          {gap: 'tight'},
+          Toolbar,
+          {label: 'Inspector commands'},
           React.createElement(
-            InlineGroup,
-            {equalItems: true},
-            React.createElement('span', null, 'Ready'),
-            React.createElement('span', null, 'Review'),
+            IconButton,
+            {label: 'More actions', variant: 'quiet'},
+            React.createElement('span', {'aria-hidden': true}, '•••'),
           ),
-          React.createElement(Divider),
           React.createElement(
-            ScrollRegion,
-            {label: 'Run history', size: 'compact'},
-            React.createElement('span', null, 'Iteration 0284'),
+            ToggleButton,
+            {defaultSelected: true, variant: 'quiet'},
+            'Pin inspector',
           ),
         ),
       ),
@@ -99,6 +130,15 @@ if (!document.querySelector('[data-wcl-responsive-grid]')?.textContent?.includes
 }
 if (document.querySelector('[aria-label="Run history"]')?.getAttribute('tabindex') !== '0') {
   throw new Error('Packed scroll region is not a labeled keyboard focus target.');
+}
+if (!document.querySelector('[data-wcl-toolbar]')) {
+  throw new Error('Packed toolbar did not render its public marker.');
+}
+if (document.querySelector('[data-wcl-toggle-button]')?.getAttribute('aria-pressed') !== 'true') {
+  throw new Error('Packed toggle button did not preserve selected semantics.');
+}
+if (document.querySelector('[data-wcl-button][type="submit"]')?.textContent !== 'Run profile') {
+  throw new Error('Packed button did not preserve explicit native form behavior.');
 }
 `;
 }

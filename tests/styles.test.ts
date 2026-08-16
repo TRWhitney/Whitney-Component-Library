@@ -18,6 +18,8 @@ describe('static appearance styles', () => {
 
     expect(forcedColors?.[1]).toContain('--wcl-accent: Highlight !important');
     expect(forcedColors?.[1]).toContain('--wcl-accent-contrast: HighlightText !important');
+    expect(forcedColors?.[1]).toContain('--wcl-accent-fill: Highlight !important');
+    expect(forcedColors?.[1]).toContain('--wcl-accent-rail: Highlight !important');
     expect(forcedColors?.[1]).toContain('--wcl-surface: Canvas');
     expect(forcedColors?.[1]).toContain('--wcl-text: CanvasText');
   });
@@ -55,5 +57,71 @@ describe('static appearance styles', () => {
     expect(sectionHeader).toContain('display: flex');
     expect(sectionHeader).toContain('flex-wrap: wrap');
     expect(styles).not.toMatch(/@media\s*\(width[^)]*\)[\s\S]*\[data-wcl-section-header\]/);
+  });
+
+  it('gives actions stable bounded sizing without overlap-producing transforms', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const actionRules = styles.match(
+      /:is\(\[data-wcl-button\],\s*\[data-wcl-icon-button\],\s*\[data-wcl-toggle-button\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(actionRules).toContain('min-block-size: 2.5rem');
+    expect(actionRules).toContain('white-space: normal');
+    expect(actionRules).toContain('overflow-wrap: anywhere');
+    expect(styles).toContain("[data-size='compact']");
+    expect(styles).not.toMatch(
+      /:is\(\[data-wcl-button\][\s\S]*?:hover[\s\S]*?transform:\s*(?:translate|scale)/,
+    );
+  });
+
+  it('uses a rail-only toggle selection and a purposeful pending rail', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const selected = styles.match(/\[data-wcl-toggle-button\]\[data-selected\]\s*\{([^}]*)\}/)?.[1];
+    const selectedPressed = styles.match(
+      /\[data-wcl-toggle-button\]\[data-selected\]\[data-pressed\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const pending = styles.match(/\[data-wcl-button\]\[data-pending\]::after\s*\{([^}]*)\}/)?.[1];
+
+    expect(selected).toContain('background: transparent');
+    expect(selected).toContain('inset 0 -3px var(--wcl-accent-rail)');
+    expect(selectedPressed).toContain('inset 0 2px 4px');
+    expect(selectedPressed).toContain('inset 0 -3px var(--wcl-accent-rail)');
+    expect(pending).toContain('var(--wcl-warning)');
+    expect(pending).toContain('var(--wcl-warning-surface)');
+    expect(pending).not.toContain('transparent');
+    expect(pending).toContain('wcl-action-pending');
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-button\]\[data-pending\]::after[\s\S]*animation:\s*none/,
+    );
+  });
+
+  it('owns group, toolbar, link, tooltip, and forced-color action treatments', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const primaryHover = styles.match(
+      /\[data-variant='primary'\]\[data-hovered\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const currentLink = styles.match(/\[data-wcl-link\]\[aria-current\]\s*\{([^}]*)\}/)?.[1];
+    const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/)?.[1];
+    const forcedPrimary = forcedColors?.match(
+      /:is\(\[data-wcl-button\],\s*\[data-wcl-icon-button\]\)\[data-variant='primary'\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(styles).toContain("[data-wcl-button-group][data-equal-items='true']");
+    expect(styles).toContain("[data-wcl-toolbar][data-orientation='vertical']");
+    expect(styles).toContain('[data-wcl-action-tooltip]');
+    expect(styles).toContain('[data-wcl-link]');
+    expect(styles).toMatch(
+      /\[data-variant='primary'\][\s\S]*?background:\s*var\(--wcl-accent-fill\)/,
+    );
+    expect(primaryHover).toContain('background: var(--wcl-accent-fill)');
+    expect(primaryHover).not.toContain('color-mix');
+    expect(currentLink).toContain('font-weight: 700');
+    expect(currentLink).toContain('var(--wcl-accent-rail)');
+    expect(forcedPrimary).toContain('border-color: Highlight');
+    expect(forcedPrimary).toContain('background: ButtonFace');
+    expect(forcedPrimary).toContain('color: ButtonText');
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-toggle-button\]\[data-selected\]::after[\s\S]*background:\s*Highlight[\s\S]*forced-color-adjust:\s*none/,
+    );
   });
 });

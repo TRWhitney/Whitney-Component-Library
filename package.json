@@ -47,6 +47,7 @@
     "react-dom": "^18.3.1 || ^19.0.0"
   },
   "dependencies": {
+    "react-aria": "3.51.0",
     "react-aria-components": "1.20.0"
   },
   "devDependencies": {

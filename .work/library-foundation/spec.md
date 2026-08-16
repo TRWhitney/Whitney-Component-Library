@@ -58,6 +58,14 @@ complete upstream prop types, private editor types, and private chart-renderer t
 part of the public surface. Components share conventions only when the semantics are genuinely the
 same; there is no universal component-props interface.
 
+Structural containers accept consumer-owned React composition. Behavior-owning composites may
+restrict the rendered controls and DOM relationships that participate in their behavior, but do
+not reject an otherwise valid consumer abstraction solely because it introduces a React component
+boundary. TypeScript enforces finite choices and representable state combinations; when JSX erases
+the identity needed to prove a rendered relationship, the composite validates that relationship at
+runtime. DOM-producing wrappers may remain unsupported where they would change required layout,
+keyboard, or accessibility relationships unless a named part explicitly supports them.
+
 Every public export also has one canonical structured component contract. A contract states:
 
 - its purpose, appropriate uses, inappropriate uses, and preferred alternatives;
@@ -214,7 +222,8 @@ than directly executable React Server Components.
   research](research/behavior-foundations.md), and [ADR
   0003](../../docs/adr/0003-build-on-react-aria-privately.md)
 - [Agent-facing contract](decisions/04-agent-contract.md) and [ADR
-  0004](../../docs/adr/0004-publish-canonical-component-contracts.md)
+  0004](../../docs/adr/0004-publish-canonical-component-contracts.md), together with [ADR
+  0010](../../docs/adr/0010-preserve-consumer-composition-boundaries.md)
 - [Visual direction and permitted variation](decisions/05-visual-direction.md) and the accepted
   [interactive prototype](prototypes/visual-directions.html)
 - [Initial public scope](decisions/06-initial-public-scope.md), [foundation expansion

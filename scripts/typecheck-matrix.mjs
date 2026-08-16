@@ -22,6 +22,7 @@ const fixtureConfig = {
     types: ['react', 'react-dom'],
   },
   files: ['./public-api.tsx', './styles.d.ts'],
+  include: [],
   exclude: [],
 };
 

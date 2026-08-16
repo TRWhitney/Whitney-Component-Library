@@ -1,6 +1,7 @@
 'use client';
 
-import type {CSSProperties, ReactNode} from 'react';
+import {UNSAFE_PortalProvider} from 'react-aria/PortalProvider';
+import {useRef, type CSSProperties, type ReactNode} from 'react';
 
 import {deriveAccentRoles, type AccentColor} from './accent.js';
 
@@ -14,19 +15,24 @@ export interface AppearanceProviderProps {
 type ProviderStyles = CSSProperties & Record<`--wcl-${string}`, string>;
 
 export function AppearanceProvider({accent, appearance, children}: AppearanceProviderProps) {
+  const providerRef = useRef<HTMLDivElement>(null);
   const roles = deriveAccentRoles(accent, appearance);
   const styles: ProviderStyles = {
     '--wcl-accent': roles.accent,
     '--wcl-accent-contrast': roles.contrast,
+    '--wcl-accent-fill': roles.fill,
     '--wcl-accent-focus': roles.focus,
     '--wcl-accent-muted': roles.muted,
+    '--wcl-accent-rail': roles.rail,
     '--wcl-accent-soft': roles.soft,
     '--wcl-accent-text': roles.text,
   };
 
   return (
-    <div data-wcl-appearance={appearance} data-wcl-provider="" style={styles}>
-      {children}
-    </div>
+    <UNSAFE_PortalProvider getContainer={() => providerRef.current}>
+      <div data-wcl-appearance={appearance} data-wcl-provider="" ref={providerRef} style={styles}>
+        {children}
+      </div>
+    </UNSAFE_PortalProvider>
   );
 }

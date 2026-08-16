@@ -14,8 +14,16 @@ and which should be communicated through agent-readable guidance and examples?
 
 Accepted boundary:
 
-- Narrow TypeScript APIs enforce finite variants, valid state combinations, and permitted
-  composition without exposing upstream React Aria props.
+- Narrow TypeScript APIs enforce finite variants and valid state combinations without exposing
+  upstream React Aria props. They enforce composition where the relevant relationship survives
+  JSX typing.
+- Structural containers preserve consumer-owned React composition. Behavior-owning composites
+  constrain the rendered controls and DOM relationships that participate in their behavior, but
+  do not reject an otherwise valid consumer abstraction solely because it introduces a React
+  component boundary.
+- When JSX erases the component identity needed for reliable compile-time composition checks, the
+  component validates the rendered relationship at runtime. A required DOM relationship may still
+  exclude DOM-producing wrappers unless a named part explicitly supports them.
 - Each public export has one canonical structured contract covering appropriate and inappropriate
   use, preferred alternatives, content rules, composition, states, accessibility obligations, and
   focused examples or counterexamples.
@@ -32,7 +40,8 @@ Accepted boundary:
 - Reducing variance and advertising appropriate use to agents are primary project goals.
 - A private React Aria foundation makes this library's public API and documentation the complete
   surface agents should consume.
-- Semantic appropriateness cannot always be represented by TypeScript, while structural variants
-  and permitted compositions often can be.
+- Semantic appropriateness and JSX child identity cannot always be represented by TypeScript,
+  while finite variants, state ownership, and many explicit part or slot relationships can be.
+- [Architecture decision: Preserve Consumer Composition Boundaries](../../../docs/adr/0010-preserve-consumer-composition-boundaries.md)
 - [Component Library Context](../../../CONTEXT.md)
 - [Architecture decision: Publish Canonical Component Contracts](../../../docs/adr/0004-publish-canonical-component-contracts.md)

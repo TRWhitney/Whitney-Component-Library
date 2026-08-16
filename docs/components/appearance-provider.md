@@ -46,7 +46,7 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 
 ## Accessibility
 
-- Choose an accent freely; the provider derives separate contrast-safe text and focus roles.
+- Choose an accent freely; the provider derives separate contrast-safe fill, text, focus, and rail roles, including readable accent text on the accent-soft hover surface.
 - Do not use the application accent in place of success, warning, or danger meaning.
 
 ## Keyboard, labeling, localization, and direction
@@ -65,7 +65,7 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 ## Accent, forced colors, and reduced motion
 
 - The application accent feeds focus, selection, progress, active structure, and relationship rails.
-- The provider derives contrast-safe accent text and focus roles instead of applying the raw accent indiscriminately.
+- The provider derives a surface-distinct primary fill plus contrast-safe accent text, focus, and rail roles instead of applying the raw accent indiscriminately.
 - Forced-color mode replaces decorative color roles with system colors through the static stylesheet.
 - Reduced motion changes transition duration without changing state meaning or removing feedback.
 
