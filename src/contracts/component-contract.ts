@@ -160,24 +160,35 @@ export function renderContractDocumentation(
     ...items.map((item) => `- ${item}`),
     '',
   ];
-  const importLines = [
-    ...(contract.stylesheet
-      ? [`import '${packageName}/${contract.stylesheet.replace('./', '')}';`]
-      : []),
-    `import {${contract.exportName}} from '${packageName}';`,
-  ];
-  const renderExample = (example: ContractExample) => [
-    `### ${example.title}`,
-    '',
-    example.description,
-    '',
-    '```tsx',
-    ...importLines,
-    '',
-    example.code,
-    '```',
-    '',
-  ];
+  const renderExample = (example: ContractExample) => {
+    const exampleImports = [
+      contract.exportName,
+      ...contract.relatedExports.filter(
+        (exportName) =>
+          exportName === 'AppearanceProvider' ||
+          new RegExp(`<${exportName}(?:\\s|/|>)`).test(example.code),
+      ),
+    ].sort();
+    const importLines = [
+      ...(contract.stylesheet
+        ? [`import '${packageName}/${contract.stylesheet.replace('./', '')}';`]
+        : []),
+      `import {${exampleImports.join(', ')}} from '${packageName}';`,
+    ];
+
+    return [
+      `### ${example.title}`,
+      '',
+      example.description,
+      '',
+      '```tsx',
+      ...importLines,
+      '',
+      example.code,
+      '```',
+      '',
+    ];
+  };
   const examples = contract.examples.flatMap(renderExample);
   const counterExamples = contract.counterExamples.flatMap(renderExample);
 

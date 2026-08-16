@@ -3,7 +3,16 @@ export function createConsumerVerificationSource(packageName) {
 import React from 'react';
 import {JSDOM} from 'jsdom';
 import {renderToString} from 'react-dom/server';
-import {AppearanceProvider} from '${packageName}';
+import {
+  AppearanceProvider,
+  Divider,
+  InlineGroup,
+  ResponsiveGrid,
+  ScrollRegion,
+  Section,
+  Stack,
+  Surface,
+} from '${packageName}';
 
 const manifest = (await import('${packageName}/manifest.json', {with: {type: 'json'}})).default;
 if (manifest.exports[0]?.name !== 'AppearanceProvider') {
@@ -31,7 +40,40 @@ console.warn = (...messages) => consoleMessages.push(messages);
 const view = React.createElement(
   AppearanceProvider,
   {appearance: 'dark', accent: '#2474ff'},
-  React.createElement('span', null, 'Profile'),
+  React.createElement(
+    Surface,
+    {variant: 'raised'},
+    React.createElement(
+      Section,
+      {title: 'Thermal envelope'},
+      React.createElement(
+        ResponsiveGrid,
+        {minimumItemWidth: 'compact', equalItems: true},
+        React.createElement(
+          Stack,
+          {gap: 'tight'},
+          React.createElement('strong', null, 'Solver'),
+          React.createElement('span', null, 'Adaptive mesh'),
+        ),
+        React.createElement(
+          Stack,
+          {gap: 'tight'},
+          React.createElement(
+            InlineGroup,
+            {equalItems: true},
+            React.createElement('span', null, 'Ready'),
+            React.createElement('span', null, 'Review'),
+          ),
+          React.createElement(Divider),
+          React.createElement(
+            ScrollRegion,
+            {label: 'Run history', size: 'compact'},
+            React.createElement('span', null, 'Iteration 0284'),
+          ),
+        ),
+      ),
+    ),
+  ),
 );
 const serverMarkup = renderToString(view);
 const dom = new JSDOM('<div id="root">' + serverMarkup + '</div>');
@@ -52,8 +94,11 @@ console.warn = originalConsoleWarn;
 if (consoleMessages.length > 0 || recoverableErrors.length > 0) {
   throw new Error('SSR or hydration emitted warnings or recoverable errors.');
 }
-if (document.querySelector('[data-wcl-provider]')?.textContent !== 'Profile') {
-  throw new Error('Packed provider did not hydrate its server-rendered content.');
+if (!document.querySelector('[data-wcl-responsive-grid]')?.textContent?.includes('Adaptive mesh')) {
+  throw new Error('Packed layout primitives did not hydrate their server-rendered content.');
+}
+if (document.querySelector('[aria-label="Run history"]')?.getAttribute('tabindex') !== '0') {
+  throw new Error('Packed scroll region is not a labeled keyboard focus target.');
 }
 `;
 }

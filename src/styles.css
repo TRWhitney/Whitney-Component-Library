@@ -49,6 +49,248 @@
   }
 }
 
+@layer wcl.components {
+  :is([data-wcl-stack], [data-wcl-inline-group], [data-wcl-responsive-grid]) {
+    gap: var(--wcl-layout-gap);
+    min-inline-size: 0;
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group], [data-wcl-responsive-grid])[data-gap='none'] {
+    --wcl-layout-gap: 0;
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group], [data-wcl-responsive-grid])[data-gap='tight'] {
+    --wcl-layout-gap: calc(var(--wcl-space) * 0.5);
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group], [data-wcl-responsive-grid])[data-gap='regular'] {
+    --wcl-layout-gap: var(--wcl-space);
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group], [data-wcl-responsive-grid])[data-gap='relaxed'] {
+    --wcl-layout-gap: calc(var(--wcl-space) * 2);
+  }
+
+  [data-wcl-stack] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  [data-wcl-stack] > * {
+    margin-block: 0;
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group])[data-align='start'] {
+    align-items: flex-start;
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group])[data-align='center'] {
+    align-items: center;
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group])[data-align='end'] {
+    align-items: flex-end;
+  }
+
+  :is([data-wcl-stack], [data-wcl-inline-group])[data-align='stretch'] {
+    align-items: stretch;
+  }
+
+  [data-wcl-inline-group] {
+    display: flex;
+    flex-direction: row;
+  }
+
+  [data-wcl-inline-group][data-align='baseline'] {
+    align-items: baseline;
+  }
+
+  [data-wcl-inline-group][data-wrap='true'] {
+    flex-wrap: wrap;
+  }
+
+  [data-wcl-inline-group][data-wrap='false'] {
+    flex-wrap: nowrap;
+  }
+
+  [data-wcl-inline-group][data-equal-items='true'] {
+    display: grid;
+    grid-auto-rows: 1fr;
+    align-items: stretch;
+  }
+
+  [data-wcl-inline-group][data-equal-items='true'][data-wrap='true'] {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr));
+  }
+
+  [data-wcl-inline-group][data-equal-items='true'][data-wrap='false'] {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+
+  [data-wcl-inline-group][data-equal-items='true'] > * {
+    min-inline-size: 0;
+  }
+
+  [data-wcl-responsive-grid] {
+    --wcl-grid-minimum: 18rem;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--wcl-grid-minimum)), 1fr));
+  }
+
+  [data-wcl-responsive-grid][data-minimum-item-width='compact'] {
+    --wcl-grid-minimum: 12rem;
+  }
+
+  [data-wcl-responsive-grid][data-minimum-item-width='wide'] {
+    --wcl-grid-minimum: 26rem;
+  }
+
+  [data-wcl-responsive-grid][data-equal-items='true'] {
+    grid-auto-rows: 1fr;
+  }
+
+  [data-wcl-divider] {
+    flex: none;
+    margin: 0;
+    border: 0;
+    background: var(--wcl-border);
+  }
+
+  [data-wcl-divider][data-orientation='horizontal'] {
+    inline-size: 100%;
+    block-size: 1px;
+  }
+
+  [data-wcl-divider][data-orientation='vertical'] {
+    align-self: stretch;
+    inline-size: 1px;
+    min-block-size: 1.5rem;
+  }
+
+  [data-wcl-surface] {
+    min-inline-size: 0;
+    border: 1px solid var(--wcl-border);
+    border-radius: var(--wcl-radius);
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+  }
+
+  [data-wcl-surface][data-variant='base'] {
+    background: var(--wcl-surface);
+  }
+
+  [data-wcl-surface][data-variant='raised'] {
+    background: var(--wcl-surface-raised);
+    box-shadow: var(--wcl-shadow);
+  }
+
+  [data-wcl-surface][data-variant='subtle'] {
+    background: var(--wcl-surface-subtle);
+  }
+
+  [data-wcl-surface][data-padding='compact'] {
+    padding: calc(var(--wcl-space) * 1.5);
+  }
+
+  [data-wcl-surface][data-padding='regular'] {
+    padding: calc(var(--wcl-space) * 2);
+  }
+
+  [data-wcl-surface][data-padding='spacious'] {
+    padding: calc(var(--wcl-space) * 3);
+  }
+
+  [data-wcl-section] {
+    display: grid;
+    gap: calc(var(--wcl-space) * 2);
+    min-inline-size: 0;
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+  }
+
+  [data-wcl-section-header] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--wcl-space) * 2);
+    align-items: end;
+  }
+
+  [data-wcl-section-heading] {
+    display: grid;
+    flex: 1 1 18rem;
+    gap: calc(var(--wcl-space) * 0.5);
+    min-inline-size: 0;
+  }
+
+  [data-wcl-section-heading] > :is(h1, h2, h3, h4, h5, h6),
+  [data-wcl-section-description] {
+    margin: 0;
+  }
+
+  [data-wcl-section-heading] > :is(h1, h2, h3, h4, h5, h6) {
+    font-size: 1rem;
+    font-weight: 650;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  [data-wcl-section-description] {
+    max-inline-size: 68ch;
+    color: var(--wcl-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  [data-wcl-section-actions] {
+    flex: 0 1 auto;
+    min-inline-size: 0;
+  }
+
+  [data-wcl-section-content] {
+    min-inline-size: 0;
+  }
+
+  [data-wcl-scroll-region] {
+    max-block-size: 20rem;
+    min-inline-size: 0;
+    padding: calc(var(--wcl-space) * 1.5);
+    border: 1px solid var(--wcl-border);
+    border-radius: var(--wcl-control-radius);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    background: var(--wcl-surface-subtle);
+    color: var(--wcl-text);
+    scrollbar-color: var(--wcl-border-strong) transparent;
+    scrollbar-width: thin;
+  }
+
+  [data-wcl-scroll-region][data-size='compact'] {
+    max-block-size: 12rem;
+  }
+
+  [data-wcl-scroll-region][data-size='tall'] {
+    max-block-size: 32rem;
+  }
+
+  [data-wcl-scroll-region][data-orientation='vertical'] {
+    overflow: hidden auto;
+  }
+
+  [data-wcl-scroll-region][data-orientation='horizontal'] {
+    overflow: auto hidden;
+  }
+
+  [data-wcl-scroll-region][data-orientation='both'] {
+    overflow: auto;
+  }
+
+  [data-wcl-scroll-region]:focus-visible {
+    outline-color: var(--wcl-accent-focus);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   @layer wcl.theme {
     [data-wcl-provider] {
@@ -74,6 +316,28 @@
       --wcl-surface-subtle: Canvas;
       --wcl-text: CanvasText;
       --wcl-text-muted: GrayText;
+    }
+  }
+
+  @layer wcl.components {
+    [data-wcl-surface] {
+      border-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+    }
+
+    [data-wcl-divider] {
+      background: CanvasText;
+    }
+
+    [data-wcl-scroll-region] {
+      border-color: CanvasText;
+      background: Canvas;
+      scrollbar-color: CanvasText Canvas;
+    }
+
+    [data-wcl-scroll-region]:focus-visible {
+      outline-color: Highlight;
     }
   }
 }

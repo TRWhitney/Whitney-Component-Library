@@ -186,12 +186,43 @@ function referenceContexts(source, name) {
 
 function createTypeConsumerSource(packageName) {
   return `
-import {AppearanceProvider, type AccentColor} from '${packageName}';
+import {
+  AppearanceProvider,
+  Divider,
+  InlineGroup,
+  ResponsiveGrid,
+  ScrollRegion,
+  Section,
+  Stack,
+  Surface,
+  type AccentColor,
+  type LayoutGap,
+} from '${packageName}';
 
 const accent: AccentColor = '#2474ff';
+const gap: LayoutGap = 'regular';
 export const provider = (
   <AppearanceProvider appearance="dark" accent={accent}>
-    <main>Profile</main>
+    <Surface variant="raised">
+      <Section title="Thermal envelope">
+        <ResponsiveGrid minimumItemWidth="compact" equalItems>
+          <Stack gap={gap}>
+            <strong>Solver</strong>
+            <span>Adaptive mesh</span>
+          </Stack>
+          <Stack gap="tight">
+            <InlineGroup equalItems>
+              <span>Ready</span>
+              <span>Review</span>
+            </InlineGroup>
+            <Divider />
+            <ScrollRegion label="Run history" size="compact">
+              Iteration 0284
+            </ScrollRegion>
+          </Stack>
+        </ResponsiveGrid>
+      </Section>
+    </Surface>
   </AppearanceProvider>
 );
 `;
@@ -210,14 +241,27 @@ function createBrowserConsumerSource(packageName) {
   return `
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {AppearanceProvider} from '${packageName}';
+import {AppearanceProvider, ResponsiveGrid, Section, Surface} from '${packageName}';
 import '${packageName}/styles.css';
 
 createRoot(document.getElementById('root')).render(
   React.createElement(
     AppearanceProvider,
     {appearance: 'dark', accent: '#2474ff'},
-    React.createElement('main', null, 'Profile'),
+    React.createElement(
+      Surface,
+      {variant: 'raised'},
+      React.createElement(
+        Section,
+        {title: 'Thermal envelope'},
+        React.createElement(
+          ResponsiveGrid,
+          {minimumItemWidth: 'compact'},
+          React.createElement('span', null, 'Solver'),
+          React.createElement('span', null, 'Adaptive mesh'),
+        ),
+      ),
+    ),
   ),
 );
 `;

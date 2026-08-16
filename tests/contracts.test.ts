@@ -2,6 +2,7 @@ import {describe, expect, it} from 'vitest';
 
 import {
   appearanceProviderContract,
+  componentContracts,
   renderAgentIndex,
   renderContractDocumentation,
   renderTypeScriptExamples,
@@ -27,6 +28,78 @@ describe('canonical component contracts', () => {
     expect(
       renderContractDocumentation(appearanceProviderContract, 'component-library-under-test'),
     ).toContain('## Do not use for');
+  });
+
+  it('covers every layout primitive with one canonical contract', () => {
+    const exportNames = [
+      'AppearanceProvider',
+      'Divider',
+      'InlineGroup',
+      'ResponsiveGrid',
+      'ScrollRegion',
+      'Section',
+      'Stack',
+      'Surface',
+    ];
+
+    expect(validateComponentContracts(componentContracts, exportNames)).toHaveLength(
+      exportNames.length,
+    );
+    expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+  });
+
+  it('places every layout example inside its required appearance provider', () => {
+    const layoutContracts = componentContracts.filter(
+      (contract) => contract.exportName !== 'AppearanceProvider',
+    );
+
+    for (const contract of layoutContracts) {
+      expect(contract.relatedExports).toContain('AppearanceProvider');
+      expect(contract.composition.join(' ')).toMatch(/AppearanceProvider/);
+      for (const example of [...contract.examples, ...contract.counterExamples]) {
+        expect(example.code).toContain('<AppearanceProvider');
+      }
+      expect(renderContractDocumentation(contract, '@fixture/component-library')).toContain(
+        'AppearanceProvider',
+      );
+    }
+  });
+
+  it('describes each layout primitive only in terms of the visual roles it paints', () => {
+    const expectedAppearance = new Map([
+      ['Divider', /border role/],
+      ['InlineGroup', /paints no decorative color/],
+      ['ResponsiveGrid', /paints no decorative color/],
+      ['ScrollRegion', /subtle surface.*border.*focus/i],
+      ['Section', /text.*spacing/i],
+      ['Stack', /paints no decorative color/],
+      ['Surface', /shape.*surface.*text.*border/i],
+    ]);
+
+    for (const contract of componentContracts) {
+      const expected = expectedAppearance.get(contract.exportName);
+      if (expected) {
+        expect(contract.appearance.join(' ')).toMatch(expected);
+      }
+    }
+  });
+
+  it('uses owned layout rhythm in the canonical Surface example', () => {
+    const surface = componentContracts.find((contract) => contract.exportName === 'Surface');
+
+    expect(surface?.examples[0]?.code).toContain('<Stack');
+    expect(renderContractDocumentation(surface!, '@fixture/component-library')).toContain(
+      "import {AppearanceProvider, Stack, Surface} from '@fixture/component-library';",
+    );
+  });
+
+  it('distinguishes Surface containment from nested Section semantics', () => {
+    const surface = componentContracts.find((contract) => contract.exportName === 'Surface');
+
+    expect(surface?.inappropriateUses.join(' ')).not.toMatch(
+      /content needs a named semantic region/,
+    );
+    expect(surface?.preferredAlternatives.join(' ')).toMatch(/Section inside Surface/);
   });
 
   it('rejects a contract with missing required guidance', () => {

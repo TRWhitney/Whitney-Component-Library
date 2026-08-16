@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Novel-work implementation: the repository quality prerequisite is delivered, Ticket 01 remains
-delivered, and Ticket 02 is the ready frontier and has not started.
+Novel-work implementation: Tickets 01 and 02 are delivered. Ticket 03 is ready for an agent and
+remains unstarted.
 
 ## Progress
 
@@ -41,7 +41,22 @@ text/focus contrast in both appearances, and imports the public stylesheet in cl
 builds. Final gate corrections scan all declaration files, recognize static Node imports and
 Node-specific globals in owned output, reject retained/externalized Node modules in Vite bundles,
 and align the tooling contract with Node `>=22.12.0`. [Ticket
-02](tickets/02-layout-and-surface-primitives.md) is now ready for implementation.
+02](tickets/02-layout-and-surface-primitives.md) now provides Stack, InlineGroup, ResponsiveGrid,
+Divider, Surface, Section, and ScrollRegion through narrow typed APIs and canonical contracts.
+The primitives own bounded spacing, responsive equal-item layout, rounded neutral containment,
+semantic sections and dividers, and labeled keyboard-reachable overflow without exposing arbitrary
+class, style, token, or breakpoint injection.
+Delivery review corrections place forced-color overrides in the effective component layer, make
+section actions respond to container space, reject ineffective equal-item alignment combinations,
+support the complete HTML heading hierarchy, and put every canonical layout example inside its
+required AppearanceProvider. Final intent-review corrections make each primitive's appearance
+guidance describe only the roles it actually paints and make the canonical Surface example use
+library-owned Stack rhythm. Final release-review corrections make generated snippets import every
+related component they use, describe ScrollRegion's subtle surface accurately, and make Stack own
+direct-child block rhythm instead of inheriting browser margins. Surface guidance now distinguishes
+unnamed visual containment from the nested Section that supplies a visible semantic name.
+Both final independent delivery review axes passed with no findings. Ticket 03 is now the sole
+ready frontier.
 
 Repository-wide quality gates now run before the existing type, test, generated-artifact, and
 compatibility checks. Prettier owns formatting for authored files, ESLint applies type-informed
@@ -74,7 +89,7 @@ See the [decision map](map.md).
 
 ## Verification
 
-- `npm run check`: repository formatting, zero-warning code and style linting, source types, 73
+- `npm run check`: repository formatting, zero-warning code and style linting, source types, 87
   focused and regression tests, generated documentation, exact contract coverage, and canonical
   examples compiled under TypeScript 5.9.3, 6.0.3, and 7.0.2.
 - `npm run verify:package`: the actual artifact installed, server-rendered, and hydrated without
@@ -87,15 +102,24 @@ See the [decision map](map.md).
   representative accents and every owned surface in both appearances. Forced-color and
   reduced-motion rules are covered. Packed declarations compile against React 18 and React 19
   types. `git diff --check` passed and no `Any` usage was found in source, tests, or tooling.
+- Chromium, Firefox, and WebKit keyboard inspection reached the final inline content of horizontal
+  and two-axis ScrollRegions; the two-axis case also reached its final block content and retained a
+  visible focus ring without clipping or overflow leakage.
+- Chromium, Firefox, and WebKit inspection of the canonical Surface example in both appearances
+  confirmed zero semantic-child block margins and an exact 8px regular Stack gap at compact width.
+- Chromium, Firefox, and WebKit RTL inspection confirmed logical peer/grid ordering, logical
+  Section heading/action placement, and horizontal keyboard scrolling to final inline content.
+  The declaration matrix also accepts a runtime boolean for InlineGroup equal sizing while
+  rejecting ineffective alignment combinations.
 
 ## Continuation
 
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-Begin [Ticket 02](tickets/02-layout-and-surface-primitives.md) in the next request.
+Begin Ticket 03 in the next request; do not start a later ticket first.
 
-Current branch: `master` (`[Chore] Enforce repository quality gates`).
+Current branch: `master` (`[Feature] Add layout primitives`).
 
-Owned uncommitted paths: none.
+Owned uncommitted paths: none. No unrelated uncommitted paths are present.
 
 Prototype browser inspection passed for appearance, viewport, accent, error, disabled, dialog,
 review, progress, segmented adjacency, the normalized field-to-Profile gap, the gliding rail,

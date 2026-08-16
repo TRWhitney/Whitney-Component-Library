@@ -11,4 +11,22 @@ describe('packed consumer verification source', () => {
     expect(source.indexOf('console.warn =', 0)).toBeLessThan(serverRender);
     expect(source).toContain('SSR or hydration emitted warnings or recoverable errors.');
   });
+
+  it('exercises the layout primitives through the packed public API', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of [
+      'Divider',
+      'InlineGroup',
+      'ResponsiveGrid',
+      'ScrollRegion',
+      'Section',
+      'Stack',
+      'Surface',
+    ]) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-responsive-grid');
+    expect(source).toContain("label: 'Run history'");
+  });
 });

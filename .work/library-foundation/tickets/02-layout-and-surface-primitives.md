@@ -5,18 +5,18 @@ scroll-region primitives that express the accepted spatial grammar without arbit
 
 **Blocked by:** [Package, Provider, and Contract Spine](01-package-provider-and-contract-spine.md)
 
-**Status:** ready-for-agent
+**Status:** delivered
 
-- [ ] Each primitive has a narrow typed API and complete canonical contract.
-- [ ] Spacing and responsive choices come from bounded semantic options rather than arbitrary
+- [x] Each primitive has a narrow typed API and complete canonical contract.
+- [x] Spacing and responsive choices come from bounded semantic options rather than arbitrary
       consumer token or class injection.
-- [ ] Adjacent equivalent content can maintain consistent dimensions and alignment.
-- [ ] Surfaces and sections preserve rounded containment, density, and continuity rules.
-- [ ] Scroll regions preserve keyboard access, visible focus, and content reachability.
-- [ ] Light, dark, accent, compact, wide, forced-color, and reduced-motion checks pass where
+- [x] Adjacent equivalent content can maintain consistent dimensions and alignment.
+- [x] Surfaces and sections preserve rounded containment, density, and continuity rules.
+- [x] Scroll regions preserve keyboard access, visible focus, and content reachability.
+- [x] Light, dark, accent, compact, wide, forced-color, and reduced-motion checks pass where
       applicable.
-- [ ] Server output and hydration are deterministic under both supported React majors.
-- [ ] Focused examples compile and demonstrate appropriate and inappropriate composition.
+- [x] Server output and hydration are deterministic under both supported React majors.
+- [x] Focused examples compile and demonstrate appropriate and inappropriate composition.
 
 ## Accepted sources
 
@@ -26,4 +26,32 @@ scroll-region primitives that express the accepted spatial grammar without arbit
 
 ## Completion evidence
 
-Pending implementation.
+- `Stack`, `InlineGroup`, `ResponsiveGrid`, `Divider`, `Surface`, `Section`, and `ScrollRegion`
+  expose bounded public props from the root package. Each has one canonical contract, generated
+  human documentation, manifest guidance, an agent-index entry, and compiling examples and
+  counterexamples.
+- `npm run check` passed formatting, zero-warning code and style linting, source types, 87 tests,
+  generated-documentation drift, exact contract coverage, and the TypeScript 5.9.3, 6.0.3, and
+  7.0.2 declaration/example matrix.
+- `npm run verify:package` packed the actual artifact and passed public types, server rendering,
+  hydration without warnings, and Vite browser builds in clean React 18.3.1 and 19.2.8 consumers.
+- Direct Chromium, Firefox, and WebKit inspection covered dark wide and light compact rendering,
+  focus, native keyboard scrolling, nested narrow-section reflow, heading hierarchy, equal peers,
+  responsive grid alignment, and overflow containment. Chromium additionally covered forced colors
+  and reduced motion. Every screenshot was inspected and removed.
+- In every engine, an overflowing `ScrollRegion` accepted keyboard focus and moved its native scroll
+  position with Page Down and End until the final content was reachable.
+- In every engine, horizontal and two-axis `ScrollRegion` variants reached their final inline
+  content with native Arrow Right input; the two-axis variant also reached its final block content
+  with Page Down. Final focus and content visibility were inspected in each engine.
+- The corrected canonical `Surface` composition rendered in both appearances at compact width in
+  Chromium, Firefox, and WebKit. In every engine, `Stack` neutralized semantic-child block margins
+  and applied the exact 8px regular gap; all six rendered surfaces were inspected.
+- Direct RTL inspection in Chromium, Firefox, and WebKit confirmed logical InlineGroup and grid
+  ordering, logical Section heading/action placement, and keyboard reachability of the final inline
+  content in a horizontal ScrollRegion. Every final RTL screenshot was inspected and removed.
+- The declaration fixture accepts a runtime boolean for `InlineGroup.equalItems` while retaining
+  the compile-time rejection of an ineffective non-stretch alignment combination.
+- Surface guidance distinguishes its visual containment from nested Section semantics: a Surface
+  does not name itself, while a Section inside it can provide the visible semantic name.
+- `git diff --check` passed and no `Any` usage was found in source, tests, or tooling.

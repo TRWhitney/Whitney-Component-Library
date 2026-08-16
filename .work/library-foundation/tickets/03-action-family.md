@@ -6,7 +6,7 @@ clear command, navigation, and persistent-selection semantics.
 **Blocked by:** [Package, Provider, and Contract Spine](01-package-provider-and-contract-spine.md),
 [Layout and Surface Primitives](02-layout-and-surface-primitives.md)
 
-**Status:** blocked
+**Status:** ready-for-agent
 
 - [ ] Command buttons and navigation links cannot be confused through a polymorphic escape hatch.
 - [ ] Icon-only actions require an accessible name and provide consistent tooltip guidance where
