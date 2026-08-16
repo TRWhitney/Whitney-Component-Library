@@ -9,10 +9,9 @@ propagated application accent.
 
 ## Current state
 
-Novel-work implementation: Tickets 01 through 03 are delivered. Ticket 03 has current repository,
-package, and direct-browser evidence, and its final independent intent and engineering review axes
-are clean. Its complete action-family outcome is preserved in the current HEAD. Ticket 04 has not
-started.
+Novel-work implementation: Tickets 01 through 03 are delivered. The requested repository-local
+component showcase has current completion evidence, clean final independent review axes, and is
+preserved in the current HEAD with its maintenance instruction. Ticket 04 has not started.
 
 ## Progress
 
@@ -79,8 +78,14 @@ components that render valid direct action DOM children, while behavior-owning c
 the resulting DOM relationship at runtime. Review also found untested white-accent primary emphasis
 and saturated-accent hover contrast defects; those corrections now have current evidence. A later
 engineering review found that Toolbar navigation used the global DOM realm. A focused iframe
-regression now passes with event targets resolved from the Toolbar's owning window; the affected
-completion gates remain to be repeated.
+regression now passes with event targets resolved from the Toolbar's owning window, and its affected
+completion gates passed on repetition.
+
+The repository now includes a runnable human-facing showcase for every contracted public component.
+It uses the library's accepted visual language, provides working light and dark examples at wide
+and compact widths, and derives its catalog from an explicit specimen inventory. A focused test
+compares rendered specimens with the canonical component contracts so catalog drift fails the
+repository checks. The local `AGENTS.md` requires the showcase to change with public components.
 
 Repository-wide quality gates now run before the existing type, test, generated-artifact, and
 compatibility checks. Prettier owns formatting for authored files, ESLint applies type-informed
@@ -161,11 +166,26 @@ See the [decision map](map.md).
   screenshots show a visible focus indicator without clipping in every engine. Temporary validation
   artifacts were moved to Trash.
 - Final independent intent and engineering review axes passed with no findings.
+- `npm run check` passes formatting, zero-warning code and style linting, strict types, generated
+  artifacts, the TypeScript 5.9/6/7 matrix, and 113 tests including separate rendered-specimen and
+  navigation-catalog coverage for all 14 contracted public components. `npm run showcase:build`
+  produces a clean Vite artifact.
+- Package verification still passes in clean React 18.3.1 and React 19.2.8 consumers, the dependency
+  audit reports zero vulnerabilities, `git diff --check` passes, and the showcase introduces no
+  `Any` usage.
+- Direct Chromium, Firefox, and WebKit inspection covers dark wide and light compact layouts,
+  appearance switching, catalog navigation, hover feedback, and the icon-button tooltip. Every
+  engine renders all 14 specimens, reaches the Toolbar from the compact catalog, contains document
+  overflow at 390px, and presents the inspected states without clipping or style leakage. Temporary
+  screenshots, scripts, and build artifacts were moved to Trash.
+- Final independent intent and engineering review axes passed with no findings after navigation
+  catalog coverage was enforced separately from rendered-specimen coverage.
 
 ## Continuation
 
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-Ticket 03 is delivered. Begin Ticket 04 only when Whitney explicitly requests the next ticket.
+The showcase addition is delivered. Begin Ticket 04 only when Whitney explicitly requests the next
+ticket.
 
 Current branch: `master`.
 

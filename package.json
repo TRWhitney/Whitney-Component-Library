@@ -37,6 +37,8 @@
     "lint:code": "eslint . --max-warnings 0",
     "lint:styles": "stylelint \"**/*.css\" --max-warnings 0",
     "prepack": "npm run build",
+    "showcase": "vite showcase",
+    "showcase:build": "vite build showcase --outDir ../.showcase-dist --emptyOutDir",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "typecheck:matrix": "npm run build && node ./scripts/typecheck-matrix.mjs",

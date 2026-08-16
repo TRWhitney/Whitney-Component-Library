@@ -6,7 +6,12 @@ import tseslint from 'typescript-eslint';
 
 const javascriptFiles = ['**/*.{js,mjs,cjs}'];
 const typescriptFiles = ['**/*.{ts,tsx,mts,cts}'];
-const typedTypescriptFiles = ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}', 'vitest.config.ts'];
+const typedTypescriptFiles = [
+  'showcase/**/*.{ts,tsx}',
+  'src/**/*.{ts,tsx}',
+  'tests/**/*.{ts,tsx}',
+  'vitest.config.ts',
+];
 
 export default defineConfig(
   globalIgnores(['dist/**', 'node_modules/**', 'coverage/**', '.typecheck-*/**']),
