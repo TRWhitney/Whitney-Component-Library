@@ -1,7 +1,7 @@
-import {act, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {renderToString} from 'react-dom/server';
 import {hydrateRoot} from 'react-dom/client';
-import {describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import {
   AppearanceProvider,
@@ -13,6 +13,10 @@ import {
   Stack,
   Surface,
 } from '../src/index.js';
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe('layout and surface primitives', () => {
   it('expresses bounded spacing, alignment, wrapping, and equal-item choices', () => {
@@ -87,6 +91,29 @@ describe('layout and surface primitives', () => {
 
     region.focus();
     expect(document.activeElement).toBe(region);
+  });
+
+  it('reveals its native scrollbar during activity and clears the signal after idle', async () => {
+    vi.useFakeTimers();
+    const {getByRole} = render(
+      <ScrollRegion label="Activity history">
+        <pre>Iteration 0284</pre>
+      </ScrollRegion>,
+    );
+    const region = getByRole('region', {name: 'Activity history'});
+
+    expect(region.hasAttribute('data-scrollbar-active')).toBe(false);
+
+    fireEvent.scroll(region);
+    expect(region.getAttribute('data-scrollbar-active')).toBe('true');
+
+    await act(() => vi.advanceTimersByTime(899));
+    fireEvent.pointerMove(region);
+    await act(() => vi.advanceTimersByTime(899));
+    expect(region.getAttribute('data-scrollbar-active')).toBe('true');
+
+    await act(() => vi.advanceTimersByTime(1));
+    expect(region.hasAttribute('data-scrollbar-active')).toBe(false);
   });
 
   it('server-renders and hydrates a composed layout deterministically', async () => {

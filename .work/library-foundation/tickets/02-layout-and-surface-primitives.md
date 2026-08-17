@@ -55,3 +55,18 @@ scroll-region primitives that express the accepted spatial grammar without arbit
 - Surface guidance distinguishes its visual containment from nested Section semantics: a Surface
   does not name itself, while a Section inside it can provide the visible semantic name.
 - `git diff --check` passed and no `Any` usage was found in source, tests, or tooling.
+- Post-delivery ScrollRegion refinement preserves native overflow detection, scroll position, wheel
+  input, and keyboard input while revealing the native thumb for pointer or scroll activity and
+  fading it after 900ms idle. Focus within keeps the thumb visible, reduced motion disables the
+  transition, forced colors retains the system scrollbar, and no new public props or callbacks are
+  exposed. Its human showcase specimen explicitly explains activity reveal, idle fade, and focus
+  persistence. A zero-specificity inheritance boundary prevents this treatment from changing
+  consumer-provided nested scrollers while preserving their explicit scrollbar styling.
+- The renewed `npm run check` passes 130 tests plus formatting, zero-warning linters, strict types,
+  generated guidance, and the TypeScript 5.9/6/7 matrix. Showcase and packed-package builds,
+  React 18.3.1 and 19.2.8 SSR/hydration/type/browser consumers, the dependency audit, and diff checks
+  pass. Direct Chromium, Firefox, and WebKit operation confirms the opaque-to-transparent idle
+  transition, focus persistence, native scroll movement, both appearances, and compact reflow;
+  inspected temporary artifacts were discarded.
+- Final fresh independent intent and engineering review axes report no findings after the showcase,
+  nested-scroller inheritance boundary, evidence, and durable workflow handoff corrections.

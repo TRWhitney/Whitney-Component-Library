@@ -30,18 +30,19 @@ ScrollRegion keeps bounded overflow content labeled, focusable, and reachable.
 
 ## States
 
-- The primitive has no internal state; changing a bounded prop deterministically updates its structural attributes.
+- Pointer or scroll activity reveals the native scrollbar thumb and resets its idle interval; the thumb fades after idle while focus keeps it available to keyboard users.
 
 ## Control, events, validation, and forms
 
 - Size and overflow orientation are controlled by bounded props; native scrolling owns position and input behavior.
-- The primitive emits no callback events and owns no interactive state.
+- Native overflow determines whether a scrollbar appears; the library changes only its transient thumb visibility.
+- ScrollRegion exposes no callback events and owns only transient scrollbar visibility state; native scrolling remains the source of position and input behavior.
 - The TypeScript API rejects arbitrary classes, inline styles, token values, and unsupported semantic options.
 - The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.
 
 ## Accessibility
 
-- ScrollRegion is a labeled region and keyboard focus target so overflow remains reachable without a pointer.
+- ScrollRegion is a labeled region and keyboard focus target so overflow remains reachable without a pointer; its native scrollbar stays visible while focus remains within the region.
 
 ## Keyboard, labeling, localization, and direction
 
@@ -58,8 +59,8 @@ ScrollRegion keeps bounded overflow content labeled, focusable, and reachable.
 ## Accent, forced colors, and reduced motion
 
 - ScrollRegion uses the derived focus accent only for keyboard focus and does not tint its content surface.
-- Forced-color mode uses Canvas and CanvasText for containment and Highlight for visible focus.
-- The primitive introduces no motion, so reduced motion preserves the same structure without an alternate transition.
+- Forced-color mode uses Canvas and CanvasText for containment and a continuously visible native scrollbar, plus Highlight for visible focus.
+- Reduced motion removes the scrollbar fade transition while preserving the same activity, focus, idle visibility, and native scrolling behavior.
 
 ## Examples
 

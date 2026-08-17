@@ -548,7 +548,7 @@ export const scrollRegionContract = {
     'ScrollRegion uses the derived focus accent only for keyboard focus and does not tint its content surface.',
   ],
   accessibility: [
-    'ScrollRegion is a labeled region and keyboard focus target so overflow remains reachable without a pointer.',
+    'ScrollRegion is a labeled region and keyboard focus target so overflow remains reachable without a pointer; its native scrollbar stays visible while focus remains within the region.',
   ],
   appropriateUses: [
     'bounded history, source, logs, or dense content must remain reachable within a surrounding layout',
@@ -562,6 +562,7 @@ export const scrollRegionContract = {
   ],
   controlBehavior: [
     'Size and overflow orientation are controlled by bounded props; native scrolling owns position and input behavior.',
+    'Native overflow determines whether a scrollbar appears; the library changes only its transient thumb visibility.',
   ],
   counterExamples: [
     {
@@ -580,7 +581,10 @@ export const scrollRegionContract = {
   ],
   exportName: 'ScrollRegion',
   forcedColorBehavior: [
-    'Forced-color mode uses Canvas and CanvasText for containment and Highlight for visible focus.',
+    'Forced-color mode uses Canvas and CanvasText for containment and a continuously visible native scrollbar, plus Highlight for visible focus.',
+  ],
+  events: [
+    'ScrollRegion exposes no callback events and owns only transient scrollbar visibility state; native scrolling remains the source of position and input behavior.',
   ],
   importPath: '.',
   inappropriateUses: [
@@ -603,6 +607,12 @@ export const scrollRegionContract = {
   relatedExports: ['AppearanceProvider', 'Section', 'Surface'],
   responsiveBehavior: [
     'The region fills available inline size and preserves its semantic maximum block size at compact and wide widths.',
+  ],
+  reducedMotionBehavior: [
+    'Reduced motion removes the scrollbar fade transition while preserving the same activity, focus, idle visibility, and native scrolling behavior.',
+  ],
+  states: [
+    'Pointer or scroll activity reveals the native scrollbar thumb and resets its idle interval; the thumb fades after idle while focus keeps it available to keyboard users.',
   ],
   summary: 'Keep bounded overflow content labeled and keyboard reachable.',
   examples: [

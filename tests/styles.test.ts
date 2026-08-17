@@ -131,6 +131,43 @@ describe('static appearance styles', () => {
     expect(scrollRegion).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
   });
 
+  it('fades the ScrollRegion thumb after idle while preserving native visibility conditions', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const scrollRegion = styles.match(/\[data-wcl-scroll-region\]\s*\{([^}]*)\}/)?.[1];
+    const visibleScrollRegion = styles.match(
+      /:is\(\[data-wcl-scroll-region\]\[data-scrollbar-active\], \[data-wcl-scroll-region\]:focus-within\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const thumb = styles.match(
+      /\[data-wcl-scroll-region\]::-(?:webkit-)?scrollbar-thumb\s*\{([^}]*)\}/,
+    )?.[1];
+    const visibleThumb = styles.match(
+      /:is\(\s*\[data-wcl-scroll-region\]\[data-scrollbar-active\],\s*\[data-wcl-scroll-region\]:focus-within\s*\)::-webkit-scrollbar-thumb\s*\{([^}]*)\}/,
+    )?.[1];
+    const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/)?.[1];
+
+    expect(scrollRegion).toContain('scrollbar-color: transparent transparent');
+    expect(scrollRegion).toContain('transition: scrollbar-color');
+    expect(visibleScrollRegion).toContain('scrollbar-color: var(--wcl-border-strong) transparent');
+    expect(styles).toMatch(
+      /:where\(\[data-wcl-scroll-region\]\s*>\s*\*\)\s*\{[^}]*scrollbar-color:\s*auto/,
+    );
+    expect(thumb).toContain('background-color: transparent');
+    expect(thumb).toContain('transition: background-color');
+    expect(visibleThumb).toContain('background-color: var(--wcl-border-strong)');
+    expect(styles).toMatch(
+      /@supports\s+not\s*\(scrollbar-color:\s*auto\)\s*\{[\s\S]*\[data-wcl-scroll-region\]::-webkit-scrollbar-thumb/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-scroll-region\]\s*\{[^}]*transition:\s*none/,
+    );
+    expect(forcedColors).toMatch(
+      /\[data-wcl-scroll-region\]\s*\{[^}]*scrollbar-color:\s*CanvasText Canvas/,
+    );
+    expect(forcedColors).toMatch(
+      /\[data-wcl-scroll-region\]::-webkit-scrollbar-thumb\s*\{[^}]*background-color:\s*CanvasText/,
+    );
+  });
+
   it('keeps resting content neutral and uses accent roles for interaction structure', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const hover = styles.match(

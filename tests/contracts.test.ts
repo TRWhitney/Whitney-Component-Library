@@ -154,6 +154,17 @@ describe('canonical component contracts', () => {
     }
   });
 
+  it('documents ScrollRegion scrollbar activity without replacing native scrolling', () => {
+    const scrollRegion = componentContracts.find(
+      (contract) => contract.exportName === 'ScrollRegion',
+    );
+
+    expect(scrollRegion?.states.join(' ')).toMatch(/activity.*idle/i);
+    expect(scrollRegion?.events.join(' ')).toMatch(/no callback.*transient/i);
+    expect(scrollRegion?.controlBehavior.join(' ')).toMatch(/native.*whether.*scrollbar/i);
+    expect(scrollRegion?.reducedMotionBehavior.join(' ')).toMatch(/fade transition.*visibility/i);
+  });
+
   it('uses owned layout rhythm in the canonical Surface example', () => {
     const surface = componentContracts.find((contract) => contract.exportName === 'Surface');
 

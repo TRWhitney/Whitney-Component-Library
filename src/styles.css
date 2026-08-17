@@ -296,8 +296,32 @@
     outline-offset: 2px;
     background: var(--wcl-surface-subtle);
     color: var(--wcl-text);
-    scrollbar-color: var(--wcl-border-strong) transparent;
+    scrollbar-color: transparent transparent;
     scrollbar-width: thin;
+    transition: scrollbar-color var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  :is([data-wcl-scroll-region][data-scrollbar-active], [data-wcl-scroll-region]:focus-within) {
+    scrollbar-color: var(--wcl-border-strong) transparent;
+  }
+
+  :where([data-wcl-scroll-region] > *) {
+    scrollbar-color: auto;
+  }
+
+  @supports not (scrollbar-color: auto) {
+    [data-wcl-scroll-region]::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background-color: transparent;
+      transition: background-color var(--wcl-motion-duration) var(--wcl-motion-easing);
+    }
+
+    :is(
+      [data-wcl-scroll-region][data-scrollbar-active],
+      [data-wcl-scroll-region]:focus-within
+    )::-webkit-scrollbar-thumb {
+      background-color: var(--wcl-border-strong);
+    }
   }
 
   [data-wcl-scroll-region][data-size='compact'] {
@@ -640,6 +664,14 @@
       transition: none;
     }
 
+    [data-wcl-scroll-region] {
+      transition: none;
+    }
+
+    [data-wcl-scroll-region]::-webkit-scrollbar-thumb {
+      transition: none;
+    }
+
     [data-wcl-action-tooltip][data-entering],
     [data-wcl-action-tooltip][data-exiting] {
       translate: none;
@@ -693,6 +725,12 @@
       border-color: CanvasText;
       background: Canvas;
       scrollbar-color: CanvasText Canvas;
+      transition: none;
+    }
+
+    [data-wcl-scroll-region]::-webkit-scrollbar-thumb {
+      background-color: CanvasText;
+      transition: none;
     }
 
     [data-wcl-scroll-region]:focus-visible {

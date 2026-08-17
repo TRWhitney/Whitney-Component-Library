@@ -168,7 +168,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Keep bounded overflow keyboard reachable and explicitly labeled."
+        description="Keep bounded overflow labeled and keyboard reachable; reveal its native thumb during activity, fade it after idle, and retain it during focus."
         name="ScrollRegion"
       >
         <ScrollRegion label="Solver event log" size="compact">

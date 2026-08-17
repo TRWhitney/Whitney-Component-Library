@@ -27,6 +27,11 @@ exact identity, rich same-hue tint, neutral content, and saturated same-hue stru
 production correction reached delivery, where independent review exposed missing per-surface roles,
 an absent primary-hover delta for some accents, and one stale visual-direction sentence. The final
 correction is complete, and Ticket 04 is ready but has not started.
+The requested ScrollRegion refinement is delivered in the current HEAD after an inheritance
+boundary stopped its transient thumb color from leaking into consumer-provided nested scrollers.
+Native overflow and input remain authoritative, and activity, idle, focus, reduced-motion,
+forced-color, showcase, nested-composition, and fresh independent review checks pass. Ticket 04
+remains ready and has not started.
 
 ## Progress
 
@@ -399,13 +404,54 @@ See the [decision map](map.md).
   resolved in the style/theme ADR and decision, foundation specification, visual-direction decision,
   provider and action contracts, generated component guidance, future segmented-control constraint,
   accepted prototype record, Ticket 03A, and this status index. All relative Markdown links resolve.
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict types, 130 tests,
+  generated-artifact checks, and the TypeScript 5.9/6/7 declaration matrix after the ScrollRegion
+  idle treatment. `npm run showcase:build`, `npm run verify:package`, `npm audit --audit-level=low`,
+  and `git diff --check` pass; packed React 18.3.1 and React 19.2.8 consumers pass SSR, hydration,
+  public types, and browser builds.
+- Direct Chromium, Firefox, and WebKit operation exercised an overflowing ScrollRegion with pointer,
+  wheel, idle, focus, Home, and Page Down input. Every engine retained native `overflow-y: auto`,
+  moved its native scroll position, changed the thumb from opaque through an interpolated
+  near-transparent color to transparent after the 900ms idle interval, and kept it opaque while
+  focus remained within. Reduced-motion contexts report no transition; Chromium forced colors
+  returns scrollbar rendering to the system. Dark wide, light wide, and light compact screenshots
+  were inspected for hierarchy, clipping, overflow, and style leakage, then discarded with the
+  temporary harness.
+- Initial independent intent and engineering review both found that the human showcase's
+  ScrollRegion description had not been updated with the component behavior. The specimen now
+  explains activity reveal, idle fade, and focus persistence. Renewed `npm run check` passes all
+  130 tests and quality gates; a fresh Chromium wide and 390px compact inspection confirms the
+  explanation is present, wraps cleanly, retains zero document overflow, and accompanies the live
+  active thumb state without clipping or style leakage. Temporary artifacts were discarded.
+- Repeat intent and engineering review found the status handoff stale after the delivery transition.
+  Engineering also found that inherited `scrollbar-color` could carry the ScrollRegion's transient
+  thumb treatment into a consumer's nested scroller. The latter is an objective implementation
+  defect; affected evidence and both repeat review conclusions are invalidated pending correction.
+- A focused stylesheet regression failed before a zero-specificity direct-child boundary reset the
+  inherited scrollbar color, then passed with the complete 130-test repository gate. Fresh Chromium,
+  Firefox, and WebKit inspection makes the parent thumb active while an unstyled nested consumer
+  scroller remains `auto` and an explicitly red/blue consumer scrollbar remains unchanged. Inspected
+  screenshots show the nested composition without clipping or style leakage. Renewed showcase,
+  packed React 18/19 consumer, audit, and diff checks pass; temporary artifacts were discarded.
+- Final fresh independent intent and engineering reviews examined the complete corrected boundary
+  from HEAD `2f6622b` through the working tree and report no findings. Canonical contract guidance,
+  generated human guidance, the live showcase explanation, Ticket 02 evidence, and this status index
+  resolve the documentation impact.
+- ScrollRegion scrollbar activity is implemented without replacing native scrolling or overflow
+  detection. Pointer entry, pointer movement, and actual scroll activity reveal the native thumb and
+  reset a 900ms idle signal; focus within the region preserves keyboard discoverability. The thumb
+  then fades through the library motion role, reduced motion removes that transition, and forced
+  colors keeps the system scrollbar continuously visible. Focused component, stylesheet, and
+  contract regressions failed first and now pass. The complete 130-test repository check, strict
+  types, linters, generated guidance, TypeScript 5.9/6/7 declaration matrix, showcase build, package
+  verification, dependency audit, and direct three-engine rendering checks pass.
 
 ## Continuation
 
 Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
 The page-scrollbar question is resolved without a repository change: the showcase remains normally
-scrollable and leaves native scrollbar presentation to the browser. Ticket 03A is delivered. Begin
-Ticket 04 only when Whitney explicitly requests the next ticket.
+scrollable and leaves native scrollbar presentation to the browser. Ticket 04 remains the sole
+ready-for-agent frontier and must not start until Whitney explicitly requests it.
 
 Current branch: `master`.
 
