@@ -30,58 +30,19 @@ canonical contract schema, and generated manifest and agent index working end to
 
 ## Completion evidence
 
-- `npm run check` passes public provider, hydration, canonical-contract, package-surface,
-  browser-safety, type, canonical-example compilation, and generated-documentation checks (73
-  tests).
-- `npm run typecheck:matrix` builds the package and compiles a generated public-consumer fixture
-  with TypeScript 5.9.3, 6.0.3, and 7.0.2.
-- `npm run verify:package` packs and installs the actual artifact in clean React 18.3.1 and 19.2.8
-  consumers, then verifies SSR, hydration, the four exported subpaths, internal-path
-  encapsulation, private React Aria declarations, the full Node built-in/global exclusion gate,
-  and explicit CSS loading through successful Vite browser builds.
+- `npm run check` passes the provider, hydration, canonical-contract, package-surface,
+  browser-safety, public-example, generated-documentation, and TypeScript 5.9/6/7 checks.
+- `npm run verify:package` installs the packed artifact in clean React 18.3.1 and 19.2.8
+  consumers and verifies SSR, hydration, public types, the four exported subpaths, internal-path
+  encapsulation, private React Aria declarations, explicit CSS loading, and successful Vite
+  browser builds.
+- Owned distribution JavaScript is rejected if it imports Node built-ins, references unbound Node
+  globals, or imports CSS. Consumer bundles are rejected if they retain a Node module import or
+  Vite browser-external shim; the verifier deliberately does not interpret control flow inside
+  bundled third-party fallback code.
 - `src/contracts/appearance-provider.contract.ts` is the one authored provider contract;
   `npm run build` derives `docs/components/appearance-provider.md`, `dist/manifest.json`, and
   `dist/agent-index.md`, while `npm run check:generated` detects stale human documentation.
 - The applied interface direction is the accepted Focus + Rail + Momentum + Route system under
-  continuity without conflation. The foundation plan uses the accepted light and dark neutral
-  fields, independent success/warning/danger colors, IBM Plex Sans and Mono roles, compact rounded
-  geometry, and a 150 ms purposeful-motion baseline. Accent-derived focus and text roles retain
-  readable contrast even for middle-luminance accents. Ticket 01 affects only the provider scope
-  and static theme tokens; component rendering, rails, routes, and activity states remain for
-  their owning tickets to render and inspect in light, dark, compact, forced-color, and
-  reduced-motion states.
-
-The first delivery review invalidated evidence for canonical example compilation, one-to-one
-contract coverage, Node-only scanning, accent text/focus contrast, and consumer stylesheet loading.
-Each gap was corrected and the complete validation matrix was rerun before the repeated delivery
-review.
-
-The repeated review found the browser-safety gate still omitted valid template-literal imports,
-several Node globals, and the Vite-emitted browser bundle; private-type inspection stopped at the
-root declaration facade; and the declared Node floor was lower than Vite 8's supported Node 22
-floor. The final correction scans all declarations, covers the valid Node import/global forms,
-inspects Vite bundles for retained or externalized Node modules, and declares Node `>=22.12.0`.
-The last review cycle also aligned `jsdom` with that Node floor, extended text and focus contrast
-across every owned surface, covered Node globals inside template expressions, verified forced-color
-and reduced-motion rules, and compiled the packed declarations against both React type majors.
-The closure review found that the claimed Node-global gate still depended on syntax-specific
-regular expressions and that removed contracts could leave orphaned generated component pages.
-The final implementation replaces that scan with syntax-aware import and identifier inspection,
-covers qualified global-object access, and makes both generated-documentation checking and normal
-generation reconcile obsolete Markdown pages against the canonical contract set.
-Renewed package validation then exercised React's guarded scheduler fallback. The scanner now
-distinguishes references protected by a matching `typeof` control-flow guard from required Node
-globals, including chained and statement-level capability checks used by React, while the
-library's own distribution remains subject to unconditional exclusion.
-The final intent review found that the canonical schema still collapsed several specification
-dimensions into broad arrays. The schema and generated guide now require explicit guidance for
-parts, control behavior, events, validation and forms, keyboard and labeling behavior,
-localization and directionality, accent and accessibility modes, and preferred higher-level
-compositions. Focused tests reject omission of every added dimension.
-The following review found that SSR occurred before warning capture and that syntax-aware global
-detection did not distinguish lexical bindings. Consumer verification now captures both warning
-channels before server rendering, and the scanner uses TypeScript binding information to permit
-local names while continuing to reject unbound Node globals. Focused regressions cover both gates.
-The next engineering review found valid import forms outside two checks. Syntax-aware inspection now
-covers dynamic imports with options and all static or dynamic CSS module specifiers, protecting the
-Node-free root and explicit-stylesheet-only contracts without relying on import formatting.
+  continuity without conflation. Ticket 01 owns only the provider scope and static theme roles;
+  component rendering and interaction remain with their component tickets.

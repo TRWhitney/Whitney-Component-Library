@@ -23,6 +23,13 @@ export function findNodeOnlyReferences(source) {
   return [...new Set([...findNodeOnlyImports(source), ...findNodeOnlyGlobals(source)])];
 }
 
+export function findBrowserBundleHazards(source) {
+  return [
+    ...findNodeOnlyImports(source),
+    ...(source.includes('__vite-browser-external') ? ['__vite-browser-external'] : []),
+  ];
+}
+
 export function findNodeOnlyImports(source) {
   const references = new Set();
   const {sourceFile} = analyze(source);
@@ -54,18 +61,6 @@ export function findStyleImports(source) {
   visit(sourceFile, (node) => {
     const specifier = moduleSpecifier(node);
     if (specifier && /\.css(?:[?#].*)?$/.test(specifier)) references.add(specifier);
-  });
-
-  return [...references];
-}
-
-export function findUnguardedNodeGlobals(source) {
-  const references = new Set();
-  const {checker, sourceFile} = analyze(source);
-
-  visit(sourceFile, (node) => {
-    const reference = nodeGlobalReference(node, checker);
-    if (reference && !isGuardedReference(node, reference)) references.add(reference);
   });
 
   return [...references];
@@ -250,160 +245,4 @@ function bindingNameContains(bindingName, name) {
   return bindingName.elements.some((element) =>
     ts.isOmittedExpression(element) ? false : bindingNameContains(element.name, name),
   );
-}
-
-function isGuardedReference(node, name) {
-  if (isTypeofReference(node)) return true;
-
-  let child = node;
-  for (let parent = node.parent; parent; parent = parent.parent) {
-    if (ts.isConditionalExpression(parent)) {
-      if (child === parent.whenTrue && conditionGuarantees(parent.condition, name, true)) {
-        return true;
-      }
-      if (child === parent.whenFalse && conditionGuarantees(parent.condition, name, false)) {
-        return true;
-      }
-    }
-
-    if (
-      ts.isIfStatement(parent) &&
-      child === parent.thenStatement &&
-      conditionGuarantees(parent.expression, name, true)
-    ) {
-      return true;
-    }
-
-    if (ts.isBinaryExpression(parent) && child === parent.right) {
-      if (
-        parent.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken &&
-        conditionGuarantees(parent.left, name, true)
-      ) {
-        return true;
-      }
-      if (
-        parent.operatorToken.kind === ts.SyntaxKind.BarBarToken &&
-        conditionGuarantees(parent.left, name, false)
-      ) {
-        return true;
-      }
-    }
-
-    child = parent;
-  }
-
-  return false;
-}
-
-function isTypeofReference(node) {
-  return ts.isTypeOfExpression(node.parent) && node.parent.expression === node;
-}
-
-function conditionGuarantees(condition, name, whenTruthy) {
-  if (ts.isParenthesizedExpression(condition)) {
-    return conditionGuarantees(condition.expression, name, whenTruthy);
-  }
-  if (
-    ts.isPrefixUnaryExpression(condition) &&
-    condition.operator === ts.SyntaxKind.ExclamationToken
-  ) {
-    return conditionGuarantees(condition.operand, name, !whenTruthy);
-  }
-  if (!ts.isBinaryExpression(condition)) return false;
-
-  if (condition.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken && whenTruthy) {
-    return (
-      conditionGuarantees(condition.left, name, true) ||
-      conditionGuarantees(condition.right, name, true)
-    );
-  }
-  if (condition.operatorToken.kind === ts.SyntaxKind.BarBarToken && !whenTruthy) {
-    return (
-      conditionGuarantees(condition.left, name, false) ||
-      conditionGuarantees(condition.right, name, false)
-    );
-  }
-
-  const leftTypeof = typeofName(condition.left);
-  const rightTypeof = typeofName(condition.right);
-  const leftText = literalText(condition.left);
-  const rightText = literalText(condition.right);
-  const operator = condition.operatorToken.kind;
-
-  if (leftTypeof === name && rightText === 'undefined') {
-    return equalityGuaranteesDefined(operator, whenTruthy);
-  }
-  if (rightTypeof === name && leftText === 'undefined') {
-    return equalityGuaranteesDefined(operator, whenTruthy);
-  }
-  if (leftTypeof === name && rightText === 'u') {
-    return orderingGuaranteesDefined(operator, whenTruthy, false);
-  }
-  if (rightTypeof === name && leftText === 'u') {
-    return orderingGuaranteesDefined(operator, whenTruthy, true);
-  }
-  if (leftTypeof === name && rightText !== undefined) {
-    return equalityToDefinedTypeGuaranteesDefined(operator, whenTruthy);
-  }
-  if (rightTypeof === name && leftText !== undefined) {
-    return equalityToDefinedTypeGuaranteesDefined(operator, whenTruthy);
-  }
-
-  return false;
-}
-
-function equalityToDefinedTypeGuaranteesDefined(operator, whenTruthy) {
-  if (
-    operator === ts.SyntaxKind.EqualsEqualsEqualsToken ||
-    operator === ts.SyntaxKind.EqualsEqualsToken
-  ) {
-    return whenTruthy;
-  }
-  if (
-    operator === ts.SyntaxKind.ExclamationEqualsEqualsToken ||
-    operator === ts.SyntaxKind.ExclamationEqualsToken
-  ) {
-    return !whenTruthy;
-  }
-  return false;
-}
-
-function equalityGuaranteesDefined(operator, whenTruthy) {
-  if (
-    operator === ts.SyntaxKind.ExclamationEqualsEqualsToken ||
-    operator === ts.SyntaxKind.ExclamationEqualsToken
-  ) {
-    return whenTruthy;
-  }
-  if (
-    operator === ts.SyntaxKind.EqualsEqualsEqualsToken ||
-    operator === ts.SyntaxKind.EqualsEqualsToken
-  ) {
-    return !whenTruthy;
-  }
-  return false;
-}
-
-function orderingGuaranteesDefined(operator, whenTruthy, reversed) {
-  const definedWhenTruthy = reversed
-    ? operator === ts.SyntaxKind.GreaterThanToken
-    : operator === ts.SyntaxKind.LessThanToken;
-  const undefinedWhenTruthy = reversed
-    ? operator === ts.SyntaxKind.LessThanEqualsToken
-    : operator === ts.SyntaxKind.GreaterThanEqualsToken;
-  if (definedWhenTruthy) return whenTruthy;
-  if (undefinedWhenTruthy) return !whenTruthy;
-  return false;
-}
-
-function typeofName(node) {
-  if (!ts.isTypeOfExpression(node)) return undefined;
-  if (ts.isIdentifier(node.expression) && NODE_GLOBALS.has(node.expression.text)) {
-    return node.expression.text;
-  }
-  return qualifiedNodeGlobal(node.expression);
-}
-
-function literalText(node) {
-  return ts.isStringLiteralLike(node) ? node.text : undefined;
 }

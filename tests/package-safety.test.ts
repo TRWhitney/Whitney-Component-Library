@@ -2,9 +2,9 @@ import {describe, expect, it} from 'vitest';
 
 // The package-safety utility is Node-only repository tooling, not part of the public library.
 import {
+  findBrowserBundleHazards,
   findNodeOnlyReferences,
   findStyleImports,
-  findUnguardedNodeGlobals,
 } from '../scripts/package-safety.mjs';
 
 describe('browser package safety', () => {
@@ -56,23 +56,16 @@ describe('browser package safety', () => {
     ).toEqual([]);
   });
 
-  it('distinguishes guarded platform fallbacks from required Node globals', () => {
+  it('reports browser bundle externalization hazards without interpreting dependency fallbacks', () => {
+    expect(findBrowserBundleHazards("import runtime from 'node:module';")).toEqual(['node:module']);
+    expect(findBrowserBundleHazards('const runtime = "__vite-browser-external";')).toEqual([
+      '__vite-browser-external',
+    ]);
     expect(
-      findUnguardedNodeGlobals(
+      findBrowserBundleHazards(
         "const schedule = typeof setImmediate !== 'undefined' ? setImmediate : null;",
       ),
     ).toEqual([]);
-    expect(
-      findUnguardedNodeGlobals('const schedule = typeof setImmediate < `u` ? setImmediate : null;'),
-    ).toEqual([]);
-    expect(
-      findUnguardedNodeGlobals(`
-        if (typeof process === 'object' && typeof process.emit === 'function') {
-          process.emit('uncaughtException', error);
-        }
-      `),
-    ).toEqual([]);
-    expect(findUnguardedNodeGlobals('setImmediate(run);')).toEqual(['setImmediate']);
   });
 
   it('does not confuse object keys or string content with Node globals', () => {

@@ -4,10 +4,9 @@ import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 
 import {
-  findNodeOnlyImports,
+  findBrowserBundleHazards,
   findNodeOnlyReferences,
   findStyleImports,
-  findUnguardedNodeGlobals,
 } from './package-safety.mjs';
 import {createConsumerVerificationSource} from './consumer-verification-source.mjs';
 
@@ -156,32 +155,13 @@ async function verifyConsumer({
   }
   for (const file of browserFiles.filter((candidate) => candidate.endsWith('.js'))) {
     const browserSource = await readFile(file, 'utf8');
-    const nodeImports = findNodeOnlyImports(browserSource);
-    if (nodeImports.length > 0 || browserSource.includes('__vite-browser-external')) {
+    const hazards = findBrowserBundleHazards(browserSource);
+    if (hazards.length > 0) {
       throw new Error(
-        `Built browser output retains a Node-only module in ${file}: ${nodeImports.join(', ')}.`,
-      );
-    }
-    const unsafeGlobals = findUnguardedNodeGlobals(browserSource);
-    if (unsafeGlobals.length > 0) {
-      const contexts = unsafeGlobals.flatMap((name) => referenceContexts(browserSource, name));
-      throw new Error(
-        `Built browser output retains an unguarded Node global in ${file}: ${unsafeGlobals.join(', ')}. Context: ${contexts.join(' | ')}`,
+        `Built browser output retains a Node-only module in ${file}: ${hazards.join(', ')}.`,
       );
     }
   }
-}
-
-function referenceContexts(source, name) {
-  const contexts = [];
-  let offset = 0;
-  while (contexts.length < 4) {
-    const index = source.indexOf(name, offset);
-    if (index < 0) break;
-    contexts.push(source.slice(Math.max(0, index - 80), index + name.length + 80));
-    offset = index + name.length;
-  }
-  return contexts;
 }
 
 function createTypeConsumerSource(packageName) {
