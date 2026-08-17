@@ -311,6 +311,16 @@ describe('static appearance styles', () => {
     expect(styles).not.toMatch(/\[data-wcl-field[^\]]*\][\s\S]*?transform:\s*(?:translate|scale)/);
   });
 
+  it('keeps native select entries readable in the active appearance', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const selectEntries = styles.match(
+      /\[data-wcl-field-control\]\s*>\s*select\s+:is\(option, optgroup\)\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(selectEntries).toContain('background-color: var(--wcl-surface-subtle)');
+    expect(selectEntries).toContain('color: var(--wcl-text)');
+  });
+
   it('owns field box sizing, readable guidance, and form-section rhythm', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const lightTheme = styles.match(/\[data-wcl-provider\]\s*\{([^}]*)\}/)?.[1];

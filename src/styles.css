@@ -467,6 +467,11 @@
     opacity: 1;
   }
 
+  [data-wcl-field-control] > select :is(option, optgroup) {
+    background-color: var(--wcl-surface-subtle);
+    color: var(--wcl-text);
+  }
+
   [data-wcl-text-area] [data-wcl-field-input] {
     padding-block: var(--wcl-space);
     resize: vertical;

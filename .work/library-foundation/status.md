@@ -100,9 +100,9 @@ stepping, commit, intermediate input, and external-form reset without exposing R
 
 Field is a bounded extension seam for one direct custom form control. It validates the generated
 relationships and states it owns at React commit time, rejects direct hidden/inert controls and
-native role overrides, and leaves role-specific widget behavior to the consumer. The earlier
-per-Field subtree observer and broad native host-role compatibility matrix were removed as
-quality-degrading overengineering.
+native role overrides, keeps native select entries readable in either appearance, and leaves
+role-specific widget behavior to the consumer. The earlier per-Field subtree observer and broad
+native host-role compatibility matrix were removed as quality-degrading overengineering.
 
 ## Frontier
 
@@ -134,7 +134,7 @@ Controls](tickets/05-choice-controls.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 164
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 165
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,

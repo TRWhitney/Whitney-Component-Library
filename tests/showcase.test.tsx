@@ -34,7 +34,7 @@ describe('component showcase', () => {
       '[data-showcase-component="Field"] .showcase-specimen-header p',
     );
 
-    expect(description?.textContent).toMatch(/label.*support.*custom control/i);
+    expect(description?.textContent).toMatch(/label.*support.*custom control.*option entries/i);
     expect(description?.textContent).not.toMatch(/read-only/i);
   });
 

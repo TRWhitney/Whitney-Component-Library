@@ -70,7 +70,7 @@ field exports with stable validation layout and shared labeling conventions.
 
 ## Completion evidence
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, all 164
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, all 165
   tests, generated contracts and guidance, and public declarations under TypeScript 5.9, 6, and 7.
 - `npm run showcase:build`, `npm run verify:package`, `npm audit --audit-level=high`,
   `git diff --check`, and the no-`Any` scan pass. Packed React 18.3.1 and React 19.2.8 consumers pass
@@ -83,6 +83,9 @@ field exports with stable validation layout and shared labeling conventions.
   of a native role override and direct hidden/inert controls, rejection when a child retains stale
   disabled props, exact `1e-21` decimal presentation, aligned responsive peers, and compact reflow
   without overflow. Every screenshot was inspected and all disposable artifacts were removed.
+- Direct operation of the native select specimen in both appearances confirms that Standard and
+  Priority use the active surface and text colors in Chromium, Firefox, and WebKit. Keyboard
+  selection remains native, and inspected Chromium popups show both entries clearly.
 - Automated browser accessibility-tree evidence continues to cover named and described regions,
   fieldsets, textboxes, searchbox, NumberField group and step commands, invalid state, and disabled
   custom controls. Manual screen-reader operation is consolidated in Ticket 30 before `1.0`.

@@ -326,7 +326,7 @@ function FieldSpecimens() {
   return (
     <>
       <Specimen
-        description="Apply shared label and support relationships to one direct custom control through a guarded accessibility seam."
+        description="Apply shared label and support relationships to one direct custom control through a guarded accessibility seam, including readable native option entries."
         name="Field"
       >
         <Field description="Select the compute queue for this run." label="Compute queue">
