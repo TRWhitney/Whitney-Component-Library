@@ -258,15 +258,27 @@ than directly executable React Server Components.
 ## Testing Decisions
 
 - Test behavior at the public component seam rather than through private foundation internals.
+- Bound each ticket by its documented supported uses, inputs, states, and ownership. Reviewers do
+  not invent additional acceptance criteria from theoretical standards conformance, unsupported
+  consumer misuse, or exhaustive edge-case permutations. Material security, data-loss, and
+  accessibility failures on supported paths remain blockers.
 - Every ticket adds contract, type, behavior, accessibility, appearance, reduced-motion, and SSR
   checks proportional to its exports; final hardening does not substitute for component-level
   evidence.
 - Run public examples and declaration fixtures under TypeScript 5.9, 6, and 7.
 - Exercise React 18.3 and 19 server rendering and hydration without mismatch warnings.
 - Exercise supported interactions in Chromium, Firefox, and WebKit against the Baseline 2023
-  target, with focused screen-reader checks for complex widgets.
+  target. Each implementation ticket verifies semantics, relationships, states, keyboard behavior,
+  and the browser accessibility tree automatically. Consolidate manual screen-reader exercises for
+  complex widgets and complete workflows in release-wide accessibility hardening before `1.0`.
 - Verify light, dark, accent changes, compact and wide reflow, forced colors, loading, empty,
   partial, error, disabled, read-only, pending, and reduced-motion states where applicable.
+- Select representative combinations according to the changed behavior and risk rather than
+  multiplying every applicable state across every environment. After a correction, rerun affected
+  checks and target re-review at the original finding and directly affected behavior. Repeat the
+  complete review only when the correction materially changes the public interface, architecture,
+  or accepted scope; repeated waves of new blockers require boundary clarification instead of an
+  unbounded closeout loop.
 - Pack and install the actual npm artifact in clean client-rendered and SSR fixtures.
 - Inspect production bundles to ensure ordinary imports exclude editor and chart JavaScript.
 - Establish representative responsiveness budgets for large Markdown documents and chart data.

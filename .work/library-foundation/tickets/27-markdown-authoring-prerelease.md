@@ -13,7 +13,8 @@ previewing, navigating wiki links, inserting assets, invoking commands, and coor
       state, and preview through bounded public composition.
 - [ ] It demonstrates unsaved, saving, saved, invalid, read-only, locked, asset-pending, and error
       states without owning persistence or collaborative transport.
-- [ ] Source, Live Preview, and read-only flows remain keyboard and screen-reader operable.
+- [ ] Source, Live Preview, and read-only flows remain keyboard operable and expose coherent
+      controls, content, relationships, and state in the browser accessibility tree.
 - [ ] Compact and wide layouts preserve authoring focus, supporting metadata, and commands.
 - [ ] A clean packed-package fixture implements the complete slice with no private import or
       external substitute component.

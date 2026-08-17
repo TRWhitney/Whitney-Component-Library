@@ -26,6 +26,32 @@ unused until stable release. Breaking changes may occur between `0.x` minors, bu
 must pass its applicable quality checks and update affected contracts, generated guidance, and all
 four integration slices.
 
+Component and slice tickets verify their assistive-technology surface through automated semantic,
+relationship, state, keyboard, and browser accessibility-tree checks. Manual screen-reader
+exercises are consolidated in release-wide accessibility hardening after the catalog and slices
+exist and must pass before `1.0`; they are not repeated as an intervention gate for every ticket.
+
+Per-ticket validation and review remain proportional to the ticket's accepted public behavior.
+One complete review examines the documented supported paths, task-owned changes, and material
+regression risk. Corrections receive focused revalidation and targeted review of the original
+finding plus behavior directly affected by the correction; they do not trigger a new unrestricted
+search for unrelated edge cases. A new full review is warranted only when the correction materially
+reshapes the public interface, architecture, or accepted scope.
+
+An observation blocks delivery only when it is reachable through a documented supported use,
+contradicts an accepted source or causes a material regression, has concrete evidence, and belongs
+to the ticket to remedy. Theoretical conformance concerns, exhaustive input or environment
+permutations, unsupported consumer misuse, and speculative hardening do not enlarge a ticket.
+Record a materially useful out-of-scope concern for later planning instead. Credible security,
+data-loss, or accessibility failures on a supported path remain blocking regardless of when they
+are discovered.
+
+If targeted re-review produces repeated waves of new blockers, stop delivery and revisit the
+ticket's supported boundary with Whitney rather than continuing an open-ended review-remediation
+loop. Passing evidence uses representative combinations selected by changed behavior and risk; it
+does not require the Cartesian product of every browser, appearance, viewport, state, and input
+unless the ticket explicitly makes that matrix part of its acceptance criteria.
+
 Stable `1.0` requires explicit acceptance after all of the following remain true:
 
 - The accepted broad conventional catalog, Markdown editor, and chart family are production-ready.

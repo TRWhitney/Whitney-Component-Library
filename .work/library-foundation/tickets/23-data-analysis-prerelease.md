@@ -14,8 +14,8 @@ filtering, sorting, selecting, comparing, charting, and inspecting data.
 - [ ] Table and chart selection can coordinate while retaining their separate roles and focus.
 - [ ] Loading, empty, no-results, partial, stale, and error states preserve context and recovery.
 - [ ] Responsive reflow keeps dense analysis usable without decorative chart identity or lost data.
-- [ ] Keyboard and screen-reader users can perform the same search, selection, comparison, and
-      inspection tasks.
+- [ ] Keyboard users can perform every search, selection, comparison, and inspection task, and the
+      browser accessibility tree exposes the corresponding controls, relationships, and state.
 - [ ] A clean packed-package fixture implements the complete slice with no private imports or
       external substitute component.
 - [ ] Contracts guide agents to the workspace construct and appropriate chart types.

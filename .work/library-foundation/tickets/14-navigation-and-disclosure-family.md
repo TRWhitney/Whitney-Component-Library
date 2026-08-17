@@ -18,8 +18,8 @@ exports with explicit navigation, selection, expansion, and current-location sem
 - [ ] Side navigation owns hierarchy, current destination, groups, compact collapse, and keyboard
       reachability without becoming an application router.
 - [ ] Controlled and uncontrolled state and URL integration seams are explicit.
-- [ ] Focus, touch, keyboard, screen-reader, directionality, responsive, theme, SSR, hydration, and
-      type checks pass.
+- [ ] Focus, touch, keyboard, browser accessibility-tree, directionality, responsive, theme, SSR,
+      hydration, and type checks pass.
 - [ ] Contracts direct agents among tabs, side navigation, menu, disclosure, and ordinary links.
 
 ## Accepted sources

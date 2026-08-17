@@ -9,8 +9,9 @@ assistive-technology, appearance, responsive, and motion matrix after the catalo
 
 - [ ] Chromium, Firefox, and WebKit pass representative behavior across every public family under
       the fixed Baseline 2023 contract.
-- [ ] Focused screen-reader exercises cover compound fields, select/combobox, overlays, collections,
-      navigation, charts, Markdown editing, and all four higher-level constructs.
+- [ ] Manual focused screen-reader exercises cover compound fields, select/combobox, overlays,
+      collections, navigation, charts, Markdown editing, and all four higher-level constructs
+      before stable-candidate acceptance.
 - [ ] Keyboard-only and touch flows complete every supported slice without an inaccessible
       substitute path.
 - [ ] Light, dark, multiple accents, compact/wide, zoom, forced-color, reduced-motion, loading,

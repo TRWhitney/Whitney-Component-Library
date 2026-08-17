@@ -18,8 +18,8 @@ static, dynamic, filterable, and asynchronous option behavior without exposing t
       combinations.
 - [ ] Overlay placement and compact reflow remain reachable without viewport overflow.
 - [ ] Form values and reset behavior are deterministic.
-- [ ] Pointer, touch, keyboard, screen-reader, locale, directionality, SSR, hydration, and type
-      checks pass.
+- [ ] Pointer, touch, keyboard, browser accessibility-tree, locale, directionality, SSR, hydration,
+      and type checks pass.
 
 ## Accepted sources
 

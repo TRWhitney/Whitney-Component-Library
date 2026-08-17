@@ -20,8 +20,8 @@ managing tabs and panels, invoking commands, and presenting transient feedback.
       or status signals.
 - [ ] A clean packed-package fixture hosts representative ordinary components, the data workspace,
       and Markdown workspace through public APIs only.
-- [ ] Keyboard, touch, screen-reader, theme, accent, forced-color, reduced-motion, browser, SSR,
-      hydration, types, and generated guidance pass.
+- [ ] Keyboard, touch, browser accessibility-tree, theme, accent, forced-color, reduced-motion,
+      browser, SSR, hydration, types, and generated guidance pass.
 - [ ] Contracts guide agents between application shell, workbench, page header, and simpler layout
       alternatives.
 

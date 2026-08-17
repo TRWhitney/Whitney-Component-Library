@@ -20,8 +20,8 @@ and bounded syntax/command/decoration extension seams for the Markdown surface.
       resolution without exposing editor-engine objects or enabling an arbitrary plugin runtime.
 - [ ] Extension conflicts and unsupported syntax fail deterministically rather than corrupting the
       document.
-- [ ] Keyboard, touch, screen-reader, theme, reduced-motion, SSR, hydration, types, and security
-      checks pass.
+- [ ] Keyboard, touch, browser accessibility-tree, theme, reduced-motion, SSR, hydration, types,
+      and security checks pass.
 - [ ] Contracts distinguish built-in behavior, consumer callbacks, and explicitly excluded notes-
       ecosystem behavior.
 

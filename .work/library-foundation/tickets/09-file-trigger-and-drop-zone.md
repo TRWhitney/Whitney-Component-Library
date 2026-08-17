@@ -16,7 +16,8 @@ paste where applicable, and drag/drop file acquisition without owning upload or 
 - [ ] Form, reset, validation, and announcement behavior is deterministic.
 - [ ] The APIs compose with the Markdown asset-insertion callback without specializing themselves
       to Markdown.
-- [ ] Touch, keyboard, screen-reader, theme, forced-color, SSR, hydration, and type checks pass.
+- [ ] Touch, keyboard, browser accessibility-tree, theme, forced-color, SSR, hydration, and type
+      checks pass.
 
 ## Accepted sources
 

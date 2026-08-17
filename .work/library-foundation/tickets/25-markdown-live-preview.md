@@ -15,8 +15,8 @@ markup around the active cursor or selection while preserving a stable Markdown 
       preserve a valid canonical Markdown value.
 - [ ] Live Preview, source, and read-only mode transitions preserve value and a reasonable selection
       or focus location.
-- [ ] Syntax and rendered meaning remain available to screen-reader users without duplicate noisy
-      announcements.
+- [ ] Syntax and rendered meaning have one coherent browser accessibility-tree representation
+      without duplicate live-region or rendered content.
 - [ ] Tables, code blocks, long lines, bidirectional text, zoom, and compact containers remain
       editable and reachable.
 - [ ] Theme, accent, forced-color, reduced-motion, SSR, hydration, types, and contracts pass.
