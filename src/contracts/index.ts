@@ -17,6 +17,15 @@ export {
   surfaceContract,
 } from './layout.contracts.js';
 export {
+  fieldContract,
+  fieldGroupContract,
+  formSectionContract,
+  numberFieldContract,
+  searchFieldContract,
+  textAreaContract,
+  textFieldContract,
+} from './field.contracts.js';
+export {
   renderAgentIndex,
   renderContractDocumentation,
   renderTypeScriptExamples,
@@ -45,20 +54,36 @@ import {
   stackContract,
   surfaceContract,
 } from './layout.contracts.js';
+import {
+  fieldContract,
+  fieldGroupContract,
+  formSectionContract,
+  numberFieldContract,
+  searchFieldContract,
+  textAreaContract,
+  textFieldContract,
+} from './field.contracts.js';
 
 export const componentContracts = [
   appearanceProviderContract,
   buttonContract,
   buttonGroupContract,
   dividerContract,
+  fieldContract,
+  fieldGroupContract,
+  formSectionContract,
   iconButtonContract,
   inlineGroupContract,
   linkContract,
+  numberFieldContract,
   responsiveGridContract,
   scrollRegionContract,
+  searchFieldContract,
   sectionContract,
   stackContract,
   surfaceContract,
+  textAreaContract,
+  textFieldContract,
   toggleButtonContract,
   toolbarContract,
 ] as const;

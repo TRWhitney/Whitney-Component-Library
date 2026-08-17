@@ -9,29 +9,11 @@ propagated application accent.
 
 ## Current state
 
-Novel-work implementation: Tickets 01 through 03A are delivered. The requested repository-local
-component showcase is delivered with its maintenance instruction. Its unexplained specimen-stage
-ticks and the selected ToggleButton rail's curved inset treatment are corrected with focused tests
-and current repository, package, and direct Chromium, Firefox, and WebKit validation. The correction
-has clean independent intent and engineering review axes and is preserved in the current HEAD.
-Ticket 04 has not started.
-The showcase now has a validated live accent selector and explicit action-example labels.
-Independent delivery review found a stale controlled-ToggleButton caption after interaction and an
-invalid cross-engine color-swatch selector list. Both are corrected with current repository,
-showcase-build, and direct three-engine evidence. Fresh repeat intent and engineering review axes
-report no findings, and the change is preserved in the current HEAD.
-Ticket 03A's first implementation preserved literal fills but derived washed-out support colors.
-Whitney's showcase evaluation invalidated that visual acceptance, and the subsequent
-[accent-family prototype](prototypes/accent-family-exploration.md) established the replacement:
-exact identity, rich same-hue tint, neutral content, and saturated same-hue structure. The first
-production correction reached delivery, where independent review exposed missing per-surface roles,
-an absent primary-hover delta for some accents, and one stale visual-direction sentence. The final
-correction is complete, and Ticket 04 is ready but has not started.
-The requested ScrollRegion refinement is delivered in the current HEAD after an inheritance
-boundary stopped its transient thumb color from leaking into consumer-provided nested scrollers.
-Native overflow and input remain authoritative, and activity, idle, focus, reduced-motion,
-forced-color, showcase, nested-composition, and fresh independent review checks pass. Ticket 04
-remains ready and has not started.
+Novel-work delivery: Tickets 01 through 04, the requested showcase, and the ScrollRegion refinement
+are complete. Ticket 04's finite closeout retained material supported-path corrections and removed
+the quality-degrading per-Field subtree observer and broad native-role compatibility matrix.
+Manual screen-reader operation remains deferred to the Ticket 30 pre-`1.0` release gate. Ticket 05
+is ready, and no work on it has started.
 
 ## Progress
 
@@ -129,6 +111,16 @@ compatibility checks. Prettier owns formatting for authored files, ESLint applie
 TypeScript and React Hooks rules alongside JavaScript checks, and Stylelint applies the standard
 CSS rule set. Generated component documentation, npm's lockfile, build output, coverage output,
 and installed dependencies remain owned by their respective generators rather than Prettier.
+
+[Ticket 04](tickets/04-field-and-text-entry-family.md) currently provides Field, FieldGroup, FormSection,
+TextField, TextArea, NumberField, and SearchField through distinct narrow APIs and canonical
+contracts. Shared visible labels and reserved support tracks keep descriptions, validation,
+pending feedback, and adjacent control geometry stable. NumberField owns explicit locale,
+formatting, bounds, stepping, committed numeric values, private intermediate text, and external
+form reset without exposing React Aria. Native text, multiline, search, fieldset, and section
+semantics remain distinct. All seven components are represented in the maintained showcase. Ticket
+04 remains active until its review corrections pass focused, repository, package, direct-browser,
+and repeat independent review gates. Ticket 05 remains blocked behind it.
 
 ## Frontier
 
@@ -445,13 +437,84 @@ See the [decision map](map.md).
   contract regressions failed first and now pass. The complete 130-test repository check, strict
   types, linters, generated guidance, TypeScript 5.9/6/7 declaration matrix, showcase build, package
   verification, dependency audit, and direct three-engine rendering checks pass.
+- Ticket 04's initial repository, package, and direct-browser evidence passed before independent
+  review found behavior outside that evidence. The affected completion evidence and both review
+  axes are invalidated pending the focused corrections and renewed validation.
+- Ticket 04's corrected `npm run check` passes 148 tests, strict types, zero-warning linters,
+  formatting, generated guidance, and the TypeScript 5.9/6/7 matrix. The showcase build, packed
+  React 18.3.1 and React 19.2.8 consumers, high-severity dependency audit, diff hygiene, and
+  no-`Any` scan pass.
+- Direct Chromium, Firefox, and WebKit correction checks pass for wheel stepping, bounded TextArea
+  rows, custom and grouped disabled state, read-only ARIA state, disabled search clearing, compact
+  reflow, and overflow. Chromium's accessibility tree includes the described disabled group and the
+  NumberField and invalid TextField with complete state and relationships. This satisfies Ticket
+  04's accepted automated accessibility boundary; manual screen-reader exercises are consolidated
+  in Ticket 30 before stable-candidate acceptance.
+- Ticket 04's final `npm run check` passes all 154 tests, zero-warning linters, strict types,
+  generated guidance, and the TypeScript 5.9/6/7 declaration matrix. Showcase and packed React
+  18.3.1/19.2.8 consumer builds, SSR, hydration, package styles, high-severity audit, diff hygiene,
+  and the no-`Any` scan pass.
+- Fresh Chromium, Firefox, and WebKit operation covers dark/light, wide/compact, RTL, keyboard,
+  pointer, wheel, touch, external form reset, disabled traversal, invalid custom-control rejection,
+  and browser accessibility-tree relationships. Forced-color invalid fields use readable system
+  text with a dashed control boundary and underlined message; screenshots in all three engines were
+  inspected and discarded.
+- Post-review validation confirms the guarded custom `Field` seam rejects missing generated props,
+  non-control roles, and hidden inputs in Chromium, Firefox, and WebKit. A complete role-based
+  control remains named, described, invalid, required, and disabled; end-phase pointer, mouse,
+  touch, Enter, and Space activation stays suppressed, Escape bubbles, and Tab advances. The
+  refreshed 154-test repository gate, generated guidance, package consumers, and audit pass.
+- Ticket 04's reopened corrections have current completion evidence. `npm run check` passes
+  formatting, zero-warning ESLint and Stylelint, strict source types, all 156 tests, generated
+  guidance, and the TypeScript 5.9/6/7 declaration matrix. `npm run showcase:build`, packed React
+  18.3.1 and React 19.2.8 SSR/hydration/type/style/browser verification, the high-severity
+  dependency audit, diff hygiene, and the no-`Any` scan pass.
+- Direct Chromium, Firefox, and WebKit operation of the maintained showcase confirms its actual
+  wrapping FieldGroup specimen has equal two-line label tracks, identical 44px peer controls, and
+  no overflow in dark wide presentation. Light compact presentation collapses to one column with
+  an 8px inter-field gap and no overflow. Every screenshot was inspected for alignment, hierarchy,
+  wrapping, clipping, awkward gaps, and style leakage, then removed.
+- Direct three-engine operation of a disposable validation fixture removed disabled, invalid,
+  read-only, and required attributes from a custom textbox without an error or stale relationship.
+  Read-only button and select controls and a required slider each reached the expected application
+  error boundary. Browser accessibility snapshots exposed the surviving named textbox and three
+  actionable alerts; inspected screenshots and the disposable fixture were removed.
+- Final independent delivery review then found five objective defects and failed both axes. Four
+  focused public-seam checks and one surface-role style check failed against the reviewed
+  implementation, then all 44 focused field/style checks and the affected 162-test repository gate
+  passed after correction. The prior package and browser evidence is invalidated where the guard or
+  inner-action accent roles changed.
+- The first combined browser fixture revealed that a retained-props regression cached every
+  generated relationship and was invalid before the intended state transition. That test boundary
+  is replaced with a control that spreads every current relationship while retaining only disabled
+  state. It remains valid initially and reaches the error boundary only after Field's disabled
+  expectation changes; the focused regression passes.
+- Renewed final validation passes `npm run check` with formatting, zero-warning ESLint and
+  Stylelint, strict source types, 162 tests, generated guidance, and TypeScript 5.9/6/7. The
+  showcase build, packed React 18.3.1 and React 19.2.8 SSR/hydration/type/style/browser consumers,
+  high-severity audit, diff hygiene, and no-`Any` scan pass.
+- Final finite closeout passes `npm run check` with 164 tests, zero-warning linters, strict types,
+  generated guidance, and TypeScript 5.9/6/7 declarations. The showcase build, packed React
+  18.3.1/19.2.8 SSR/hydration/type/style/browser consumers, audit, diff hygiene, and no-`Any` scan
+  also pass.
+- Direct Chromium, Firefox, and WebKit operation confirms a valid custom textbox, uniform rejection
+  of a native role override and direct hidden/inert controls, rejection when a child retains stale
+  disabled props, exact `1e-21` decimal presentation, aligned responsive peers, and compact reflow
+  without overflow. Every screenshot was inspected and all disposable artifacts were removed.
+- Targeted closeout review found no remaining supported-path defect. It removed the per-Field
+  subtree observer and broad native host-role compatibility table as quality-degrading
+  overengineering while preserving commit-time validation of documented structure, relationships,
+  states, and semantics. Out-of-band subtree mutations and arbitrary native-role conformance
+  analysis remain outside the supported contract.
+- In the same three engines, standalone NumberField increment hover and SearchField clear focus use
+  the exact provider roles derived for the subtle control surface under a saturated purple accent.
+  Inspected screenshots show rich hover fill, visible focus structure, stable geometry, no clipping,
+  and no style leakage; all disposable fixtures and screenshots were removed.
 
 ## Continuation
 
-Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-The page-scrollbar question is resolved without a repository change: the showcase remains normally
-scrollable and leaves native scrollbar presentation to the browser. Ticket 04 remains the sole
-ready-for-agent frontier and must not start until Whitney explicitly requests it.
+Ticket 04 is complete. Resume Ticket 05 from novel-work planning in a new request; do not begin it
+as part of the Ticket 04 closeout.
 
 Current branch: `master`.
 
@@ -463,5 +526,5 @@ as a real responsive track with distinct shadow-free endpoints in wide and compa
 semantic endpoint changes with status without becoming a duplicate status indicator. Exact command
 is recorded in the prototype test source.
 
-Current planning contains 33 tickets: four delivered or complete, Ticket 04 as the sole
-`ready-for-agent` frontier ticket, and 28 blocked tickets. All local Markdown links resolve.
+Current planning contains 33 tickets: five complete, Ticket 05 ready, and 27 blocked tickets. All
+local Markdown links resolve.

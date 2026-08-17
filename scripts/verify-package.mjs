@@ -191,14 +191,21 @@ import {
   Button,
   ButtonGroup,
   Divider,
+  Field,
+  FieldGroup,
+  FormSection,
   IconButton,
   InlineGroup,
   Link,
+  NumberField,
   ResponsiveGrid,
   ScrollRegion,
+  SearchField,
   Section,
   Stack,
   Surface,
+  TextArea,
+  TextField,
   ToggleButton,
   Toolbar,
   type AccentColor,
@@ -228,6 +235,17 @@ export const provider = (
           </Stack>
         </ResponsiveGrid>
         <Link href="/runs/0284">Open run</Link>
+        <FormSection title="Solver setup">
+          <FieldGroup legend="Boundary inputs">
+            <TextField label="Run name" defaultValue="North chamber" />
+            <NumberField label="Tolerance" locale="en-US" defaultValue={0.0025} />
+            <SearchField label="Search runs" clearLabel="Clear query" />
+            <TextArea label="Notes" rows={3} />
+            <Field label="Queue">
+              {(controlProps) => <select {...controlProps}><option>Standard</option></select>}
+            </Field>
+          </FieldGroup>
+        </FormSection>
         <ButtonGroup label="Profile actions" equalItems>
           <Button>Review conditions</Button>
           <Button variant="primary" type="submit">Run profile</Button>
@@ -262,11 +280,14 @@ import {
   AppearanceProvider,
   Button,
   ButtonGroup,
+  FieldGroup,
   IconButton,
   Link,
+  NumberField,
   ResponsiveGrid,
   Section,
   Surface,
+  TextField,
   ToggleButton,
   Toolbar,
 } from '${packageName}';
@@ -286,6 +307,9 @@ createRoot(document.getElementById('root')).render(
           React.createElement('span', null, 'Solver'),
           React.createElement('span', null, 'Adaptive mesh')),
         React.createElement(Link, {href: '/runs/0284'}, 'Open run'),
+        React.createElement(FieldGroup, {legend: 'Boundary inputs'},
+          React.createElement(TextField, {label: 'Run name', defaultValue: 'North chamber'}),
+          React.createElement(NumberField, {label: 'Tolerance', locale: 'en-US', defaultValue: 0.0025})),
         React.createElement(ButtonGroup, {label: 'Profile actions', equalItems: true},
           React.createElement(Button, null, 'Review conditions'),
           React.createElement(Button, {variant: 'primary'}, 'Run profile')),

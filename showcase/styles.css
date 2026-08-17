@@ -305,6 +305,11 @@
     background: var(--wcl-surface);
   }
 
+  .showcase-specimen-stage
+    > :is([data-wcl-field], [data-wcl-field-group], [data-wcl-form-section]) {
+    inline-size: 100%;
+  }
+
   .showcase-example {
     display: grid;
     gap: 0.45rem;

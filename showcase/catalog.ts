@@ -21,6 +21,18 @@ export const showcaseGroups = [
     label: 'Actions',
     components: ['Button', 'IconButton', 'Link', 'ToggleButton', 'ButtonGroup', 'Toolbar'],
   },
+  {
+    label: 'Fields',
+    components: [
+      'Field',
+      'TextField',
+      'TextArea',
+      'NumberField',
+      'SearchField',
+      'FieldGroup',
+      'FormSection',
+    ],
+  },
 ] as const satisfies readonly ShowcaseGroup[];
 
 export const showcasedComponentNames = showcaseGroups.flatMap((group) => group.components);

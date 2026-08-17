@@ -38,14 +38,21 @@ describe('canonical component contracts', () => {
       'Button',
       'ButtonGroup',
       'Divider',
+      'Field',
+      'FieldGroup',
+      'FormSection',
       'IconButton',
       'InlineGroup',
       'Link',
+      'NumberField',
       'ResponsiveGrid',
       'ScrollRegion',
+      'SearchField',
       'Section',
       'Stack',
       'Surface',
+      'TextArea',
+      'TextField',
       'ToggleButton',
       'Toolbar',
     ];
@@ -54,6 +61,38 @@ describe('canonical component contracts', () => {
       exportNames.length,
     );
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+  });
+
+  it('directs agents among custom, text, multiline, numeric, search, group, and section semantics', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Field')?.preferredAlternatives.join(' ')).toMatch(
+      /TextField.*TextArea.*NumberField.*SearchField/i,
+    );
+    expect(contractFor('TextField')?.inappropriateUses.join(' ')).toMatch(
+      /multiline.*numeric.*search/i,
+    );
+    expect(contractFor('TextArea')?.appropriateUses.join(' ')).toMatch(/multiline|prose/i);
+    expect(contractFor('NumberField')?.controlBehavior.join(' ')).toMatch(
+      /localized.*incomplete.*committed/i,
+    );
+    expect(contractFor('NumberField')?.formBehavior.join(' ')).toMatch(
+      /raw number.*external reset/i,
+    );
+    expect(contractFor('SearchField')?.keyboardBehavior.join(' ')).toMatch(/Enter.*Escape/i);
+    expect(contractFor('FieldGroup')?.accessibility.join(' ')).toMatch(/fieldset.*legend/i);
+    expect(contractFor('FieldGroup')?.appearance.join(' ')).toMatch(/fieldset|group surface/i);
+    expect(contractFor('FieldGroup')?.appearance.join(' ')).not.toMatch(
+      /control height|support track|hover|focus|pending/i,
+    );
+    expect(contractFor('FormSection')?.preferredAlternatives.join(' ')).toMatch(
+      /FieldGroup.*Section.*Surface/i,
+    );
+    expect(contractFor('FormSection')?.appearance.join(' ')).toMatch(/rhythm|heading|region/i);
+    expect(contractFor('FormSection')?.appearance.join(' ')).not.toMatch(
+      /control height|support track|hover|focus|pending/i,
+    );
   });
 
   it('directs agents among command, navigation, selection, and composite action semantics', () => {

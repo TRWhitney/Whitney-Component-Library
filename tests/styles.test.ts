@@ -118,6 +118,18 @@ describe('static appearance styles', () => {
     expect(toolbar).toContain('--wcl-accent-rail: var(--wcl-accent-rail-on-subtle)');
     expect(toolbar).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
 
+    const fieldGroup = styles.match(/\[data-wcl-field-group\]\s*\{([^}]*)\}/)?.[1];
+    expect(fieldGroup).toContain(
+      '--wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-subtle)',
+    );
+    expect(fieldGroup).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-subtle)');
+    expect(fieldGroup).toContain(
+      '--wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle)',
+    );
+    expect(fieldGroup).toContain('--wcl-accent-muted: var(--wcl-accent-muted-on-subtle)');
+    expect(fieldGroup).toContain('--wcl-accent-rail: var(--wcl-accent-rail-on-subtle)');
+    expect(fieldGroup).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
+
     const scrollRegion = styles.match(/\[data-wcl-scroll-region\]\s*\{([^}]*)\}/)?.[1];
     expect(scrollRegion).toContain(
       '--wcl-accent-fill-boundary: var(--wcl-accent-fill-boundary-on-subtle)',
@@ -273,5 +285,106 @@ describe('static appearance styles', () => {
     expect(styles).toMatch(
       /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-toggle-button\]\[data-selected\]::after[\s\S]*background:\s*Highlight[\s\S]*forced-color-adjust:\s*none/,
     );
+  });
+
+  it('keeps field controls and their support tracks dimensionally stable across states', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const field = styles.match(/\[data-wcl-field\]\s*\{([^}]*)\}/)?.[1];
+    const control = styles.match(/\[data-wcl-field-control\]\s*\{([^}]*)\}/)?.[1];
+    const support = styles.match(/\[data-wcl-field-support\]\s*\{([^}]*)\}/)?.[1];
+    const textArea = styles.match(
+      /\[data-wcl-text-area\]\s+\[data-wcl-field-control\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(field).toContain('grid-template-rows: auto auto minmax(2.25rem, auto)');
+    expect(control).toContain('min-block-size: 2.75rem');
+    expect(control).toContain('block-size: 2.75rem');
+    expect(support).toContain('min-block-size: 2.25rem');
+    expect(textArea).toContain('block-size: auto');
+    expect(textArea).not.toContain('min-block-size: 7.5rem');
+    expect(styles).not.toMatch(
+      /\[data-wcl-text-area\]\s+\[data-wcl-field-input\]\s*\{[^}]*min-block-size:\s*7\.5rem/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-field\]\[data-invalid\]\s+\[data-wcl-field-control\][\s\S]*border-color:\s*var\(--wcl-danger\)/,
+    );
+    expect(styles).not.toMatch(/\[data-wcl-field[^\]]*\][\s\S]*?transform:\s*(?:translate|scale)/);
+  });
+
+  it('owns field box sizing, readable guidance, and form-section rhythm', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const lightTheme = styles.match(/\[data-wcl-provider\]\s*\{([^}]*)\}/)?.[1];
+    const placeholder = styles.match(
+      /\[data-wcl-field-input\]::placeholder,[\s\S]*?\{([^}]*)\}/,
+    )?.[1];
+    const formSectionContent = styles.match(/\[data-wcl-form-section-content\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(lightTheme).toContain('--wcl-text-muted: #5f6c75');
+    expect(placeholder).toContain('opacity: 1');
+    expect(styles).toMatch(
+      /:is\([^}]*\[data-wcl-field-control\][^}]*\)\s*\{[^}]*box-sizing:\s*border-box/,
+    );
+    expect(formSectionContent).toContain('display: grid');
+    expect(formSectionContent).toContain('gap: calc(var(--wcl-space) * 2)');
+  });
+
+  it('derives nested field actions against their subtle control surface', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const nestedActions = styles.match(
+      /:is\(\[data-wcl-number-step\], \[data-wcl-search-clear\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(nestedActions).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-subtle)');
+    expect(nestedActions).toContain(
+      '--wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle)',
+    );
+    expect(nestedActions).toContain('--wcl-accent-muted: var(--wcl-accent-muted-on-subtle)');
+    expect(nestedActions).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
+  });
+
+  it('uses bounded equal field columns and preserves semantic status colors', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const responsiveGroup = styles.match(
+      /\[data-wcl-field-group\]\[data-columns='responsive'\]\s+\[data-wcl-field-group-content\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const fieldError = styles.match(/\[data-wcl-field-error\]\s*\{([^}]*)\}/)?.[1];
+    const pending = styles.match(/\[data-wcl-field-pending\]\s*\{([^}]*)\}/)?.[1];
+    const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/)?.[1];
+
+    expect(responsiveGroup).toContain(
+      'grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr))',
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-field-group\]\[data-columns='responsive'\]\s+\[data-wcl-field-group-content\]\s*>\s*\[data-wcl-field\]\s*\{[^}]*grid-row:\s*span 3[^}]*grid-template-rows:\s*subgrid/,
+    );
+    expect(fieldError).toContain('color: var(--wcl-danger)');
+    expect(pending).toContain('color: var(--wcl-warning)');
+    expect(forcedColors).toMatch(
+      /\[data-wcl-field-control\]\s*\{[^}]*border-color:\s*FieldText[^}]*background:\s*Field/,
+    );
+    expect(forcedColors).toMatch(
+      /\[data-wcl-field\]\[data-invalid\]\s+\[data-wcl-field-control\]\s*\{[^}]*border-color:\s*CanvasText[^}]*border-style:\s*dashed/,
+    );
+    expect(forcedColors).toMatch(
+      /\[data-wcl-field-error\]\s*\{[^}]*color:\s*CanvasText[^}]*text-decoration:\s*underline/,
+    );
+    expect(forcedColors).not.toMatch(
+      /\[data-wcl-field(?:-error|[^\]]*\]\[data-invalid)[\s\S]*?\{[^}]*\bMark\b/,
+    );
+  });
+
+  it('uses one library-owned search decoration across browser engines', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const searchInput = styles.match(
+      /\[data-wcl-search-control\]\s+\[data-wcl-field-input\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const nativeCancel = styles.match(
+      /\[data-wcl-search-control\]\s+\[data-wcl-field-input\]::-webkit-search-cancel-button\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(searchInput).toContain('appearance: auto !important');
+    expect(nativeCancel).toContain('-webkit-appearance: none !important');
+    expect(nativeCancel).toContain('appearance: none !important');
+    expect(nativeCancel).toContain('display: none !important');
   });
 });

@@ -5,7 +5,7 @@ typed single, multiple, binary, and bounded-exclusive choice semantics.
 
 **Blocked by:** [Field and Text Entry Family](04-field-and-text-entry-family.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Each control advertises when its choice model is appropriate and names preferred alternatives.
 - [ ] Native form participation, labels, descriptions, validation, reset, and submitted values are
@@ -18,8 +18,8 @@ typed single, multiple, binary, and bounded-exclusive choice semantics.
 - [ ] Equivalent adjacent choices maintain consistent size and alignment.
 - [ ] Indeterminate checkbox, read-only where meaningful, disabled, invalid, and required states
       are covered.
-- [ ] Pointer, touch, keyboard, screen-reader, theme, reduced-motion, SSR, hydration, and type
-      checks pass.
+- [ ] Pointer, touch, keyboard, browser accessibility-tree, theme, reduced-motion, SSR, hydration,
+      and type checks pass.
 
 ## Accepted sources
 

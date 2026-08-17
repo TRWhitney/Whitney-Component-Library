@@ -47,4 +47,24 @@ describe('packed consumer verification source', () => {
     expect(source).toContain('aria-pressed');
     expect(source).toContain("type: 'submit'");
   });
+
+  it('exercises every field-family export and its packed relationships', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of [
+      'Field',
+      'FieldGroup',
+      'FormSection',
+      'NumberField',
+      'SearchField',
+      'TextArea',
+      'TextField',
+    ]) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-number-field');
+    expect(source).toContain('aria-describedby');
+    expect(source).toContain("locale: 'en-US'");
+    expect(source).toContain('globalThis.InputEvent = dom.window.InputEvent');
+  });
 });

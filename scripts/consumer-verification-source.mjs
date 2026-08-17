@@ -8,14 +8,21 @@ import {
   Button,
   ButtonGroup,
   Divider,
+  Field,
+  FieldGroup,
+  FormSection,
   IconButton,
   InlineGroup,
   Link,
+  NumberField,
   ResponsiveGrid,
   ScrollRegion,
+  SearchField,
   Section,
   Stack,
   Surface,
+  TextArea,
+  TextField,
   ToggleButton,
   Toolbar,
 } from '${packageName}';
@@ -83,6 +90,44 @@ const view = React.createElement(
         ),
         React.createElement(Link, {href: '/runs/0284'}, 'Open run'),
         React.createElement(
+          FormSection,
+          {title: 'Solver setup'},
+          React.createElement(
+            FieldGroup,
+            {legend: 'Boundary inputs'},
+            React.createElement(TextField, {
+              label: 'Run name',
+              description: 'Visible in reports.',
+              defaultValue: 'North chamber',
+            }),
+            React.createElement(NumberField, {
+              label: 'Tolerance',
+              locale: 'en-US',
+              defaultValue: 0.0025,
+              step: 0.0005,
+            }),
+            React.createElement(SearchField, {
+              label: 'Search runs',
+              clearLabel: 'Clear query',
+              defaultValue: 'thermal',
+            }),
+            React.createElement(TextArea, {
+              label: 'Notes',
+              defaultValue: 'Review boundary conditions.',
+              rows: 3,
+            }),
+            React.createElement(
+              Field,
+              {label: 'Queue', description: 'Choose compute priority.'},
+              (controlProps) => React.createElement(
+                'select',
+                controlProps,
+                React.createElement('option', {value: 'standard'}, 'Standard'),
+              ),
+            ),
+          ),
+        ),
+        React.createElement(
           ButtonGroup,
           {label: 'Profile actions', equalItems: true},
           React.createElement(Button, {variant: 'secondary'}, 'Review conditions'),
@@ -110,8 +155,20 @@ const serverMarkup = renderToString(view);
 const dom = new JSDOM('<div id="root">' + serverMarkup + '</div>');
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
+globalThis.Element = dom.window.Element;
+globalThis.Event = dom.window.Event;
+globalThis.FocusEvent = dom.window.FocusEvent;
+globalThis.HTMLButtonElement = dom.window.HTMLButtonElement;
 globalThis.HTMLElement = dom.window.HTMLElement;
+globalThis.HTMLInputElement = dom.window.HTMLInputElement;
+globalThis.HTMLSelectElement = dom.window.HTMLSelectElement;
+globalThis.HTMLTextAreaElement = dom.window.HTMLTextAreaElement;
+globalThis.InputEvent = dom.window.InputEvent;
+globalThis.KeyboardEvent = dom.window.KeyboardEvent;
+globalThis.MouseEvent = dom.window.MouseEvent;
 globalThis.Node = dom.window.Node;
+globalThis.NodeFilter = dom.window.NodeFilter;
+globalThis.SVGElement = dom.window.SVGElement;
 Object.defineProperty(globalThis, 'navigator', {value: dom.window.navigator, configurable: true});
 
 const {hydrateRoot} = await import('react-dom/client');
@@ -139,6 +196,13 @@ if (document.querySelector('[data-wcl-toggle-button]')?.getAttribute('aria-press
 }
 if (document.querySelector('[data-wcl-button][type="submit"]')?.textContent !== 'Run profile') {
   throw new Error('Packed button did not preserve explicit native form behavior.');
+}
+if (!document.querySelector('[data-wcl-number-field]')) {
+  throw new Error('Packed number field did not render its private localized behavior composition.');
+}
+const runNameInput = document.querySelector('input[value="North chamber"]');
+if (!runNameInput?.getAttribute('aria-describedby')) {
+  throw new Error('Packed text field did not preserve its generated description relationship.');
 }
 `;
 }

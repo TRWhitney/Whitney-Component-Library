@@ -28,6 +28,16 @@ describe('component showcase', () => {
     expect([...showcasedComponentNames].sort()).toEqual(contractNames.sort());
   });
 
+  it('describes the Field behavior demonstrated by its custom select', () => {
+    const {container} = render(<Showcase />);
+    const description = container.querySelector(
+      '[data-showcase-component="Field"] .showcase-specimen-header p',
+    );
+
+    expect(description?.textContent).toMatch(/label.*support.*custom control/i);
+    expect(description?.textContent).not.toMatch(/read-only/i);
+  });
+
   it('lets a reader change the propagated accent and see its exact value', () => {
     const {container, getByLabelText, getByText} = render(<Showcase />);
     const accentInput = getByLabelText('Accent');

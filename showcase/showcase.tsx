@@ -5,14 +5,21 @@ import {
   Button,
   ButtonGroup,
   Divider,
+  Field,
+  FieldGroup,
+  FormSection,
   IconButton,
   InlineGroup,
   Link,
+  NumberField,
   ResponsiveGrid,
   ScrollRegion,
+  SearchField,
   Section,
   Stack,
   Surface,
+  TextArea,
+  TextField,
   ToggleButton,
   Toolbar,
   type AccentColor,
@@ -315,6 +322,118 @@ function ActionSpecimens() {
   );
 }
 
+function FieldSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Apply shared label and support relationships to one direct custom control through a guarded accessibility seam."
+        name="Field"
+      >
+        <Field description="Select the compute queue for this run." label="Compute queue">
+          {(controlProps) => (
+            <select {...controlProps} defaultValue="standard">
+              <option value="standard">Standard</option>
+              <option value="priority">Priority</option>
+            </select>
+          )}
+        </Field>
+      </Specimen>
+
+      <Specimen
+        description="Collect one line of text with persistent labeling and support that does not move the control."
+        name="TextField"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <TextField
+            description="Visible in exported reports."
+            label="Run name"
+            placeholder="North chamber"
+          />
+          <TextField
+            errorMessage="Use at least three characters."
+            isInvalid
+            label="Run code"
+            value="N"
+            onChange={() => undefined}
+          />
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Collect multiline plain text with a bounded three-, five-, or eight-row initial height and native editing behavior."
+        name="TextArea"
+      >
+        <TextArea
+          defaultValue="Inspect the north boundary after convergence."
+          description="Plain text review context for this run."
+          label="Review notes"
+          rows={3}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Format, parse, bound, and step a numeric value—including opt-in focused wheel stepping—without exposing intermediate parser state."
+        name="NumberField"
+      >
+        <NumberField
+          defaultValue={0.0025}
+          description="Accepted range: 0–0.01 K."
+          formatOptions={{maximumFractionDigits: 4}}
+          label="Tolerance"
+          locale="en-US"
+          maxValue={0.01}
+          minValue={0}
+          step={0.0005}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Enter, submit, and clear an editable query with native search semantics and one conditional named clear command."
+        name="SearchField"
+      >
+        <SearchField
+          clearLabel="Clear run query"
+          defaultValue="thermal"
+          description="Search run name, owner, or identifier."
+          label="Search runs"
+        />
+      </Specimen>
+
+      <Specimen
+        description="Name and arrange one related native fieldset with equal responsive columns, aligned controls when a peer label wraps, and group-owned disabled propagation."
+        name="FieldGroup"
+      >
+        <FieldGroup
+          columns="responsive"
+          description="These values define the solver boundary."
+          legend="Boundary inputs"
+        >
+          <TextField
+            defaultValue="Adaptive mesh"
+            label="Solver configuration strategy for localized runs"
+          />
+          <NumberField defaultValue={0.0025} label="Tolerance" locale="en-US" step={0.0005} />
+        </FieldGroup>
+      </Specimen>
+
+      <Specimen
+        description="Organize a larger form workflow with owned vertical rhythm under a visible semantic heading without adding a divider."
+        name="FormSection"
+      >
+        <FormSection
+          description="Configure values before reviewing conditions."
+          headingLevel={3}
+          title="Solver setup"
+        >
+          <FieldGroup columns="one" legend="Profile identity">
+            <TextField defaultValue="North chamber" label="Run name" />
+          </FieldGroup>
+        </FormSection>
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -419,6 +538,14 @@ export function Showcase() {
                 <h2 id="actions-heading">Commands keep their meaning</h2>
               </header>
               <ActionSpecimens />
+            </section>
+
+            <section aria-labelledby="fields-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Fields</span>
+                <h2 id="fields-heading">Values keep their own semantics</h2>
+              </header>
+              <FieldSpecimens />
             </section>
           </main>
         </div>
