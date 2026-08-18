@@ -26,6 +26,13 @@ export {
   textFieldContract,
 } from './field.contracts.js';
 export {
+  checkboxContract,
+  checkboxGroupContract,
+  radioGroupContract,
+  segmentedControlContract,
+  switchContract,
+} from './choice.contracts.js';
+export {
   renderAgentIndex,
   renderContractDocumentation,
   renderTypeScriptExamples,
@@ -63,11 +70,20 @@ import {
   textAreaContract,
   textFieldContract,
 } from './field.contracts.js';
+import {
+  checkboxContract,
+  checkboxGroupContract,
+  radioGroupContract,
+  segmentedControlContract,
+  switchContract,
+} from './choice.contracts.js';
 
 export const componentContracts = [
   appearanceProviderContract,
   buttonContract,
   buttonGroupContract,
+  checkboxContract,
+  checkboxGroupContract,
   dividerContract,
   fieldContract,
   fieldGroupContract,
@@ -77,11 +93,14 @@ export const componentContracts = [
   linkContract,
   numberFieldContract,
   responsiveGridContract,
+  radioGroupContract,
   scrollRegionContract,
   searchFieldContract,
   sectionContract,
+  segmentedControlContract,
   stackContract,
   surfaceContract,
+  switchContract,
   textAreaContract,
   textFieldContract,
   toggleButtonContract,

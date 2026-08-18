@@ -7,6 +7,26 @@ export {
 } from './appearance/appearance-provider.js';
 export type {AccentColor} from './appearance/accent.js';
 export {
+  Checkbox,
+  CheckboxGroup,
+  RadioGroup,
+  SegmentedControl,
+  Switch,
+  type BooleanChoiceValueProps,
+  type CheckboxGroupProps,
+  type CheckboxProps,
+  type ChoiceOption,
+  type ChoiceOptions,
+  type ChoiceStateProps,
+  type ExclusiveChoiceValueProps,
+  type MultipleChoiceValueProps,
+  type RadioGroupProps,
+  type SegmentedControlOptions,
+  type SegmentedControlOption,
+  type SegmentedControlProps,
+  type SwitchProps,
+} from './choices/index.js';
+export {
   Field,
   FieldGroup,
   FormSection,

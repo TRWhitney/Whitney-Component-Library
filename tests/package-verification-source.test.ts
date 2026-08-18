@@ -67,4 +67,23 @@ describe('packed consumer verification source', () => {
     expect(source).toContain("locale: 'en-US'");
     expect(source).toContain('globalThis.InputEvent = dom.window.InputEvent');
   });
+
+  it('exercises every choice-family export and its packed native semantics', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of [
+      'Checkbox',
+      'CheckboxGroup',
+      'RadioGroup',
+      'SegmentedControl',
+      'Switch',
+    ]) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-checkbox-group');
+    expect(source).toContain('data-wcl-segmented-control');
+    expect(source).toContain("getAttribute('role') !== 'switch'");
+    expect(source).toContain("form: 'packed-choice-form'");
+    expect(source).toContain('external native form association');
+  });
 });

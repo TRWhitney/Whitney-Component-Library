@@ -4,6 +4,8 @@ import {
   AppearanceProvider,
   Button,
   ButtonGroup,
+  Checkbox,
+  CheckboxGroup,
   Divider,
   Field,
   FieldGroup,
@@ -13,11 +15,14 @@ import {
   Link,
   NumberField,
   ResponsiveGrid,
+  RadioGroup,
   ScrollRegion,
   SearchField,
   Section,
   Stack,
+  SegmentedControl,
   Surface,
+  Switch,
   TextArea,
   TextField,
   ToggleButton,
@@ -28,6 +33,16 @@ import {
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
 
 const defaultAccent: AccentColor = '#2878ff';
+const runModeOptions = [
+  {label: 'Conservative', value: 'conservative'},
+  {description: 'Balances precision and solve time.', label: 'Balanced', value: 'balanced'},
+  {label: 'Fast', value: 'fast'},
+] as const;
+const densityOptions = [
+  {label: 'Conservative', value: 'conservative'},
+  {label: 'Balanced', value: 'balanced'},
+  {label: 'Fast', value: 'fast'},
+] as const;
 
 interface SpecimenProps {
   readonly children: ReactNode;
@@ -434,6 +449,93 @@ function FieldSpecimens() {
   );
 }
 
+function ChoiceSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Select one independent optional or indeterminate value with a stable native form meaning."
+        name="Checkbox"
+      >
+        <InlineGroup align="start" gap="regular" wrap>
+          <Example label="Selected Checkbox">
+            <Checkbox defaultSelected label="Include mesh" name="features" value="mesh" />
+          </Example>
+          <Example label="Indeterminate Checkbox">
+            <Checkbox isIndeterminate label="All result layers" />
+          </Example>
+          <Example label="Invalid required Checkbox">
+            <Checkbox
+              errorMessage="Review unresolved conditions before continuing."
+              isInvalid
+              isRequired
+              label="Review unresolved conditions"
+            />
+          </Example>
+        </InlineGroup>
+      </Specimen>
+
+      <Specimen
+        description="Choose zero or more related values under one accessible group question."
+        name="CheckboxGroup"
+      >
+        <CheckboxGroup
+          defaultValue={['thermal']}
+          description="Select every layer to retain in the exported result."
+          label="Result layers"
+          name="layers"
+          options={[
+            {label: 'Thermal', value: 'thermal'},
+            {label: 'Pressure', value: 'pressure'},
+            {isDisabled: true, label: 'Velocity unavailable', value: 'velocity'},
+          ]}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Choose one visible mutually exclusive answer with native radio and arrow-key behavior."
+        name="RadioGroup"
+      >
+        <RadioGroup
+          defaultValue="balanced"
+          description="The selected mode applies to the next run."
+          label="Run mode"
+          name="mode"
+          options={runModeOptions}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Turn one immediately applied setting on or off without changing its label."
+        name="Switch"
+      >
+        <InlineGroup align="start" gap="regular" wrap>
+          <Example label="On Switch">
+            <Switch defaultSelected label="Keep results synchronized" />
+          </Example>
+          <Example label="Read-only Switch">
+            <Switch defaultSelected isReadOnly label="Pin approved result" />
+          </Example>
+          <Example label="Disabled Switch">
+            <Switch isDisabled label="Stream intermediate frames" />
+          </Example>
+        </InlineGroup>
+      </Specimen>
+
+      <Specimen
+        description="Switch among compact bounded modes with equal peers and one gliding rail below neutral selected text."
+        name="SegmentedControl"
+      >
+        <SegmentedControl
+          defaultValue="balanced"
+          label="Display density"
+          name="density"
+          options={densityOptions}
+        />
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -546,6 +648,14 @@ export function Showcase() {
                 <h2 id="fields-heading">Values keep their own semantics</h2>
               </header>
               <FieldSpecimens />
+            </section>
+
+            <section aria-labelledby="choices-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Choices</span>
+                <h2 id="choices-heading">Selection keeps its model visible</h2>
+              </header>
+              <ChoiceSpecimens />
             </section>
           </main>
         </div>

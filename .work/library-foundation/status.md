@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 04, including the intervening Ticket 03A accent correction, are complete.
-Ticket 05 is ready and no work on it has started. The maintained human showcase covers every
+Tickets 01 through 05, including the intervening Ticket 03A accent correction, are complete.
+Ticket 06 is ready and no work on it has started. The maintained human showcase covers every
 contracted public component. Manual screen-reader operation is intentionally consolidated in the
 Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
 
@@ -104,10 +104,23 @@ native role overrides, keeps native select entries readable in either appearance
 role-specific widget behavior to the consumer. The earlier per-Field subtree observer and broad
 native host-role compatibility matrix were removed as quality-degrading overengineering.
 
+### Ticket 05 — choice controls
+
+Checkbox, CheckboxGroup, RadioGroup, Switch, and SegmentedControl now own independent binary, related
+multiple, visible exclusive, immediate setting, and compact bounded-exclusive choice semantics.
+Controlled and uncontrolled state, labels and support relationships, native form serialization
+and reset, validation, read-only, disabled, indeterminate, and required behavior remain distinct
+through narrow public types and canonical guidance.
+
+SegmentedControl uses native radio behavior under one equal-width track. Its selected label stays
+neutral while one group-owned accent bottom rail glides in logical direction above transient
+adjacent hover surfaces. Reduced motion settles the rail immediately, and forced colors retain the
+group, focus, and selected relationships.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is [Ticket 05 — Choice
-Controls](tickets/05-choice-controls.md).
+See the [decision map](map.md). The next implementation unit is [Ticket 06 — Select and
+Combobox](tickets/06-select-and-combobox.md).
 
 ## Accepted sources
 
@@ -134,20 +147,21 @@ Controls](tickets/05-choice-controls.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 165
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 181
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
-  hydration, public types, explicit styles, encapsulated subpaths, and Vite browser builds.
+  hydration, bounded public choice types, external native form association, explicit styles,
+  encapsulated subpaths, and Vite browser builds.
 - `npm run showcase:build`, `npm audit --audit-level=high`, `git diff --check`, and the source/test/
   tooling no-`Any` scan pass.
 - Chromium, Firefox, and WebKit evidence covers the completed layout, ScrollRegion, action, accent,
-  and field supported paths in light/dark, wide/compact, RTL where applicable, reduced-motion and
-  forced-color modes, keyboard, pointer, wheel, touch, form reset, and accessibility-tree states.
-  Inspected fixtures and screenshots were discarded after validation.
+  field, and choice supported paths in light/dark, wide/compact, RTL where applicable,
+  reduced-motion and forced-color modes, keyboard, pointer, wheel, touch, form reset, and
+  accessibility-tree states. Inspected fixtures and screenshots were discarded after validation.
 - Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
-Resume Ticket 05 from novel-work planning in a new request. Current planning contains 33 tickets:
-five complete, Ticket 05 ready, and 27 blocked. Current branch: `master`.
+Resume Ticket 06 from novel-work planning in a new request. Current planning contains 33 tickets:
+six complete, Ticket 06 ready, and 26 blocked. Current branch: `master`.

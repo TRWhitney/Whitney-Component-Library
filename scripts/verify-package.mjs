@@ -170,6 +170,8 @@ import {
   AppearanceProvider,
   Button,
   ButtonGroup,
+  Checkbox,
+  CheckboxGroup,
   Divider,
   Field,
   FieldGroup,
@@ -178,12 +180,15 @@ import {
   InlineGroup,
   Link,
   NumberField,
+  RadioGroup,
   ResponsiveGrid,
   ScrollRegion,
   SearchField,
   Section,
+  SegmentedControl,
   Stack,
   Surface,
+  Switch,
   TextArea,
   TextField,
   ToggleButton,
@@ -194,6 +199,10 @@ import {
 
 const accent: AccentColor = '#2474ff';
 const gap: LayoutGap = 'regular';
+const choiceOptions = [
+  {label: 'Conservative', value: 'conservative'},
+  {label: 'Balanced', value: 'balanced'},
+] as const;
 export const provider = (
   <AppearanceProvider appearance="dark" accent={accent}>
     <Surface variant="raised">
@@ -230,6 +239,16 @@ export const provider = (
           <Button>Review conditions</Button>
           <Button variant="primary" type="submit">Run profile</Button>
         </ButtonGroup>
+        <Checkbox label="Include mesh" defaultSelected />
+        <CheckboxGroup label="Layers" options={choiceOptions} defaultValue={['balanced']} />
+        <RadioGroup
+          label="Optional mode"
+          options={choiceOptions}
+          value={null}
+          onChange={() => undefined}
+        />
+        <Switch label="Pin result" defaultSelected />
+        <SegmentedControl label="Density" options={choiceOptions} defaultValue="balanced" />
         <Toolbar label="Inspector commands">
           <IconButton label="More actions" variant="quiet">
             <span aria-hidden="true">•••</span>
@@ -240,6 +259,9 @@ export const provider = (
     </Surface>
   </AppearanceProvider>
 );
+
+// @ts-expect-error Exclusive values are bounded by the supplied literal options.
+export const invalidChoice = <RadioGroup label="Mode" options={choiceOptions} value="unknown" onChange={() => undefined} />;
 `;
 }
 

@@ -7,6 +7,8 @@ import {
   AppearanceProvider,
   Button,
   ButtonGroup,
+  Checkbox,
+  CheckboxGroup,
   Divider,
   Field,
   FieldGroup,
@@ -15,12 +17,15 @@ import {
   InlineGroup,
   Link,
   NumberField,
+  RadioGroup,
   ResponsiveGrid,
   ScrollRegion,
   SearchField,
   Section,
+  SegmentedControl,
   Stack,
   Surface,
+  Switch,
   TextArea,
   TextField,
   ToggleButton,
@@ -89,6 +94,7 @@ const view = React.createElement(
           ),
         ),
         React.createElement(Link, {href: '/runs/0284'}, 'Open run'),
+        React.createElement('form', {id: 'packed-choice-form'}),
         React.createElement(
           FormSection,
           {title: 'Solver setup'},
@@ -133,6 +139,50 @@ const view = React.createElement(
           React.createElement(Button, {variant: 'secondary'}, 'Review conditions'),
           React.createElement(Button, {variant: 'primary', type: 'submit'}, 'Run profile'),
         ),
+        React.createElement(Checkbox, {
+          defaultSelected: true,
+          form: 'packed-choice-form',
+          label: 'Include mesh',
+          name: 'features',
+          value: 'mesh',
+        }),
+        React.createElement(CheckboxGroup, {
+          defaultValue: ['thermal'],
+          form: 'packed-choice-form',
+          label: 'Result layers',
+          name: 'layers',
+          options: [
+            {label: 'Thermal', value: 'thermal'},
+            {label: 'Pressure', value: 'pressure'},
+          ],
+        }),
+        React.createElement(RadioGroup, {
+          defaultValue: 'balanced',
+          form: 'packed-choice-form',
+          label: 'Run mode',
+          name: 'mode',
+          options: [
+            {label: 'Conservative', value: 'conservative'},
+            {label: 'Balanced', value: 'balanced'},
+          ],
+        }),
+        React.createElement(Switch, {
+          defaultSelected: true,
+          form: 'packed-choice-form',
+          label: 'Pin result',
+          name: 'pin',
+          value: 'yes',
+        }),
+        React.createElement(SegmentedControl, {
+          defaultValue: 'balanced',
+          form: 'packed-choice-form',
+          label: 'Display density',
+          name: 'density',
+          options: [
+            {label: 'Compact', value: 'compact'},
+            {label: 'Balanced', value: 'balanced'},
+          ],
+        }),
         React.createElement(
           Toolbar,
           {label: 'Inspector commands'},
@@ -199,6 +249,32 @@ if (document.querySelector('[data-wcl-button][type="submit"]')?.textContent !== 
 }
 if (!document.querySelector('[data-wcl-number-field]')) {
   throw new Error('Packed number field did not render its private localized behavior composition.');
+}
+if (!document.querySelector('[data-wcl-checkbox] input:checked')) {
+  throw new Error('Packed checkbox did not preserve native selected state.');
+}
+if (document.querySelectorAll('[data-wcl-checkbox-group] input[type="checkbox"]').length !== 2) {
+  throw new Error('Packed checkbox group did not render its native option inputs.');
+}
+if (!document.querySelector('[data-wcl-radio-group] input[value="balanced"]:checked')) {
+  throw new Error('Packed radio group did not preserve exclusive selection.');
+}
+if (document.querySelector('[data-wcl-switch] input')?.getAttribute('role') !== 'switch') {
+  throw new Error('Packed switch did not preserve switch semantics.');
+}
+if (!document.querySelector('[data-wcl-segmented-control] input[value="balanced"]:checked')) {
+  throw new Error('Packed segmented control did not preserve exclusive selection.');
+}
+const packedChoiceForm = document.getElementById('packed-choice-form');
+const packedChoiceEntries = [...new dom.window.FormData(packedChoiceForm).entries()];
+if (JSON.stringify(packedChoiceEntries) !== JSON.stringify([
+  ['features', 'mesh'],
+  ['layers', 'thermal'],
+  ['mode', 'balanced'],
+  ['pin', 'yes'],
+  ['density', 'balanced'],
+])) {
+  throw new Error('Packed choices did not preserve external native form association.');
 }
 const runNameInput = document.querySelector('input[value="North chamber"]');
 if (!runNameInput?.getAttribute('aria-describedby')) {

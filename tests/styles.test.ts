@@ -234,6 +234,24 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('keeps segmented selection on one gliding rail above adjacent hover surfaces', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const track = styles.match(/\[data-wcl-segment-track\]\s*\{([^}]*)\}/)?.[1];
+    const rail = styles.match(/\[data-wcl-segment-track\]::after\s*\{([^}]*)\}/)?.[1];
+    const selected = styles.match(/\[data-wcl-segment\]\[data-selected\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(track).toContain('grid-template-columns: repeat(var(--wcl-segment-count)');
+    expect(track).toContain('isolation: isolate');
+    expect(rail).toContain('z-index: 3');
+    expect(rail).toContain('inset-inline-start: calc(var(--wcl-segment-index)');
+    expect(rail).toContain('inset-inline-start var(--wcl-motion-duration)');
+    expect(selected).toContain('background: transparent');
+    expect(selected).toContain('color: var(--wcl-text)');
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-segment-track\]::after[\s\S]*transition:\s*none/,
+    );
+  });
+
   it('does not decorate showcase specimens with an unexplained calibration tick', async () => {
     const styles = await readFile('showcase/styles.css', 'utf8');
     const stageRules = [...styles.matchAll(/\.showcase-specimen-stage\s*\{([^}]*)\}/g)];
@@ -309,6 +327,29 @@ describe('static appearance styles', () => {
       /\[data-wcl-field\]\[data-invalid\]\s+\[data-wcl-field-control\][\s\S]*border-color:\s*var\(--wcl-danger\)/,
     );
     expect(styles).not.toMatch(/\[data-wcl-field[^\]]*\][\s\S]*?transform:\s*(?:translate|scale)/);
+  });
+
+  it('keeps choice support stable and derives accents for subtle choice surfaces', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const support = styles.match(/\[data-wcl-choice-support\]\s*\{([^}]*)\}/)?.[1];
+    const subtleChoices = styles.match(
+      /:is\(\[data-wcl-choice-indicator\],\s*\[data-wcl-switch-track\],\s*\[data-wcl-segment-track\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(support).toContain('min-block-size: 2.25rem');
+    expect(styles).toMatch(
+      /\[data-wcl-choice-support\]\[data-has-error\]\s+\[data-wcl-choice-description\]/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-choice-support\]:not\(\[data-has-error\]\)\s+\[data-wcl-choice-error\]/,
+    );
+    expect(subtleChoices).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-subtle)');
+    expect(subtleChoices).toContain(
+      '--wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle)',
+    );
+    expect(subtleChoices).toContain('--wcl-accent-muted: var(--wcl-accent-muted-on-subtle)');
+    expect(subtleChoices).toContain('--wcl-accent-rail: var(--wcl-accent-rail-on-subtle)');
+    expect(subtleChoices).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
   });
 
   it('keeps native select entries readable in the active appearance', async () => {

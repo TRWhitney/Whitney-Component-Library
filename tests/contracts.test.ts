@@ -37,6 +37,8 @@ describe('canonical component contracts', () => {
       'AppearanceProvider',
       'Button',
       'ButtonGroup',
+      'Checkbox',
+      'CheckboxGroup',
       'Divider',
       'Field',
       'FieldGroup',
@@ -45,12 +47,15 @@ describe('canonical component contracts', () => {
       'InlineGroup',
       'Link',
       'NumberField',
+      'RadioGroup',
       'ResponsiveGrid',
       'ScrollRegion',
       'SearchField',
       'Section',
+      'SegmentedControl',
       'Stack',
       'Surface',
+      'Switch',
       'TextArea',
       'TextField',
       'ToggleButton',
@@ -61,6 +66,28 @@ describe('canonical component contracts', () => {
       exportNames.length,
     );
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+  });
+
+  it('directs agents among binary, multiple, exclusive, and segmented choice models', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Checkbox')?.preferredAlternatives.join(' ')).toMatch(
+      /Switch.*CheckboxGroup.*RadioGroup.*SegmentedControl/i,
+    );
+    expect(contractFor('CheckboxGroup')?.appropriateUses.join(' ')).toMatch(/zero.*one.*several/i);
+    expect(contractFor('RadioGroup')?.keyboardBehavior.join(' ')).toMatch(
+      /arrow.*focus.*selection/i,
+    );
+    expect(contractFor('RadioGroup')?.controlBehavior.join(' ')).toMatch(/controlled.*null/i);
+    expect(contractFor('Switch')?.appropriateUses.join(' ')).toMatch(/on or off.*immediately/i);
+    expect(contractFor('SegmentedControl')?.appearance.join(' ')).toMatch(
+      /equal.*bottom rail.*label.*neutral.*no selected fill/i,
+    );
+    expect(contractFor('SegmentedControl')?.controlBehavior.join(' ')).toMatch(
+      /controlled or uncontrolled.*exclusive/i,
+    );
+    expect(contractFor('SegmentedControl')?.controlBehavior.join(' ')).toMatch(/controlled.*null/i);
   });
 
   it('directs agents among custom, text, multiline, numeric, search, group, and section semantics', () => {

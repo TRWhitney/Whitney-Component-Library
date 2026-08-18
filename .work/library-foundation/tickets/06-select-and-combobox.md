@@ -6,7 +6,7 @@ static, dynamic, filterable, and asynchronous option behavior without exposing t
 **Blocked by:** [Field and Text Entry Family](04-field-and-text-entry-family.md),
 [Choice Controls](05-choice-controls.md), [Action Family](03-action-family.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Contracts distinguish bounded selection from editable autocomplete and direct agents to the
       simpler control whenever appropriate.

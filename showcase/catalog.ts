@@ -33,6 +33,10 @@ export const showcaseGroups = [
       'FormSection',
     ],
   },
+  {
+    label: 'Choices',
+    components: ['Checkbox', 'CheckboxGroup', 'RadioGroup', 'Switch', 'SegmentedControl'],
+  },
 ] as const satisfies readonly ShowcaseGroup[];
 
 export const showcasedComponentNames = showcaseGroups.flatMap((group) => group.components);
