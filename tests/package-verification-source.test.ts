@@ -66,6 +66,7 @@ describe('packed consumer verification source', () => {
     expect(source).toContain('aria-describedby');
     expect(source).toContain("locale: 'en-US'");
     expect(source).toContain('globalThis.InputEvent = dom.window.InputEvent');
+    expect(source).toContain('globalThis.HTMLTemplateElement = dom.window.HTMLTemplateElement');
   });
 
   it('exercises every choice-family export and its packed native semantics', () => {
@@ -85,5 +86,17 @@ describe('packed consumer verification source', () => {
     expect(source).toContain("getAttribute('role') !== 'switch'");
     expect(source).toContain("form: 'packed-choice-form'");
     expect(source).toContain('external native form association');
+  });
+
+  it('exercises bounded and editable collection selection through the packed API', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of ['ComboBox', 'Select']) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-selection-field');
+    expect(source).toContain("getAttribute('role') !== 'combobox'");
+    expect(source).toContain("['select-mode', 'balanced']");
+    expect(source).toContain("['combo-mode', 'balanced']");
   });
 });

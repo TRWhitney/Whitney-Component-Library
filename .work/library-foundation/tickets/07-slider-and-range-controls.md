@@ -5,7 +5,7 @@ formatting, keyboard behavior, and stable adjacent-thumb interaction.
 
 **Blocked by:** [Field and Text Entry Family](04-field-and-text-entry-family.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Min, max, step, orientation, formatted value, and controlled or uncontrolled state are
       explicit and valid.

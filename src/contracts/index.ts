@@ -32,6 +32,7 @@ export {
   segmentedControlContract,
   switchContract,
 } from './choice.contracts.js';
+export {comboBoxContract, selectContract} from './selection.contracts.js';
 export {
   renderAgentIndex,
   renderContractDocumentation,
@@ -77,6 +78,7 @@ import {
   segmentedControlContract,
   switchContract,
 } from './choice.contracts.js';
+import {comboBoxContract, selectContract} from './selection.contracts.js';
 
 export const componentContracts = [
   appearanceProviderContract,
@@ -84,6 +86,7 @@ export const componentContracts = [
   buttonGroupContract,
   checkboxContract,
   checkboxGroupContract,
+  comboBoxContract,
   dividerContract,
   fieldContract,
   fieldGroupContract,
@@ -97,6 +100,7 @@ export const componentContracts = [
   scrollRegionContract,
   searchFieldContract,
   sectionContract,
+  selectContract,
   segmentedControlContract,
   stackContract,
   surfaceContract,

@@ -486,6 +486,17 @@
     line-height: 1.45;
   }
 
+  [data-wcl-selection-field]
+    > :is([data-wcl-field-description], [data-wcl-field-error], [data-wcl-field-pending]) {
+    grid-area: 3 / 1;
+    min-block-size: 2.25rem;
+    min-inline-size: 0;
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
   :where([data-wcl-field-support] > *) {
     grid-area: 1 / 1;
     margin: 0;
@@ -579,6 +590,180 @@
   [data-wcl-search-control] {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  [data-wcl-select-trigger] {
+    inline-size: 100%;
+    justify-content: space-between;
+    gap: var(--wcl-space);
+    padding: 0 calc(var(--wcl-space) * 1.25);
+    color: var(--wcl-text);
+    font: inherit;
+    font-size: 0.9375rem;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  [data-wcl-select-value] {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  [data-wcl-select-value][data-placeholder] {
+    color: var(--wcl-text-muted);
+  }
+
+  [data-wcl-combo-control] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2.5rem;
+  }
+
+  [data-wcl-combo-trigger] {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    min-inline-size: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--wcl-text-muted);
+    cursor: pointer;
+    transition:
+      background-color var(--wcl-motion-duration) var(--wcl-motion-easing),
+      color var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  [data-wcl-combo-trigger][data-hovered] {
+    background: var(--wcl-accent-soft);
+    color: var(--wcl-accent-hover-contrast);
+  }
+
+  [data-wcl-combo-trigger][data-focus-visible] {
+    outline: 2px solid var(--wcl-accent-focus);
+    outline-offset: -3px;
+  }
+
+  [data-wcl-selection-chevron] {
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: none;
+    stroke: currentcolor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.75;
+    transition: rotate var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  [data-wcl-selection-field][data-open] [data-wcl-selection-chevron] {
+    rotate: 180deg;
+  }
+
+  [data-wcl-selection-field][data-disabled]
+    :is([data-wcl-select-trigger], [data-wcl-combo-trigger]) {
+    cursor: not-allowed;
+  }
+
+  [data-wcl-selection-popover] {
+    box-sizing: border-box;
+    inline-size: var(--trigger-width);
+    max-inline-size: calc(100vw - calc(var(--wcl-space) * 2));
+    max-block-size: min(20rem, var(--available-height));
+    overflow: hidden;
+    border: 1px solid var(--wcl-border-strong);
+    border-radius: var(--wcl-control-radius);
+    background: var(--wcl-surface-raised);
+    box-shadow: var(--wcl-shadow);
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+    transition:
+      opacity var(--wcl-motion-duration) var(--wcl-motion-easing),
+      translate var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  [data-wcl-selection-popover]:is([data-entering], [data-exiting]) {
+    opacity: 0;
+    translate: 0 -3px;
+  }
+
+  [data-wcl-selection-list] {
+    box-sizing: border-box;
+    max-block-size: min(20rem, var(--available-height));
+    padding-block: calc(var(--wcl-space) * 0.5);
+    overflow: auto;
+    outline: 0;
+  }
+
+  [data-wcl-selection-option] {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3px minmax(0, 1fr);
+    gap: var(--wcl-space);
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-block: calc(var(--wcl-space) * 0.75);
+    padding-inline: calc(var(--wcl-space) * 0.75) calc(var(--wcl-space) * 1.25);
+    outline: 0;
+    color: var(--wcl-text);
+    cursor: pointer;
+  }
+
+  [data-wcl-selection-option][data-hovered] {
+    background: var(--wcl-accent-soft-on-raised);
+  }
+
+  [data-wcl-selection-option][data-focused] {
+    box-shadow: inset 0 0 0 2px var(--wcl-accent-focus-on-raised);
+  }
+
+  [data-wcl-selection-option][data-disabled] {
+    color: var(--wcl-text-muted);
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  [data-wcl-selection-rail] {
+    align-self: stretch;
+    inline-size: 3px;
+    min-block-size: 1.25rem;
+    border-radius: 99px;
+    background: transparent;
+    transition: background-color var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  [data-wcl-selection-rail][data-selected] {
+    background: var(--wcl-accent-rail-on-raised);
+  }
+
+  [data-wcl-selection-option-copy] {
+    display: grid;
+    gap: calc(var(--wcl-space) * 0.25);
+    min-inline-size: 0;
+  }
+
+  [data-wcl-selection-option-label] {
+    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  [data-wcl-selection-option-description] {
+    color: var(--wcl-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  [data-wcl-selection-empty] {
+    padding: calc(var(--wcl-space) * 1.5);
+    color: var(--wcl-text-muted);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
   }
 
   [data-wcl-search-icon] {
@@ -1370,6 +1555,16 @@
       transition: none;
     }
 
+    [data-wcl-selection-popover],
+    [data-wcl-selection-chevron],
+    [data-wcl-selection-rail] {
+      transition: none;
+    }
+
+    [data-wcl-selection-popover]:is([data-entering], [data-exiting]) {
+      translate: none;
+    }
+
     [data-wcl-scroll-region] {
       transition: none;
     }
@@ -1485,6 +1680,27 @@
       border: 1px solid CanvasText;
       background: Canvas;
       box-shadow: none;
+    }
+
+    [data-wcl-selection-popover] {
+      border-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+      color: CanvasText;
+      forced-color-adjust: auto;
+    }
+
+    [data-wcl-selection-option][data-focused] {
+      box-shadow: inset 0 0 0 2px Highlight;
+    }
+
+    [data-wcl-selection-option][data-hovered] {
+      background: Canvas;
+    }
+
+    [data-wcl-selection-rail][data-selected] {
+      background: Highlight;
+      forced-color-adjust: none;
     }
 
     [data-wcl-choice-indicator],

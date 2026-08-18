@@ -352,6 +352,35 @@ describe('static appearance styles', () => {
     expect(subtleChoices).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
   });
 
+  it('bounds collection overlays and keeps selected option labels neutral', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const popover = styles.match(/\[data-wcl-selection-popover\]\s*\{([^}]*)\}/)?.[1];
+    const option = styles.match(/\[data-wcl-selection-option\]\s*\{([^}]*)\}/)?.[1];
+    const selectedRail = styles.match(
+      /\[data-wcl-selection-rail\]\[data-selected\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const optionLabel = styles.match(/\[data-wcl-selection-option-label\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(popover).toContain('inline-size: var(--trigger-width)');
+    expect(popover).toContain('max-inline-size: calc(100vw');
+    expect(popover).toContain('max-block-size: min(20rem, var(--available-height))');
+    expect(popover).toContain('background: var(--wcl-surface-raised)');
+    expect(option).toContain('padding-block: calc(var(--wcl-space) * 0.75)');
+    expect(option).toContain(
+      'padding-inline: calc(var(--wcl-space) * 0.75) calc(var(--wcl-space) * 1.25)',
+    );
+    expect(option).not.toMatch(/\bpadding:/);
+    expect(selectedRail).toContain('background: var(--wcl-accent-rail-on-raised)');
+    expect(optionLabel).toContain('color: inherit');
+    expect(optionLabel).not.toMatch(/accent/i);
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-selection-popover\][\s\S]*transition:\s*none/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-selection-rail\]\[data-selected\][\s\S]*background:\s*Highlight/,
+    );
+  });
+
   it('keeps native select entries readable in the active appearance', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const selectEntries = styles.match(

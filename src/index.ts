@@ -27,6 +27,19 @@ export {
   type SwitchProps,
 } from './choices/index.js';
 export {
+  ComboBox,
+  Select,
+  type CollectionFieldProps,
+  type CollectionLoadingProps,
+  type CollectionOption,
+  type CollectionOptions,
+  type ComboBoxFilterBehavior,
+  type ComboBoxInputValueProps,
+  type ComboBoxProps,
+  type SelectionValueProps,
+  type SelectProps,
+} from './selection/index.js';
+export {
   Field,
   FieldGroup,
   FormSection,

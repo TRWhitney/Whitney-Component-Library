@@ -6,6 +6,7 @@ import {
   ButtonGroup,
   Checkbox,
   CheckboxGroup,
+  ComboBox,
   Divider,
   Field,
   FieldGroup,
@@ -19,6 +20,7 @@ import {
   ScrollRegion,
   SearchField,
   Section,
+  Select,
   Stack,
   SegmentedControl,
   Surface,
@@ -536,6 +538,55 @@ function ChoiceSpecimens() {
   );
 }
 
+function SelectionSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Choose one stable value from a bounded collapsible collection with typeahead, native form behavior, and viewport-aware overlay placement."
+        name="Select"
+      >
+        <Select
+          defaultValue="balanced"
+          description="Every mode is known before the run starts."
+          emptyMessage="No run modes"
+          label="Run mode"
+          name="mode"
+          options={runModeOptions}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Filter and choose one stable value from local, dynamic, or asynchronously supplied options while input and selection ownership remain explicit."
+        name="ComboBox"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Local filtered ComboBox">
+            <ComboBox
+              description="Type to filter the local mode catalog."
+              emptyMessage="No matching modes"
+              label="Find run mode"
+              options={runModeOptions}
+              placeholder="Type a mode"
+            />
+          </Example>
+          <Example label="Loading manual ComboBox">
+            <ComboBox
+              emptyMessage="No remote modes"
+              filterBehavior="manual"
+              inputValue="thermal"
+              isLoading
+              label="Remote mode"
+              loadingMessage="Loading remote modes"
+              onInputChange={() => undefined}
+              options={[]}
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -656,6 +707,14 @@ export function Showcase() {
                 <h2 id="choices-heading">Selection keeps its model visible</h2>
               </header>
               <ChoiceSpecimens />
+            </section>
+
+            <section aria-labelledby="selection-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Selection</span>
+                <h2 id="selection-heading">Collections stay bounded and searchable</h2>
+              </header>
+              <SelectionSpecimens />
             </section>
           </main>
         </div>

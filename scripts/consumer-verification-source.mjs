@@ -9,6 +9,7 @@ import {
   ButtonGroup,
   Checkbox,
   CheckboxGroup,
+  ComboBox,
   Divider,
   Field,
   FieldGroup,
@@ -22,6 +23,7 @@ import {
   ScrollRegion,
   SearchField,
   Section,
+  Select,
   SegmentedControl,
   Stack,
   Surface,
@@ -183,6 +185,28 @@ const view = React.createElement(
             {label: 'Balanced', value: 'balanced'},
           ],
         }),
+        React.createElement(Select, {
+          defaultValue: 'balanced',
+          emptyMessage: 'No modes',
+          form: 'packed-choice-form',
+          label: 'Bounded mode',
+          name: 'select-mode',
+          options: [
+            {label: 'Conservative', value: 'conservative'},
+            {label: 'Balanced', value: 'balanced'},
+          ],
+        }),
+        React.createElement(ComboBox, {
+          defaultValue: 'balanced',
+          emptyMessage: 'No matching modes',
+          form: 'packed-choice-form',
+          label: 'Filter mode',
+          name: 'combo-mode',
+          options: [
+            {label: 'Conservative', value: 'conservative'},
+            {label: 'Balanced', value: 'balanced'},
+          ],
+        }),
         React.createElement(
           Toolbar,
           {label: 'Inspector commands'},
@@ -212,6 +236,7 @@ globalThis.HTMLButtonElement = dom.window.HTMLButtonElement;
 globalThis.HTMLElement = dom.window.HTMLElement;
 globalThis.HTMLInputElement = dom.window.HTMLInputElement;
 globalThis.HTMLSelectElement = dom.window.HTMLSelectElement;
+globalThis.HTMLTemplateElement = dom.window.HTMLTemplateElement;
 globalThis.HTMLTextAreaElement = dom.window.HTMLTextAreaElement;
 globalThis.InputEvent = dom.window.InputEvent;
 globalThis.KeyboardEvent = dom.window.KeyboardEvent;
@@ -220,6 +245,32 @@ globalThis.Node = dom.window.Node;
 globalThis.NodeFilter = dom.window.NodeFilter;
 globalThis.SVGElement = dom.window.SVGElement;
 Object.defineProperty(globalThis, 'navigator', {value: dom.window.navigator, configurable: true});
+
+// React Aria installs these browser-only template hooks when its client bundle is evaluated.
+// This single-process SSR fixture imports the package before JSDOM exists, so reproduce that
+// client initialization before hydration rather than testing a module lifecycle browsers cannot have.
+Object.defineProperties(globalThis.HTMLTemplateElement.prototype, {
+  firstChild: {
+    configurable: true,
+    enumerable: true,
+    get() { return this.content.firstChild; },
+  },
+  appendChild: {
+    configurable: true,
+    enumerable: true,
+    value(node) { return this.content.appendChild(node); },
+  },
+  removeChild: {
+    configurable: true,
+    enumerable: true,
+    value(node) { return this.content.removeChild(node); },
+  },
+  insertBefore: {
+    configurable: true,
+    enumerable: true,
+    value(node, child) { return this.content.insertBefore(node, child); },
+  },
+});
 
 const {hydrateRoot} = await import('react-dom/client');
 hydrateRoot(document.getElementById('root'), view, {
@@ -230,7 +281,11 @@ console.error = originalConsoleError;
 console.warn = originalConsoleWarn;
 
 if (consoleMessages.length > 0 || recoverableErrors.length > 0) {
-  throw new Error('SSR or hydration emitted warnings or recoverable errors.');
+  const details = [
+    ...consoleMessages.map((messages) => messages.map(String).join(' ')),
+    ...recoverableErrors.map(String),
+  ].join('\\n');
+  throw new Error('SSR or hydration emitted warnings or recoverable errors.\\n' + details);
 }
 if (!document.querySelector('[data-wcl-responsive-grid]')?.textContent?.includes('Adaptive mesh')) {
   throw new Error('Packed layout primitives did not hydrate their server-rendered content.');
@@ -265,6 +320,12 @@ if (document.querySelector('[data-wcl-switch] input')?.getAttribute('role') !== 
 if (!document.querySelector('[data-wcl-segmented-control] input[value="balanced"]:checked')) {
   throw new Error('Packed segmented control did not preserve exclusive selection.');
 }
+if (!document.querySelector('[data-wcl-selection-field]')) {
+  throw new Error('Packed selection family did not render its private collection composition.');
+}
+if (document.querySelector('[data-wcl-combo-box] input')?.getAttribute('role') !== 'combobox') {
+  throw new Error('Packed combo box did not preserve editable autocomplete semantics.');
+}
 const packedChoiceForm = document.getElementById('packed-choice-form');
 const packedChoiceEntries = [...new dom.window.FormData(packedChoiceForm).entries()];
 if (JSON.stringify(packedChoiceEntries) !== JSON.stringify([
@@ -273,6 +334,8 @@ if (JSON.stringify(packedChoiceEntries) !== JSON.stringify([
   ['mode', 'balanced'],
   ['pin', 'yes'],
   ['density', 'balanced'],
+  ['select-mode', 'balanced'],
+  ['combo-mode', 'balanced'],
 ])) {
   throw new Error('Packed choices did not preserve external native form association.');
 }

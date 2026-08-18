@@ -39,6 +39,7 @@ describe('canonical component contracts', () => {
       'ButtonGroup',
       'Checkbox',
       'CheckboxGroup',
+      'ComboBox',
       'Divider',
       'Field',
       'FieldGroup',
@@ -53,6 +54,7 @@ describe('canonical component contracts', () => {
       'SearchField',
       'Section',
       'SegmentedControl',
+      'Select',
       'Stack',
       'Surface',
       'Switch',
@@ -88,6 +90,26 @@ describe('canonical component contracts', () => {
       /controlled or uncontrolled.*exclusive/i,
     );
     expect(contractFor('SegmentedControl')?.controlBehavior.join(' ')).toMatch(/controlled.*null/i);
+  });
+
+  it('distinguishes bounded selection from editable autocomplete', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Select')?.appropriateUses.join(' ')).toMatch(/bounded.*collection/i);
+    expect(contractFor('Select')?.preferredAlternatives.join(' ')).toMatch(
+      /ComboBox.*editable|ComboBox.*filter/i,
+    );
+    expect(contractFor('Select')?.states.join(' ')).toMatch(/no read-only prop/i);
+    expect(contractFor('ComboBox')?.appropriateUses.join(' ')).toMatch(
+      /typing.*filtering.*dynamic.*asynchronous/i,
+    );
+    expect(contractFor('ComboBox')?.controlBehavior.join(' ')).toMatch(
+      /Selection and input text.*independent.*controlled or uncontrolled/i,
+    );
+    expect(contractFor('ComboBox')?.composition.join(' ')).toMatch(
+      /manual.*dynamic.*asynchronous/i,
+    );
   });
 
   it('directs agents among custom, text, multiline, numeric, search, group, and section semantics', () => {

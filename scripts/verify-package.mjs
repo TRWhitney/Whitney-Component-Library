@@ -172,6 +172,7 @@ import {
   ButtonGroup,
   Checkbox,
   CheckboxGroup,
+  ComboBox,
   Divider,
   Field,
   FieldGroup,
@@ -185,6 +186,7 @@ import {
   ScrollRegion,
   SearchField,
   Section,
+  Select,
   SegmentedControl,
   Stack,
   Surface,
@@ -249,6 +251,17 @@ export const provider = (
         />
         <Switch label="Pin result" defaultSelected />
         <SegmentedControl label="Density" options={choiceOptions} defaultValue="balanced" />
+        <Select
+          label="Bounded mode"
+          emptyMessage="No modes"
+          options={choiceOptions}
+          defaultValue="balanced"
+        />
+        <ComboBox
+          label="Filter mode"
+          emptyMessage="No matching modes"
+          options={choiceOptions}
+        />
         <Toolbar label="Inspector commands">
           <IconButton label="More actions" variant="quiet">
             <span aria-hidden="true">•••</span>
@@ -262,6 +275,9 @@ export const provider = (
 
 // @ts-expect-error Exclusive values are bounded by the supplied literal options.
 export const invalidChoice = <RadioGroup label="Mode" options={choiceOptions} value="unknown" onChange={() => undefined} />;
+
+// @ts-expect-error Select values are bounded by the supplied literal options.
+export const invalidSelection = <Select label="Mode" emptyMessage="No modes" options={choiceOptions} value="unknown" onChange={() => undefined} />;
 `;
 }
 
@@ -282,12 +298,14 @@ import {
   AppearanceProvider,
   Button,
   ButtonGroup,
+  ComboBox,
   FieldGroup,
   IconButton,
   Link,
   NumberField,
   ResponsiveGrid,
   Section,
+  Select,
   Surface,
   TextField,
   ToggleButton,
@@ -315,6 +333,12 @@ createRoot(document.getElementById('root')).render(
         React.createElement(ButtonGroup, {label: 'Profile actions', equalItems: true},
           React.createElement(Button, null, 'Review conditions'),
           React.createElement(Button, {variant: 'primary'}, 'Run profile')),
+        React.createElement(Select, {label: 'Bounded mode', emptyMessage: 'No modes', options: [
+          {label: 'Conservative', value: 'conservative'},
+          {label: 'Balanced', value: 'balanced'}]}),
+        React.createElement(ComboBox, {label: 'Filter mode', emptyMessage: 'No matching modes', options: [
+          {label: 'Conservative', value: 'conservative'},
+          {label: 'Balanced', value: 'balanced'}]}),
         React.createElement(Toolbar, {label: 'Inspector commands'},
           React.createElement(IconButton, {label: 'More actions'},
             React.createElement('span', {'aria-hidden': true}, '•••')),
