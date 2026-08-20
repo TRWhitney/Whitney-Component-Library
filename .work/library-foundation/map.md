@@ -52,6 +52,9 @@ application.
 - [Prerelease integration slice set](decisions/14-prerelease-slice-set.md): Require operational
   workflow, data analysis, Markdown authoring, and application workbench slices before stable
   release without limiting the wider component catalog.
+- [Date and time value contract](decisions/15-date-and-time-value-contract.md): Keep public civil
+  dates, wall-clock times, and inclusive ranges as plain library values; require explicit display
+  locale, calendar, hour cycle, and granularity without implying a time-zone-aware instant.
 
 ## Not yet specified
 

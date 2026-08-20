@@ -38,6 +38,10 @@ export const showcaseGroups = [
     components: ['Checkbox', 'CheckboxGroup', 'RadioGroup', 'Switch', 'SegmentedControl'],
   },
   {label: 'Selection', components: ['Select', 'ComboBox']},
+  {
+    label: 'Date and time',
+    components: ['DateField', 'TimeField', 'DatePicker', 'DateRangePicker'],
+  },
   {label: 'Ranges', components: ['Slider', 'RangeSlider']},
 ] as const satisfies readonly ShowcaseGroup[];
 

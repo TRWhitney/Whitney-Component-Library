@@ -22,6 +22,7 @@ describe('package surface', () => {
       'react-dom': '^18.3.1 || ^19.0.0',
     });
     expect(packageJson.dependencies['react-aria-components']).toBe('1.20.0');
+    expect(packageJson.dependencies['@internationalized/date']).toBe('3.12.3');
     expect(packageJson.peerDependencies).not.toHaveProperty('react-aria-components');
     expect(packageJson.engines.node).toBe('>=22.12.0');
   });

@@ -7,6 +7,9 @@ import {
   Checkbox,
   CheckboxGroup,
   ComboBox,
+  DateField,
+  DatePicker,
+  DateRangePicker,
   Divider,
   Field,
   FieldGroup,
@@ -29,6 +32,7 @@ import {
   Switch,
   TextArea,
   TextField,
+  TimeField,
   ToggleButton,
   Toolbar,
   type AccentColor,
@@ -660,6 +664,128 @@ function RangeSpecimens() {
   );
 }
 
+function DateTimeSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Enter one known ISO civil date through locale- and calendar-aware segments without unnecessary calendar interaction."
+        name="DateField"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Gregorian DateField">
+            <DateField
+              calendar="gregory"
+              defaultValue={{day: 20, month: 8, year: 2026}}
+              description="Stored and submitted as an ISO calendar date."
+              label="Run date"
+              locale="en-US"
+            />
+          </Example>
+          <Example label="Japanese-calendar DateField">
+            <DateField
+              calendar="japanese"
+              defaultValue={{day: 20, month: 8, year: 2026}}
+              label="Review date"
+              locale="ja-JP"
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Enter one zone-free wall-clock time with an explicit localized hour cycle and visible precision."
+        name="TimeField"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="24-hour TimeField">
+            <TimeField
+              defaultValue={{hour: 14, minute: 30, second: 0}}
+              granularity="minute"
+              hourCycle={24}
+              label="Daily review"
+              locale="en-US"
+            />
+          </Example>
+          <Example label="Read-only 12-hour TimeField">
+            <TimeField
+              defaultValue={{hour: 9, minute: 15, second: 0}}
+              granularity="minute"
+              hourCycle={12}
+              isReadOnly
+              label="Approved start"
+              locale="en-US"
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Choose one ISO civil date through synchronized segmented entry and a bounded calendar when nearby context helps."
+        name="DatePicker"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Bounded DatePicker">
+            <DatePicker
+              calendar="gregory"
+              calendarButtonLabel="Choose review date"
+              defaultValue={{day: 20, month: 8, year: 2026}}
+              isDateUnavailable={(date) => date.day === 21 || date.day === 22}
+              label="Review date"
+              locale="en-US"
+              maxValue={{day: 31, month: 8, year: 2026}}
+              minValue={{day: 18, month: 8, year: 2026}}
+              placeholderValue={{day: 20, month: 8, year: 2026}}
+            />
+          </Example>
+          <Example label="Invalid DatePicker">
+            <DatePicker
+              calendar="gregory"
+              calendarButtonLabel="Choose deployment date"
+              errorMessage="Choose an approved deployment day."
+              isInvalid
+              label="Deployment date"
+              locale="en-US"
+              placeholderValue={{day: 20, month: 8, year: 2026}}
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Choose one inclusive continuous ISO date interval whose synchronized endpoints retain separate form identities."
+        name="DateRangePicker"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="DateRangePicker interval">
+            <DateRangePicker
+              calendar="gregory"
+              calendarButtonLabel="Choose review window"
+              defaultValue={{
+                start: {day: 20, month: 8, year: 2026},
+                end: {day: 24, month: 8, year: 2026},
+              }}
+              description="Both endpoint dates are included."
+              label="Review window"
+              locale="en-US"
+              placeholderValue={{day: 20, month: 8, year: 2026}}
+            />
+          </Example>
+          <Example label="Disabled DateRangePicker">
+            <DateRangePicker
+              calendar="gregory"
+              calendarButtonLabel="Choose archived window"
+              isDisabled
+              label="Archived window"
+              locale="en-US"
+              placeholderValue={{day: 20, month: 8, year: 2026}}
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -796,6 +922,14 @@ export function Showcase() {
                 <h2 id="ranges-heading">Values stay measurable</h2>
               </header>
               <RangeSpecimens />
+            </section>
+
+            <section aria-labelledby="date-time-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Date and time</span>
+                <h2 id="date-time-heading">Civil values keep their context</h2>
+              </header>
+              <DateTimeSpecimens />
             </section>
           </main>
         </div>

@@ -6,7 +6,7 @@ paste where applicable, and drag/drop file acquisition without owning upload or 
 **Blocked by:** [Action Family](03-action-family.md),
 [Field and Text Entry Family](04-field-and-text-entry-family.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Accepted file types, multiplicity, size guidance, disabled, invalid, pending, and rejection
       behavior are explicit.

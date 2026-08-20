@@ -173,6 +173,9 @@ import {
   Checkbox,
   CheckboxGroup,
   ComboBox,
+  DateField,
+  DatePicker,
+  DateRangePicker,
   Divider,
   Field,
   FieldGroup,
@@ -195,6 +198,7 @@ import {
   Switch,
   TextArea,
   TextField,
+  TimeField,
   ToggleButton,
   Toolbar,
   type AccentColor,
@@ -264,6 +268,33 @@ export const provider = (
           emptyMessage="No matching modes"
           options={choiceOptions}
         />
+        <DateField
+          calendar="gregory"
+          defaultValue={{year: 2026, month: 8, day: 20}}
+          label="Run date"
+          locale="en-US"
+        />
+        <TimeField
+          defaultValue={{hour: 14, minute: 30, second: 0}}
+          granularity="minute"
+          hourCycle={24}
+          label="Run time"
+          locale="en-US"
+        />
+        <DatePicker
+          calendar="japanese"
+          calendarButtonLabel="Choose review date"
+          label="Review date"
+          locale="ja-JP"
+          placeholderValue={{year: 2026, month: 8, day: 20}}
+        />
+        <DateRangePicker
+          calendar="gregory"
+          calendarButtonLabel="Choose review window"
+          label="Review window"
+          locale="en-US"
+          placeholderValue={{year: 2026, month: 8, day: 20}}
+        />
         <Slider
           defaultValue={0.4}
           formatOptions={{style: 'percent'}}
@@ -319,6 +350,9 @@ import {
   Button,
   ButtonGroup,
   ComboBox,
+  DateField,
+  DatePicker,
+  DateRangePicker,
   FieldGroup,
   IconButton,
   Link,
@@ -330,6 +364,7 @@ import {
   Slider,
   Surface,
   TextField,
+  TimeField,
   ToggleButton,
   Toolbar,
 } from '${packageName}';
@@ -361,6 +396,10 @@ createRoot(document.getElementById('root')).render(
         React.createElement(ComboBox, {label: 'Filter mode', emptyMessage: 'No matching modes', options: [
           {label: 'Conservative', value: 'conservative'},
           {label: 'Balanced', value: 'balanced'}]}),
+        React.createElement(DateField, {calendar: 'gregory', defaultValue: {year: 2026, month: 8, day: 20}, label: 'Run date', locale: 'en-US'}),
+        React.createElement(TimeField, {defaultValue: {hour: 14, minute: 30, second: 0}, granularity: 'minute', hourCycle: 24, label: 'Run time', locale: 'en-US'}),
+        React.createElement(DatePicker, {calendar: 'gregory', calendarButtonLabel: 'Choose date', label: 'Review date', locale: 'en-US', placeholderValue: {year: 2026, month: 8, day: 20}}),
+        React.createElement(DateRangePicker, {calendar: 'gregory', calendarButtonLabel: 'Choose range', label: 'Review window', locale: 'en-US', placeholderValue: {year: 2026, month: 8, day: 20}}),
         React.createElement(Slider, {defaultValue: 0.4, formatOptions: {style: 'percent'}, label: 'Confidence', locale: 'en-US', minValue: 0, maxValue: 1, step: 0.05}),
         React.createElement(RangeSlider, {defaultValue: [20, 80], label: 'Review window', locale: 'en-US', minValue: 0, maxValue: 100, step: 5, thumbLabels: ['Window start', 'Window end']}),
         React.createElement(Toolbar, {label: 'Inspector commands'},

@@ -35,6 +35,12 @@ export {
 export {comboBoxContract, selectContract} from './selection.contracts.js';
 export {rangeSliderContract, sliderContract} from './range.contracts.js';
 export {
+  dateFieldContract,
+  datePickerContract,
+  dateRangePickerContract,
+  timeFieldContract,
+} from './date-time.contracts.js';
+export {
   renderAgentIndex,
   renderContractDocumentation,
   renderTypeScriptExamples,
@@ -81,6 +87,12 @@ import {
 } from './choice.contracts.js';
 import {comboBoxContract, selectContract} from './selection.contracts.js';
 import {rangeSliderContract, sliderContract} from './range.contracts.js';
+import {
+  dateFieldContract,
+  datePickerContract,
+  dateRangePickerContract,
+  timeFieldContract,
+} from './date-time.contracts.js';
 
 export const componentContracts = [
   appearanceProviderContract,
@@ -89,6 +101,9 @@ export const componentContracts = [
   checkboxContract,
   checkboxGroupContract,
   comboBoxContract,
+  dateFieldContract,
+  datePickerContract,
+  dateRangePickerContract,
   dividerContract,
   fieldContract,
   fieldGroupContract,
@@ -111,6 +126,7 @@ export const componentContracts = [
   switchContract,
   textAreaContract,
   textFieldContract,
+  timeFieldContract,
   toggleButtonContract,
   toolbarContract,
 ] as const;

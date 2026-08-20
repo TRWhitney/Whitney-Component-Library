@@ -10,6 +10,9 @@ import {
   Checkbox,
   CheckboxGroup,
   ComboBox,
+  DateField,
+  DatePicker,
+  DateRangePicker,
   Divider,
   Field,
   FieldGroup,
@@ -32,6 +35,7 @@ import {
   Switch,
   TextArea,
   TextField,
+  TimeField,
   ToggleButton,
   Toolbar,
 } from '${packageName}';
@@ -209,6 +213,46 @@ const view = React.createElement(
             {label: 'Balanced', value: 'balanced'},
           ],
         }),
+        React.createElement(DateField, {
+          calendar: 'gregory',
+          defaultValue: {year: 2026, month: 8, day: 20},
+          form: 'packed-choice-form',
+          label: 'Run date',
+          locale: 'en-US',
+          name: 'run-date',
+        }),
+        React.createElement(TimeField, {
+          defaultValue: {hour: 14, minute: 30, second: 0},
+          form: 'packed-choice-form',
+          granularity: 'minute',
+          hourCycle: 24,
+          label: 'Run time',
+          locale: 'en-US',
+          name: 'run-time',
+        }),
+        React.createElement(DatePicker, {
+          calendar: 'japanese',
+          calendarButtonLabel: 'Choose review date',
+          defaultValue: {year: 2026, month: 8, day: 21},
+          form: 'packed-choice-form',
+          label: 'Review date',
+          locale: 'ja-JP',
+          name: 'review-date',
+          placeholderValue: {year: 2026, month: 8, day: 20},
+        }),
+        React.createElement(DateRangePicker, {
+          calendar: 'gregory',
+          calendarButtonLabel: 'Choose review window',
+          defaultValue: {
+            start: {year: 2026, month: 8, day: 20},
+            end: {year: 2026, month: 8, day: 24},
+          },
+          form: 'packed-choice-form',
+          label: 'Review dates',
+          locale: 'en-US',
+          names: ['review-start', 'review-end'],
+          placeholderValue: {year: 2026, month: 8, day: 20},
+        }),
         React.createElement(Slider, {
           defaultValue: 0.4,
           form: 'packed-choice-form',
@@ -353,6 +397,9 @@ if (document.querySelector('[data-wcl-combo-box] input')?.getAttribute('role') !
 if (document.querySelectorAll('[data-wcl-range-field] input[type="range"]').length !== 3) {
   throw new Error('Packed range family did not preserve one single and two paired range inputs.');
 }
+if (document.querySelectorAll('[data-wcl-date-segment]').length < 12) {
+  throw new Error('Packed date and time family did not render localized segmented controls.');
+}
 const packedChoiceForm = document.getElementById('packed-choice-form');
 const packedChoiceEntries = [...new dom.window.FormData(packedChoiceForm).entries()];
 if (JSON.stringify(packedChoiceEntries) !== JSON.stringify([
@@ -363,11 +410,39 @@ if (JSON.stringify(packedChoiceEntries) !== JSON.stringify([
   ['density', 'balanced'],
   ['select-mode', 'balanced'],
   ['combo-mode', 'balanced'],
+  ['run-date', '2026-08-20'],
+  ['run-time', '14:30:00'],
+  ['review-date', '2026-08-21'],
+  ['review-start', '2026-08-20'],
+  ['review-end', '2026-08-24'],
   ['confidence', '0.4'],
   ['window-start', '20'],
   ['window-end', '80'],
 ])) {
   throw new Error('Packed choices did not preserve external native form association.');
+}
+const packedDateInput = document.querySelector('input[name="run-date"]');
+const packedTimeInput = document.querySelector('input[name="run-time"]');
+const packedDateDay = packedDateInput
+  ?.closest('[data-wcl-date-field]')
+  ?.querySelector('[data-wcl-date-segment][data-type="day"]');
+const packedTimeMinute = packedTimeInput
+  ?.closest('[data-wcl-time-field]')
+  ?.querySelector('[data-wcl-date-segment][data-type="minute"]');
+for (const segment of [packedDateDay, packedTimeMinute]) {
+  segment?.dispatchEvent(
+    new dom.window.KeyboardEvent('keydown', {bubbles: true, key: 'ArrowUp'}),
+  );
+}
+await new Promise((resolve) => setTimeout(resolve, 25));
+const changedDateTimeEntries = [...new dom.window.FormData(packedChoiceForm).entries()].filter(
+  ([name]) => name === 'run-date' || name === 'run-time',
+);
+if (JSON.stringify(changedDateTimeEntries) !== JSON.stringify([
+  ['run-date', '2026-08-21'],
+  ['run-time', '14:31:00'],
+])) {
+  throw new Error('Packed date and time fields did not accept segmented changes.');
 }
 const packedRangeInputs = [...document.querySelectorAll(
   '[data-wcl-range-field] input[type="range"]',
@@ -391,6 +466,15 @@ if (JSON.stringify(changedRangeEntries) !== JSON.stringify([
 }
 packedChoiceForm.reset();
 await new Promise((resolve) => setTimeout(resolve, 25));
+const resetDateTimeEntries = [...new dom.window.FormData(packedChoiceForm).entries()].filter(
+  ([name]) => name === 'run-date' || name === 'run-time',
+);
+if (JSON.stringify(resetDateTimeEntries) !== JSON.stringify([
+  ['run-date', '2026-08-20'],
+  ['run-time', '14:30:00'],
+])) {
+  throw new Error('Packed date and time fields did not restore defaults on form reset.');
+}
 const resetRangeEntries = [...new dom.window.FormData(packedChoiceForm).entries()].slice(-3);
 if (JSON.stringify(resetRangeEntries) !== JSON.stringify([
   ['confidence', '0.4'],

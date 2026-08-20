@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 07, including the intervening Ticket 03A accent correction, are complete.
-Ticket 08 is ready and no work on it has started. The maintained human showcase covers every
+Tickets 01 through 08, including the intervening Ticket 03A accent correction, are complete.
+Ticket 09 is ready and no work on it has started. The maintained human showcase covers every
 contracted public component. Manual screen-reader operation is intentionally consolidated in the
 Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
 
@@ -143,10 +143,24 @@ thumbs use stable caliper offsets so close and equal values remain separately op
 invalid, forced-color, reduced-motion, compact, RTL, SSR, hydration, and public-package behavior
 are covered without exposing React Aria or consumer style injection.
 
+### Ticket 08 — date and time controls
+
+DateField, TimeField, DatePicker, and DateRangePicker expose library-owned ISO civil dates,
+zone-free wall-clock times, and inclusive continuous date ranges without leaking private date
+types. Locale, bounded display calendar, hour cycle, granularity, bounds, unavailable dates,
+controlled and uncontrolled ownership, validation, native form serialization and reset, and
+optional picker open state remain explicit. Required plain ISO placeholder values deterministically
+anchor empty picker calendars without selecting or submitting those dates.
+
+Localized segmented entry and calendar selection share one value model. Picker overlays own focus,
+dismissal, navigation, viewport containment, and endpoint meaning. One raised almanac sheet and a
+subdued Route band with accent endpoint bookends cover light, dark, compact, RTL, forced-color,
+reduced-motion, SSR, hydration, and packed React 18 and 19 behavior.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is [Ticket 08 — Date and Time
-Controls](tickets/08-date-and-time-controls.md).
+See the [decision map](map.md). The next implementation unit is [Ticket 09 — File Trigger and Drop
+Zone](tickets/09-file-trigger-and-drop-zone.md).
 
 ## Accepted sources
 
@@ -173,7 +187,7 @@ Controls](tickets/08-date-and-time-controls.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 206
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 222
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
@@ -193,10 +207,17 @@ Controls](tickets/08-date-and-time-controls.md).
   adjustment, non-crossing equal bounds, read-only behavior, localized RTL direction, and
   accessibility-tree states. Chromium additionally covers touch, compact forced-color, and
   reduced-motion rendering. Inspected screenshots were discarded after validation.
+- Chromium, Firefox, and WebKit evidence covers non-Gregorian date segment editing, touch calendar
+  selection, unavailable dates, continuous range semantics, keyboard opening, dismissal and focus
+  restoration, compact containment, and RTL flow. Chromium additionally covers forced-color and
+  reduced-motion rendering. Chromium direct inspection also confirms an empty picker is anchored by
+  its explicit placeholder date without selecting it. Wide and compact inspected screenshots were
+  discarded after validation.
 - Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
-Resume Ticket 08 from novel-work implementation with
-`python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-Current branch: `master`. Ticket 07 is committed at the commit recorded in repository history.
+Resume Ticket 09 from novel-work implementation with
+`python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`
+and begin the file-trigger and drop-zone slice. Current branch: `master`. Ticket 08 is delivered by
+the commit containing this record; no Ticket 09 implementation has started.

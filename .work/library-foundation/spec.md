@@ -128,6 +128,20 @@ React Aria Components and lower-level React Aria hooks provide the private inter
 accessibility foundation. The library owns all public concepts, DOM and composition promises,
 styles, state conventions, and behavior tests.
 
+Date and time controls expose only plain library-owned values. A calendar date is an ISO civil day,
+a time is a zone-free wall-clock value, and a date range is an inclusive ascending pair of civil
+days. Date controls require locale and a bounded display calendar while retaining ISO value and
+form identity; TimeField requires locale and explicit hour cycle and granularity. None of these
+values identifies an instant, so time zones and combined or zoned date-times remain outside this
+family. Direct segmented fields collect known values without a calendar. Pickers add a calendar
+only for spatial comparison or availability and own trigger, open state, focus restoration,
+dismissal, navigation, bounds, unavailable dates, and continuous range semantics. Each picker
+requires a plain ISO placeholder date that deterministically anchors its empty calendar without
+selecting or submitting a value. A complete range containing an unavailable day remains
+representable but recoverably invalid under controlled or uncontrolled ownership, and native
+validation prevents submission. See
+[Date and Time Value Contract](decisions/15-date-and-time-value-contract.md).
+
 Applicable components support keyboard, pointer, touch, focus-visible, labeling, descriptions,
 validation, required, disabled, read-only, pending, controlled, uncontrolled, form submission,
 localization, right-to-left direction, server rendering, and hydration behavior. Overlay components

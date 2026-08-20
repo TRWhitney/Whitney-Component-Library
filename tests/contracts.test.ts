@@ -42,6 +42,9 @@ describe('canonical component contracts', () => {
       'Checkbox',
       'CheckboxGroup',
       'ComboBox',
+      'DateField',
+      'DatePicker',
+      'DateRangePicker',
       'Divider',
       'Field',
       'FieldGroup',
@@ -64,6 +67,7 @@ describe('canonical component contracts', () => {
       'Switch',
       'TextArea',
       'TextField',
+      'TimeField',
       'ToggleButton',
       'Toolbar',
     ];
@@ -94,6 +98,20 @@ describe('canonical component contracts', () => {
       /controlled or uncontrolled.*exclusive/i,
     );
     expect(contractFor('SegmentedControl')?.controlBehavior.join(' ')).toMatch(/controlled.*null/i);
+  });
+
+  it('distinguishes direct civil entry, calendar selection, ranges, and wall-clock time', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('DateField')?.appropriateUses.join(' ')).toMatch(/knows.*direct/i);
+    expect(contractFor('DateField')?.preferredAlternatives.join(' ')).toMatch(/DatePicker/i);
+    expect(contractFor('DatePicker')?.appropriateUses.join(' ')).toMatch(/nearby.*availability/i);
+    expect(contractFor('DatePicker')?.counterExamples[0]?.description).toMatch(/faster to type/i);
+    expect(contractFor('DateRangePicker')?.controlBehavior.join(' ')).toMatch(
+      /continuous interval/i,
+    );
+    expect(contractFor('TimeField')?.inappropriateUses.join(' ')).toMatch(/time-zone.*instant/i);
   });
 
   it('distinguishes bounded selection from editable autocomplete', () => {
