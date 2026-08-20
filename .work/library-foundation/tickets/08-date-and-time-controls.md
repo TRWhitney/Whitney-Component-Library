@@ -6,7 +6,7 @@ internationalized segmented entry and calendar selection.
 **Blocked by:** [Field and Text Entry Family](04-field-and-text-entry-family.md),
 [Action Family](03-action-family.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Public value types distinguish calendar dates, times, and ranges without leaking private
       React Aria types.

@@ -99,4 +99,18 @@ describe('packed consumer verification source', () => {
     expect(source).toContain("['select-mode', 'balanced']");
     expect(source).toContain("['combo-mode', 'balanced']");
   });
+
+  it('exercises single and paired range entry through the packed API', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of ['RangeSlider', 'Slider']) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-range-field');
+    expect(source).toContain("['confidence', '0.4']");
+    expect(source).toContain("['window-start', '20']");
+    expect(source).toContain("['window-end', '80']");
+    expect(source).toContain('Packed ranges did not accept stepped changes.');
+    expect(source).toContain('Packed ranges did not restore defaults on form reset.');
+  });
 });

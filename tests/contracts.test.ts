@@ -8,6 +8,8 @@ import {
   renderAgentIndex,
   renderContractDocumentation,
   renderTypeScriptExamples,
+  rangeSliderContract,
+  sliderContract,
   toComponentManifest,
   validateComponentContracts,
   type ComponentContract,
@@ -49,12 +51,14 @@ describe('canonical component contracts', () => {
       'Link',
       'NumberField',
       'RadioGroup',
+      'RangeSlider',
       'ResponsiveGrid',
       'ScrollRegion',
       'SearchField',
       'Section',
       'SegmentedControl',
       'Select',
+      'Slider',
       'Stack',
       'Surface',
       'Switch',
@@ -110,6 +114,19 @@ describe('canonical component contracts', () => {
     expect(contractFor('ComboBox')?.composition.join(' ')).toMatch(
       /manual.*dynamic.*asynchronous/i,
     );
+  });
+
+  it('distinguishes one approximate value from a bounded interval and exact entry', () => {
+    expect(sliderContract.appropriateUses.join(' ')).toMatch(/one.*bounded.*approximate/i);
+    expect(sliderContract.preferredAlternatives.join(' ')).toMatch(/NumberField.*exact/i);
+    expect(sliderContract.controlBehavior.join(' ')).toMatch(
+      /finite.*minValue.*maxValue.*step.*controlled or uncontrolled/i,
+    );
+    expect(rangeSliderContract.controlBehavior.join(' ')).toMatch(
+      /two-value tuple.*ascending.*never cross/i,
+    );
+    expect(rangeSliderContract.labeling.join(' ')).toMatch(/thumbLabels.*distinct/i);
+    expect(rangeSliderContract.formBehavior.join(' ')).toMatch(/names.*two.*native range/i);
   });
 
   it('directs agents among custom, text, multiline, numeric, search, group, and section semantics', () => {

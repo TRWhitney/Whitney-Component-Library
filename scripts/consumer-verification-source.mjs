@@ -19,12 +19,14 @@ import {
   Link,
   NumberField,
   RadioGroup,
+  RangeSlider,
   ResponsiveGrid,
   ScrollRegion,
   SearchField,
   Section,
   Select,
   SegmentedControl,
+  Slider,
   Stack,
   Surface,
   Switch,
@@ -207,6 +209,28 @@ const view = React.createElement(
             {label: 'Balanced', value: 'balanced'},
           ],
         }),
+        React.createElement(Slider, {
+          defaultValue: 0.4,
+          form: 'packed-choice-form',
+          formatOptions: {style: 'percent'},
+          label: 'Confidence',
+          locale: 'en-US',
+          maxValue: 1,
+          minValue: 0,
+          name: 'confidence',
+          step: 0.05,
+        }),
+        React.createElement(RangeSlider, {
+          defaultValue: [20, 80],
+          form: 'packed-choice-form',
+          label: 'Review window',
+          locale: 'en-US',
+          maxValue: 100,
+          minValue: 0,
+          names: ['window-start', 'window-end'],
+          step: 5,
+          thumbLabels: ['Window start', 'Window end'],
+        }),
         React.createElement(
           Toolbar,
           {label: 'Inspector commands'},
@@ -326,6 +350,9 @@ if (!document.querySelector('[data-wcl-selection-field]')) {
 if (document.querySelector('[data-wcl-combo-box] input')?.getAttribute('role') !== 'combobox') {
   throw new Error('Packed combo box did not preserve editable autocomplete semantics.');
 }
+if (document.querySelectorAll('[data-wcl-range-field] input[type="range"]').length !== 3) {
+  throw new Error('Packed range family did not preserve one single and two paired range inputs.');
+}
 const packedChoiceForm = document.getElementById('packed-choice-form');
 const packedChoiceEntries = [...new dom.window.FormData(packedChoiceForm).entries()];
 if (JSON.stringify(packedChoiceEntries) !== JSON.stringify([
@@ -336,8 +363,41 @@ if (JSON.stringify(packedChoiceEntries) !== JSON.stringify([
   ['density', 'balanced'],
   ['select-mode', 'balanced'],
   ['combo-mode', 'balanced'],
+  ['confidence', '0.4'],
+  ['window-start', '20'],
+  ['window-end', '80'],
 ])) {
   throw new Error('Packed choices did not preserve external native form association.');
+}
+const packedRangeInputs = [...document.querySelectorAll(
+  '[data-wcl-range-field] input[type="range"]',
+)];
+for (const [input, value] of [
+  [packedRangeInputs[0], '0.7'],
+  [packedRangeInputs[1], '35'],
+]) {
+  input.value = value;
+  input.dispatchEvent(new dom.window.Event('input', {bubbles: true}));
+  input.dispatchEvent(new dom.window.Event('change', {bubbles: true}));
+}
+await new Promise((resolve) => setTimeout(resolve, 25));
+const changedRangeEntries = [...new dom.window.FormData(packedChoiceForm).entries()].slice(-3);
+if (JSON.stringify(changedRangeEntries) !== JSON.stringify([
+  ['confidence', '0.7'],
+  ['window-start', '35'],
+  ['window-end', '80'],
+])) {
+  throw new Error('Packed ranges did not accept stepped changes.');
+}
+packedChoiceForm.reset();
+await new Promise((resolve) => setTimeout(resolve, 25));
+const resetRangeEntries = [...new dom.window.FormData(packedChoiceForm).entries()].slice(-3);
+if (JSON.stringify(resetRangeEntries) !== JSON.stringify([
+  ['confidence', '0.4'],
+  ['window-start', '20'],
+  ['window-end', '80'],
+])) {
+  throw new Error('Packed ranges did not restore defaults on form reset.');
 }
 const runNameInput = document.querySelector('input[value="North chamber"]');
 if (!runNameInput?.getAttribute('aria-describedby')) {

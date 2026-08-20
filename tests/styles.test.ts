@@ -381,6 +381,41 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('renders calibrated range rails with separable paired thumbs', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const field = styles.match(/\[data-wcl-range-field\]\s*\{([^}]*)\}/)?.[1];
+    const track = styles.match(/\[data-wcl-range-track\]\s*\{([^}]*)\}/)?.[1];
+    const fill = styles.match(/\[data-wcl-range-fill\]\s*\{([^}]*)\}/)?.[1];
+    const thumb = styles.match(/\[data-wcl-range-thumb\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(field).toContain('min-inline-size: 0');
+    expect(track).toContain('touch-action: none');
+    expect(fill).toContain('background: var(--wcl-accent-rail)');
+    expect(thumb).toContain('inline-size: 1.25rem');
+    expect(thumb).toContain('block-size: 1.25rem');
+    expect(styles).toMatch(
+      /\[data-wcl-range-field\]\[data-orientation='horizontal'\]\s+\[data-wcl-range-thumb\]\s*\{[^}]*top:\s*50%/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-range-field\]\[data-orientation='vertical'\]\s+\[data-wcl-range-thumb\]\s*\{[^}]*left:\s*50%/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-range-slider\]\s+\[data-wcl-range-thumb\]\[data-thumb='start'\][\s\S]*translate:\s*0 -0\.5rem/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-range-slider\]\s+\[data-wcl-range-thumb\]\[data-thumb='end'\][\s\S]*translate:\s*0 0\.5rem/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-range-field\]\[data-orientation='vertical'\][\s\S]*min-block-size:\s*12rem/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-range-thumb\][\s\S]*transition:\s*none/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-range-fill\][\s\S]*background:\s*Highlight/,
+    );
+  });
+
   it('keeps native select entries readable in the active appearance', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const selectEntries = styles.match(

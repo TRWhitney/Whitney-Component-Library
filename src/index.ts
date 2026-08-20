@@ -7,6 +7,19 @@ export {
 } from './appearance/appearance-provider.js';
 export type {AccentColor} from './appearance/accent.js';
 export {
+  RangeSlider,
+  Slider,
+  type RangeFieldProps,
+  type RangeSliderNames,
+  type RangeSliderProps,
+  type RangeSliderThumbLabels,
+  type RangeSliderValue,
+  type RangeSliderValueProps,
+  type SliderOrientation,
+  type SliderProps,
+  type SliderValueProps,
+} from './ranges/index.js';
+export {
   Checkbox,
   CheckboxGroup,
   RadioGroup,

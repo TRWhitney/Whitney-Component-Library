@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 06, including the intervening Ticket 03A accent correction, are complete.
-Ticket 07 is ready and no work on it has started. The maintained human showcase covers every
+Tickets 01 through 07, including the intervening Ticket 03A accent correction, are complete.
+Ticket 08 is ready and no work on it has started. The maintained human showcase covers every
 contracted public component. Manual screen-reader operation is intentionally consolidated in the
 Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
 
@@ -130,10 +130,23 @@ read-only behavior, native form serialization and reset, keyboard/pointer/touch 
 viewport-aware overlays, RTL direction, SSR, hydration, and public declaration encapsulation are
 covered through runtime, package, browser, and type checks.
 
+### Ticket 07 — slider and range controls
+
+Slider and RangeSlider own explicit finite stepped domains, localized number formatting,
+horizontal or vertical orientation, controlled or uncontrolled state, native form association and
+reset, and separately named non-crossing range thumbs. Read-only controls retain focus without
+changing, disabled controls are inert, and shared descriptions and validation remain available to
+each native range input.
+
+One calibrated rail treatment presents formatted endpoints and compact current output. Range
+thumbs use stable caliper offsets so close and equal values remain separately operable. Accent,
+invalid, forced-color, reduced-motion, compact, RTL, SSR, hydration, and public-package behavior
+are covered without exposing React Aria or consumer style injection.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is [Ticket 07 — Slider and Range
-Controls](tickets/07-slider-and-range-controls.md).
+See the [decision map](map.md). The next implementation unit is [Ticket 08 — Date and Time
+Controls](tickets/08-date-and-time-controls.md).
 
 ## Accepted sources
 
@@ -160,7 +173,7 @@ Controls](tickets/07-slider-and-range-controls.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 194
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 206
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
@@ -176,9 +189,14 @@ Controls](tickets/07-slider-and-range-controls.md).
   filtering, touch selection, compact reflow, Arabic RTL, viewport containment, and
   accessibility-tree states. Chromium additionally covers light/wide, forced-color, and
   reduced-motion rendering. Inspected fixtures and screenshots were discarded after validation.
+- Chromium, Firefox, and WebKit evidence covers Slider and RangeSlider keyboard and pointer
+  adjustment, non-crossing equal bounds, read-only behavior, localized RTL direction, and
+  accessibility-tree states. Chromium additionally covers touch, compact forced-color, and
+  reduced-motion rendering. Inspected screenshots were discarded after validation.
 - Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
-Resume Ticket 07 from novel-work planning in a new request. Current planning contains 33 tickets:
-seven complete, Ticket 07 ready, and 25 blocked. Current branch: `master`.
+Resume Ticket 08 from novel-work implementation with
+`python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
+Current branch: `master`. Ticket 07 is committed at the commit recorded in repository history.

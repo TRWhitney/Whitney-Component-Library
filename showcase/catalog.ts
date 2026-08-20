@@ -38,6 +38,7 @@ export const showcaseGroups = [
     components: ['Checkbox', 'CheckboxGroup', 'RadioGroup', 'Switch', 'SegmentedControl'],
   },
   {label: 'Selection', components: ['Select', 'ComboBox']},
+  {label: 'Ranges', components: ['Slider', 'RangeSlider']},
 ] as const satisfies readonly ShowcaseGroup[];
 
 export const showcasedComponentNames = showcaseGroups.flatMap((group) => group.components);

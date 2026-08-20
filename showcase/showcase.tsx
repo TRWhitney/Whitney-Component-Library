@@ -15,12 +15,14 @@ import {
   InlineGroup,
   Link,
   NumberField,
+  RangeSlider,
   ResponsiveGrid,
   RadioGroup,
   ScrollRegion,
   SearchField,
   Section,
   Select,
+  Slider,
   Stack,
   SegmentedControl,
   Surface,
@@ -587,6 +589,77 @@ function SelectionSpecimens() {
   );
 }
 
+function RangeSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Adjust one approximate bounded value on a calibrated scale with explicit domain, formatting, and direct keyboard, pointer, or touch operation."
+        name="Slider"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Horizontal percentage Slider">
+            <Slider
+              defaultValue={0.4}
+              description="Sets the solver confidence threshold."
+              formatOptions={{style: 'percent'}}
+              label="Confidence"
+              locale="en-US"
+              maxValue={1}
+              minValue={0}
+              step={0.05}
+            />
+          </Example>
+          <Example label="Vertical read-only Slider">
+            <Slider
+              defaultValue={7}
+              isReadOnly
+              label="Approved passes"
+              locale="en-US"
+              maxValue={10}
+              minValue={0}
+              orientation="vertical"
+              step={1}
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Adjust one ordered interval with separately named non-crossing bounds and offset caliper thumbs that remain distinct when close together."
+        name="RangeSlider"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Close RangeSlider bounds">
+            <RangeSlider
+              defaultValue={[45, 55]}
+              description="Keep the detailed review centered on the transition."
+              label="Review window"
+              locale="en-US"
+              maxValue={100}
+              minValue={0}
+              step={5}
+              thumbLabels={['Window start', 'Window end']}
+            />
+          </Example>
+          <Example label="Invalid RangeSlider">
+            <RangeSlider
+              defaultValue={[20, 80]}
+              errorMessage="Keep the interval within the approved band."
+              isInvalid
+              label="Retained interval"
+              locale="en-US"
+              maxValue={100}
+              minValue={0}
+              step={5}
+              thumbLabels={['Lower bound', 'Upper bound']}
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -715,6 +788,14 @@ export function Showcase() {
                 <h2 id="selection-heading">Collections stay bounded and searchable</h2>
               </header>
               <SelectionSpecimens />
+            </section>
+
+            <section aria-labelledby="ranges-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Ranges</span>
+                <h2 id="ranges-heading">Values stay measurable</h2>
+              </header>
+              <RangeSpecimens />
             </section>
           </main>
         </div>

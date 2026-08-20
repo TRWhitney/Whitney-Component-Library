@@ -33,6 +33,7 @@ export {
   switchContract,
 } from './choice.contracts.js';
 export {comboBoxContract, selectContract} from './selection.contracts.js';
+export {rangeSliderContract, sliderContract} from './range.contracts.js';
 export {
   renderAgentIndex,
   renderContractDocumentation,
@@ -79,6 +80,7 @@ import {
   switchContract,
 } from './choice.contracts.js';
 import {comboBoxContract, selectContract} from './selection.contracts.js';
+import {rangeSliderContract, sliderContract} from './range.contracts.js';
 
 export const componentContracts = [
   appearanceProviderContract,
@@ -95,12 +97,14 @@ export const componentContracts = [
   inlineGroupContract,
   linkContract,
   numberFieldContract,
+  rangeSliderContract,
   responsiveGridContract,
   radioGroupContract,
   scrollRegionContract,
   searchFieldContract,
   sectionContract,
   selectContract,
+  sliderContract,
   segmentedControlContract,
   stackContract,
   surfaceContract,

@@ -182,12 +182,14 @@ import {
   Link,
   NumberField,
   RadioGroup,
+  RangeSlider,
   ResponsiveGrid,
   ScrollRegion,
   SearchField,
   Section,
   Select,
   SegmentedControl,
+  Slider,
   Stack,
   Surface,
   Switch,
@@ -262,6 +264,24 @@ export const provider = (
           emptyMessage="No matching modes"
           options={choiceOptions}
         />
+        <Slider
+          defaultValue={0.4}
+          formatOptions={{style: 'percent'}}
+          label="Confidence"
+          locale="en-US"
+          maxValue={1}
+          minValue={0}
+          step={0.05}
+        />
+        <RangeSlider
+          defaultValue={[20, 80]}
+          label="Review window"
+          locale="en-US"
+          maxValue={100}
+          minValue={0}
+          step={5}
+          thumbLabels={['Window start', 'Window end']}
+        />
         <Toolbar label="Inspector commands">
           <IconButton label="More actions" variant="quiet">
             <span aria-hidden="true">•••</span>
@@ -303,9 +323,11 @@ import {
   IconButton,
   Link,
   NumberField,
+  RangeSlider,
   ResponsiveGrid,
   Section,
   Select,
+  Slider,
   Surface,
   TextField,
   ToggleButton,
@@ -339,6 +361,8 @@ createRoot(document.getElementById('root')).render(
         React.createElement(ComboBox, {label: 'Filter mode', emptyMessage: 'No matching modes', options: [
           {label: 'Conservative', value: 'conservative'},
           {label: 'Balanced', value: 'balanced'}]}),
+        React.createElement(Slider, {defaultValue: 0.4, formatOptions: {style: 'percent'}, label: 'Confidence', locale: 'en-US', minValue: 0, maxValue: 1, step: 0.05}),
+        React.createElement(RangeSlider, {defaultValue: [20, 80], label: 'Review window', locale: 'en-US', minValue: 0, maxValue: 100, step: 5, thumbLabels: ['Window start', 'Window end']}),
         React.createElement(Toolbar, {label: 'Inspector commands'},
           React.createElement(IconButton, {label: 'More actions'},
             React.createElement('span', {'aria-hidden': true}, '•••')),
