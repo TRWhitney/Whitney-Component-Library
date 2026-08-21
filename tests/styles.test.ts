@@ -549,6 +549,14 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('highlights the full field control boundary on hover', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const hover = styles.match(/\[data-wcl-field-control\]:hover\s*\{([^}]*)\}/)?.[1];
+
+    expect(hover).toContain('border-color: var(--wcl-accent-muted)');
+    expect(styles).not.toContain('[data-wcl-field-control]:has(:hover)');
+  });
+
   it('keeps choice support stable and derives accents for subtle choice surfaces', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const support = styles.match(/\[data-wcl-choice-support\]\s*\{([^}]*)\}/)?.[1];

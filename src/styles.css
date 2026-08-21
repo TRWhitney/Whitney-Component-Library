@@ -417,7 +417,7 @@
     block-size: auto;
   }
 
-  [data-wcl-field-control]:has(:hover) {
+  [data-wcl-field-control]:hover {
     border-color: var(--wcl-accent-muted);
   }
 

@@ -356,7 +356,7 @@ function FieldSpecimens() {
   return (
     <>
       <Specimen
-        description="Connect a label and support text to one custom control, including readable native option entries."
+        description="Connect a label and support text to one custom control, including readable native option entries. The full control boundary responds to hover, including padding around its content."
         name="Field"
       >
         <Field description="Select the compute queue for this run." label="Compute queue">
@@ -559,7 +559,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one value from a centered trigger and rounded list options with typeahead, native form behavior, and viewport-aware placement."
+        description="Choose one value from a centered trigger whose full boundary responds to hover, with rounded list options, typeahead, native form behavior, and viewport-aware placement."
         name="Select"
       >
         <Select
@@ -679,7 +679,7 @@ function DateTimeSpecimens() {
   return (
     <>
       <Specimen
-        description="Enter an ISO civil date through locale- and calendar-aware segments. Focused segments use the same low-profile rail as selected actions."
+        description="Enter an ISO civil date through locale- and calendar-aware segments. The full field boundary responds to hover, while focused segments use the same low-profile rail as selected actions."
         name="DateField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
