@@ -490,7 +490,7 @@ function ChoiceSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose zero or more related values under one accessible group question."
+        description="Choose zero or more related values under one accessible group question. If one option has supporting text, every checkbox aligns with its first line."
         name="CheckboxGroup"
       >
         <CheckboxGroup
@@ -500,14 +500,18 @@ function ChoiceSpecimens() {
           name="layers"
           options={[
             {label: 'Thermal', value: 'thermal'},
-            {label: 'Pressure', value: 'pressure'},
+            {
+              description: 'Used for load and stress review.',
+              label: 'Pressure',
+              value: 'pressure',
+            },
             {isDisabled: true, label: 'Velocity unavailable', value: 'velocity'},
           ]}
         />
       </Specimen>
 
       <Specimen
-        description="Choose one visible mutually exclusive answer with native radio and arrow-key behavior."
+        description="Choose one visible mutually exclusive answer with native radio and arrow-key behavior. If one option has supporting text, every radio aligns with its first line."
         name="RadioGroup"
       >
         <RadioGroup

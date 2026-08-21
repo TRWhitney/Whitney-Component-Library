@@ -459,6 +459,17 @@ describe('static appearance styles', () => {
     expect(subtleChoices).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
   });
 
+  it('aligns every control in a mixed-detail choice group to the first line', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const choiceControl = styles.match(/\[data-wcl-choice-control\]\s*\{([^}]*)\}/)?.[1];
+    const mixedDetailGroup = styles.match(
+      /\[data-wcl-choice-group\]:has\(\[data-wcl-choice-option-description\]\)\s+\[data-wcl-choice-control\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(choiceControl).toContain('align-items: center');
+    expect(mixedDetailGroup).toContain('align-items: flex-start');
+  });
+
   it('centers content within the Select trigger', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const selectTrigger = styles.match(/\[data-wcl-select-trigger\]\s*\{([^}]*)\}/)?.[1];

@@ -1496,7 +1496,7 @@
   [data-wcl-choice-control] {
     display: inline-flex;
     gap: var(--wcl-space);
-    align-items: flex-start;
+    align-items: center;
     min-block-size: 2.5rem;
     min-inline-size: 0;
     padding: calc(var(--wcl-space) * 0.625) calc(var(--wcl-space) * 0.75);
@@ -1518,6 +1518,10 @@
   [data-wcl-choice-option] [data-wcl-choice-control] {
     box-sizing: border-box;
     inline-size: 100%;
+  }
+
+  [data-wcl-choice-group]:has([data-wcl-choice-option-description]) [data-wcl-choice-control] {
+    align-items: flex-start;
   }
 
   [data-wcl-choice-control][data-hovered] {
