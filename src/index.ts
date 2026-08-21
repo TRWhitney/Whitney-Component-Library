@@ -7,6 +7,17 @@ export {
 } from './appearance/appearance-provider.js';
 export type {AccentColor} from './appearance/accent.js';
 export {
+  DropZone,
+  FileTrigger,
+  type DropZoneProps,
+  type FileAcceptanceProps,
+  type FileAcquisitionResult,
+  type FileAcquisitionSource,
+  type FileRejectionReason,
+  type FileTriggerProps,
+  type RejectedFile,
+} from './files/index.js';
+export {
   DateField,
   DatePicker,
   DateRangePicker,

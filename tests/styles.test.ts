@@ -234,6 +234,34 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('distinguishes drop activity, rejection, invalidity, and pending without color alone', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const dropTarget = styles.match(
+      /\[data-wcl-drop-zone\]\[data-drop-target\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const rejected = styles.match(/\[data-wcl-drop-zone\]\[data-rejected\]\s*\{([^}]*)\}/)?.[1];
+    const invalid = styles.match(/\[data-wcl-drop-zone\]\[data-invalid\]\s*\{([^}]*)\}/)?.[1];
+    const pending = styles.match(
+      /\[data-wcl-drop-zone\]\[data-pending\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+    const acceptedAnnouncement = styles.match(/\[data-wcl-file-announcement\]\s*\{([^}]*)\}/)?.[1];
+    const rejectedAnnouncement = styles.match(
+      /:is\(\[data-wcl-file-trigger\], \[data-wcl-drop-zone\]\)\[data-rejected\]\s+\[data-wcl-file-announcement\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const dropContainer = styles.match(/\[data-wcl-drop-zone-container\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(dropTarget).toContain('border-style: solid');
+    expect(rejected).toContain('inset 4px 0');
+    expect(invalid).toContain('border-style: dotted');
+    expect(pending).toContain('wcl-file-pending');
+    expect(acceptedAnnouncement).toContain('var(--wcl-success)');
+    expect(rejectedAnnouncement).toContain('var(--wcl-danger)');
+    expect(dropContainer).toContain('inline-size: 100%');
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-drop-zone\]\[data-drop-target\][\s\S]*Highlight/,
+    );
+  });
+
   it('keeps segmented selection on one gliding rail above adjacent hover surfaces', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const track = styles.match(/\[data-wcl-segment-track\]\s*\{([^}]*)\}/)?.[1];

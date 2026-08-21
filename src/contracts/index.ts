@@ -40,6 +40,7 @@ export {
   dateRangePickerContract,
   timeFieldContract,
 } from './date-time.contracts.js';
+export {dropZoneContract, fileTriggerContract} from './file.contracts.js';
 export {
   renderAgentIndex,
   renderContractDocumentation,
@@ -93,6 +94,7 @@ import {
   dateRangePickerContract,
   timeFieldContract,
 } from './date-time.contracts.js';
+import {dropZoneContract, fileTriggerContract} from './file.contracts.js';
 
 export const componentContracts = [
   appearanceProviderContract,
@@ -105,8 +107,10 @@ export const componentContracts = [
   datePickerContract,
   dateRangePickerContract,
   dividerContract,
+  dropZoneContract,
   fieldContract,
   fieldGroupContract,
+  fileTriggerContract,
   formSectionContract,
   iconButtonContract,
   inlineGroupContract,

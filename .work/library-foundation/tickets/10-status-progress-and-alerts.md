@@ -6,7 +6,7 @@ spinner exports with independent semantic tones and live-region behavior.
 **Blocked by:** [Package, Provider, and Contract Spine](01-package-provider-and-contract-spine.md),
 [Layout and Surface Primitives](02-layout-and-surface-primitives.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Success, warning or in-progress, danger, neutral, and accent roles remain semantically
       distinct in light and dark appearance.

@@ -9,10 +9,10 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 08, including the intervening Ticket 03A accent correction, are complete.
-Ticket 09 is ready and no work on it has started. The maintained human showcase covers every
-contracted public component. Manual screen-reader operation is intentionally consolidated in the
-Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
+Tickets 01 through 09, including the intervening Ticket 03A accent correction, are complete.
+Ticket 10 is ready. The maintained human showcase covers every contracted public component. Manual
+screen-reader operation is intentionally consolidated in the Ticket 30 pre-`1.0` release gate
+rather than repeated for every component ticket.
 
 The library remains pre-adoption. Four completed `0.x` integration slices, a broad conventional
 catalog, the accepted Markdown editing surface, the accessible chart family including radar
@@ -157,10 +157,23 @@ dismissal, navigation, viewport containment, and endpoint meaning. One raised al
 subdued Route band with accent endpoint bookends cover light, dark, compact, RTL, forced-color,
 reduced-motion, SSR, hydration, and packed React 18 and 19 behavior.
 
+### Ticket 09 — file trigger and drop zone
+
+FileTrigger and DropZone expose one immutable accepted/rejected result model across native picker,
+drag/drop, and focused paste acquisition without owning upload, persistence, or selected-file
+state. MIME types, wildcards, filename extensions, multiplicity, and per-file byte limits produce
+explicit rejection reasons while browser File references remain consumer-owned.
+
+Named picker actions, accessible drop affordances, localized live announcements, external
+invalidity, pending state, disabled behavior, non-serializing form reset, compact reflow, accent,
+semantic success and danger, forced colors, reduced motion, SSR, hydration, and React 18/19 package
+consumption are covered. The same callback boundary composes with later Markdown asset insertion
+without specializing the file controls to Markdown.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is [Ticket 09 — File Trigger and Drop
-Zone](tickets/09-file-trigger-and-drop-zone.md).
+See the [decision map](map.md). The next implementation unit is [Ticket 10 — Status, Progress, and
+Alerts](tickets/10-status-progress-and-alerts.md).
 
 ## Accepted sources
 
@@ -187,7 +200,7 @@ Zone](tickets/09-file-trigger-and-drop-zone.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 222
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 238
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
@@ -213,11 +226,19 @@ Zone](tickets/09-file-trigger-and-drop-zone.md).
   reduced-motion rendering. Chromium direct inspection also confirms an empty picker is anchored by
   its explicit placeholder date without selecting it. Wide and compact inspected screenshots were
   discarded after validation.
+- Chromium direct evidence covers keyboard, pointer, and touch file picker activation, native file
+  drag enter/drop, plain-text drag rejection, normalized drag constraints, drop source after an
+  unrelated picker paste, stable drop-affordance naming and descriptions, accepted and rejected
+  results, compact and wide layout, dark and light appearance, forced colors, reduced motion, live
+  announcements, and accessibility-tree state.
+  Firefox and WebKit cover keyboard picker activation, rejection, focused file paste, compact light
+  layout, live announcements, and accessibility-tree state. All inspected browser flows completed
+  without overflow, console errors, or page errors; screenshots were discarded after validation.
 - Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
-Resume Ticket 09 from novel-work implementation with
+Resume Ticket 10 from novel-work implementation with
 `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`
-and begin the file-trigger and drop-zone slice. Current branch: `master`. Ticket 08 is delivered by
-the commit containing this record; no Ticket 09 implementation has started.
+and begin the status, progress, and alert slice. Current branch: `master`. Ticket 09 is delivered by
+the commit containing this record; no Ticket 10 implementation has started.

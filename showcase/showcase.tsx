@@ -11,8 +11,10 @@ import {
   DatePicker,
   DateRangePicker,
   Divider,
+  DropZone,
   Field,
   FieldGroup,
+  FileTrigger,
   FormSection,
   IconButton,
   InlineGroup,
@@ -37,6 +39,7 @@ import {
   Toolbar,
   type AccentColor,
   type Appearance,
+  type FileAcquisitionResult,
 } from '../src/index.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
 
@@ -786,6 +789,86 @@ function DateTimeSpecimens() {
   );
 }
 
+function announceFiles({files, rejectedFiles}: FileAcquisitionResult): string {
+  if (rejectedFiles.length > 0) {
+    return `${rejectedFiles.length} file${rejectedFiles.length === 1 ? '' : 's'} rejected.`;
+  }
+  return `${files.length} file${files.length === 1 ? '' : 's'} accepted.`;
+}
+
+function FileSpecimens() {
+  const [latestFiles, setLatestFiles] = useState<readonly string[]>([]);
+
+  const rememberFiles = ({files}: FileAcquisitionResult) => {
+    setLatestFiles(files.map((file) => file.name));
+  };
+
+  return (
+    <>
+      <Specimen
+        description="Open a constrained native picker, report accepted and rejected files explicitly, and leave every acquired File with the consumer."
+        name="FileTrigger"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Multiple-image FileTrigger">
+            <FileTrigger
+              acceptedFileTypes={['image/png', '.jpg']}
+              allowsMultiple
+              description="PNG or JPG, up to 2 MB each."
+              getAnnouncement={announceFiles}
+              label="Choose reference images"
+              maxFileSize={2_000_000}
+              onFiles={rememberFiles}
+            />
+          </Example>
+          <Example label="Pending FileTrigger">
+            <FileTrigger
+              getAnnouncement={announceFiles}
+              isPending
+              label="Choose replacement dataset"
+              onFiles={rememberFiles}
+              pendingMessage="Checking the current dataset"
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Unify drag, focused paste, and a correctly named native-picker action without taking on upload or storage."
+        name="DropZone"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Image-and-PDF DropZone">
+            <DropZone
+              acceptedFileTypes={['image/*', 'application/pdf']}
+              actionLabel="Browse evidence"
+              allowsMultiple
+              description="Drop, paste, or browse for images and PDFs up to 10 MB each."
+              getAnnouncement={announceFiles}
+              label="Evidence"
+              maxFileSize={10_000_000}
+              onFiles={rememberFiles}
+            >
+              {latestFiles.length > 0 ? `Latest: ${latestFiles.join(', ')}` : 'No files acquired.'}
+            </DropZone>
+          </Example>
+          <Example label="Invalid DropZone">
+            <DropZone
+              actionLabel="Browse solver inputs"
+              description="One JSON input file is required."
+              errorMessage="Choose a valid solver input."
+              getAnnouncement={announceFiles}
+              isInvalid
+              label="Solver input"
+              onFiles={rememberFiles}
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -930,6 +1013,14 @@ export function Showcase() {
                 <h2 id="date-time-heading">Civil values keep their context</h2>
               </header>
               <DateTimeSpecimens />
+            </section>
+
+            <section aria-labelledby="files-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Files</span>
+                <h2 id="files-heading">Acquisition stops at the application boundary</h2>
+              </header>
+              <FileSpecimens />
             </section>
           </main>
         </div>

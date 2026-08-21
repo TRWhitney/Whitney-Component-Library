@@ -46,8 +46,10 @@ describe('canonical component contracts', () => {
       'DatePicker',
       'DateRangePicker',
       'Divider',
+      'DropZone',
       'Field',
       'FieldGroup',
+      'FileTrigger',
       'FormSection',
       'IconButton',
       'InlineGroup',
@@ -76,6 +78,31 @@ describe('canonical component contracts', () => {
       exportNames.length,
     );
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+  });
+
+  it('keeps file acquisition separate from upload and makes rejection ownership explicit', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('FileTrigger')?.controlBehavior.join(' ')).toMatch(
+      /accepted.*rejected.*source/i,
+    );
+    expect(contractFor('FileTrigger')?.inappropriateUses.join(' ')).toMatch(
+      /upload|storage|persist/i,
+    );
+    expect(contractFor('DropZone')?.keyboardBehavior.join(' ')).toMatch(/paste.*picker/i);
+    expect(contractFor('DropZone')?.states.join(' ')).toMatch(/drag.*rejected.*invalid.*pending/i);
+    expect(contractFor('DropZone')?.formBehavior.join(' ')).toMatch(
+      /does not serialize.*reset.*feedback/i,
+    );
+    const triggerAdaptationGuidance = [
+      ...(contractFor('FileTrigger')?.accentBehavior ?? []),
+      ...(contractFor('FileTrigger')?.directionality ?? []),
+      ...(contractFor('FileTrigger')?.forcedColorBehavior ?? []),
+      ...(contractFor('FileTrigger')?.reducedMotionBehavior ?? []),
+      ...(contractFor('FileTrigger')?.responsiveBehavior ?? []),
+    ].join(' ');
+    expect(triggerAdaptationGuidance).not.toMatch(/drop target|drop boundary|custom content/i);
   });
 
   it('directs agents among binary, multiple, exclusive, and segmented choice models', () => {

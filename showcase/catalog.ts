@@ -43,6 +43,7 @@ export const showcaseGroups = [
     components: ['DateField', 'TimeField', 'DatePicker', 'DateRangePicker'],
   },
   {label: 'Ranges', components: ['Slider', 'RangeSlider']},
+  {label: 'Files', components: ['FileTrigger', 'DropZone']},
 ] as const satisfies readonly ShowcaseGroup[];
 
 export const showcasedComponentNames = showcaseGroups.flatMap((group) => group.components);
