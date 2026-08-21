@@ -371,6 +371,37 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('uses an animated icon action in drop zones', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const dropZone = styles.match(/\[data-wcl-drop-zone\]\s*\{([^}]*)\}/)?.[1];
+    const iconAction = styles.match(/\[data-wcl-drop-zone-action\]\s*\{([^}]*)\}/)?.[1];
+    const activeGlyph = styles.match(
+      /\[data-wcl-drop-zone-action\]\[data-hovered\]\s+\[data-wcl-file-glyph\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const focusedGlyph = styles.match(
+      /\[data-wcl-drop-zone-action\]\[data-focus-visible\]\s+\[data-wcl-file-glyph\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(dropZone).toContain('grid-template-columns: auto minmax(0, 1fr)');
+    expect(iconAction).toContain('inline-size: 2.75rem');
+    expect(iconAction).toContain('block-size: 2.75rem');
+    expect(iconAction).toContain('outline: 0');
+    expect(activeGlyph).toContain('transform: translateY(-2px) rotate(-5deg)');
+    expect(focusedGlyph).toContain('stroke-width: 2');
+    expect(focusedGlyph).not.toContain('transform');
+    expect(styles).not.toMatch(/\[data-wcl-drop-zone-action\]\[data-hovered\]\s*\{/);
+    expect(styles).not.toMatch(
+      /\[data-wcl-drop-zone-action\]\[data-focus-visible\]\s*\{[^}]*outline/,
+    );
+    expect(styles).not.toMatch(
+      /\[data-wcl-drop-zone-action\]\[data-pressed\][^{]*\[data-wcl-file-glyph\][^{]*\{[^}]*transform/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-drop-zone-action\][\s\S]*transition:\s*none[\s\S]*\[data-wcl-drop-zone-action\][\s\S]*\[data-wcl-file-glyph\][\s\S]*transform:\s*none/,
+    );
+    expect(styles).not.toContain('[data-wcl-drop-zone] [data-wcl-file-action]');
+  });
+
   it('keeps segmented selection on one gliding rail above adjacent hover surfaces', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const track = styles.match(/\[data-wcl-segment-track\]\s*\{([^}]*)\}/)?.[1];
@@ -463,7 +494,9 @@ describe('static appearance styles', () => {
     expect(styles).toMatch(
       /\[data-wcl-field\]\[data-invalid\]\s+\[data-wcl-field-control\][\s\S]*border-color:\s*var\(--wcl-danger\)/,
     );
-    expect(styles).not.toMatch(/\[data-wcl-field[^\]]*\][\s\S]*?transform:\s*(?:translate|scale)/);
+    expect(styles).not.toMatch(
+      /\[data-wcl-field[^\]]*\][^{]*\{[^}]*transform:\s*(?:translate|scale)/,
+    );
   });
 
   it('keeps choice support stable and derives accents for subtle choice surfaces', async () => {

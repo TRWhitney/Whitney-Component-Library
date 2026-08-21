@@ -122,10 +122,10 @@ export const dropZoneContract = {
     'Focus and the active drop border use a more saturated version of the accent hue. Invalid and rejected-file feedback use danger colors.',
   ],
   accessibility: [
-    'DropZone exposes one labeled drop affordance for pointer, keyboard, and assistive-technology drag operations plus one distinctly named native-picker action and localized live result feedback.',
+    'DropZone exposes one labeled drop affordance for pointer, keyboard, and assistive-technology drag operations plus one distinctly named file-icon picker action and localized live result feedback.',
   ],
   appearance: [
-    'DropZone uses a neutral dashed border, a compact file icon, and the standard secondary picker action. Focus, valid drag target, rejection, invalid, disabled, and pending states use distinct shapes or colors.',
+    'DropZone uses a neutral dashed border and a compact file icon as its picker action. The original glyph moves only on pointer hover without adding a hover container or leaving a transformed focus state. Focus, valid drag target, rejection, invalid, disabled, and pending states use distinct shapes or colors.',
   ],
   appropriateUses: [
     'drag, paste, and native-picker acquisition should share one persistent and clearly explained file target',
@@ -137,7 +137,7 @@ export const dropZoneContract = {
     'Use label for the target purpose and actionLabel for the picker command; state accepted types, multiplicity, and maximum per-file size in description whenever constrained.',
   ],
   directionality: [
-    'Text, action placement, and the active border follow inherited writing direction. File order stays unchanged.',
+    'Text, icon-action placement, and the active border follow inherited writing direction. File order stays unchanged.',
   ],
   controlBehavior: [
     'Picker, drop, and paste return the same accepted and rejected result shape. The control rejects non-file transfers. The application manages the browser-created File objects.',
@@ -170,14 +170,14 @@ export const dropZoneContract = {
     'DropZone does not submit files as a form control. Native reset clears its picker and feedback without calling onFiles or changing application-held files.',
   ],
   forcedColorBehavior: [
-    'Forced colors use system colors and non-color cues for the action, focus border, active drop target, invalid state, and rejected files.',
+    'Forced colors use system colors and non-color cues for the icon action, focus border, active drop target, invalid state, and rejected files.',
   ],
   importPath: '.',
   inappropriateUses: [
     'upload or storage ownership, directory traversal, free-form text paste, sortable acquired-file collections, or a picker-only action that does not need a persistent target',
   ],
   keyboardBehavior: [
-    'Tab reaches the drop affordance and picker action; keyboard drag-and-drop follows the platform announcement path, paste is accepted while the affordance is focused, and Enter or Space on the named picker action opens the native picker.',
+    'Tab reaches the drop affordance and file-icon picker action; keyboard drag-and-drop follows the platform announcement path, paste is accepted while the affordance is focused, and Enter or Space on the named icon action opens the native picker.',
   ],
   kind: 'component',
   labeling: [
@@ -185,7 +185,7 @@ export const dropZoneContract = {
   ],
   name: 'DropZone',
   parts: [
-    'DropZone includes an accessible target, active border, file icon, label and optional content, named picker action, hidden native input, and fixed support area.',
+    'DropZone includes an accessible target, active border, named file-icon picker action, label and optional content, hidden native input, and fixed support area.',
   ],
   preferredAlternatives: [
     'Use FileTrigger for picker-only acquisition and a later collection component to review, reorder, or remove acquired files.',
@@ -195,11 +195,11 @@ export const dropZoneContract = {
   ],
   purpose: 'DropZone accepts application-managed files through drag, paste, or a native picker.',
   reducedMotionBehavior: [
-    'Reduced motion removes active-boundary and pending transitions while retaining their settled structure and live announcements.',
+    'Reduced motion removes icon-action, active-boundary, and pending transitions while retaining their settled structure and live announcements.',
   ],
   relatedExports: ['AppearanceProvider', 'FileTrigger'],
   responsiveBehavior: [
-    'The control fills its parent, wraps guidance and custom content, and keeps its action usable without horizontal overflow on narrow screens.',
+    'The control fills its parent, wraps guidance and custom content, and keeps the icon action beside its label without horizontal overflow on narrow screens.',
   ],
   states: [
     'Idle, hovered, focused, active drag target, accepted, rejected, invalid, disabled, and pending states are distinguishable without color alone.',

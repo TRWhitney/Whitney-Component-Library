@@ -1,10 +1,10 @@
 'use client';
 
+import {Button as AriaButton} from 'react-aria-components/Button';
 import {DropZone as AriaDropZone} from 'react-aria-components/DropZone';
 import {FileTrigger as AriaFileTrigger} from 'react-aria-components/FileTrigger';
 import {useId, useRef, type ReactElement} from 'react';
 
-import {FileAction} from './file-action.js';
 import {useFileAcquisitionState} from './file-acquisition-state.js';
 import {FileSupport, supportIds} from './file-support.js';
 import {
@@ -119,11 +119,6 @@ export function DropZone({
           }
         }}
       >
-        <FileGlyph />
-        <div data-wcl-file-copy="">
-          <span data-wcl-file-label="">{label}</span>
-          {children ? <div data-wcl-file-content="">{children}</div> : null}
-        </div>
         <AriaFileTrigger
           {...(normalizedFileTypes === undefined ? {} : {acceptedFileTypes: normalizedFileTypes})}
           allowsMultiple={allowsMultiple}
@@ -132,14 +127,21 @@ export function DropZone({
           }}
           ref={inputRef}
         >
-          <FileAction
-            describedBy={describedBy}
-            isDisabled={isDisabled}
-            isInvalid={isInvalid}
-            isPending={isPending}
-            label={actionLabel}
-          />
+          <AriaButton
+            {...(describedBy === undefined ? {} : {'aria-describedby': describedBy})}
+            aria-invalid={isInvalid || undefined}
+            aria-label={actionLabel}
+            data-wcl-drop-zone-action=""
+            isDisabled={isDisabled || isPending}
+            type="button"
+          >
+            <FileGlyph />
+          </AriaButton>
         </AriaFileTrigger>
+        <div data-wcl-file-copy="">
+          <span data-wcl-file-label="">{label}</span>
+          {children ? <div data-wcl-file-content="">{children}</div> : null}
+        </div>
         <FileSupport {...support} />
       </AriaDropZone>
     </div>

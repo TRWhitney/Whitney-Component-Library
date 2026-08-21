@@ -165,6 +165,27 @@ describe('file acquisition', () => {
     expect(screen.getByRole('status').textContent).toBe('Checking evidence');
   });
 
+  it('uses the drop-zone glyph as the named native-picker action', () => {
+    render(
+      <DropZone
+        actionLabel="Browse evidence"
+        description="Drop or paste one PNG."
+        getAnnouncement={announcement}
+        label="Evidence"
+        onFiles={() => undefined}
+      />,
+    );
+
+    const picker = screen.getByRole('button', {name: 'Browse evidence'});
+
+    expect(picker.hasAttribute('data-wcl-drop-zone-action')).toBe(true);
+    expect(picker.querySelector('[data-wcl-file-glyph]')).toBeTruthy();
+    expect(screen.queryByText('Browse evidence')).toBeNull();
+    expect(picker.getAttribute('aria-describedby')?.split(' ')).toContain(
+      screen.getByText('Drop or paste one PNG.').id,
+    );
+  });
+
   it('reports focused clipboard files as paste acquisition', async () => {
     const onFiles = vi.fn();
     const file = new File(['diagram'], 'diagram.png', {type: 'image/png'});

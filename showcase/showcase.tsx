@@ -842,7 +842,7 @@ function FileSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Accept files by drag, focused paste, or a named native picker. Upload and storage remain application concerns."
+        description="Accept files by drag, focused paste, or the named file-icon picker. The icon moves on hover without adding another button row."
         name="DropZone"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">

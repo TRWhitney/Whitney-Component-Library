@@ -17,7 +17,7 @@ DropZone accepts application-managed files through drag, paste, or a native pick
 ## Composition and parts
 
 - Render DropZone inside AppearanceProvider; optional children may add concise domain context but cannot replace its required label, description, constraints, action, or callback.
-- DropZone includes an accessible target, active border, file icon, label and optional content, named picker action, hidden native input, and fixed support area.
+- DropZone includes an accessible target, active border, named file-icon picker action, label and optional content, hidden native input, and fixed support area.
 
 ## Preferred higher-level compositions
 
@@ -40,25 +40,25 @@ DropZone accepts application-managed files through drag, paste, or a native pick
 
 ## Accessibility
 
-- DropZone exposes one labeled drop affordance for pointer, keyboard, and assistive-technology drag operations plus one distinctly named native-picker action and localized live result feedback.
+- DropZone exposes one labeled drop affordance for pointer, keyboard, and assistive-technology drag operations plus one distinctly named file-icon picker action and localized live result feedback.
 
 ## Keyboard, labeling, localization, and direction
 
-- Tab reaches the drop affordance and picker action; keyboard drag-and-drop follows the platform announcement path, paste is accepted while the affordance is focused, and Enter or Space on the named picker action opens the native picker.
+- Tab reaches the drop affordance and file-icon picker action; keyboard drag-and-drop follows the platform announcement path, paste is accepted while the affordance is focused, and Enter or Space on the named icon action opens the native picker.
 - label names the drop target, actionLabel names the picker command, description explains constraints, and generated error, pending, and announcement relationships require no consumer ids.
 - Localize labels, descriptions, errors, pending text, action labels, and getAnnouncement output. Explain file type and byte constraints in human-readable text.
-- Text, action placement, and the active border follow inherited writing direction. File order stays unchanged.
+- Text, icon-action placement, and the active border follow inherited writing direction. File order stays unchanged.
 
 ## Appearance and responsive behavior
 
-- DropZone uses a neutral dashed border, a compact file icon, and the standard secondary picker action. Focus, valid drag target, rejection, invalid, disabled, and pending states use distinct shapes or colors.
-- The control fills its parent, wraps guidance and custom content, and keeps its action usable without horizontal overflow on narrow screens.
+- DropZone uses a neutral dashed border and a compact file icon as its picker action. The original glyph moves only on pointer hover without adding a hover container or leaving a transformed focus state. Focus, valid drag target, rejection, invalid, disabled, and pending states use distinct shapes or colors.
+- The control fills its parent, wraps guidance and custom content, and keeps the icon action beside its label without horizontal overflow on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
 - Focus and the active drop border use a more saturated version of the accent hue. Invalid and rejected-file feedback use danger colors.
-- Forced colors use system colors and non-color cues for the action, focus border, active drop target, invalid state, and rejected files.
-- Reduced motion removes active-boundary and pending transitions while retaining their settled structure and live announcements.
+- Forced colors use system colors and non-color cues for the icon action, focus border, active drop target, invalid state, and rejected files.
+- Reduced motion removes icon-action, active-boundary, and pending transitions while retaining their settled structure and live announcements.
 
 ## Examples
 
