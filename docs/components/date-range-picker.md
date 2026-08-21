@@ -56,7 +56,7 @@ DateRangePicker collects one inclusive continuous civil-date interval.
 
 ## Accent, forced colors, and reduced motion
 
-- Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid state uses danger colors.
+- Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid fields retain their danger boundary and thicken it on enabled hover.
 - Forced colors use system colors for fields, segment focus, calendar borders, unavailable dates, today, selected ranges, and endpoints.
 - Reduced motion removes the short popover transition; segment edits and month changes never use positional animation.
 

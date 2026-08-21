@@ -410,7 +410,8 @@
       background-color var(--wcl-motion-duration) var(--wcl-motion-easing),
       border-color var(--wcl-motion-duration) var(--wcl-motion-easing),
       box-shadow var(--wcl-motion-duration) var(--wcl-motion-easing),
-      outline-color var(--wcl-motion-duration) var(--wcl-motion-easing);
+      outline-color var(--wcl-motion-duration) var(--wcl-motion-easing),
+      outline-width var(--wcl-motion-duration) var(--wcl-motion-easing);
   }
 
   [data-wcl-text-area] [data-wcl-field-control] {
@@ -440,6 +441,10 @@
 
   [data-wcl-field][data-invalid] [data-wcl-field-control]:has(:focus-visible) {
     outline-color: var(--wcl-danger);
+  }
+
+  [data-wcl-field][data-invalid]:not([data-disabled]) [data-wcl-field-control]:hover {
+    box-shadow: inset 0 0 0 1px var(--wcl-danger);
   }
 
   [data-wcl-field][data-disabled] {
@@ -1542,7 +1547,8 @@
     transition:
       background-color var(--wcl-motion-duration) var(--wcl-motion-easing),
       color var(--wcl-motion-duration) var(--wcl-motion-easing),
-      outline-color var(--wcl-motion-duration) var(--wcl-motion-easing);
+      outline-color var(--wcl-motion-duration) var(--wcl-motion-easing),
+      outline-width var(--wcl-motion-duration) var(--wcl-motion-easing);
   }
 
   [data-wcl-choice-option] [data-wcl-choice-control] {
@@ -1690,9 +1696,14 @@
     visibility: hidden;
   }
 
-  [data-wcl-choice-group][data-invalid] [data-wcl-choice-control],
-  [data-wcl-choice-field][data-invalid] [data-wcl-choice-control] {
+  :is([data-wcl-choice-group], [data-wcl-choice-field])[data-invalid] [data-wcl-choice-control] {
     outline-color: var(--wcl-danger);
+    outline-width: 1px;
+  }
+
+  :is([data-wcl-choice-group], [data-wcl-choice-field])[data-invalid]:not([data-disabled])
+    [data-wcl-choice-control][data-hovered]:not([data-disabled]) {
+    outline-width: 2px;
   }
 
   [data-wcl-switch] {
@@ -2909,6 +2920,10 @@
     [data-wcl-field][data-invalid] [data-wcl-field-control] {
       border-color: CanvasText;
       border-style: dashed;
+    }
+
+    [data-wcl-field][data-invalid]:not([data-disabled]) [data-wcl-field-control]:hover {
+      outline-width: 3px;
     }
 
     [data-wcl-field-error] {

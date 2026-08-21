@@ -2,7 +2,7 @@ import type {ComponentContract} from './component-contract.js';
 
 const commonSelectionGuidance = {
   accentBehavior: [
-    'Selected option labels stay neutral. A slim leading rail and focus outline use accent colors adjusted for the raised list background.',
+    'Selected option labels stay neutral. A slim leading rail and focus outline use accent colors adjusted for the raised list background. Invalid fields retain their danger boundary and thicken it on enabled hover.',
   ],
   directionality: [
     'Control text, chevrons, option padding, and the selection rail follow inherited writing direction. The application sets option order.',

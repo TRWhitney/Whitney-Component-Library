@@ -1,9 +1,13 @@
 import type {ComponentContract} from './component-contract.js';
 
+const choiceAccentBehavior =
+  'Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.';
+const invalidChoiceAccentBehavior = [
+  `${choiceAccentBehavior} Invalid controls use a thin danger outline that thickens on enabled hover.`,
+];
+
 const commonChoiceGuidance = {
-  accentBehavior: [
-    'Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.',
-  ],
+  accentBehavior: [choiceAccentBehavior],
   directionality: [
     'Indicators, option copy, switch movement, and segmented rail placement follow inherited writing direction without changing option order.',
   ],
@@ -63,6 +67,7 @@ const verboseModes = `options={[
 
 export const checkboxContract = {
   ...commonChoiceGuidance,
+  accentBehavior: invalidChoiceAccentBehavior,
   accessibility: [
     'Checkbox renders one native checkbox with a persistent visible label and generated description, invalid, required, disabled, and read-only relationships.',
   ],
@@ -141,6 +146,7 @@ export const checkboxContract = {
 
 export const checkboxGroupContract = {
   ...commonChoiceGuidance,
+  accentBehavior: invalidChoiceAccentBehavior,
   accessibility: [
     'CheckboxGroup exposes one named group and native checkbox options with generated group description, error, required, disabled, and read-only relationships.',
   ],
@@ -214,6 +220,7 @@ export const checkboxGroupContract = {
 
 export const radioGroupContract = {
   ...commonChoiceGuidance,
+  accentBehavior: invalidChoiceAccentBehavior,
   accessibility: [
     'RadioGroup exposes one named native radio group with one tab stop and generated group description, error, required, disabled, and read-only relationships.',
   ],

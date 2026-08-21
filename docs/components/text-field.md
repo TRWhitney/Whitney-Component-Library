@@ -56,7 +56,7 @@ TextField collects one line of text with native form and validation behavior.
 
 ## Accent, forced colors, and reduced motion
 
-- Resting field content stays neutral; enabled hover and focus use saturated same-hue accent structure, while disabled controls remain inert and invalid and pending states retain independent danger and warning colors.
+- Resting field content stays neutral; enabled hover and focus use saturated same-hue accent structure, while disabled controls remain inert. Invalid controls retain their danger boundary and thicken it on enabled hover; pending controls retain their warning color.
 - Forced-color mode maps field surfaces, boundaries, focus, invalid state, and pending state to system colors without suppressing native control behavior.
 - Reduced motion stops the pending rail and removes field transitions while retaining a static warning rail and every state boundary.
 

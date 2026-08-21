@@ -56,7 +56,7 @@ CheckboxGroup selects several related values under one accessible question.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.
+- Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue. Invalid controls use a thin danger outline that thickens on enabled hover.
 - Forced-color mode maps boundaries, selected indicators, focus outlines, switch state, and the segmented rail to system colors without hiding native inputs.
 - Reduced motion removes indicator, switch-thumb, hover, and segmented-rail transitions while retaining the final state.
 

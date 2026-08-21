@@ -568,6 +568,35 @@ describe('static appearance styles', () => {
     expect(styles).not.toMatch(/^\s*\[data-wcl-field-control\]:hover/m);
   });
 
+  it('uses thin resting invalid boundaries that thicken on enabled hover', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const fieldControl = styles.match(/\[data-wcl-field-control\]\s*\{([^}]*)\}/)?.[1];
+    const choiceControl = styles.match(/\[data-wcl-choice-control\]\s*\{([^}]*)\}/)?.[1];
+    const invalidChoice = styles.match(
+      /:is\(\[data-wcl-choice-group\], \[data-wcl-choice-field\]\)\[data-invalid\]\s+\[data-wcl-choice-control\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const invalidChoiceHover = styles.match(
+      /:is\(\[data-wcl-choice-group\], \[data-wcl-choice-field\]\)\[data-invalid\]:not\(\[data-disabled\]\)\s+\[data-wcl-choice-control\]\[data-hovered\]:not\(\[data-disabled\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const invalidFieldHover = styles.match(
+      /\[data-wcl-field\]\[data-invalid\]:not\(\[data-disabled\]\)\s+\[data-wcl-field-control\]:hover\s*\{([^}]*)\}/,
+    )?.[1];
+    const forcedInvalidFieldHover = styles.match(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*?\[data-wcl-field\]\[data-invalid\]:not\(\[data-disabled\]\)\s+\[data-wcl-field-control\]:hover\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(fieldControl).toContain(
+      'outline-width var(--wcl-motion-duration) var(--wcl-motion-easing)',
+    );
+    expect(choiceControl).toContain(
+      'outline-width var(--wcl-motion-duration) var(--wcl-motion-easing)',
+    );
+    expect(invalidChoice).toContain('outline-width: 1px');
+    expect(invalidChoiceHover).toContain('outline-width: 2px');
+    expect(invalidFieldHover).toContain('box-shadow: inset 0 0 0 1px var(--wcl-danger)');
+    expect(forcedInvalidFieldHover).toContain('outline-width: 3px');
+  });
+
   it('keeps choice support stable and derives accents for subtle choice surfaces', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const support = styles.match(/\[data-wcl-choice-support\]\s*\{([^}]*)\}/)?.[1];

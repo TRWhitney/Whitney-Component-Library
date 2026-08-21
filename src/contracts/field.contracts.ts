@@ -2,7 +2,7 @@ import type {ComponentContract} from './component-contract.js';
 
 const commonFieldGuidance = {
   accentBehavior: [
-    'Resting field content stays neutral; enabled hover and focus use saturated same-hue accent structure, while disabled controls remain inert and invalid and pending states retain independent danger and warning colors.',
+    'Resting field content stays neutral; enabled hover and focus use saturated same-hue accent structure, while disabled controls remain inert. Invalid controls retain their danger boundary and thicken it on enabled hover; pending controls retain their warning color.',
   ],
   appearance: [
     'The field family uses compact rounded controls, one consistent single-line control height, neutral surfaces, and a reserved support track beneath each control.',

@@ -56,7 +56,7 @@ ComboBox filters local, dynamic, or asynchronous options and chooses one value.
 
 ## Accent, forced colors, and reduced motion
 
-- Selected option labels stay neutral. A slim leading rail and focus outline use accent colors adjusted for the raised list background.
+- Selected option labels stay neutral. A slim leading rail and focus outline use accent colors adjusted for the raised list background. Invalid fields retain their danger boundary and thicken it on enabled hover.
 - Forced-color mode maps control and overlay borders, focused options, and the selection rail to system colors without hiding option states.
 - Reduced motion removes overlay, chevron, selection-rail, and loading transitions. Their final states remain visible.
 

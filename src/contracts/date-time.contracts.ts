@@ -2,7 +2,7 @@ import type {ComponentContract} from './component-contract.js';
 
 const common = {
   accentBehavior: [
-    'Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid state uses danger colors.',
+    'Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid fields retain their danger boundary and thicken it on enabled hover.',
   ],
   appearance: [
     'Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels, a continuous range fill, and selected-day or endpoint rails that match selected actions.',

@@ -468,7 +468,7 @@ function ChoiceSpecimens() {
   return (
     <>
       <Specimen
-        description="Select one optional value, including an indeterminate state, with native form behavior."
+        description="Select one optional value, including an indeterminate state, with native form behavior. Invalid rows use a thin danger outline that thickens on enabled hover."
         name="Checkbox"
       >
         <InlineGroup align="start" gap="regular" wrap>
@@ -559,7 +559,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one value from a centered trigger whose full enabled boundary responds to hover, with rounded list options, typeahead, native form behavior, and viewport-aware placement."
+        description="Choose one value from a centered trigger whose full enabled boundary responds to hover, with rounded list options, typeahead, native form behavior, and viewport-aware placement. Invalid boundaries retain their danger color and thicken on enabled hover."
         name="Select"
       >
         <Select
@@ -573,7 +573,7 @@ function SelectionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Filter local, dynamic, or asynchronous options and choose one value from rounded list options. Input text and selection stay separate."
+        description="Filter local, dynamic, or asynchronous options and choose one value from rounded list options. Input text and selection stay separate; invalid boundaries retain their danger color and thicken on enabled hover."
         name="ComboBox"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -731,7 +731,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an ISO civil date through synchronized segments and a calendar. Focused segments and selected days use the same low-profile rail as selected actions."
+        description="Choose an ISO civil date through synchronized segments and a calendar. Focused segments and selected days use the same low-profile rail as selected actions; invalid boundaries thicken on enabled hover."
         name="DatePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
