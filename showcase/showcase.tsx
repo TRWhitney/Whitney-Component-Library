@@ -402,7 +402,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Format, parse, limit, and step a number. Focused wheel stepping is optional, and partial input stays internal."
+        description="Format, parse, limit, and step a number. Faint separators keep both step actions distinct from the value."
         name="NumberField"
       >
         <NumberField

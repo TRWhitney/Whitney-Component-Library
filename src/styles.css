@@ -571,6 +571,14 @@
     border-radius: 999px;
   }
 
+  [data-wcl-number-step][slot='decrement'] {
+    border-inline-end: 1px solid var(--wcl-border);
+  }
+
+  [data-wcl-number-step][slot='increment'] {
+    border-inline-start: 1px solid var(--wcl-border);
+  }
+
   :is([data-wcl-number-step], [data-wcl-search-clear]) {
     --wcl-accent-focus: var(--wcl-accent-focus-on-subtle);
     --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle);

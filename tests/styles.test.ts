@@ -601,7 +601,7 @@ describe('static appearance styles', () => {
     expect(formSectionContent).toContain('gap: calc(var(--wcl-space) * 2)');
   });
 
-  it('keeps number steps as end caps and insets the search clear action', async () => {
+  it('separates number step end caps and insets the search clear action', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const actionGeometry = styles.match(
       /\[data-wcl-number-step\],[\s\S]*?\[data-wcl-search-clear\]\s*\{([^}]*)\}/,
@@ -612,9 +612,17 @@ describe('static appearance styles', () => {
     const nestedActions = styles.match(
       /:is\(\[data-wcl-number-step\], \[data-wcl-search-clear\]\)\s*\{([^}]*)\}/,
     )?.[1];
+    const decrement = styles.match(
+      /\[data-wcl-number-step\]\[slot='decrement'\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const increment = styles.match(
+      /\[data-wcl-number-step\]\[slot='increment'\]\s*\{([^}]*)\}/,
+    )?.[1];
 
     expect(actionGeometry).not.toContain('margin:');
     expect(actionGeometry).not.toContain('border-radius:');
+    expect(decrement).toContain('border-inline-end: 1px solid var(--wcl-border)');
+    expect(increment).toContain('border-inline-start: 1px solid var(--wcl-border)');
     expect(searchClearGeometry).toContain(
       'margin: calc(var(--wcl-space) * 0.625) calc(var(--wcl-space) * 0.25)',
     );
