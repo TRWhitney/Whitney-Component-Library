@@ -565,6 +565,12 @@
       color var(--wcl-motion-duration) var(--wcl-motion-easing);
   }
 
+  [data-wcl-search-control] [data-wcl-search-clear] {
+    inline-size: 2.25rem;
+    margin: calc(var(--wcl-space) * 0.625) calc(var(--wcl-space) * 0.25);
+    border-radius: 999px;
+  }
+
   :is([data-wcl-number-step], [data-wcl-search-clear]) {
     --wcl-accent-focus: var(--wcl-accent-focus-on-subtle);
     --wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle);
@@ -579,7 +585,14 @@
 
   :is([data-wcl-number-step], [data-wcl-search-clear])[data-focus-visible] {
     outline: 2px solid var(--wcl-accent-focus);
+  }
+
+  [data-wcl-number-step][data-focus-visible] {
     outline-offset: -3px;
+  }
+
+  [data-wcl-search-clear][data-focus-visible] {
+    outline-offset: 0;
   }
 
   [data-wcl-number-step][data-disabled] {
@@ -1338,10 +1351,6 @@
   [data-wcl-search-control] [data-wcl-field-input] {
     padding-inline-start: calc(var(--wcl-space) * 0.75);
     appearance: auto !important;
-  }
-
-  [data-wcl-search-clear] {
-    inline-size: 2.5rem;
   }
 
   [data-wcl-field-group] {

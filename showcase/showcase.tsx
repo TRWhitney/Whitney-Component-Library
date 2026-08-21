@@ -418,7 +418,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Enter, submit, and clear an editable query with native search semantics and one conditional named clear command."
+        description="Enter, submit, and clear an editable query with native search semantics and one conditional clear action inset into the field."
         name="SearchField"
       >
         <SearchField

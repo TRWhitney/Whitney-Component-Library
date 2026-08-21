@@ -550,12 +550,25 @@ describe('static appearance styles', () => {
     expect(formSectionContent).toContain('gap: calc(var(--wcl-space) * 2)');
   });
 
-  it('derives nested field actions against their subtle control surface', async () => {
+  it('keeps number steps as end caps and insets the search clear action', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
+    const actionGeometry = styles.match(
+      /\[data-wcl-number-step\],[\s\S]*?\[data-wcl-search-clear\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const searchClearGeometry = styles.match(
+      /\[data-wcl-search-control\]\s+\[data-wcl-search-clear\]\s*\{([^}]*)\}/,
+    )?.[1];
     const nestedActions = styles.match(
       /:is\(\[data-wcl-number-step\], \[data-wcl-search-clear\]\)\s*\{([^}]*)\}/,
     )?.[1];
 
+    expect(actionGeometry).not.toContain('margin:');
+    expect(actionGeometry).not.toContain('border-radius:');
+    expect(searchClearGeometry).toContain(
+      'margin: calc(var(--wcl-space) * 0.625) calc(var(--wcl-space) * 0.25)',
+    );
+    expect(searchClearGeometry).toContain('inline-size: 2.25rem');
+    expect(searchClearGeometry).toContain('border-radius: 999px');
     expect(nestedActions).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-subtle)');
     expect(nestedActions).toContain(
       '--wcl-accent-hover-contrast: var(--wcl-accent-hover-contrast-on-subtle)',
