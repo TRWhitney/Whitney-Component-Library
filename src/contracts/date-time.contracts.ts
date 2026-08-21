@@ -5,7 +5,7 @@ const common = {
     'Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid state uses danger colors.',
   ],
   appearance: [
-    'Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels and a continuous range fill.',
+    'Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels, a continuous range fill, and selected-day or endpoint rails that match selected actions.',
   ],
   directionality: [
     'Locale determines segment order, numerals, calendar grid direction, and logical previous or next navigation without changing value identity or DOM reading order.',

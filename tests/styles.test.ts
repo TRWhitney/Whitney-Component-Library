@@ -356,6 +356,43 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('uses toggle rail geometry without replacing the today marker', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const singleSelection = styles.match(
+      /\[data-wcl-calendar-cell\]\[data-selected\]:not\(\[data-wcl-range-calendar\] \*\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const rangeEndpoint = styles.match(
+      /\[data-wcl-range-calendar\][\s\S]*?\[data-wcl-calendar-cell\]:is\(\[data-selection-start\], \[data-selection-end\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const calendarRail = styles.match(
+      /\[data-wcl-calendar-cell\]\[data-selected\]:not\(\[data-wcl-range-calendar\] \*\)::before\s*,[\s\S]*?\{([^}]*)\}/,
+    )?.[1];
+    const toggleRail = styles.match(
+      /\[data-wcl-toggle-button\]\[data-selected\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(singleSelection).not.toContain('box-shadow: inset');
+    expect(rangeEndpoint).not.toContain('box-shadow: inset');
+    for (const declaration of [
+      'inset-inline: 0',
+      'inset-block-end: 0',
+      'block-size: 3px',
+      'border-radius: 3px 3px 0 0',
+    ]) {
+      expect(calendarRail).toContain(declaration);
+      expect(toggleRail).toContain(declaration);
+    }
+    expect(calendarRail).toContain('background: var(--wcl-accent-rail-on-raised)');
+    expect(styles).not.toMatch(/\[data-wcl-calendar-cell\]\[data-invalid\]\s*\{[^}]*box-shadow/);
+    expect(styles).toMatch(
+      /\[data-wcl-calendar-cell\]\[data-selected\]\[data-invalid\]::before\s*\{[^}]*background:\s*var\(--wcl-danger\)/,
+    );
+    expect(styles).toMatch(/\[data-wcl-calendar-cell\]\[data-today\]::after\s*\{/);
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-calendar-cell\]\[data-selected\]:not\(\[data-wcl-range-calendar\] \*\)::before[\s\S]*background:\s*Highlight[\s\S]*forced-color-adjust:\s*none/,
+    );
+  });
+
   it('distinguishes drop activity, rejection, invalidity, and pending without color alone', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const dropTarget = styles.match(

@@ -731,7 +731,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an ISO civil date through synchronized segments and a calendar. Focused segments use the same low-profile rail as selected actions."
+        description="Choose an ISO civil date through synchronized segments and a calendar. Focused segments and selected days use the same low-profile rail as selected actions."
         name="DatePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -763,7 +763,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an inclusive ISO date interval with a separate form value for each endpoint. Focused segments use the same low-profile rail as selected actions."
+        description="Choose an inclusive ISO date interval with a separate form value for each endpoint. Focused segments and selected endpoints use the same low-profile rail as selected actions."
         name="DateRangePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">

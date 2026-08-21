@@ -51,7 +51,7 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 
 ## Appearance and responsive behavior
 
-- Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels and a continuous range fill.
+- Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels, a continuous range fill, and selected-day or endpoint rails that match selected actions.
 - Fields fill their parent. Segments remain operable on narrow screens, and the single-month calendar stays inside the viewport.
 
 ## Accent, forced colors, and reduced motion
