@@ -270,7 +270,7 @@ export const dateRangePickerContract = {
     'Name the interval as a whole and explain whether both inclusive endpoint dates count.',
   ],
   controlBehavior: [
-    'Controlled or uncontrolled ranges may be empty; placeholderValue deterministically anchors the empty calendar without selecting a range, start never follows end, ranges containing unavailable dates remain representable but invalid, and entry and calendar selection remain synchronized.',
+    'Controlled or uncontrolled ranges may be empty; each value is one continuous interval, placeholderValue deterministically anchors the empty calendar without selecting a range, start never follows end, ranges containing unavailable dates remain representable but invalid, and entry and calendar selection remain synchronized.',
   ],
   counterExamples: [
     {

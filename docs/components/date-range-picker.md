@@ -33,7 +33,7 @@ DateRangePicker collects one inclusive continuous civil-date interval.
 
 ## Control, events, validation, and forms
 
-- Controlled or uncontrolled ranges may be empty; placeholderValue deterministically anchors the empty calendar without selecting a range, start never follows end, ranges containing unavailable dates remain representable but invalid, and entry and calendar selection remain synchronized.
+- Controlled or uncontrolled ranges may be empty; each value is one continuous interval, placeholderValue deterministically anchors the empty calendar without selecting a range, start never follows end, ranges containing unavailable dates remain representable but invalid, and entry and calendar selection remain synchronized.
 - onChange reports a complete inclusive ISO range or null; onOpenChange reports every owned overlay transition.
 - Ordering, bounds, unavailable dates, required state, custom validate, and external invalidity apply to the complete interval and stable error track.
 - names supplies ordered start and end field names; each endpoint serializes as YYYY-MM-DD and reset restores the complete default range.
