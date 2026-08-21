@@ -125,7 +125,7 @@ export const dropZoneContract = {
     'DropZone exposes one labeled drop affordance for pointer, keyboard, and assistive-technology drag operations plus one distinctly named file-icon picker action and localized live result feedback.',
   ],
   appearance: [
-    'DropZone uses a neutral dashed border and a compact file icon as its picker action. The original glyph moves only on pointer hover without adding a hover container or leaving a transformed focus state. Focus, valid drag target, rejection, invalid, disabled, and pending states use distinct shapes or colors.',
+    'DropZone uses a neutral dashed border and a compact file icon as its picker action. The original glyph moves only on enabled pointer hover without adding a hover container or leaving a transformed focus state. Disabled targets and picker actions remain visually inert, while focus, valid drag target, rejection, invalid, and pending states use distinct shapes or colors.',
   ],
   appropriateUses: [
     'drag, paste, and native-picker acquisition should share one persistent and clearly explained file target',

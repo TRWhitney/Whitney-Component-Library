@@ -2,7 +2,7 @@ import type {ComponentContract} from './component-contract.js';
 
 const commonRangeGuidance = {
   accentBehavior: [
-    'Labels, values, endpoints, and the empty track stay neutral. The measured fill, thumbs, hover, and focus use accent colors. Invalid state uses danger colors.',
+    'Labels, values, endpoints, and the empty track stay neutral. The measured fill, thumbs, and focus use accent colors. Interactive thumb hover adds dilation without changing color. Invalid state uses danger colors.',
   ],
   appearance: [
     'Range controls use a compact label and value header, formatted endpoints, a narrow track, and circular thumbs instead of a field box.',

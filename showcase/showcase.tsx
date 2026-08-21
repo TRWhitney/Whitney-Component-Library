@@ -356,7 +356,7 @@ function FieldSpecimens() {
   return (
     <>
       <Specimen
-        description="Connect a label and support text to one custom control, including readable native option entries. The full control boundary responds to hover, including padding around its content."
+        description="Connect a label and support text to one custom control, including readable native option entries. The full enabled control boundary responds to hover, including padding around its content."
         name="Field"
       >
         <Field description="Select the compute queue for this run." label="Compute queue">
@@ -559,7 +559,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one value from a centered trigger whose full boundary responds to hover, with rounded list options, typeahead, native form behavior, and viewport-aware placement."
+        description="Choose one value from a centered trigger whose full enabled boundary responds to hover, with rounded list options, typeahead, native form behavior, and viewport-aware placement."
         name="Select"
       >
         <Select
@@ -608,7 +608,7 @@ function RangeSpecimens() {
   return (
     <>
       <Specimen
-        description="Adjust an approximate value on a formatted scale with keyboard, pointer, or touch input."
+        description="Adjust an approximate value on a formatted scale with keyboard, pointer, or touch input. Only interactive thumbs dilate on hover."
         name="Slider"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -679,7 +679,7 @@ function DateTimeSpecimens() {
   return (
     <>
       <Specimen
-        description="Enter an ISO civil date through locale- and calendar-aware segments. The full field boundary responds to hover, while focused segments use the same low-profile rail as selected actions."
+        description="Enter an ISO civil date through locale- and calendar-aware segments. The full enabled field boundary responds to hover, while focused segments use the same low-profile rail as selected actions."
         name="DateField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -763,7 +763,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an inclusive ISO date interval with a separate form value for each endpoint. Focused segments and selected endpoints use the same low-profile rail as selected actions."
+        description="Choose an inclusive ISO date interval with a separate form value for each endpoint. Focused segments and selected endpoints use the same low-profile rail as selected actions, while disabled fields remain neutral on hover."
         name="DateRangePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -842,7 +842,7 @@ function FileSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Accept files by drag, focused paste, or the named file-icon picker. The icon moves on hover without adding another button row."
+        description="Accept files by drag, focused paste, or the named file-icon picker. The icon moves on enabled hover without adding another button row; disabled targets remain still."
         name="DropZone"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -868,6 +868,16 @@ function FileSpecimens() {
               getAnnouncement={announceFiles}
               isInvalid
               label="Solver input"
+              onFiles={rememberFiles}
+            />
+          </Example>
+          <Example label="Disabled DropZone">
+            <DropZone
+              actionLabel="Browse archived evidence"
+              description="File acquisition is unavailable."
+              getAnnouncement={announceFiles}
+              isDisabled
+              label="Archived evidence"
               onFiles={rememberFiles}
             />
           </Example>

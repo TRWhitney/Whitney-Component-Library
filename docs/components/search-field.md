@@ -56,7 +56,7 @@ SearchField collects, submits, and clears a search query with native semantics.
 
 ## Accent, forced colors, and reduced motion
 
-- Resting field content stays neutral; hover and focus use saturated same-hue accent structure, while invalid and pending states retain independent danger and warning colors.
+- Resting field content stays neutral; enabled hover and focus use saturated same-hue accent structure, while disabled controls remain inert and invalid and pending states retain independent danger and warning colors.
 - Forced-color mode maps field surfaces, boundaries, focus, invalid state, and pending state to system colors without suppressing native control behavior.
 - Reduced motion stops the pending rail and removes field transitions while retaining a static warning rail and every state boundary.
 

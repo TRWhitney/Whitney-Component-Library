@@ -56,7 +56,7 @@ RangeSlider adjusts an ordered numeric interval within a finite range.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels, values, endpoints, and the empty track stay neutral. The measured fill, thumbs, hover, and focus use accent colors. Invalid state uses danger colors.
+- Labels, values, endpoints, and the empty track stay neutral. The measured fill, thumbs, and focus use accent colors. Interactive thumb hover adds dilation without changing color. Invalid state uses danger colors.
 - Forced-color mode maps the track, measured fill, thumbs, focus, and invalid state to system colors without moving them.
 - Direct thumb position never animates; reduced motion also removes the remaining thumb hover and focus transitions without removing value or focus structure.
 

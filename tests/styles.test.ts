@@ -424,15 +424,23 @@ describe('static appearance styles', () => {
   it('uses an animated icon action in drop zones', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const dropZone = styles.match(/\[data-wcl-drop-zone\]\s*\{([^}]*)\}/)?.[1];
+    const dropZoneHover = styles.match(
+      /\[data-wcl-drop-zone\]\[data-hovered\]:where\(:not\(\[data-disabled\]\)\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const disabledDropZone = styles.match(
+      /\[data-wcl-drop-zone\]\[data-disabled\]\s*\{([^}]*)\}/,
+    )?.[1];
     const iconAction = styles.match(/\[data-wcl-drop-zone-action\]\s*\{([^}]*)\}/)?.[1];
     const activeGlyph = styles.match(
-      /\[data-wcl-drop-zone-action\]\[data-hovered\]\s+\[data-wcl-file-glyph\]\s*\{([^}]*)\}/,
+      /\[data-wcl-drop-zone-action\]\[data-hovered\]:where\(:not\(\[data-disabled\]\)\)\s+\[data-wcl-file-glyph\]\s*\{([^}]*)\}/,
     )?.[1];
     const focusedGlyph = styles.match(
       /\[data-wcl-drop-zone-action\]\[data-focus-visible\]\s+\[data-wcl-file-glyph\]\s*\{([^}]*)\}/,
     )?.[1];
 
     expect(dropZone).toContain('grid-template-columns: auto minmax(0, 1fr)');
+    expect(dropZoneHover).toContain('border-color: var(--wcl-accent-muted)');
+    expect(disabledDropZone).toContain('cursor: not-allowed');
     expect(iconAction).toContain('inline-size: 2.75rem');
     expect(iconAction).toContain('block-size: 2.75rem');
     expect(iconAction).toContain('outline: 0');
@@ -551,10 +559,13 @@ describe('static appearance styles', () => {
 
   it('highlights the full field control boundary on hover', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
-    const hover = styles.match(/\[data-wcl-field-control\]:hover\s*\{([^}]*)\}/)?.[1];
+    const hover = styles.match(
+      /:where\(\[data-wcl-field\]:not\(\[data-disabled\]\)\)\s+\[data-wcl-field-control\]:hover\s*\{([^}]*)\}/,
+    )?.[1];
 
     expect(hover).toContain('border-color: var(--wcl-accent-muted)');
     expect(styles).not.toContain('[data-wcl-field-control]:has(:hover)');
+    expect(styles).not.toMatch(/^\s*\[data-wcl-field-control\]:hover/m);
   });
 
   it('keeps choice support stable and derives accents for subtle choice surfaces', async () => {
@@ -636,12 +647,21 @@ describe('static appearance styles', () => {
     const track = styles.match(/\[data-wcl-range-track\]\s*\{([^}]*)\}/)?.[1];
     const fill = styles.match(/\[data-wcl-range-fill\]\s*\{([^}]*)\}/)?.[1];
     const thumb = styles.match(/\[data-wcl-range-thumb\]\s*\{([^}]*)\}/)?.[1];
+    const interactiveThumb = styles.match(
+      /:where\(\[data-wcl-range-field\]:not\(\[data-readonly\], \[data-disabled\]\)\)\s+\[data-wcl-range-thumb\]:is\(\[data-hovered\], \[data-dragging\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const invalidThumb = styles.match(
+      /\[data-wcl-range-field\]\[data-invalid\]\s+\[data-wcl-range-thumb\]\s*\{([^}]*)\}/,
+    )?.[1];
 
     expect(field).toContain('min-inline-size: 0');
     expect(track).toContain('touch-action: none');
     expect(fill).toContain('background: var(--wcl-accent-rail)');
     expect(thumb).toContain('inline-size: 1.25rem');
     expect(thumb).toContain('block-size: 1.25rem');
+    expect(interactiveThumb).toContain('scale: 1.08');
+    expect(interactiveThumb).not.toContain('border-color');
+    expect(invalidThumb).toContain('border-color: var(--wcl-danger)');
     expect(styles).toMatch(
       /\[data-wcl-range-field\]\[data-orientation='horizontal'\]\s+\[data-wcl-range-thumb\]\s*\{[^}]*top:\s*50%/,
     );

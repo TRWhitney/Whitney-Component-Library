@@ -51,7 +51,7 @@ DropZone accepts application-managed files through drag, paste, or a native pick
 
 ## Appearance and responsive behavior
 
-- DropZone uses a neutral dashed border and a compact file icon as its picker action. The original glyph moves only on pointer hover without adding a hover container or leaving a transformed focus state. Focus, valid drag target, rejection, invalid, disabled, and pending states use distinct shapes or colors.
+- DropZone uses a neutral dashed border and a compact file icon as its picker action. The original glyph moves only on enabled pointer hover without adding a hover container or leaving a transformed focus state. Disabled targets and picker actions remain visually inert, while focus, valid drag target, rejection, invalid, and pending states use distinct shapes or colors.
 - The control fills its parent, wraps guidance and custom content, and keeps the icon action beside its label without horizontal overflow on narrow screens.
 
 ## Accent, forced colors, and reduced motion
