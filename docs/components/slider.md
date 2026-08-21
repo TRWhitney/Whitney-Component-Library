@@ -1,10 +1,10 @@
 # Slider
 
-Slider adjusts one approximate numeric value within an explicit bounded domain.
+Slider adjusts an approximate numeric value within a finite range.
 
 ## Use for
 
-- one bounded approximate value is adjusted and its relative position within the domain helps the user choose
+- one approximate value is adjusted and its position within a finite range helps the user choose
 
 ## Do not use for
 
@@ -17,7 +17,7 @@ Slider adjusts one approximate numeric value within an explicit bounded domain.
 ## Composition and parts
 
 - Render Slider inside AppearanceProvider; provide one finite minValue, maxValue, step, locale, and optional shared number format rather than rebuilding its label, output, endpoints, track, or thumb.
-- Slider owns one header, visible label, formatted output, endpoint scale, track, measured fill, thumb, hidden native range input, and stable support track.
+- Slider includes a header, visible label, formatted output, endpoint scale, track, measured fill, thumb, hidden native range input, and fixed support area.
 
 ## Preferred higher-level compositions
 
@@ -29,13 +29,13 @@ Slider adjusts one approximate numeric value within an explicit bounded domain.
 
 ## States
 
-- Controlled, uncontrolled, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states preserve the calibrated scale and formatted output.
+- Controlled, uncontrolled, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states keep the same scale and formatted output.
 
 ## Control, events, validation, and forms
 
-- Finite minValue, maxValue, and step define one reachable numeric domain; value ownership is controlled or uncontrolled, read-only preserves focus without accepting changes, and disabled removes operation.
+- Finite minValue, maxValue, and step define the numeric range. The value may be controlled or uncontrolled. Read-only keeps focus but rejects changes, while disabled prevents operation.
 - onChange reports each accepted stepped value; onChangeEnd reports the final value when keyboard, pointer, or touch adjustment ends.
-- The component rejects non-finite, reversed, unreachable, off-step, or out-of-bounds domains and values; use isInvalid with errorMessage for externally owned domain validation.
+- The component rejects non-finite, reversed, unreachable, off-step, or out-of-bounds ranges and values. Use isInvalid with errorMessage for validation handled by the application.
 - name and form serialize the raw numeric value through one hidden native range input; native reset restores defaultValue while visible formatting remains presentational.
 
 ## Accessibility
@@ -51,20 +51,20 @@ Slider adjusts one approximate numeric value within an explicit bounded domain.
 
 ## Appearance and responsive behavior
 
-- Range controls use a calibrated instrument layout with a compact label/value header, formatted endpoints, one narrow measurement rail, and precise circular thumbs rather than a generic field box.
-- Horizontal controls fill a bounded parent and retain reachable endpoint and thumb geometry at compact widths; vertical controls use a bounded instrument width and a twelve-rem minimum track height.
+- Range controls use a compact label and value header, formatted endpoints, a narrow track, and circular thumbs instead of a field box.
+- Horizontal controls fill their parent and keep endpoints and thumbs operable on narrow screens. Vertical controls use a preset width and a twelve-rem minimum track height.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels, values, endpoints, and resting track content stay neutral; the measured fill, thumb structure, hover, and focus use bounded accent roles, while invalid state remains independently dangerous.
-- Forced-color mode maps the track, measured fill, thumbs, focus, and invalid structure to system colors while preserving their boundaries and positions.
+- Labels, values, endpoints, and the empty track stay neutral. The measured fill, thumbs, hover, and focus use accent colors. Invalid state uses danger colors.
+- Forced-color mode maps the track, measured fill, thumbs, focus, and invalid state to system colors without moving them.
 - Direct thumb position never animates; reduced motion also removes the remaining thumb hover and focus transitions without removing value or focus structure.
 
 ## Examples
 
 ### Set a confidence threshold
 
-Adjust one approximate threshold while retaining its percentage context.
+Adjust an approximate threshold and display it as a percentage.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

@@ -16,8 +16,8 @@ SegmentedControl selects one compact mode through equal adjacent radio segments.
 
 ## Composition and parts
 
-- Render SegmentedControl inside AppearanceProvider and provide at least two stable options whose short labels fit adjacent comparison.
-- SegmentedControl owns one group label, equal segment track, single moving rail, and support track.
+- Render SegmentedControl inside AppearanceProvider. Provide at least two options with durable keys and short labels that fit side by side.
+- SegmentedControl includes one group label, equal segment row, moving rail, and support area.
 
 ## Preferred higher-level compositions
 
@@ -25,17 +25,17 @@ SegmentedControl selects one compact mode through equal adjacent radio segments.
 
 ## Content
 
-- Use short parallel labels and stable values; move verbose explanation to the group description rather than individual segments.
+- Use short parallel labels and durable keys. Put longer explanations in the group description.
 
 ## States
 
-- Selected, unselected, required, invalid, read-only, group-disabled, and option-disabled states preserve equal segment geometry.
+- Selected, unselected, required, invalid, read-only, group-disabled, and option-disabled states keep segments equal.
 
 ## Control, events, validation, and forms
 
-- SegmentedControl owns controlled or uncontrolled exclusive string selection; a controlled value uses one option value or null for the unselected state, while disabled options remain visible and the selected rail follows current state.
+- SegmentedControl supports controlled or uncontrolled exclusive string selection. A controlled value is one option key or null. Disabled options remain visible, and the rail follows the selection.
 - onChange reports the newly selected segment value after accepted pointer or keyboard input.
-- Use isRequired when an empty selection is invalid and isInvalid with errorMessage for externally owned invalidity.
+- Use isRequired when an empty selection is invalid. Use isInvalid with errorMessage for errors supplied by the application.
 - name and form serialize the selected native radio value; reset restores defaultValue without losing the rail position.
 
 ## Accessibility
@@ -51,12 +51,12 @@ SegmentedControl selects one compact mode through equal adjacent radio segments.
 
 ## Appearance and responsive behavior
 
-- SegmentedControl keeps equal adjacent segments on one neutral surface; one group-owned accent bottom rail glides between selected segments while every label remains neutral and no selected fill or elevation persists.
-- Choice rows fill their bounded parent; option copy wraps, and segmented peers remain equal while their labels wrap at compact widths.
+- SegmentedControl places equal adjacent segments on a neutral background. One accent rail moves below the selection. Labels stay neutral, and selection adds no fill or shadow.
+- Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels remain neutral; selected indicators, focus structure, and the segmented rail use the exact or saturated same-hue accent role appropriate to the surface.
+- Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.
 - Forced-color mode maps boundaries, selected indicators, focus outlines, switch state, and the segmented rail to system colors without hiding native inputs.
 - Reduced motion removes indicator, switch-thumb, hover, and segmented-rail transitions while retaining the final state.
 
@@ -64,7 +64,7 @@ SegmentedControl selects one compact mode through equal adjacent radio segments.
 
 ### Choose display density
 
-Compare and switch among a compact bounded set of modes.
+Compare and switch among a few compact modes.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

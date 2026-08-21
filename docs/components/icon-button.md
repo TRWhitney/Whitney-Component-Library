@@ -30,7 +30,7 @@ IconButton presents a familiar icon-only command with required accessible guidan
 
 ## States
 
-- Secondary is the default; quiet and danger offer bounded emphasis while hover, focus, press, and disabled remain visible without movement.
+- Secondary is the default. Quiet lowers emphasis, and danger marks a destructive command. Hover, focus, press, and disabled states use no movement.
 
 ## Control, events, validation, and forms
 
@@ -46,7 +46,7 @@ IconButton presents a familiar icon-only command with required accessible guidan
 ## Keyboard, labeling, localization, and direction
 
 - Enter and Space activate the native button; focus also reveals the tooltip after its short guidance delay.
-- label is required, becomes the accessible name, and is reused verbatim as the library-owned tooltip text.
+- label is required. It becomes the accessible name and the tooltip text.
 - Supply all visible and accessible labels in the application locale and allow labels to grow without relying on a fixed text width.
 - Logical sizing and placement follow inherited writing direction; authored content remains in DOM reading order.
 
@@ -57,9 +57,9 @@ IconButton presents a familiar icon-only command with required accessible guidan
 
 ## Accent, forced colors, and reduced motion
 
-- Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary icon content stays neutral. Danger keeps its semantic color.
+- Hover colors keep the accent hue. Focus and interactive edges use the exact accent or a more saturated version of the same hue. Icons stay neutral, and danger uses its status color.
 - Forced-color mode maps the control boundary, icon, focus outline, and tooltip to system colors.
-- Reduced motion removes control and tooltip transitions while preserving hover, focus, press, disabled, and tooltip meaning.
+- Reduced motion removes control and tooltip transitions. Hover, focus, press, disabled, and tooltip states remain visible.
 
 ## Examples
 

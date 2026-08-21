@@ -1,14 +1,14 @@
 # Select
 
-Select chooses one stable value from a bounded collapsible collection.
+Select chooses one value from a finite collapsible list.
 
 ## Use for
 
-- one value must be chosen from a bounded collection and showing every option inline would consume unnecessary space
+- one value must be chosen from a finite list that would take too much space to show in full
 
 ## Do not use for
 
-- users need to type to filter or query options, compare a small set visibly, select several values, or preserve a truly immutable value
+- users need to filter options, compare a small set in full, select several values, or view an immutable value
 
 ## Prefer instead
 
@@ -16,8 +16,8 @@ Select chooses one stable value from a bounded collapsible collection.
 
 ## Composition and parts
 
-- Render Select inside AppearanceProvider; supply stable string values and localized empty/loading copy, and keep the selected option present while its value is active.
-- Select owns one field shell, trigger and value, chevron, support track, positioned popover, listbox, option copy, and selected rail.
+- Render Select inside AppearanceProvider. Use durable string keys and localized empty and loading messages. Keep the selected option in the collection.
+- Select includes a field shell, trigger and value, chevron, support area, positioned popover, listbox, option text, and selection rail.
 
 ## Preferred higher-level compositions
 
@@ -29,13 +29,13 @@ Select chooses one stable value from a bounded collapsible collection.
 
 ## States
 
-- Empty, selected, open, focused, required, invalid, disabled, loading, and option-disabled states remain distinct; Select is inherently non-editable and deliberately has no read-only prop.
+- Empty, selected, open, focused, required, invalid, disabled, loading, and option-disabled states are visually distinct. Select is non-editable and has no read-only prop.
 
 ## Control, events, validation, and forms
 
-- Select owns either controlled value plus onChange or uncontrolled defaultValue; null means no selection, and option values are stable keys independent of array identity or order.
-- onChange reports the accepted stable string value, or null after an external clear.
-- Use isRequired and validationBehavior for native requirement, validate for value rules, and isInvalid with errorMessage for externally owned errors; loading is progress, not invalidity.
+- Use value with onChange for controlled selection or defaultValue for uncontrolled selection. null means no selection. Option keys must not depend on array identity or order.
+- onChange reports the selected string key, or null after an external clear.
+- Use isRequired and validationBehavior for native requirements, validate for value rules, and isInvalid with errorMessage for errors supplied by the application. Loading does not imply an error.
 - name and form serialize the selected key through the hidden native control; native reset restores defaultValue, and required native validation prevents empty submission.
 
 ## Accessibility
@@ -47,24 +47,24 @@ Select chooses one stable value from a bounded collapsible collection.
 - Enter or Space opens the collection, arrows move focus, locale-aware typeahead locates options, Enter commits, and Escape dismisses and restores focus to the trigger.
 - label is always visible; description, errors, requirement, loading, and empty copy are generated without consumer-authored ids.
 - Supply localized labels, descriptions, errors, placeholders, option copy, emptyMessage, and loadingMessage; matching uses the active locale with case-insensitive base sensitivity.
-- Control copy, chevrons, option padding, and the selected leading rail follow inherited writing direction; option order remains application-defined.
+- Control text, chevrons, option padding, and the selection rail follow inherited writing direction. The application sets option order.
 
 ## Appearance and responsive behavior
 
 - Select extends the neutral field shell with one compact chevron and a raised anchored collection; selection is carried by a slim leading rail rather than selected-label color.
-- The control fills its bounded parent; the anchored collection matches its trigger when space allows, stays inside the viewport, scrolls within available height, and wraps option copy at compact widths.
+- The control fills its parent. The anchored list matches the trigger width when possible, stays inside the viewport, scrolls within the available height, and wraps option text on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
-- Selected option labels remain neutral; a slim leading rail and focus structure use the saturated same-hue accent roles for the raised collection surface.
-- Forced-color mode maps control and overlay boundaries, focused options, and the selected rail to system colors without removing semantic option states.
-- Reduced motion removes overlay, chevron, selected-rail, and loading transitions while retaining their settled state.
+- Selected option labels stay neutral. A slim leading rail and focus outline use accent colors adjusted for the raised list background.
+- Forced-color mode maps control and overlay borders, focused options, and the selection rail to system colors without hiding option states.
+- Reduced motion removes overlay, chevron, selection-rail, and loading transitions. Their final states remain visible.
 
 ## Examples
 
 ### Choose one run mode
 
-Choose one bounded mode while preserving native form serialization.
+Choose one run mode and submit its key through the native form.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

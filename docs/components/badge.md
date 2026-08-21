@@ -17,7 +17,7 @@ Badge presents short static metadata or category context beside a named object.
 ## Composition and parts
 
 - Render inside AppearanceProvider and place Badge inline with the object it qualifies; content may be text or a concise text-bearing React node.
-- Badge owns one compact bordered text capsule.
+- Badge includes one compact bordered text capsule.
 
 ## Preferred higher-level compositions
 
@@ -25,11 +25,11 @@ Badge presents short static metadata or category context beside a named object.
 
 ## Content
 
-- Keep content brief and self-explanatory; accent may emphasize identity or current context but never replaces a semantic status tone.
+- Keep content brief and self-explanatory. Accent may emphasize identity or current context, but it never replaces a status tone.
 
 ## States
 
-- Neutral is the default; accent, success, warning, and danger are explicit visual roles with no live behavior.
+- Neutral is the default. Accent, success, warning, and danger change only the visual treatment and never create live behavior.
 
 ## Control, events, validation, and forms
 
@@ -40,7 +40,7 @@ Badge presents short static metadata or category context beside a named object.
 
 ## Accessibility
 
-- Badge exposes its visible content as ordinary text and deliberately creates no live region or duplicated accessible label.
+- Badge exposes its visible content as text. It creates no live region or duplicate accessible label.
 
 ## Keyboard, labeling, localization, and direction
 
@@ -51,13 +51,13 @@ Badge presents short static metadata or category context beside a named object.
 
 ## Appearance and responsive behavior
 
-- A compact utility-type capsule uses a persistent boundary so neutral, accent, and semantic roles remain legible in either appearance.
+- A compact capsule uses a persistent border so neutral, accent, and status tones remain legible in light or dark mode.
 - Badge wraps its content rather than clipping or forcing a containing row beyond compact bounds.
 
 ## Accent, forced colors, and reduced motion
 
-- Accent Badge is reserved for identity, current context, or category emphasis; semantic Badge tones retain independent green, yellow, and red roles and do not derive from accent.
-- Forced colors retain the capsule boundary and text; accent identity maps to system highlight structure without becoming semantic status.
+- Use the accent Badge for identity, current context, or category emphasis. Status Badge tones use their own green, yellow, and red colors.
+- Forced colors keep the capsule border and text. Accent identity maps to system highlight colors without becoming status.
 - Badge has no motion or transient state.
 
 ## Examples
@@ -83,7 +83,7 @@ export function RunIdentifierBadge() {
 
 ### Do not use Badge as live status
 
-A changing operation state needs StatusIndicator announcement behavior and an explicit semantic contract.
+A changing operation state needs StatusIndicator and its optional announcements.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

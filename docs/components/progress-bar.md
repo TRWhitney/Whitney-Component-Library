@@ -1,27 +1,27 @@
 # ProgressBar
 
-ProgressBar reports known or unknown advancement toward an explicitly described completion.
+ProgressBar reports known or unknown progress toward a described completion.
 
 ## Use for
 
-- an operation advances toward completion over time and is either numerically known or explicitly indeterminate
+- an operation advances toward completion and its progress is known or indeterminate
 
 ## Do not use for
 
-- capacity, score, health, or another bounded measurement; generic compact busy state; final success or failure; or decorative animation
+- capacity, score, health, or another measurement; a compact busy state; final success or failure; or decorative animation
 
 ## Prefer instead
 
-- Use Meter for a bounded quantity, Spinner for generic busy state, or StatusIndicator for a resulting semantic state.
+- Use Meter for a measured quantity, Spinner for a generic busy state, or StatusIndicator for the result.
 
 ## Composition and parts
 
 - Render inside AppearanceProvider and place ProgressBar near the operation it reports; update isActive from the operation lifecycle, and update determinate value and valueLabel together or use the exclusive indeterminate contract.
-- ProgressBar owns one label/value row, progressbar rail and fill, visible indeterminate status when applicable, and programmatic completion description.
+- ProgressBar includes a label and value row, rail and fill, visible indeterminate status when needed, and a completion description for assistive technology.
 
 ## Preferred higher-level compositions
 
-- Compose beneath the action or workflow stage that owns the operation, followed by one separate StatusIndicator when work settles.
+- Place ProgressBar below the action or workflow stage for the operation. Show a separate StatusIndicator when the work finishes.
 
 ## Content
 
@@ -29,18 +29,18 @@ ProgressBar reports known or unknown advancement toward an explicitly described 
 
 ## States
 
-- Determinate and indeterminate progress each support explicit active and inactive operation states; completed determinate progress remains still and does not itself claim semantic success.
+- Determinate and indeterminate progress each support active and inactive states. Completed determinate progress stops moving but does not claim success.
 
 ## Control, events, validation, and forms
 
-- isActive is required and controls activity motion independently; determinate progress requires value and valueLabel within a finite min/max domain, while indeterminate progress forbids numeric values and requires statusLabel, and both require explicit completion meaning.
-- ProgressBar emits no events; operation ownership and cancellation remain external.
+- isActive is required and controls activity motion. Determinate progress requires value and valueLabel within a finite min/max range. Indeterminate progress forbids numeric values and requires statusLabel. Both require a completion description.
+- ProgressBar emits no events. The application manages the operation and cancellation.
 - Consumer data determines meaning; the component validates only representable numeric domains and threshold ordering where applicable.
 - This display component is not a successful form control and does not serialize, validate, or respond to form reset.
 
 ## Accessibility
 
-- The owned progressbar exposes its visible label, determinate min, max, current value and value text, or an indeterminate state described by visible status copy, plus completion meaning.
+- The progressbar exposes its visible label and completion description. Determinate progress also exposes min, max, current value, and value text. Indeterminate progress uses visible status text.
 
 ## Keyboard, labeling, localization, and direction
 
@@ -51,20 +51,20 @@ ProgressBar reports known or unknown advancement toward an explicitly described 
 
 ## Appearance and responsive behavior
 
-- A compact label row and bounded accent rail preserve one stable footprint; sheen appears only while isActive is true and work is incomplete.
+- A compact label row and accent rail use a fixed footprint. The sheen appears only while isActive is true and work is incomplete.
 - The rail fills available space and the label row wraps long localized operation text without losing the value or overflowing compact containers.
 
 ## Accent, forced colors, and reduced motion
 
-- The progress fill uses application accent as active structure; success, warning, and danger remain outside ProgressBar and belong in a separate resulting status.
+- The progress fill uses the application accent. Success, warning, and danger belong in a separate result status.
 - Forced colors map the accent fill to system Highlight and retain a system-colored track boundary, label, value, and completion description.
-- Reduced motion settles fill transitions and active route sheen to one effectively instantaneous iteration while preserving the current rail length.
+- Reduced motion makes fill changes immediate and reduces active sheen to one instant pass. The current fill length does not change.
 
 ## Examples
 
 ### Determinate solve progress
 
-Report known completion with explicit units and completion semantics.
+Report progress with units and describe what completion means.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
@@ -83,7 +83,7 @@ export function BoundaryProgress() {
 
 ### Do not use progress for measurement
 
-Storage utilization is a bounded quantity, not an operation moving to completion.
+Storage usage is a measured quantity, not an operation moving toward completion.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

@@ -16,7 +16,7 @@ Link exposes a real navigation destination through native anchor semantics.
 
 ## Composition and parts
 
-- Render Link inside AppearanceProvider and place it in prose, navigation, or a region that owns the surrounding destination context.
+- Render Link inside AppearanceProvider and place it in prose, navigation, or a region that supplies the destination context.
 - Link exposes one destination-label region and no command or icon slots.
 
 ## Preferred higher-level compositions
@@ -33,7 +33,7 @@ Link exposes a real navigation destination through native anchor semantics.
 
 ## Control, events, validation, and forms
 
-- href is required; current, isDisabled, and newWindow describe bounded navigation state without an activation callback.
+- href is required. current, isDisabled, and newWindow describe navigation state without an activation callback.
 - Link exposes native navigation rather than onPress; application routing may intercept the anchor through its normal router integration.
 - The TypeScript API rejects arbitrary classes, inline styles, polymorphic elements, and unsupported visual variants.
 - Link does not submit, reset, validate, or contribute a value to a form.
@@ -45,7 +45,7 @@ Link exposes a real navigation destination through native anchor semantics.
 
 ## Keyboard, labeling, localization, and direction
 
-- Enter follows the native anchor destination; Link participates in ordinary document tab order.
+- Enter follows the native anchor destination. Link participates in normal document tab order.
 - Visible children provide the accessible name; avoid generic destination text such as click here or more.
 - Supply all visible and accessible labels in the application locale and allow labels to grow without relying on a fixed text width.
 - Logical sizing and placement follow inherited writing direction; authored content remains in DOM reading order.
@@ -58,7 +58,7 @@ Link exposes a real navigation destination through native anchor semantics.
 ## Accent, forced colors, and reduced motion
 
 - Link text stays neutral while its resting underline, focus, hover tint, and stronger current-destination underline use exact or saturated same-hue accent structure without borrowing status colors.
-- Forced-color mode uses the system link color and focus highlight while preserving native underline and current-destination emphasis.
+- Forced-color mode uses the system link color and focus highlight while keeping the native underline and current-page emphasis.
 - Reduced motion removes link color and underline transitions without removing any navigation state.
 
 ## Examples

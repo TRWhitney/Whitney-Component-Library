@@ -1,6 +1,6 @@
 # RangeSlider
 
-RangeSlider adjusts one ordered numeric interval within an explicit bounded domain.
+RangeSlider adjusts an ordered numeric interval within a finite range.
 
 ## Use for
 
@@ -12,12 +12,12 @@ RangeSlider adjusts one ordered numeric interval within an explicit bounded doma
 
 ## Prefer instead
 
-- Use Slider for one approximate value, two NumberField controls for independently exact bounds, named choice controls for categorical endpoints, and Meter for display-only intervals.
+- Use Slider for one approximate value, two NumberField controls for exact bounds, named choice controls for categorical endpoints, and Meter for display-only intervals.
 
 ## Composition and parts
 
 - Render RangeSlider inside AppearanceProvider; provide one finite domain and exactly two localized thumbLabels, and let the component own both thumbs and their ordering.
-- RangeSlider owns one header, formatted range output, endpoint scale, track, interval fill, two offset thumbs, two hidden native range inputs, and one stable support track.
+- RangeSlider includes a header, formatted range output, endpoint scale, track, interval fill, two offset thumbs, two hidden native range inputs, and one fixed support area.
 
 ## Preferred higher-level compositions
 
@@ -29,7 +29,7 @@ RangeSlider adjusts one ordered numeric interval within an explicit bounded doma
 
 ## States
 
-- Controlled, uncontrolled, separated, adjacent, equal, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states preserve two operable bound identities.
+- Both bounds remain separately operable in controlled, uncontrolled, separated, adjacent, equal, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states.
 
 ## Control, events, validation, and forms
 
@@ -51,13 +51,13 @@ RangeSlider adjusts one ordered numeric interval within an explicit bounded doma
 
 ## Appearance and responsive behavior
 
-- Range controls use a calibrated instrument layout with a compact label/value header, formatted endpoints, one narrow measurement rail, and precise circular thumbs rather than a generic field box.
-- Horizontal controls fill a bounded parent and retain reachable endpoint and thumb geometry at compact widths; vertical controls use a bounded instrument width and a twelve-rem minimum track height.
+- Range controls use a compact label and value header, formatted endpoints, a narrow track, and circular thumbs instead of a field box.
+- Horizontal controls fill their parent and keep endpoints and thumbs operable on narrow screens. Vertical controls use a preset width and a twelve-rem minimum track height.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels, values, endpoints, and resting track content stay neutral; the measured fill, thumb structure, hover, and focus use bounded accent roles, while invalid state remains independently dangerous.
-- Forced-color mode maps the track, measured fill, thumbs, focus, and invalid structure to system colors while preserving their boundaries and positions.
+- Labels, values, endpoints, and the empty track stay neutral. The measured fill, thumbs, hover, and focus use accent colors. Invalid state uses danger colors.
+- Forced-color mode maps the track, measured fill, thumbs, focus, and invalid state to system colors without moving them.
 - Direct thumb position never animates; reduced motion also removes the remaining thumb hover and focus transitions without removing value or focus structure.
 
 ## Examples

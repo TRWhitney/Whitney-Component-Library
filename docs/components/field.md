@@ -1,6 +1,6 @@
 # Field
 
-Field provides a bounded accessible shell for one custom form control.
+Field provides an accessible shell for one custom form control.
 
 ## Use for
 
@@ -8,16 +8,18 @@ Field provides a bounded accessible shell for one custom form control.
 
 ## Do not use for
 
-- TextField, TextArea, NumberField, SearchField, or another semantic library field already owns the required behavior
+- TextField, TextArea, NumberField, SearchField, or another library field already provides the required behavior
 
 ## Prefer instead
 
-- Prefer TextField, TextArea, NumberField, SearchField, and later semantic field exports whenever their behavior matches the value being collected.
+- Prefer TextField, TextArea, NumberField, SearchField, or another library field when it already matches the value.
 
 ## Composition and parts
 
-- Render Field inside AppearanceProvider; return one direct native control without overriding its native role, or one semantically neutral element with a button, checkbox, combobox, listbox, radio, searchbox, slider, spinbutton, switch, or textbox role. Spread every supplied control prop onto it without a DOM wrapper or overridden relationship or state prop. Field rejects native role overrides uniformly and protects its direct structure and generated relationships; it does not verify complete role-specific widget behavior.
-- Field owns a label, one control shell, and one stable support track.
+- Render Field inside AppearanceProvider.
+- Return either one direct native control without a role override, or one neutral element with a button, checkbox, combobox, listbox, radio, searchbox, slider, spinbutton, switch, or textbox role.
+- Spread every supplied control prop onto that element without a DOM wrapper or overridden relationship or state prop. Field protects this structure but does not verify all behavior required by the chosen role.
+- Field includes a label, one control shell, and one fixed support area.
 
 ## Preferred higher-level compositions
 
@@ -29,30 +31,31 @@ Field provides a bounded accessible shell for one custom form control.
 
 ## States
 
-- Required, invalid, read-only, disabled, and pending states affect the generated control props and stable support presentation without changing geometry; required and read-only may be used only when the rendered native element or ARIA role supports that state.
+- Required, invalid, read-only, disabled, and pending states update the control props and support text without changing layout. Use required and read-only only when the rendered element or ARIA role supports them.
 
 ## Control, events, validation, and forms
 
-- Field owns support and state relationships, removes a disabled custom control from tab order, and suppresses its direct activation; the rendered control retains value, non-activation events, domain behavior, and role-specific keyboard and ARIA conformance.
-- Field emits no events; the callback-rendered control owns its domain event contract.
-- Set isInvalid with errorMessage for externally owned invalidity; the custom control remains responsible for native or domain validation behavior.
-- Field does not serialize a value; native name, form association, validation, submission, and reset remain the custom control’s responsibility.
+- Field connects support text and state to the control. It removes a disabled custom control from tab order and blocks direct activation. The control still handles its value, other events, domain behavior, keyboard input, and ARIA requirements.
+- Field emits no events. The rendered control handles its domain events.
+- Set isInvalid with errorMessage for application errors. The custom control still handles native or domain validation.
+- Field does not submit a value. The custom control handles name, form association, validation, submission, and reset.
 
 ## Accessibility
 
-- Field generates stable label, description, error, required, invalid, busy, native and ARIA disabled, and native and ARIA read-only props for exactly one direct supported control.
+- Field generates label, description, error, required, invalid, and busy props for one supported direct child.
+- It supplies both native and ARIA versions of disabled and read-only state.
 
 ## Keyboard, labeling, localization, and direction
 
-- Field adds no enabled keyboard model; the rendered custom control must provide the keyboard behavior appropriate to its semantic role and honor the supplied read-only state.
+- Field adds no keyboard model. The custom control must provide keyboard behavior for its role and honor the supplied read-only state.
 - label is always visible; the generated control props reference it and any supplied description or error without consumer-authored ids.
-- Supply visible labels, descriptions, errors, pending messages, and explicit command labels in the application locale, and allow them to wrap.
+- Localize visible labels, descriptions, errors, pending messages, and command labels. Allow them to wrap.
 - Logical padding, group placement, icons, and step controls follow the inherited writing direction without changing DOM reading order.
 
 ## Appearance and responsive behavior
 
 - The field family uses compact rounded controls, one consistent single-line control height, neutral surfaces, and a reserved support track beneath each control.
-- Fields fill their bounded parent width; support text grows below without moving or resizing the control, and responsive groups collapse through content-owned minimums.
+- Fields fill their parent width. Support text grows below without moving or resizing the control. Responsive groups collapse when their content no longer fits.
 
 ## Accent, forced colors, and reduced motion
 

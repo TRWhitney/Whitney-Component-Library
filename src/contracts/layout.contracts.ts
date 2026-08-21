@@ -4,7 +4,7 @@ const passiveLayoutGuidance = {
   directionality: [
     'Logical block and inline properties follow the inherited writing direction without a direction override.',
   ],
-  events: ['The primitive emits no callback events and owns no interactive state.'],
+  events: ['The primitive emits no callbacks and has no interactive state.'],
   formBehavior: [
     'The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.',
   ],
@@ -12,14 +12,14 @@ const passiveLayoutGuidance = {
     'The primitive renders consumer content without translating, reordering, or constructing localized sentences.',
   ],
   reducedMotionBehavior: [
-    'The primitive introduces no motion, so reduced motion preserves the same structure without an alternate transition.',
+    'The primitive has no motion, so the reduced-motion setting does not change it.',
   ],
   states: [
-    'The primitive has no internal state; changing a bounded prop deterministically updates its structural attributes.',
+    'The primitive has no internal state. Changing a prop updates its structural attributes.',
   ],
   stylesheet: './styles.css',
   validation: [
-    'The TypeScript API rejects arbitrary classes, inline styles, token values, and unsupported semantic options.',
+    'The TypeScript API rejects custom classes, inline styles, token values, and unsupported options.',
   ],
 } satisfies Pick<
   ComponentContract,
@@ -51,25 +51,21 @@ function withinAppearanceProvider(lines: readonly string[]): string {
 
 export const stackContract = {
   ...passiveLayoutGuidance,
-  appearance: [
-    'Stack uses library-owned spacing in both appearances and paints no decorative color.',
-  ],
+  appearance: ['Stack uses the library spacing scale and adds no color.'],
   accentBehavior: ['Stack does not apply the application accent.'],
   accessibility: [
-    'Stack contributes layout only; use semantic child elements for lists, navigation, regions, and headings.',
+    'Stack changes layout only. Use the appropriate child elements for lists, navigation, regions, and headings.',
   ],
   appropriateUses: [
     'related elements need a consistent vertical rhythm with one semantic spacing and alignment choice',
   ],
   composition: [
-    'Render Stack inside AppearanceProvider so its owned spacing tokens are available.',
+    'Render Stack inside AppearanceProvider to load its spacing tokens.',
     'Place related siblings directly inside Stack and nest another layout primitive only when the relationship changes.',
   ],
-  contentRules: [
-    'Order children in reading order and keep each child responsible for its own semantic element.',
-  ],
+  contentRules: ['Keep children in reading order and give each one the appropriate HTML element.'],
   controlBehavior: [
-    'Gap and cross-axis alignment are controlled by bounded props with regular spacing and stretch alignment as defaults.',
+    'The gap and alignment props use preset values. They default to regular spacing and stretch alignment.',
   ],
   counterExamples: [
     {
@@ -107,12 +103,12 @@ export const stackContract = {
   preferredCompositions: [
     'Use Stack inside Surface or Section for a compact vertical field, status, or content sequence.',
   ],
-  purpose: 'Stack establishes bounded vertical rhythm between related elements.',
+  purpose: 'Stack arranges related elements vertically with consistent spacing.',
   relatedExports: ['AppearanceProvider', 'InlineGroup', 'ResponsiveGrid', 'Section', 'Surface'],
   responsiveBehavior: [
-    'Stack remains vertical at every width; children wrap or reflow according to their own contracts.',
+    'Stack stays vertical at every width. Its children decide how they wrap or reflow.',
   ],
-  summary: 'Arrange related content in a bounded vertical rhythm.',
+  summary: 'Arrange related content vertically with consistent spacing.',
   examples: [
     {
       title: 'Arrange a field summary',
@@ -133,25 +129,23 @@ export const stackContract = {
 
 export const inlineGroupContract = {
   ...passiveLayoutGuidance,
-  appearance: [
-    'InlineGroup uses library-owned spacing in both appearances and paints no decorative color.',
-  ],
+  appearance: ['InlineGroup uses the library spacing scale and adds no color.'],
   accentBehavior: ['InlineGroup does not apply the application accent.'],
   accessibility: [
-    'InlineGroup contributes layout only; child controls retain their own names, roles, states, and focus order.',
+    'InlineGroup changes layout only. Child controls keep their names, roles, states, and focus order.',
   ],
   appropriateUses: [
     'peer controls, labels, or compact values belong on one line and may wrap as a unit',
   ],
   composition: [
-    'Render InlineGroup inside AppearanceProvider so its owned spacing tokens are available.',
+    'Render InlineGroup inside AppearanceProvider to load its spacing tokens.',
     'Place equivalent peers directly inside InlineGroup and enable equalItems only when their roles should have equal dimensions.',
   ],
   contentRules: [
     'Keep children in reading and tab order; do not reorder peers visually with consumer CSS.',
   ],
   controlBehavior: [
-    'Gap, alignment, wrapping, and equivalent-item sizing are controlled by bounded props; equal items share both inline and cross-axis dimensions.',
+    'Preset props control gap, alignment, wrapping, and equal-item sizing. Equal items share both dimensions.',
   ],
   counterExamples: [
     {
@@ -177,7 +171,7 @@ export const inlineGroupContract = {
   inappropriateUses: [
     'children form a vertical sequence, need responsive columns, or have unequal semantic roles that should not be equalized',
   ],
-  keyboardBehavior: ['InlineGroup preserves child focus order and adds no keyboard behavior.'],
+  keyboardBehavior: ['InlineGroup keeps child focus order and adds no keyboard behavior.'],
   kind: 'component',
   labeling: ['InlineGroup creates no semantic group and receives no label.'],
   name: 'InlineGroup',
@@ -188,8 +182,7 @@ export const inlineGroupContract = {
   preferredCompositions: [
     'Use equalItems for adjacent equivalent controls, actions, or repeated regions that must align consistently.',
   ],
-  purpose:
-    'InlineGroup arranges peers with bounded spacing, alignment, wrapping, and equal sizing.',
+  purpose: 'InlineGroup arranges peers with preset spacing, alignment, wrapping, and equal sizing.',
   relatedExports: ['AppearanceProvider', 'ResponsiveGrid', 'Stack'],
   responsiveBehavior: [
     'Wrapping is enabled by default; disabling it is appropriate only when the complete row remains reachable at compact widths.',
@@ -215,9 +208,7 @@ export const inlineGroupContract = {
 
 export const responsiveGridContract = {
   ...passiveLayoutGuidance,
-  appearance: [
-    'ResponsiveGrid uses library-owned spacing and minimum item widths in both appearances and paints no decorative color.',
-  ],
+  appearance: ['ResponsiveGrid uses preset spacing and minimum item widths and adds no color.'],
   accentBehavior: ['ResponsiveGrid does not apply the application accent.'],
   accessibility: [
     'ResponsiveGrid changes visual columns without changing DOM order, reading order, or focus order.',
@@ -226,13 +217,11 @@ export const responsiveGridContract = {
     'equivalent regions should fill available width and collapse into fewer columns from a semantic minimum size',
   ],
   composition: [
-    'Render ResponsiveGrid inside AppearanceProvider so its owned spacing tokens are available.',
-    'Place one coherent item in each direct child and choose the minimum width from compact, regular, or wide.',
+    'Render ResponsiveGrid inside AppearanceProvider to load its spacing tokens.',
+    'Put one complete item in each direct child and choose a compact, regular, or wide minimum width.',
   ],
-  contentRules: ['Keep each child independently understandable when it reflows to its own row.'],
-  controlBehavior: [
-    'Minimum item width, gap, and optional equal row sizing are controlled by bounded props.',
-  ],
+  contentRules: ['Each child must still make sense when it moves to its own row.'],
+  controlBehavior: ['Preset props control minimum item width, gap, and optional equal row sizing.'],
   counterExamples: [
     {
       title: 'Do not replace tabular relationships',
@@ -257,7 +246,7 @@ export const responsiveGridContract = {
   inappropriateUses: [
     'content requires a fixed table, consumer-authored breakpoint, masonry placement, or visual reordering',
   ],
-  keyboardBehavior: ['ResponsiveGrid preserves child focus order and adds no keyboard behavior.'],
+  keyboardBehavior: ['ResponsiveGrid keeps child focus order and adds no keyboard behavior.'],
   kind: 'component',
   labeling: ['ResponsiveGrid creates no semantic collection and receives no label.'],
   name: 'ResponsiveGrid',
@@ -268,12 +257,12 @@ export const responsiveGridContract = {
   preferredCompositions: [
     'Use equalItems with equivalent Surface or Section regions when aligned outer dimensions communicate parity.',
   ],
-  purpose: 'ResponsiveGrid forms stable columns from bounded semantic minimum item sizes.',
+  purpose: 'ResponsiveGrid forms columns from preset minimum item widths.',
   relatedExports: ['AppearanceProvider', 'InlineGroup', 'Stack', 'Surface'],
   responsiveBehavior: [
     'Columns are derived from available inline size with auto-fit and collapse without a consumer breakpoint.',
   ],
-  summary: 'Form responsive columns from semantic minimum item sizes.',
+  summary: 'Form responsive columns from preset minimum item widths.',
   examples: [
     {
       title: 'Arrange equivalent regions',
@@ -294,22 +283,18 @@ export const responsiveGridContract = {
 
 export const dividerContract = {
   ...passiveLayoutGuidance,
-  appearance: [
-    'Divider paints one complete rule with the library-owned neutral border role in both appearances.',
-  ],
+  appearance: ['Divider draws one complete rule with the library neutral border color.'],
   accentBehavior: ['Divider uses the neutral border role rather than the application accent.'],
   accessibility: [
     'A meaningful Divider exposes the separator role and orientation; a decorative Divider is hidden from assistive technology.',
   ],
   appropriateUses: ['two adjacent groups need a complete visual and semantic separation'],
   composition: [
-    'Render Divider inside AppearanceProvider so its owned neutral border role is available.',
+    'Render Divider inside AppearanceProvider to load its neutral border color.',
     'Place Divider between complete sibling groups; let the parent layout own spacing around it.',
   ],
   contentRules: ['Divider accepts no children, label, icon, or status content.'],
-  controlBehavior: [
-    'Orientation and whether the line is semantic or decorative are controlled by bounded props.',
-  ],
+  controlBehavior: ['Props set the orientation and whether the line is meaningful or decorative.'],
   counterExamples: [
     {
       title: 'Do not add ornamental fragments',
@@ -372,26 +357,24 @@ export const dividerContract = {
 export const surfaceContract = {
   ...passiveLayoutGuidance,
   appearance: [
-    'Surface uses library-owned shape, surface, text, and border roles in both appearances; the raised variant adds restrained elevation.',
+    'Surface uses the library shape, background, text, and border styles. The raised variant adds a small shadow.',
   ],
-  accentBehavior: [
-    'Surface remains neutral and does not apply accent atmosphere, status color, or selection color.',
-  ],
+  accentBehavior: ['Surface stays neutral. It does not apply accent, status, or selection colors.'],
   accessibility: [
-    'Surface contributes containment only; use Section or semantic children when the region needs a name or landmark.',
+    'Surface only groups content visually. Use Section or an appropriate child element when the region needs a name or landmark.',
   ],
   appropriateUses: [
     'related content needs one rounded, opaque, density-controlled containment region',
   ],
   composition: [
-    'Render Surface inside AppearanceProvider so its owned appearance and containment tokens are available.',
+    'Render Surface inside AppearanceProvider to load its appearance and container tokens.',
     'Choose base, raised, or subtle from actual hierarchy and compose content with layout primitives inside.',
   ],
   contentRules: [
-    'Keep one coherent content region inside a Surface and avoid nesting surfaces solely to create spacing.',
+    'Keep one related content region inside a Surface. Do not nest surfaces just to add space.',
   ],
   controlBehavior: [
-    'Variant and padding are controlled by bounded semantic props; Surface owns no selection or expansion state.',
+    'Preset props control variant and padding. Surface has no selection or expansion state.',
   ],
   counterExamples: [
     {
@@ -411,7 +394,7 @@ export const surfaceContract = {
   ],
   exportName: 'Surface',
   forcedColorBehavior: [
-    'Forced-color mode uses Canvas and CanvasText, preserves the boundary, and removes elevation shadow.',
+    'Forced-color mode uses Canvas and CanvasText, keeps the border, and removes the shadow.',
   ],
   importPath: '.',
   inappropriateUses: [
@@ -428,17 +411,16 @@ export const surfaceContract = {
   preferredCompositions: [
     'Compose Section, Stack, ResponsiveGrid, or ScrollRegion inside one Surface when each adds a distinct relationship.',
   ],
-  purpose:
-    'Surface contains related content with owned neutral hierarchy, padding, and rounded geometry.',
+  purpose: 'Surface groups related content with neutral hierarchy, padding, and rounded corners.',
   relatedExports: ['AppearanceProvider', 'ResponsiveGrid', 'ScrollRegion', 'Section', 'Stack'],
   responsiveBehavior: [
-    'Surface preserves its boundary and padding at every width while descendants own their reflow.',
+    'Surface keeps its border and padding at every width. Descendants control their own reflow.',
   ],
-  summary: 'Contain related content in an owned neutral surface.',
+  summary: 'Group related content in a neutral container.',
   examples: [
     {
       title: 'Contain a working region',
-      description: 'Use a base surface for one coherent working region.',
+      description: 'Use a base surface for one working region.',
       code: withinAppearanceProvider([
         'export function WorkingRegion() {',
         '  return (',
@@ -458,24 +440,24 @@ export const surfaceContract = {
 export const sectionContract = {
   ...passiveLayoutGuidance,
   appearance: [
-    'Section uses library-owned text and spacing roles in both appearances and paints no containing surface or border.',
+    'Section uses the library text and spacing styles but adds no background or border.',
   ],
   accentBehavior: ['Section does not apply the application accent or semantic status color.'],
   accessibility: [
     'Section renders a labeled section landmark whose accessible name comes from its required visible heading.',
   ],
   appropriateUses: [
-    'a coherent content region needs a visible title, optional explanation, actions, and body',
+    'a content region needs a visible title, optional explanation, actions, and body',
   ],
   composition: [
-    'Render Section inside AppearanceProvider so its owned text and spacing tokens are available.',
+    'Render Section inside AppearanceProvider to load its text and spacing tokens.',
     'Choose the heading level from document hierarchy and keep actions specific to the complete section.',
   ],
   contentRules: [
     'Use a concise string title, an optional explanatory sentence, and body content that belongs under that heading.',
   ],
   controlBehavior: [
-    'Title, description, actions, and heading level are controlled props; Section owns no collapse state.',
+    'Props set the title, description, actions, and heading level. Section has no collapse state.',
   ],
   counterExamples: [
     {
@@ -515,13 +497,12 @@ export const sectionContract = {
   preferredCompositions: [
     'Place Section inside Surface for named containment or use it directly when surrounding structure already supplies a surface.',
   ],
-  purpose:
-    'Section gives one coherent content region a visible, semantic heading and aligned actions.',
+  purpose: 'Section gives a content region a visible heading and aligned actions.',
   relatedExports: ['AppearanceProvider', 'InlineGroup', 'Stack', 'Surface'],
   responsiveBehavior: [
     'Heading and actions share a row when space permits and reflow into one column at compact widths without a divider.',
   ],
-  summary: 'Name and structure a coherent content region.',
+  summary: 'Name and structure a content region.',
   examples: [
     {
       title: 'Name a review region',
@@ -541,9 +522,7 @@ export const sectionContract = {
 
 export const scrollRegionContract = {
   ...passiveLayoutGuidance,
-  appearance: [
-    'ScrollRegion uses the library-owned subtle surface, border, and focus roles in both appearances.',
-  ],
+  appearance: ['ScrollRegion uses the library subtle background, border, and focus styles.'],
   accentBehavior: [
     'ScrollRegion uses the derived focus accent only for keyboard focus and does not tint its content surface.',
   ],
@@ -551,23 +530,24 @@ export const scrollRegionContract = {
     'ScrollRegion is a labeled region and keyboard focus target so overflow remains reachable without a pointer; its native scrollbar stays visible while focus remains within the region.',
   ],
   appropriateUses: [
-    'bounded history, source, logs, or dense content must remain reachable within a surrounding layout',
+    'history, source, logs, or dense content needs a constrained scrollable area within the surrounding layout',
   ],
   composition: [
-    'Render ScrollRegion inside AppearanceProvider so its owned containment and focus tokens are available.',
+    'Render ScrollRegion inside AppearanceProvider to load its container and focus tokens.',
     'Provide a concise label, one semantic size, and the overflow orientation that matches the content.',
   ],
   contentRules: [
     'Keep essential controls visible when practical and do not hide the only path to an action inside nested scrolling.',
   ],
   controlBehavior: [
-    'Size and overflow orientation are controlled by bounded props; native scrolling owns position and input behavior.',
+    'Preset props control size and overflow direction. The browser controls scroll position and input.',
     'Native overflow determines whether a scrollbar appears; the library changes only its transient thumb visibility.',
   ],
   counterExamples: [
     {
-      title: 'Do not replace ordinary page flow',
-      description: 'Let primary page content grow when it does not need a bounded context.',
+      title: 'Do not replace normal page flow',
+      description:
+        'Let primary page content grow when it does not need a constrained scroll region.',
       code: withinAppearanceProvider([
         'export function WholePageScroller() {',
         '  return (',
@@ -584,11 +564,11 @@ export const scrollRegionContract = {
     'Forced-color mode uses Canvas and CanvasText for containment and a continuously visible native scrollbar, plus Highlight for visible focus.',
   ],
   events: [
-    'ScrollRegion exposes no callback events and owns only transient scrollbar visibility state; native scrolling remains the source of position and input behavior.',
+    'ScrollRegion emits no callbacks and manages only temporary scrollbar visibility. The browser controls scroll position and input.',
   ],
   importPath: '.',
   inappropriateUses: [
-    'ordinary page content can grow naturally or nested scrolling would hide essential actions and context',
+    'page content can grow naturally or nested scrolling would hide essential actions and context',
   ],
   keyboardBehavior: [
     'Tab moves focus to the region; native arrow, Page Up, Page Down, Home, and End scrolling remain available where supported.',
@@ -598,27 +578,27 @@ export const scrollRegionContract = {
   name: 'ScrollRegion',
   parts: ['ScrollRegion exposes one labeled, focusable overflow content region.'],
   preferredAlternatives: [
-    'Use normal document flow when content does not require a bounded viewport.',
+    'Use normal document flow when content does not need a constrained viewport.',
   ],
   preferredCompositions: [
-    'Place ScrollRegion inside Surface or Section when a bounded history or source view belongs to that named region.',
+    'Place ScrollRegion inside Surface or Section when a constrained history or source view belongs to that region.',
   ],
-  purpose: 'ScrollRegion keeps bounded overflow content labeled, focusable, and reachable.',
+  purpose: 'ScrollRegion labels overflow content and keeps it focusable and reachable.',
   relatedExports: ['AppearanceProvider', 'Section', 'Surface'],
   responsiveBehavior: [
-    'The region fills available inline size and preserves its semantic maximum block size at compact and wide widths.',
+    'The region fills the available width and keeps its preset maximum height at every viewport size.',
   ],
   reducedMotionBehavior: [
-    'Reduced motion removes the scrollbar fade transition while preserving the same activity, focus, idle visibility, and native scrolling behavior.',
+    'Reduced motion removes the scrollbar fade. Activity, focus, idle visibility, and native scrolling work the same way.',
   ],
   states: [
     'Pointer or scroll activity reveals the native scrollbar thumb and resets its idle interval; the thumb fades after idle while focus keeps it available to keyboard users.',
   ],
-  summary: 'Keep bounded overflow content labeled and keyboard reachable.',
+  summary: 'Keep overflow content labeled and keyboard accessible.',
   examples: [
     {
       title: 'Bound solver history',
-      description: 'Name a compact log region and preserve keyboard scrolling.',
+      description: 'Name a compact log region and keep native keyboard scrolling.',
       code: withinAppearanceProvider([
         'export function SolverHistory() {',
         '  return (',

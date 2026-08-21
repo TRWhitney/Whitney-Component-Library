@@ -16,12 +16,12 @@ NumberField collects a locale-aware numeric value with bounds and stepping.
 
 ## Composition and parts
 
-- Render NumberField inside AppearanceProvider and set locale explicitly to the server and application locale.
-- NumberField owns a label, decrement command, localized text input, increment command, raw form value, and stable support track.
+- Render NumberField inside AppearanceProvider and set locale to the server and application locale.
+- NumberField includes a label, decrement command, localized text input, increment command, raw form value, and fixed support area.
 
 ## Preferred higher-level compositions
 
-- Place adjacent numeric peers in FieldGroup so their equal control dimensions remain visible across validation states.
+- Place adjacent number fields in FieldGroup to align them across validation states.
 
 ## Content
 
@@ -29,13 +29,13 @@ NumberField collects a locale-aware numeric value with bounds and stepping.
 
 ## States
 
-- Controlled, uncontrolled, required, invalid, read-only, disabled, pending, empty, and partial text states preserve numeric ownership.
+- Controlled, uncontrolled, required, invalid, read-only, disabled, pending, empty, and partial-text states keep the same value-management model.
 
 ## Control, events, validation, and forms
 
-- NumberField privately owns localized parsing and incomplete text; plain decimal formatting retains supplied finite value and step precision unless formatOptions overrides it, and onChange reports committed numbers after blur, Enter, or stepping.
+- NumberField handles localized parsing and incomplete text internally. Decimal formatting keeps the precision of finite values and steps unless formatOptions overrides it. onChange reports committed numbers after blur, Enter, or stepping.
 - onChange reports a committed number, including NaN for an empty commit; it is not a per-keystroke text callback.
-- commitBehavior chooses snapping or retained range and step invalidity; validationBehavior independently chooses native blocking or ARIA reporting.
+- commitBehavior chooses whether to snap or keep range and step errors. validationBehavior separately chooses native blocking or ARIA reporting.
 - name serializes one raw number through a hidden control; form also associates the visible input so external reset restores defaultValue.
 
 ## Accessibility
@@ -44,15 +44,15 @@ NumberField collects a locale-aware numeric value with bounds and stepping.
 
 ## Keyboard, labeling, localization, and direction
 
-- Arrow Up and Down step, Home and End reach bounds, Enter commits, and localized text editing remains available; focused wheel stepping is opt-in.
+- Arrow Up and Down step, Home and End reach the limits, and Enter commits. Localized text editing remains available. Focused wheel stepping is opt-in.
 - label is required; step commands combine localized increase or decrease text with the field label.
-- Supply visible labels, descriptions, errors, pending messages, and explicit command labels in the application locale, and allow them to wrap.
+- Localize visible labels, descriptions, errors, pending messages, and command labels. Allow them to wrap.
 - Logical padding, group placement, icons, and step controls follow the inherited writing direction without changing DOM reading order.
 
 ## Appearance and responsive behavior
 
 - The field family uses compact rounded controls, one consistent single-line control height, neutral surfaces, and a reserved support track beneath each control.
-- Fields fill their bounded parent width; support text grows below without moving or resizing the control, and responsive groups collapse through content-owned minimums.
+- Fields fill their parent width. Support text grows below without moving or resizing the control. Responsive groups collapse when their content no longer fits.
 
 ## Accent, forced colors, and reduced motion
 
@@ -62,7 +62,7 @@ NumberField collects a locale-aware numeric value with bounds and stepping.
 
 ## Examples
 
-### Set a bounded tolerance
+### Set a limited tolerance
 
 Keep formatted text private while exposing a committed numeric value.
 

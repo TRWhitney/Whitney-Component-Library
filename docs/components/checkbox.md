@@ -17,7 +17,7 @@ Checkbox selects one independent optional value with native form behavior.
 ## Composition and parts
 
 - Render Checkbox inside AppearanceProvider; use CheckboxGroup when several values share one question and group-level validation.
-- Checkbox owns one indicator, visible label, and optional support track.
+- Checkbox includes one indicator, visible label, and optional support area.
 
 ## Preferred higher-level compositions
 
@@ -29,11 +29,11 @@ Checkbox selects one independent optional value with native form behavior.
 
 ## States
 
-- Checked, unchecked, indeterminate, required, invalid, read-only, and disabled states remain geometrically stable.
+- Checked, unchecked, indeterminate, required, invalid, read-only, and disabled states do not change the control size.
 
 ## Control, events, validation, and forms
 
-- Checkbox supports controlled or uncontrolled boolean selection; isIndeterminate is a separate visual and semantic state that does not replace the submitted checked value.
+- Checkbox supports controlled or uncontrolled boolean selection. isIndeterminate changes its visual and accessible state but not the submitted checked value.
 - onChange reports the complete selected boolean after each accepted interaction.
 - Use isRequired for required acknowledgement and isInvalid with errorMessage for external invalidity; validationBehavior chooses native or ARIA validation presentation.
 - name, value, and form use native checkbox serialization; only a checked control submits its value, and native form reset restores defaultSelected.
@@ -52,11 +52,11 @@ Checkbox selects one independent optional value with native form behavior.
 ## Appearance and responsive behavior
 
 - Checkbox uses a compact rounded square indicator beside neutral label text; selected and indeterminate marks do not change row geometry.
-- Choice rows fill their bounded parent; option copy wraps, and segmented peers remain equal while their labels wrap at compact widths.
+- Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels remain neutral; selected indicators, focus structure, and the segmented rail use the exact or saturated same-hue accent role appropriate to the surface.
+- Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.
 - Forced-color mode maps boundaries, selected indicators, focus outlines, switch state, and the segmented rail to system colors without hiding native inputs.
 - Reduced motion removes indicator, switch-thumb, hover, and segmented-rail transitions while retaining the final state.
 
@@ -64,7 +64,7 @@ Checkbox selects one independent optional value with native form behavior.
 
 ### Choose an optional result feature
 
-Serialize one independently optional result feature.
+Submit one optional result feature.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

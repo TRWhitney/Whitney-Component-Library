@@ -2,22 +2,22 @@ import type {ComponentContract} from './component-contract.js';
 
 const commonSelectionGuidance = {
   accentBehavior: [
-    'Selected option labels remain neutral; a slim leading rail and focus structure use the saturated same-hue accent roles for the raised collection surface.',
+    'Selected option labels stay neutral. A slim leading rail and focus outline use accent colors adjusted for the raised list background.',
   ],
   directionality: [
-    'Control copy, chevrons, option padding, and the selected leading rail follow inherited writing direction; option order remains application-defined.',
+    'Control text, chevrons, option padding, and the selection rail follow inherited writing direction. The application sets option order.',
   ],
   forcedColorBehavior: [
-    'Forced-color mode maps control and overlay boundaries, focused options, and the selected rail to system colors without removing semantic option states.',
+    'Forced-color mode maps control and overlay borders, focused options, and the selection rail to system colors without hiding option states.',
   ],
   localization: [
     'Supply localized labels, descriptions, errors, placeholders, option copy, emptyMessage, and loadingMessage; matching uses the active locale with case-insensitive base sensitivity.',
   ],
   reducedMotionBehavior: [
-    'Reduced motion removes overlay, chevron, selected-rail, and loading transitions while retaining their settled state.',
+    'Reduced motion removes overlay, chevron, selection-rail, and loading transitions. Their final states remain visible.',
   ],
   responsiveBehavior: [
-    'The control fills its bounded parent; the anchored collection matches its trigger when space allows, stays inside the viewport, scrolls within available height, and wraps option copy at compact widths.',
+    'The control fills its parent. The anchored list matches the trigger width when possible, stays inside the viewport, scrolls within the available height, and wraps option text on narrow screens.',
   ],
   stylesheet: './styles.css',
 } satisfies Pick<
@@ -58,16 +58,16 @@ export const selectContract = {
     'Select extends the neutral field shell with one compact chevron and a raised anchored collection; selection is carried by a slim leading rail rather than selected-label color.',
   ],
   appropriateUses: [
-    'one value must be chosen from a bounded collection and showing every option inline would consume unnecessary space',
+    'one value must be chosen from a finite list that would take too much space to show in full',
   ],
   composition: [
-    'Render Select inside AppearanceProvider; supply stable string values and localized empty/loading copy, and keep the selected option present while its value is active.',
+    'Render Select inside AppearanceProvider. Use durable string keys and localized empty and loading messages. Keep the selected option in the collection.',
   ],
   contentRules: [
     'Use a question-like visible label and concise parallel option labels; descriptions may clarify durable consequences but must not carry the only distinction between options.',
   ],
   controlBehavior: [
-    'Select owns either controlled value plus onChange or uncontrolled defaultValue; null means no selection, and option values are stable keys independent of array identity or order.',
+    'Use value with onChange for controlled selection or defaultValue for uncontrolled selection. null means no selection. Option keys must not depend on array identity or order.',
   ],
   counterExamples: [
     {
@@ -79,14 +79,14 @@ export const selectContract = {
       title: 'Do not hide a searchable collection behind Select',
     },
   ],
-  events: ['onChange reports the accepted stable string value, or null after an external clear.'],
+  events: ['onChange reports the selected string key, or null after an external clear.'],
   examples: [
     {
       code: insideProvider(
         'BoundedRunMode',
         `<Select defaultValue="balanced" emptyMessage="No modes" label="Run mode" name="mode" ${modes} />`,
       ),
-      description: 'Choose one bounded mode while preserving native form serialization.',
+      description: 'Choose one run mode and submit its key through the native form.',
       title: 'Choose one run mode',
     },
   ],
@@ -96,7 +96,7 @@ export const selectContract = {
   ],
   importPath: '.',
   inappropriateUses: [
-    'users need to type to filter or query options, compare a small set visibly, select several values, or preserve a truly immutable value',
+    'users need to filter options, compare a small set in full, select several values, or view an immutable value',
   ],
   keyboardBehavior: [
     'Enter or Space opens the collection, arrows move focus, locale-aware typeahead locates options, Enter commits, and Escape dismisses and restores focus to the trigger.',
@@ -107,20 +107,20 @@ export const selectContract = {
   ],
   name: 'Select',
   parts: [
-    'Select owns one field shell, trigger and value, chevron, support track, positioned popover, listbox, option copy, and selected rail.',
+    'Select includes a field shell, trigger and value, chevron, support area, positioned popover, listbox, option text, and selection rail.',
   ],
   preferredAlternatives: [
     'Use ComboBox for editable filtering or asynchronous query results, RadioGroup for a small visible exclusive set, and plain text or a summary surface for immutable values.',
   ],
   preferredCompositions: ['Place related Select controls in FieldGroup or FormSection.'],
-  purpose: 'Select chooses one stable value from a bounded collapsible collection.',
+  purpose: 'Select chooses one value from a finite collapsible list.',
   relatedExports: ['AppearanceProvider', 'ComboBox', 'FieldGroup', 'FormSection', 'RadioGroup'],
   states: [
-    'Empty, selected, open, focused, required, invalid, disabled, loading, and option-disabled states remain distinct; Select is inherently non-editable and deliberately has no read-only prop.',
+    'Empty, selected, open, focused, required, invalid, disabled, loading, and option-disabled states are visually distinct. Select is non-editable and has no read-only prop.',
   ],
-  summary: 'Choose one value from a bounded collapsible collection.',
+  summary: 'Choose one value from a finite collapsible list.',
   validation: [
-    'Use isRequired and validationBehavior for native requirement, validate for value rules, and isInvalid with errorMessage for externally owned errors; loading is progress, not invalidity.',
+    'Use isRequired and validationBehavior for native requirements, validate for value rules, and isInvalid with errorMessage for errors supplied by the application. Loading does not imply an error.',
   ],
 } satisfies ComponentContract;
 
@@ -139,10 +139,10 @@ export const comboBoxContract = {
     'Render ComboBox inside AppearanceProvider; use contains or startsWith for client filtering and manual when onInputChange drives a dynamic or asynchronous option list.',
   ],
   contentRules: [
-    'Use a visible label that names the chosen value, a short input hint, parallel option labels, and explicit localized loading and empty messages.',
+    'Use a visible label that names the chosen value, a short input hint, parallel option labels, and localized loading and empty messages.',
   ],
   controlBehavior: [
-    'Selection and input text each have independent controlled or uncontrolled ownership; controlled value requires onChange, controlled inputValue requires onInputChange, and the two ownership channels cannot mix their respective default props.',
+    'Selection and input text may each be controlled or uncontrolled. Controlled value requires onChange, and controlled inputValue requires onInputChange. Do not pair either controlled prop with its default prop.',
   ],
   counterExamples: [
     {
@@ -150,12 +150,12 @@ export const comboBoxContract = {
         'ShortModeListCounterexample',
         `<ComboBox emptyMessage="No modes" label="Run mode" ${modes} />`,
       ),
-      description: 'A short bounded collection does not benefit from editable filtering.',
-      title: 'Do not add autocomplete to a short bounded choice',
+      description: 'A short list does not benefit from editable filtering.',
+      title: 'Do not add autocomplete to a short choice',
     },
   ],
   events: [
-    'onInputChange reports each accepted query edit; onChange separately reports the committed stable option value or null.',
+    'onInputChange reports each query edit. onChange reports the committed option key or null.',
   ],
   examples: [
     {
@@ -173,7 +173,7 @@ export const comboBoxContract = {
   ],
   importPath: '.',
   inappropriateUses: [
-    'the collection is short and bounded, arbitrary custom text must be accepted as the value, several values may be selected, or all options need simultaneous comparison',
+    'the list is short, custom text is a valid value, several values may be selected, or all options need to be visible at once',
   ],
   keyboardBehavior: [
     'Typing edits and filters, ArrowDown opens and moves through suggestions, Enter commits, Escape dismisses and restores the committed text, and Tab leaves the composite without trapping focus.',
@@ -184,14 +184,13 @@ export const comboBoxContract = {
   ],
   name: 'ComboBox',
   parts: [
-    'ComboBox owns one field shell, text input, suggestion trigger, support track, positioned popover, listbox, option copy, and selected rail over a private shared collection model.',
+    'ComboBox includes a field shell, text input, suggestion trigger, support area, positioned popover, listbox, option text, and selection rail.',
   ],
   preferredAlternatives: [
-    'Use Select for a bounded collapsible list, RadioGroup for a small visible exclusive set, SearchField when submitting free text, and a later multi-select collection control for several values.',
+    'Use Select for a finite collapsible list, RadioGroup for a small visible set, SearchField for submitted free text, and a future multi-select control for several values.',
   ],
   preferredCompositions: ['Place related ComboBox controls in FieldGroup or FormSection.'],
-  purpose:
-    'ComboBox filters and chooses one stable value from local, dynamic, or asynchronous options.',
+  purpose: 'ComboBox filters local, dynamic, or asynchronous options and chooses one value.',
   relatedExports: [
     'AppearanceProvider',
     'FieldGroup',
@@ -201,10 +200,10 @@ export const comboBoxContract = {
     'Select',
   ],
   states: [
-    'Empty, editing, open, focused, selected, required, invalid, read-only, disabled, loading, and option-disabled states remain distinct; read-only preserves focus and text while rejecting edits and selection.',
+    'Empty, editing, open, focused, selected, required, invalid, read-only, disabled, loading, and option-disabled states are visually distinct. Read-only keeps focus and text but rejects edits and selection.',
   ],
   summary: 'Filter and choose one value from local, dynamic, or asynchronous options.',
   validation: [
-    'Use isRequired and validationBehavior for committed-selection requirement, validate for selected-value rules, and isInvalid with errorMessage for external errors; asynchronous failure is supplied as an explicit error state rather than disguised as empty.',
+    'Use isRequired and validationBehavior to require a committed selection, validate for value rules, and isInvalid with errorMessage for application errors. Report asynchronous failure as an error, not an empty result.',
   ],
 } satisfies ComponentContract;

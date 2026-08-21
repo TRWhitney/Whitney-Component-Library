@@ -2,7 +2,7 @@
   "name": "@trwhitney/component-library",
   "version": "0.0.0",
   "private": true,
-  "description": "A React component, style, and behavior library for consistent application interfaces.",
+  "description": "React components with a shared visual language and behavior model.",
   "type": "module",
   "files": [
     "dist"

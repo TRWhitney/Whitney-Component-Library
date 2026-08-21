@@ -1,6 +1,6 @@
 # InlineAlert
 
-InlineAlert explains semantic feedback scoped to one nearby region.
+InlineAlert explains feedback for one nearby region.
 
 ## Use for
 
@@ -8,7 +8,7 @@ InlineAlert explains semantic feedback scoped to one nearby region.
 
 ## Do not use for
 
-- page-wide outages, a terse state label, static metadata, progress, toast-like transience, or content requiring owned dismissal
+- page-wide outages, a short state label, static metadata, progress, temporary toast messages, or content that needs dismissal
 
 ## Prefer instead
 
@@ -17,7 +17,7 @@ InlineAlert explains semantic feedback scoped to one nearby region.
 ## Composition and parts
 
 - Render inside AppearanceProvider and place InlineAlert directly after the local region it explains; keep recovery actions adjacent rather than embedding arbitrary controls in the message.
-- InlineAlert owns one glyph, visible title, and optional visible description.
+- InlineAlert includes one icon, visible title, and optional visible description.
 
 ## Preferred higher-level compositions
 
@@ -29,12 +29,12 @@ InlineAlert explains semantic feedback scoped to one nearby region.
 
 ## States
 
-- Neutral, success, warning, and danger share one stable geometry; announcement off, polite, and assertive remain deliberate separate modes.
+- Neutral, success, warning, and danger share one layout. Announcements may be off, polite, or assertive.
 
 ## Control, events, validation, and forms
 
 - announcement supports off, polite, and assertive; off is the default, polite reports non-urgent changes, and assertive is reserved for an immediate interruption.
-- The alert emits no event and owns no dismissal; consumers update or remove it and place any recovery Button outside its message semantics.
+- The alert emits no events and has no dismissal control. The application updates or removes it and places any recovery Button outside the message.
 - Consumer data determines meaning; the component validates only representable numeric domains and threshold ordering where applicable.
 - This display component is not a successful form control and does not serialize, validate, or respond to form reset.
 
@@ -45,7 +45,7 @@ InlineAlert explains semantic feedback scoped to one nearby region.
 ## Keyboard, labeling, localization, and direction
 
 - The component adds no tab stop or keyboard command; interactive recovery actions belong in adjacent action components.
-- title is required and visible; the description remains part of the same note or live region, so no aria-label duplication is needed.
+- title is required and visible. The description belongs to the same note or live region, so it needs no duplicate aria-label.
 - Supply localized labels, titles, descriptions, status copy, value labels, units, threshold labels, and completion meaning as applicable.
 - Copy and logical edges follow inherited writing direction; numeric source values and consumer-provided wording are not reordered.
 
@@ -57,7 +57,7 @@ InlineAlert explains semantic feedback scoped to one nearby region.
 ## Accent, forced colors, and reduced motion
 
 - Alerts never accept application accent as severity; neutral, success, warning, and danger retain independent meaning.
-- Forced colors preserve the stable boundary, leading edge, tone-specific glyph shape, title, and description using system colors.
+- Forced colors use system colors for the border, leading edge, status icon, title, and description.
 - Alert tone changes use no layout or continuous motion and settle immediately under reduced motion.
 
 ## Examples

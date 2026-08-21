@@ -17,7 +17,7 @@ FieldGroup names and lays out one related set of form fields.
 ## Composition and parts
 
 - Render FieldGroup inside AppearanceProvider, place fields directly within it, and choose one or responsive equal columns; do not use it as an arbitrary surface.
-- FieldGroup owns a legend, optional group description, and one bounded field-layout region.
+- FieldGroup includes a legend, optional description, and one field layout region.
 
 ## Preferred higher-level compositions
 
@@ -29,14 +29,14 @@ FieldGroup names and lays out one related set of form fields.
 
 ## States
 
-- One-column and responsive equal-column layouts preserve child control dimensions; responsive peers keep controls aligned when a label wraps, and disabled propagates to native and library-owned custom fields.
+- One-column and equal-column layouts keep child control dimensions. Adjacent controls stay aligned when a label wraps, and disabled propagates to native and custom library fields.
 
 ## Control, events, validation, and forms
 
-- FieldGroup owns group naming, disabled propagation, equal column layout, aligned peer label and control rows, and child spacing but no child values or events.
+- FieldGroup handles its name, disabled propagation, equal columns, aligned labels and controls, and child spacing. It does not handle child values or events.
 - FieldGroup emits no aggregate value or change event; each child field retains its own ownership.
-- The group does not invent aggregate invalidity; child fields expose their own errors while the group description remains stable.
-- isDisabled uses native fieldset propagation and an internal context so library and custom Field children receive disabled state; child names, validation, serialization, and reset remain owned by each field.
+- The group has no aggregate invalid state. Each child shows its own error, and the group description does not move.
+- isDisabled uses native fieldset propagation and internal context to disable library and custom Field children. Each field still handles its name, validation, submission value, and reset.
 
 ## Accessibility
 
@@ -44,15 +44,15 @@ FieldGroup names and lays out one related set of form fields.
 
 ## Keyboard, labeling, localization, and direction
 
-- FieldGroup adds no roving focus or arrow model; child fields remain in normal document tab order.
+- FieldGroup adds no roving focus or arrow keys. Child fields stay in normal document tab order.
 - legend is required and visible; description is linked to the native fieldset without consumer-authored ids.
 - Supply the visible legend and optional group description in the application locale and allow both to wrap without disturbing descendant control alignment.
 - Logical fieldset padding, column gaps, and descendant order follow the inherited writing direction without changing DOM reading order.
 
 ## Appearance and responsive behavior
 
-- FieldGroup uses one compact rounded subtle fieldset surface with a visible legend, optional description, bounded padding, and equal responsive field columns.
-- Responsive equal columns collapse through a content-owned minimum; peer fields share label and control rows when adjacent and return to ordinary one-column rhythm when stacked.
+- FieldGroup uses a compact rounded fieldset with a subtle background, visible legend, optional description, preset padding, and equal responsive columns.
+- Equal columns collapse when their content no longer fits. Adjacent fields align their label and control rows, then return to a normal one-column layout when stacked.
 
 ## Accent, forced colors, and reduced motion
 
@@ -64,7 +64,7 @@ FieldGroup names and lays out one related set of form fields.
 
 ### Group boundary inputs
 
-Keep related peer controls equally sized while preserving their distinct value semantics.
+Keep related controls equally sized without changing their value behavior.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

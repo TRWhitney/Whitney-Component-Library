@@ -1,10 +1,10 @@
 # Section
 
-Section gives one coherent content region a visible, semantic heading and aligned actions.
+Section gives a content region a visible heading and aligned actions.
 
 ## Use for
 
-- a coherent content region needs a visible title, optional explanation, actions, and body
+- a content region needs a visible title, optional explanation, actions, and body
 
 ## Do not use for
 
@@ -16,7 +16,7 @@ Section gives one coherent content region a visible, semantic heading and aligne
 
 ## Composition and parts
 
-- Render Section inside AppearanceProvider so its owned text and spacing tokens are available.
+- Render Section inside AppearanceProvider to load its text and spacing tokens.
 - Choose the heading level from document hierarchy and keep actions specific to the complete section.
 - Section exposes heading, optional description, optional actions, and content regions.
 
@@ -30,13 +30,13 @@ Section gives one coherent content region a visible, semantic heading and aligne
 
 ## States
 
-- The primitive has no internal state; changing a bounded prop deterministically updates its structural attributes.
+- The primitive has no internal state. Changing a prop updates its structural attributes.
 
 ## Control, events, validation, and forms
 
-- Title, description, actions, and heading level are controlled props; Section owns no collapse state.
-- The primitive emits no callback events and owns no interactive state.
-- The TypeScript API rejects arbitrary classes, inline styles, token values, and unsupported semantic options.
+- Props set the title, description, actions, and heading level. Section has no collapse state.
+- The primitive emits no callbacks and has no interactive state.
+- The TypeScript API rejects custom classes, inline styles, token values, and unsupported options.
 - The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.
 
 ## Accessibility
@@ -52,14 +52,14 @@ Section gives one coherent content region a visible, semantic heading and aligne
 
 ## Appearance and responsive behavior
 
-- Section uses library-owned text and spacing roles in both appearances and paints no containing surface or border.
+- Section uses the library text and spacing styles but adds no background or border.
 - Heading and actions share a row when space permits and reflow into one column at compact widths without a divider.
 
 ## Accent, forced colors, and reduced motion
 
 - Section does not apply the application accent or semantic status color.
 - Forced-color mode inherits system text and surfaces without adding decorative section color.
-- The primitive introduces no motion, so reduced motion preserves the same structure without an alternate transition.
+- The primitive has no motion, so the reduced-motion setting does not change it.
 
 ## Examples
 

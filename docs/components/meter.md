@@ -1,6 +1,6 @@
 # Meter
 
-Meter presents one current quantity within a known range and names meaningful thresholds.
+Meter shows a current quantity within a known range and names its thresholds.
 
 ## Use for
 
@@ -17,7 +17,7 @@ Meter presents one current quantity within a known range and names meaningful th
 ## Composition and parts
 
 - Render inside AppearanceProvider and provide one current value and unit-bearing valueLabel; add ordered thresholds only when each boundary has a real named interpretation.
-- Meter owns one label/value row, semantic rail and fill, optional fixed threshold marks, and their visually hidden semantic list.
+- Meter includes a label and value row, status-colored rail and fill, optional fixed threshold marks, and a visually hidden threshold list.
 
 ## Preferred higher-level compositions
 
@@ -25,7 +25,7 @@ Meter presents one current quantity within a known range and names meaningful th
 
 ## Content
 
-- label names the quantity, valueLabel includes localized value and unit, and every threshold supplies an ordered numeric value, unit-bearing valueLabel, semantic tone, and plain-language meaning.
+- label names the quantity, and valueLabel includes the localized value and unit. Each threshold supplies an ordered number, a valueLabel with units, a status tone, and a plain-language description.
 
 ## States
 
@@ -40,7 +40,7 @@ Meter presents one current quantity within a known range and names meaningful th
 
 ## Accessibility
 
-- The owned meter exposes its visible label, finite min, max, current value, localized value text, and a programmatic list of every named threshold.
+- Meter exposes its visible label, finite min, max, current value, localized value text, and a list of named thresholds to assistive technology.
 
 ## Keyboard, labeling, localization, and direction
 
@@ -51,20 +51,20 @@ Meter presents one current quantity within a known range and names meaningful th
 
 ## Appearance and responsive behavior
 
-- A calibrated semantic fill and fixed threshold marks share the progress family rail geometry while avoiding activity sheen or completion motion.
+- A status-colored fill and fixed threshold marks use the same rail layout as ProgressBar, without activity sheen or completion motion.
 - The calibrated rail fills available width and the label/value row wraps without clipping threshold meaning at compact sizes.
 
 ## Accent, forced colors, and reduced motion
 
-- Meter excludes application accent from semantic tone; neutral, success, warning, and danger describe the measured quantity independently.
-- Forced colors retain the bounded system-color rail, fill, threshold marks, and all textual values even when authored semantic hues collapse.
+- Meter does not use the application accent for status. Neutral, success, warning, and danger describe the measured quantity.
+- Forced colors use a system-color rail, fill, and threshold marks. Every text value stays visible when status colors collapse.
 - Meter has no activity animation or value-transition motion.
 
 ## Examples
 
 ### Thresholded thermal load
 
-Interpret one bounded quantity through named, unit-bearing thresholds.
+Interpret a measured quantity through named thresholds with units.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

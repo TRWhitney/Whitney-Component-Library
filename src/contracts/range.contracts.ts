@@ -2,16 +2,16 @@ import type {ComponentContract} from './component-contract.js';
 
 const commonRangeGuidance = {
   accentBehavior: [
-    'Labels, values, endpoints, and resting track content stay neutral; the measured fill, thumb structure, hover, and focus use bounded accent roles, while invalid state remains independently dangerous.',
+    'Labels, values, endpoints, and the empty track stay neutral. The measured fill, thumbs, hover, and focus use accent colors. Invalid state uses danger colors.',
   ],
   appearance: [
-    'Range controls use a calibrated instrument layout with a compact label/value header, formatted endpoints, one narrow measurement rail, and precise circular thumbs rather than a generic field box.',
+    'Range controls use a compact label and value header, formatted endpoints, a narrow track, and circular thumbs instead of a field box.',
   ],
   directionality: [
     'Horizontal minimum and maximum positions follow inherited writing direction and ArrowLeft or ArrowRight follow locale direction; vertical values always increase from bottom to top.',
   ],
   forcedColorBehavior: [
-    'Forced-color mode maps the track, measured fill, thumbs, focus, and invalid structure to system colors while preserving their boundaries and positions.',
+    'Forced-color mode maps the track, measured fill, thumbs, focus, and invalid state to system colors without moving them.',
   ],
   localization: [
     'locale and formatOptions format the current value, thumb value text, and endpoints consistently; supply localized visible labels, descriptions, errors, and range thumb labels.',
@@ -20,7 +20,7 @@ const commonRangeGuidance = {
     'Direct thumb position never animates; reduced motion also removes the remaining thumb hover and focus transitions without removing value or focus structure.',
   ],
   responsiveBehavior: [
-    'Horizontal controls fill a bounded parent and retain reachable endpoint and thumb geometry at compact widths; vertical controls use a bounded instrument width and a twelve-rem minimum track height.',
+    'Horizontal controls fill their parent and keep endpoints and thumbs operable on narrow screens. Vertical controls use a preset width and a twelve-rem minimum track height.',
   ],
   stylesheet: './styles.css',
 } satisfies Pick<
@@ -53,7 +53,7 @@ export const sliderContract = {
     'Slider exposes one labeled native range input with generated description and error relationships, formatted aria-valuetext, domain bounds, orientation, invalidity, read-only state, and disabled state.',
   ],
   appropriateUses: [
-    'one bounded approximate value is adjusted and its relative position within the domain helps the user choose',
+    'one approximate value is adjusted and its position within a finite range helps the user choose',
   ],
   composition: [
     'Render Slider inside AppearanceProvider; provide one finite minValue, maxValue, step, locale, and optional shared number format rather than rebuilding its label, output, endpoints, track, or thumb.',
@@ -62,7 +62,7 @@ export const sliderContract = {
     'Use a concise visible label and description that explains the effect of adjustment; choose formatOptions that express the unit without repeating it in every surrounding label.',
   ],
   controlBehavior: [
-    'Finite minValue, maxValue, and step define one reachable numeric domain; value ownership is controlled or uncontrolled, read-only preserves focus without accepting changes, and disabled removes operation.',
+    'Finite minValue, maxValue, and step define the numeric range. The value may be controlled or uncontrolled. Read-only keeps focus but rejects changes, while disabled prevents operation.',
   ],
   counterExamples: [
     {
@@ -83,7 +83,7 @@ export const sliderContract = {
         'ConfidenceThreshold',
         '<Slider defaultValue={0.4} formatOptions={{style: \'percent\'}} label="Confidence" locale="en-US" minValue={0} maxValue={1} step={0.05} />',
       ),
-      description: 'Adjust one approximate threshold while retaining its percentage context.',
+      description: 'Adjust an approximate threshold and display it as a percentage.',
       title: 'Set a confidence threshold',
     },
   ],
@@ -104,7 +104,7 @@ export const sliderContract = {
   ],
   name: 'Slider',
   parts: [
-    'Slider owns one header, visible label, formatted output, endpoint scale, track, measured fill, thumb, hidden native range input, and stable support track.',
+    'Slider includes a header, visible label, formatted output, endpoint scale, track, measured fill, thumb, hidden native range input, and fixed support area.',
   ],
   preferredAlternatives: [
     'Use NumberField for exact numeric entry, RangeSlider for a lower and upper interval, a finite choice control for named values, and ProgressBar or Meter for display-only feedback.',
@@ -112,14 +112,14 @@ export const sliderContract = {
   preferredCompositions: [
     'Place related Slider and NumberField peers in FieldGroup or FormSection.',
   ],
-  purpose: 'Slider adjusts one approximate numeric value within an explicit bounded domain.',
+  purpose: 'Slider adjusts an approximate numeric value within a finite range.',
   relatedExports: ['AppearanceProvider', 'FieldGroup', 'FormSection', 'NumberField', 'RangeSlider'],
   states: [
-    'Controlled, uncontrolled, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states preserve the calibrated scale and formatted output.',
+    'Controlled, uncontrolled, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states keep the same scale and formatted output.',
   ],
-  summary: 'Adjust one approximate numeric value on a formatted bounded scale.',
+  summary: 'Adjust an approximate numeric value on a formatted scale.',
   validation: [
-    'The component rejects non-finite, reversed, unreachable, off-step, or out-of-bounds domains and values; use isInvalid with errorMessage for externally owned domain validation.',
+    'The component rejects non-finite, reversed, unreachable, off-step, or out-of-bounds ranges and values. Use isInvalid with errorMessage for validation handled by the application.',
   ],
 } satisfies ComponentContract;
 
@@ -180,18 +180,18 @@ export const rangeSliderContract = {
   ],
   name: 'RangeSlider',
   parts: [
-    'RangeSlider owns one header, formatted range output, endpoint scale, track, interval fill, two offset thumbs, two hidden native range inputs, and one stable support track.',
+    'RangeSlider includes a header, formatted range output, endpoint scale, track, interval fill, two offset thumbs, two hidden native range inputs, and one fixed support area.',
   ],
   preferredAlternatives: [
-    'Use Slider for one approximate value, two NumberField controls for independently exact bounds, named choice controls for categorical endpoints, and Meter for display-only intervals.',
+    'Use Slider for one approximate value, two NumberField controls for exact bounds, named choice controls for categorical endpoints, and Meter for display-only intervals.',
   ],
   preferredCompositions: [
     'Place RangeSlider with related filters or numeric constraints in FieldGroup or FormSection.',
   ],
-  purpose: 'RangeSlider adjusts one ordered numeric interval within an explicit bounded domain.',
+  purpose: 'RangeSlider adjusts an ordered numeric interval within a finite range.',
   relatedExports: ['AppearanceProvider', 'FieldGroup', 'FormSection', 'NumberField', 'Slider'],
   states: [
-    'Controlled, uncontrolled, separated, adjacent, equal, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states preserve two operable bound identities.',
+    'Both bounds remain separately operable in controlled, uncontrolled, separated, adjacent, equal, horizontal, vertical, focused, dragging, read-only, disabled, and invalid states.',
   ],
   summary: 'Adjust an ordered numeric interval with two distinct non-crossing thumbs.',
   validation: [

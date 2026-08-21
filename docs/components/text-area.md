@@ -1,6 +1,6 @@
 # TextArea
 
-TextArea collects multiline plain text with bounded initial sizing.
+TextArea collects multiline plain text with a preset initial height.
 
 ## Use for
 
@@ -16,8 +16,8 @@ TextArea collects multiline plain text with bounded initial sizing.
 
 ## Composition and parts
 
-- Render TextArea inside AppearanceProvider; let its parent determine width while its bounded rows establish initial height.
-- TextArea owns a label, resizable multiline shell, native textarea, and stable support track.
+- Render TextArea inside AppearanceProvider. Its parent sets the width, and rows sets the initial height.
+- TextArea includes a label, resizable multiline shell, native textarea, and fixed support area.
 
 ## Preferred higher-level compositions
 
@@ -29,13 +29,13 @@ TextArea collects multiline plain text with bounded initial sizing.
 
 ## States
 
-- Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states preserve the textarea shell.
+- Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states use the same text area shell.
 
 ## Control, events, validation, and forms
 
-- TextArea supports controlled or uncontrolled strings, vertical resizing, and three bounded initial row counts.
+- TextArea supports controlled or uncontrolled strings, vertical resizing, and three preset row counts.
 - onChange reports the complete current multiline string after each accepted edit.
-- Native length, required, custom validate, and externally owned invalidity appear beneath rather than moving the textarea.
+- Native length, required, custom validate, and application errors appear below the text area instead of moving it.
 - name and form use native multiline serialization and reset; native or custom validation uses the same support track.
 
 ## Accessibility
@@ -44,15 +44,15 @@ TextArea collects multiline plain text with bounded initial sizing.
 
 ## Keyboard, labeling, localization, and direction
 
-- Native multiline editing, selection, composition, and newline behavior remain intact.
-- label is required and remains visible; description, error, required, and pending relationships are automatic.
-- Supply visible labels, descriptions, errors, pending messages, and explicit command labels in the application locale, and allow them to wrap.
+- Native multiline editing, selection, composition, and newline behavior continue to work.
+- label is required and always visible. Description, error, required, and pending relationships are automatic.
+- Localize visible labels, descriptions, errors, pending messages, and command labels. Allow them to wrap.
 - Logical padding, group placement, icons, and step controls follow the inherited writing direction without changing DOM reading order.
 
 ## Appearance and responsive behavior
 
 - The field family uses compact rounded controls, one consistent single-line control height, neutral surfaces, and a reserved support track beneath each control.
-- Fields fill their bounded parent width; support text grows below without moving or resizing the control, and responsive groups collapse through content-owned minimums.
+- Fields fill their parent width. Support text grows below without moving or resizing the control. Responsive groups collapse when their content no longer fits.
 
 ## Accent, forced colors, and reduced motion
 
@@ -64,7 +64,7 @@ TextArea collects multiline plain text with bounded initial sizing.
 
 ### Collect review notes
 
-Provide a deliberate initial writing area without arbitrary height injection.
+Choose a preset initial height instead of injecting a custom one.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

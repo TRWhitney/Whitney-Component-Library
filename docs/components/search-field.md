@@ -8,16 +8,16 @@ SearchField collects, submits, and clears a search query with native semantics.
 
 ## Do not use for
 
-- the text is stored as ordinary form data without search, filter, submit, or clear meaning
+- the text is stored as form data without search, filter, submit, or clear behavior
 
 ## Prefer instead
 
-- Use TextField for ordinary stored text and a later filter composition for multiple structured filter dimensions.
+- Use TextField for stored text and a future filter composition for several structured filters.
 
 ## Composition and parts
 
 - Render SearchField inside AppearanceProvider and place it near the collection or result region it searches.
-- SearchField owns a label, search glyph, native search input, conditional clear command, and stable support track.
+- SearchField includes a label, search icon, native search input, conditional clear button, and fixed support area.
 
 ## Preferred higher-level compositions
 
@@ -29,13 +29,13 @@ SearchField collects, submits, and clears a search query with native semantics.
 
 ## States
 
-- Empty, nonempty, controlled, uncontrolled, required, invalid, read-only, disabled, and pending states preserve one control size.
+- Empty, nonempty, controlled, uncontrolled, required, invalid, read-only, disabled, and pending states use the same control size.
 
 ## Control, events, validation, and forms
 
-- SearchField owns controlled or uncontrolled query text, Enter submission, Escape or clear-command clearing, and read-only pending state.
-- onChange reports query edits, onSubmit reports Enter submission, and onClear reports an explicit or Escape clear action.
-- Required, pattern, length, custom validate, and external invalidity share the stable error track when a query is validated.
+- SearchField supports controlled or uncontrolled query text, Enter submission, Escape or button clearing, and read-only pending state.
+- onChange reports query edits, onSubmit reports Enter submission, and onClear reports button or Escape clearing.
+- Required, pattern, length, custom validate, and application errors share the fixed error area.
 - name and form use native search-string serialization and reset while Enter also invokes onSubmit.
 
 ## Accessibility
@@ -44,15 +44,15 @@ SearchField collects, submits, and clears a search query with native semantics.
 
 ## Keyboard, labeling, localization, and direction
 
-- Native text editing remains intact; Enter submits the query and Escape clears it when editable and nonempty.
+- Native text editing continues to work. Enter submits the query, and Escape clears it when editable and nonempty.
 - label is the required visible input name; clearLabel is the required accessible name for the icon-only clear command.
-- Supply visible labels, descriptions, errors, pending messages, and explicit command labels in the application locale, and allow them to wrap.
+- Localize visible labels, descriptions, errors, pending messages, and command labels. Allow them to wrap.
 - Logical padding, group placement, icons, and step controls follow the inherited writing direction without changing DOM reading order.
 
 ## Appearance and responsive behavior
 
 - The field family uses compact rounded controls, one consistent single-line control height, neutral surfaces, and a reserved support track beneath each control.
-- Fields fill their bounded parent width; support text grows below without moving or resizing the control, and responsive groups collapse through content-owned minimums.
+- Fields fill their parent width. Support text grows below without moving or resizing the control. Responsive groups collapse when their content no longer fits.
 
 ## Accent, forced colors, and reduced motion
 
@@ -81,7 +81,7 @@ export function SearchRunsExample() {
 
 ## Counterexamples
 
-### Do not use search semantics for ordinary text
+### Do not use search behavior for stored text
 
 A stored text value is not a query and does not need clear or submit semantics.
 

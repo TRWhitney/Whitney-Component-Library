@@ -16,8 +16,8 @@ Switch changes one immediately applied binary setting.
 
 ## Composition and parts
 
-- Render Switch inside AppearanceProvider and use one stable label for the setting.
-- Switch owns one track, moving thumb, visible label, and optional description.
+- Render Switch inside AppearanceProvider and use the same label in both states.
+- Switch includes one track, moving thumb, visible label, and optional description.
 
 ## Preferred higher-level compositions
 
@@ -29,7 +29,7 @@ Switch changes one immediately applied binary setting.
 
 ## States
 
-- On, off, read-only, and disabled states remain visible and geometrically stable.
+- On, off, read-only, and disabled states remain visible without changing the control size.
 
 ## Control, events, validation, and forms
 
@@ -45,18 +45,18 @@ Switch changes one immediately applied binary setting.
 ## Keyboard, labeling, localization, and direction
 
 - Space toggles the focused switch; Tab moves to or from the enabled switch.
-- label is required and remains the switch name; description supplies optional scope.
+- label is required and does not change with state. description may add context.
 - Supply labels, descriptions, errors, and option text in the application locale and allow them to wrap without truncation.
 - Indicators, option copy, switch movement, and segmented rail placement follow inherited writing direction without changing option order.
 
 ## Appearance and responsive behavior
 
 - Switch uses a compact pill track and logical-direction thumb movement beside a neutral label without changing row geometry.
-- Choice rows fill their bounded parent; option copy wraps, and segmented peers remain equal while their labels wrap at compact widths.
+- Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels remain neutral; selected indicators, focus structure, and the segmented rail use the exact or saturated same-hue accent role appropriate to the surface.
+- Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.
 - Forced-color mode maps boundaries, selected indicators, focus outlines, switch state, and the segmented rail to system colors without hiding native inputs.
 - Reduced motion removes indicator, switch-thumb, hover, and segmented-rail transitions while retaining the final state.
 

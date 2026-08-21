@@ -1,6 +1,6 @@
 # DropZone
 
-DropZone unifies drag, paste, and native-picker acquisition of consumer-owned files.
+DropZone accepts application-managed files through drag, paste, or a native picker.
 
 ## Use for
 
@@ -17,11 +17,11 @@ DropZone unifies drag, paste, and native-picker acquisition of consumer-owned fi
 ## Composition and parts
 
 - Render DropZone inside AppearanceProvider; optional children may add concise domain context but cannot replace its required label, description, constraints, action, or callback.
-- DropZone owns one accessible target, active boundary, file glyph, label and optional content, named picker action, hidden native input, and stable support track.
+- DropZone includes an accessible target, active border, file icon, label and optional content, named picker action, hidden native input, and fixed support area.
 
 ## Preferred higher-level compositions
 
-- Pass accepted files to a consumer-owned Markdown asset-insertion callback, upload workflow, local parser, or acquired-file collection.
+- Pass accepted files to the application's Markdown asset callback, upload workflow, local parser, or file collection.
 
 ## Content
 
@@ -29,14 +29,14 @@ DropZone unifies drag, paste, and native-picker acquisition of consumer-owned fi
 
 ## States
 
-- Idle, hovered, focused, active drag target, accepted, rejected, externally invalid, disabled, and pending states remain distinct without color-only meaning.
+- Idle, hovered, focused, active drag target, accepted, rejected, invalid, disabled, and pending states are distinguishable without color alone.
 
 ## Control, events, validation, and forms
 
-- Picker, drop, and paste paths converge on the same immutable accepted/rejected result model; non-file transfers are not accepted, and browser File objects remain consumer-owned.
+- Picker, drop, and paste return the same accepted and rejected result shape. The control rejects non-file transfers. The application manages the browser-created File objects.
 - onFiles reports accepted and rejected files with picker, drop, or paste source; getAnnouncement supplies localized result copy, and no upload or persistence event is implied.
 - acceptedFileTypes, maxFileSize, and allowsMultiple apply identically after every acquisition path; per-file type and size reasons are reported and a disallowed multi-file attempt accepts none.
-- DropZone does not serialize files or become a successful form control; native reset clears its picker and visible acquisition feedback without recalling onFiles or mutating consumer-owned files.
+- DropZone does not submit files as a form control. Native reset clears its picker and feedback without calling onFiles or changing application-held files.
 
 ## Accessibility
 
@@ -46,25 +46,25 @@ DropZone unifies drag, paste, and native-picker acquisition of consumer-owned fi
 
 - Tab reaches the drop affordance and picker action; keyboard drag-and-drop follows the platform announcement path, paste is accepted while the affordance is focused, and Enter or Space on the named picker action opens the native picker.
 - label names the drop target, actionLabel names the picker command, description explains constraints, and generated error, pending, and announcement relationships require no consumer ids.
-- Supply localized labels, descriptions, errors, pending copy, action labels, and getAnnouncement output; file type strings and byte limits remain machine constraints and need matching human guidance.
-- Copy, action placement, and the route-like active boundary follow inherited writing direction while consumer-owned file order remains unchanged.
+- Localize labels, descriptions, errors, pending text, action labels, and getAnnouncement output. Explain file type and byte constraints in human-readable text.
+- Text, action placement, and the active border follow inherited writing direction. File order stays unchanged.
 
 ## Appearance and responsive behavior
 
-- DropZone uses a neutral dashed route boundary, a compact file glyph, and the standard secondary picker action; focus, valid drag target, rejection, invalidity, disabled, and pending treatments remain structurally distinct.
-- The control fills a bounded parent, wraps guidance and custom content, and keeps its action operable without horizontal overflow at compact widths.
+- DropZone uses a neutral dashed border, a compact file icon, and the standard secondary picker action. Focus, valid drag target, rejection, invalid, disabled, and pending states use distinct shapes or colors.
+- The control fills its parent, wraps guidance and custom content, and keeps its action usable without horizontal overflow on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
-- Focus and the active drop boundary use saturated same-hue structure; invalidity and rejected-file feedback remain dangerous rather than becoming the application accent.
-- Forced colors preserve the action, focus boundary, active drop target, invalid state, and rejected-file state with system colors and non-color structure.
+- Focus and the active drop border use a more saturated version of the accent hue. Invalid and rejected-file feedback use danger colors.
+- Forced colors use system colors and non-color cues for the action, focus border, active drop target, invalid state, and rejected files.
 - Reduced motion removes active-boundary and pending transitions while retaining their settled structure and live announcements.
 
 ## Examples
 
 ### Acquire evidence files
 
-Unify the three browser file-acquisition paths under one bounded target.
+Accept picker, drop, and paste input through one target.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

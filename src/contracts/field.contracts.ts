@@ -14,13 +14,13 @@ const commonFieldGuidance = {
     'Forced-color mode maps field surfaces, boundaries, focus, invalid state, and pending state to system colors without suppressing native control behavior.',
   ],
   localization: [
-    'Supply visible labels, descriptions, errors, pending messages, and explicit command labels in the application locale, and allow them to wrap.',
+    'Localize visible labels, descriptions, errors, pending messages, and command labels. Allow them to wrap.',
   ],
   reducedMotionBehavior: [
     'Reduced motion stops the pending rail and removes field transitions while retaining a static warning rail and every state boundary.',
   ],
   responsiveBehavior: [
-    'Fields fill their bounded parent width; support text grows below without moving or resizing the control, and responsive groups collapse through content-owned minimums.',
+    'Fields fill their parent width. Support text grows below without moving or resizing the control. Responsive groups collapse when their content no longer fits.',
   ],
   stylesheet: './styles.css',
 } satisfies Pick<
@@ -50,19 +50,22 @@ function withinAppearanceProvider(name: string, body: string): string {
 export const fieldContract = {
   ...commonFieldGuidance,
   accessibility: [
-    'Field generates stable label, description, error, required, invalid, busy, native and ARIA disabled, and native and ARIA read-only props for exactly one direct supported control.',
+    'Field generates label, description, error, required, invalid, and busy props for one supported direct child.',
+    'It supplies both native and ARIA versions of disabled and read-only state.',
   ],
   appropriateUses: [
     'one custom form control needs the library field layout and accessible support relationships but no specialized library control applies',
   ],
   composition: [
-    'Render Field inside AppearanceProvider; return one direct native control without overriding its native role, or one semantically neutral element with a button, checkbox, combobox, listbox, radio, searchbox, slider, spinbutton, switch, or textbox role. Spread every supplied control prop onto it without a DOM wrapper or overridden relationship or state prop. Field rejects native role overrides uniformly and protects its direct structure and generated relationships; it does not verify complete role-specific widget behavior.',
+    'Render Field inside AppearanceProvider.',
+    'Return either one direct native control without a role override, or one neutral element with a button, checkbox, combobox, listbox, radio, searchbox, slider, spinbutton, switch, or textbox role.',
+    'Spread every supplied control prop onto that element without a DOM wrapper or overridden relationship or state prop. Field protects this structure but does not verify all behavior required by the chosen role.',
   ],
   contentRules: [
     'Use a concise visible label; use description for durable input guidance, errorMessage for actionable correction, and pendingMessage only for temporary checking.',
   ],
   controlBehavior: [
-    'Field owns support and state relationships, removes a disabled custom control from tab order, and suppresses its direct activation; the rendered control retains value, non-activation events, domain behavior, and role-specific keyboard and ARIA conformance.',
+    'Field connects support text and state to the control. It removes a disabled custom control from tab order and blocks direct activation. The control still handles its value, other events, domain behavior, keyboard input, and ARIA requirements.',
   ],
   counterExamples: [
     {
@@ -75,7 +78,7 @@ export const fieldContract = {
       title: 'Do not render display content as a field control',
     },
   ],
-  events: ['Field emits no events; the callback-rendered control owns its domain event contract.'],
+  events: ['Field emits no events. The rendered control handles its domain events.'],
   examples: [
     {
       code: withinAppearanceProvider(
@@ -88,28 +91,28 @@ export const fieldContract = {
   ],
   exportName: 'Field',
   formBehavior: [
-    'Field does not serialize a value; native name, form association, validation, submission, and reset remain the custom control’s responsibility.',
+    'Field does not submit a value. The custom control handles name, form association, validation, submission, and reset.',
   ],
   importPath: '.',
   inappropriateUses: [
-    'TextField, TextArea, NumberField, SearchField, or another semantic library field already owns the required behavior',
+    'TextField, TextArea, NumberField, SearchField, or another library field already provides the required behavior',
   ],
   keyboardBehavior: [
-    'Field adds no enabled keyboard model; the rendered custom control must provide the keyboard behavior appropriate to its semantic role and honor the supplied read-only state.',
+    'Field adds no keyboard model. The custom control must provide keyboard behavior for its role and honor the supplied read-only state.',
   ],
   kind: 'composition',
   labeling: [
     'label is always visible; the generated control props reference it and any supplied description or error without consumer-authored ids.',
   ],
   name: 'Field',
-  parts: ['Field owns a label, one control shell, and one stable support track.'],
+  parts: ['Field includes a label, one control shell, and one fixed support area.'],
   preferredAlternatives: [
-    'Prefer TextField, TextArea, NumberField, SearchField, and later semantic field exports whenever their behavior matches the value being collected.',
+    'Prefer TextField, TextArea, NumberField, SearchField, or another library field when it already matches the value.',
   ],
   preferredCompositions: [
     'Place related Field peers in FieldGroup and organize larger form workflows with FormSection.',
   ],
-  purpose: 'Field provides a bounded accessible shell for one custom form control.',
+  purpose: 'Field provides an accessible shell for one custom form control.',
   relatedExports: [
     'AppearanceProvider',
     'FieldGroup',
@@ -120,11 +123,11 @@ export const fieldContract = {
     'TextField',
   ],
   states: [
-    'Required, invalid, read-only, disabled, and pending states affect the generated control props and stable support presentation without changing geometry; required and read-only may be used only when the rendered native element or ARIA role supports that state.',
+    'Required, invalid, read-only, disabled, and pending states update the control props and support text without changing layout. Use required and read-only only when the rendered element or ARIA role supports them.',
   ],
   summary: 'Label and support one custom form control through a narrow accessibility seam.',
   validation: [
-    'Set isInvalid with errorMessage for externally owned invalidity; the custom control remains responsible for native or domain validation behavior.',
+    'Set isInvalid with errorMessage for application errors. The custom control still handles native or domain validation.',
   ],
 } satisfies ComponentContract;
 
@@ -170,15 +173,15 @@ export const textFieldContract = {
     'the value is multiline prose, numeric, a search query, or a constrained choice',
   ],
   keyboardBehavior: [
-    'Native text editing, selection, composition, and browser autofill behavior remain intact.',
+    'Native text editing, selection, composition, and browser autofill continue to work.',
   ],
   kind: 'component',
   labeling: [
-    'label is required and remains visible; descriptions, errors, and required state are linked automatically.',
+    'label is required and always visible. Descriptions, errors, and required state are linked automatically.',
   ],
   name: 'TextField',
   parts: [
-    'TextField owns a label, single-line input shell, native input, and stable support track.',
+    'TextField includes a label, single-line input shell, native input, and fixed support area.',
   ],
   preferredAlternatives: [
     'Use TextArea for prose, NumberField for locale-aware numeric values, and SearchField for clearable query submission.',
@@ -196,11 +199,11 @@ export const textFieldContract = {
     'TextArea',
   ],
   states: [
-    'Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states preserve one control size.',
+    'Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states use the same control size.',
   ],
   summary: 'Collect one line of text through a persistent labeled native input.',
   validation: [
-    'Native length, pattern, required, custom validate, and externally owned invalidity share the stable error track.',
+    'Native length, pattern, required, custom validate, and application errors share the fixed error area.',
   ],
 } satisfies ComponentContract;
 
@@ -213,13 +216,13 @@ export const textAreaContract = {
     'a user enters multiline notes, explanation, source text, or other plain prose',
   ],
   composition: [
-    'Render TextArea inside AppearanceProvider; let its parent determine width while its bounded rows establish initial height.',
+    'Render TextArea inside AppearanceProvider. Its parent sets the width, and rows sets the initial height.',
   ],
   contentRules: [
     'Use the label to name the content and description to explain format or scope; do not depend on placeholder as the label.',
   ],
   controlBehavior: [
-    'TextArea supports controlled or uncontrolled strings, vertical resizing, and three bounded initial row counts.',
+    'TextArea supports controlled or uncontrolled strings, vertical resizing, and three preset row counts.',
   ],
   counterExamples: [
     {
@@ -239,7 +242,7 @@ export const textAreaContract = {
         'ReviewNotesExample',
         '<TextArea label="Review notes" name="notes" rows={5} />',
       ),
-      description: 'Provide a deliberate initial writing area without arbitrary height injection.',
+      description: 'Choose a preset initial height instead of injecting a custom one.',
       title: 'Collect review notes',
     },
   ],
@@ -252,15 +255,15 @@ export const textAreaContract = {
     'the value is one short line, numeric, a search query, or rich Markdown editing',
   ],
   keyboardBehavior: [
-    'Native multiline editing, selection, composition, and newline behavior remain intact.',
+    'Native multiline editing, selection, composition, and newline behavior continue to work.',
   ],
   kind: 'component',
   labeling: [
-    'label is required and remains visible; description, error, required, and pending relationships are automatic.',
+    'label is required and always visible. Description, error, required, and pending relationships are automatic.',
   ],
   name: 'TextArea',
   parts: [
-    'TextArea owns a label, resizable multiline shell, native textarea, and stable support track.',
+    'TextArea includes a label, resizable multiline shell, native textarea, and fixed support area.',
   ],
   preferredAlternatives: [
     'Use TextField for one line, NumberField for numbers, and the later Markdown editor for structured Markdown authoring.',
@@ -268,14 +271,14 @@ export const textAreaContract = {
   preferredCompositions: [
     'Place related prose and metadata fields in FieldGroup or a named FormSection.',
   ],
-  purpose: 'TextArea collects multiline plain text with bounded initial sizing.',
+  purpose: 'TextArea collects multiline plain text with a preset initial height.',
   relatedExports: ['AppearanceProvider', 'FieldGroup', 'FormSection', 'NumberField', 'TextField'],
   states: [
-    'Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states preserve the textarea shell.',
+    'Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states use the same text area shell.',
   ],
-  summary: 'Collect multiline plain text in a bounded native textarea.',
+  summary: 'Collect multiline plain text in a native text area with a preset height.',
   validation: [
-    'Native length, required, custom validate, and externally owned invalidity appear beneath rather than moving the textarea.',
+    'Native length, required, custom validate, and application errors appear below the text area instead of moving it.',
   ],
 } satisfies ComponentContract;
 
@@ -288,13 +291,13 @@ export const numberFieldContract = {
     'a user enters a numeric value that needs locale formatting, stepping, bounds, units, currency, or percentages',
   ],
   composition: [
-    'Render NumberField inside AppearanceProvider and set locale explicitly to the server and application locale.',
+    'Render NumberField inside AppearanceProvider and set locale to the server and application locale.',
   ],
   contentRules: [
     'Use formatOptions for numeric presentation and a description for units or constraints that are not already visible in the formatted value.',
   ],
   controlBehavior: [
-    'NumberField privately owns localized parsing and incomplete text; plain decimal formatting retains supplied finite value and step precision unless formatOptions overrides it, and onChange reports committed numbers after blur, Enter, or stepping.',
+    'NumberField handles localized parsing and incomplete text internally. Decimal formatting keeps the precision of finite values and steps unless formatOptions overrides it. onChange reports committed numbers after blur, Enter, or stepping.',
   ],
   counterExamples: [
     {
@@ -317,7 +320,7 @@ export const numberFieldContract = {
         '<NumberField label="Tolerance" locale="en-US" defaultValue={0.0025} minValue={0} step={0.0005} />',
       ),
       description: 'Keep formatted text private while exposing a committed numeric value.',
-      title: 'Set a bounded tolerance',
+      title: 'Set a limited tolerance',
     },
   ],
   exportName: 'NumberField',
@@ -329,7 +332,7 @@ export const numberFieldContract = {
     'the value is an identifier, free text, phone number, postal code, or other digit-shaped text without arithmetic meaning',
   ],
   keyboardBehavior: [
-    'Arrow Up and Down step, Home and End reach bounds, Enter commits, and localized text editing remains available; focused wheel stepping is opt-in.',
+    'Arrow Up and Down step, Home and End reach the limits, and Enter commits. Localized text editing remains available. Focused wheel stepping is opt-in.',
   ],
   kind: 'component',
   labeling: [
@@ -337,22 +340,22 @@ export const numberFieldContract = {
   ],
   name: 'NumberField',
   parts: [
-    'NumberField owns a label, decrement command, localized text input, increment command, raw form value, and stable support track.',
+    'NumberField includes a label, decrement command, localized text input, increment command, raw form value, and fixed support area.',
   ],
   preferredAlternatives: [
     'Use TextField for digit-shaped identifiers and Slider only when approximate visual adjustment matters more than exact entry.',
   ],
   preferredCompositions: [
-    'Place adjacent numeric peers in FieldGroup so their equal control dimensions remain visible across validation states.',
+    'Place adjacent number fields in FieldGroup to align them across validation states.',
   ],
   purpose: 'NumberField collects a locale-aware numeric value with bounds and stepping.',
   relatedExports: ['AppearanceProvider', 'FieldGroup', 'FormSection', 'TextField'],
   states: [
-    'Controlled, uncontrolled, required, invalid, read-only, disabled, pending, empty, and partial text states preserve numeric ownership.',
+    'Controlled, uncontrolled, required, invalid, read-only, disabled, pending, empty, and partial-text states keep the same value-management model.',
   ],
   summary: 'Collect and step a locale-aware numeric value without leaking parser state.',
   validation: [
-    'commitBehavior chooses snapping or retained range and step invalidity; validationBehavior independently chooses native blocking or ARIA reporting.',
+    'commitBehavior chooses whether to snap or keep range and step errors. validationBehavior separately chooses native blocking or ARIA reporting.',
   ],
 } satisfies ComponentContract;
 
@@ -371,7 +374,7 @@ export const searchFieldContract = {
     'Name the searched domain in the label and provide clearLabel in the application locale; placeholder is optional context only.',
   ],
   controlBehavior: [
-    'SearchField owns controlled or uncontrolled query text, Enter submission, Escape or clear-command clearing, and read-only pending state.',
+    'SearchField supports controlled or uncontrolled query text, Enter submission, Escape or button clearing, and read-only pending state.',
   ],
   counterExamples: [
     {
@@ -381,11 +384,11 @@ export const searchFieldContract = {
       ),
       description:
         'A stored text value is not a query and does not need clear or submit semantics.',
-      title: 'Do not use search semantics for ordinary text',
+      title: 'Do not use search behavior for stored text',
     },
   ],
   events: [
-    'onChange reports query edits, onSubmit reports Enter submission, and onClear reports an explicit or Escape clear action.',
+    'onChange reports query edits, onSubmit reports Enter submission, and onClear reports button or Escape clearing.',
   ],
   examples: [
     {
@@ -403,10 +406,10 @@ export const searchFieldContract = {
   ],
   importPath: '.',
   inappropriateUses: [
-    'the text is stored as ordinary form data without search, filter, submit, or clear meaning',
+    'the text is stored as form data without search, filter, submit, or clear behavior',
   ],
   keyboardBehavior: [
-    'Native text editing remains intact; Enter submits the query and Escape clears it when editable and nonempty.',
+    'Native text editing continues to work. Enter submits the query, and Escape clears it when editable and nonempty.',
   ],
   kind: 'component',
   labeling: [
@@ -414,10 +417,10 @@ export const searchFieldContract = {
   ],
   name: 'SearchField',
   parts: [
-    'SearchField owns a label, search glyph, native search input, conditional clear command, and stable support track.',
+    'SearchField includes a label, search icon, native search input, conditional clear button, and fixed support area.',
   ],
   preferredAlternatives: [
-    'Use TextField for ordinary stored text and a later filter composition for multiple structured filter dimensions.',
+    'Use TextField for stored text and a future filter composition for several structured filters.',
   ],
   preferredCompositions: [
     'Pair SearchField with the collection region it affects; use FormSection only when search is part of a larger form workflow.',
@@ -425,11 +428,11 @@ export const searchFieldContract = {
   purpose: 'SearchField collects, submits, and clears a search query with native semantics.',
   relatedExports: ['AppearanceProvider', 'FormSection', 'TextField'],
   states: [
-    'Empty, nonempty, controlled, uncontrolled, required, invalid, read-only, disabled, and pending states preserve one control size.',
+    'Empty, nonempty, controlled, uncontrolled, required, invalid, read-only, disabled, and pending states use the same control size.',
   ],
   summary: 'Collect, submit, and clear a query through native search semantics.',
   validation: [
-    'Required, pattern, length, custom validate, and external invalidity share the stable error track when a query is validated.',
+    'Required, pattern, length, custom validate, and application errors share the fixed error area.',
   ],
 } satisfies ComponentContract;
 
@@ -439,7 +442,7 @@ export const fieldGroupContract = {
     'The fieldset surface stays neutral and establishes subtle-surface accent roles for descendant fields, which retain ownership of their own hover, focus, validation, and pending states.',
   ],
   appearance: [
-    'FieldGroup uses one compact rounded subtle fieldset surface with a visible legend, optional description, bounded padding, and equal responsive field columns.',
+    'FieldGroup uses a compact rounded fieldset with a subtle background, visible legend, optional description, preset padding, and equal responsive columns.',
   ],
   accessibility: [
     'FieldGroup renders a native fieldset whose visible legend names the related controls and whose description is linked to the group.',
@@ -454,7 +457,7 @@ export const fieldGroupContract = {
     'Use a concise legend that names the relationship and an optional description that applies to every child field.',
   ],
   controlBehavior: [
-    'FieldGroup owns group naming, disabled propagation, equal column layout, aligned peer label and control rows, and child spacing but no child values or events.',
+    'FieldGroup handles its name, disabled propagation, equal columns, aligned labels and controls, and child spacing. It does not handle child values or events.',
   ],
   directionality: [
     'Logical fieldset padding, column gaps, and descendant order follow the inherited writing direction without changing DOM reading order.',
@@ -478,14 +481,13 @@ export const fieldGroupContract = {
         'BoundaryFieldGroupExample',
         '<FieldGroup legend="Boundary inputs" columns="responsive">\n  <TextField label="Solver" />\n  <NumberField label="Tolerance" locale="en-US" />\n</FieldGroup>',
       ),
-      description:
-        'Keep related peer controls equally sized while preserving their distinct value semantics.',
+      description: 'Keep related controls equally sized without changing their value behavior.',
       title: 'Group boundary inputs',
     },
   ],
   exportName: 'FieldGroup',
   formBehavior: [
-    'isDisabled uses native fieldset propagation and an internal context so library and custom Field children receive disabled state; child names, validation, serialization, and reset remain owned by each field.',
+    'isDisabled uses native fieldset propagation and internal context to disable library and custom Field children. Each field still handles its name, validation, submission value, and reset.',
   ],
   forcedColorBehavior: [
     'Forced-color mode maps the fieldset surface and boundary to system Canvas and CanvasText while descendants retain their own system-color state treatment.',
@@ -495,7 +497,7 @@ export const fieldGroupContract = {
     'content is not a related control set, needs only visual containment, or represents a larger form workflow region',
   ],
   keyboardBehavior: [
-    'FieldGroup adds no roving focus or arrow model; child fields remain in normal document tab order.',
+    'FieldGroup adds no roving focus or arrow keys. Child fields stay in normal document tab order.',
   ],
   kind: 'composition',
   labeling: [
@@ -505,9 +507,7 @@ export const fieldGroupContract = {
     'Supply the visible legend and optional group description in the application locale and allow both to wrap without disturbing descendant control alignment.',
   ],
   name: 'FieldGroup',
-  parts: [
-    'FieldGroup owns a legend, optional group description, and one bounded field-layout region.',
-  ],
+  parts: ['FieldGroup includes a legend, optional description, and one field layout region.'],
   preferredAlternatives: [
     'Use FormSection for a larger named workflow and Surface for unrelated visual containment.',
   ],
@@ -518,7 +518,7 @@ export const fieldGroupContract = {
     'FieldGroup adds no motion of its own; descendant controls retain their reduced-motion behavior.',
   ],
   responsiveBehavior: [
-    'Responsive equal columns collapse through a content-owned minimum; peer fields share label and control rows when adjacent and return to ordinary one-column rhythm when stacked.',
+    'Equal columns collapse when their content no longer fits. Adjacent fields align their label and control rows, then return to a normal one-column layout when stacked.',
   ],
   purpose: 'FieldGroup names and lays out one related set of form fields.',
   relatedExports: [
@@ -531,11 +531,11 @@ export const fieldGroupContract = {
     'TextField',
   ],
   states: [
-    'One-column and responsive equal-column layouts preserve child control dimensions; responsive peers keep controls aligned when a label wraps, and disabled propagates to native and library-owned custom fields.',
+    'One-column and equal-column layouts keep child control dimensions. Adjacent controls stay aligned when a label wraps, and disabled propagates to native and custom library fields.',
   ],
   summary: 'Name and arrange one related native fieldset without generic layout escape hatches.',
   validation: [
-    'The group does not invent aggregate invalidity; child fields expose their own errors while the group description remains stable.',
+    'The group has no aggregate invalid state. Each child shows its own error, and the group description does not move.',
   ],
 } satisfies ComponentContract;
 
@@ -545,25 +545,25 @@ export const formSectionContract = {
     'FormSection adds no accent treatment of its own; descendant fields, groups, and actions retain their role-local accent behavior.',
   ],
   appearance: [
-    'FormSection uses a visible heading, optional muted description, and owned vertical rhythm without adding a surface, border, or divider.',
+    'FormSection uses a visible heading, optional muted description, and consistent vertical spacing without adding a background, border, or divider.',
   ],
   accessibility: [
-    'FormSection renders a section labeled by a visible heading at an explicit document level.',
+    'FormSection renders a section labeled by a visible heading at the chosen document level.',
   ],
   appropriateUses: [
     'a larger form workflow needs a named region containing fields, groups, or supporting form actions',
   ],
   composition: [
-    'Render FormSection inside AppearanceProvider and compose FieldGroup or individual semantic fields as children; use Section instead when the region is not specifically form structure.',
+    'Render FormSection inside AppearanceProvider with FieldGroup or individual fields as children. Use Section when the region is not form structure.',
   ],
   contentRules: [
     'Use a task-oriented title and optional section-wide description; keep per-field instructions on the fields they describe.',
   ],
   controlBehavior: [
-    'FormSection owns semantic heading and spaced vertical region structure but no form state, submission, or aggregate validation.',
+    'FormSection provides a heading and vertical spacing but no form state, submission, or aggregate validation.',
   ],
   directionality: [
-    'The section preserves logical document order and inherited writing direction without repositioning its heading, description, or children.',
+    'The section keeps document order and inherited writing direction. It does not reposition its heading, description, or children.',
   ],
   counterExamples: [
     {
@@ -572,7 +572,7 @@ export const formSectionContract = {
         '<FormSection title="Card"><p>Read-only metrics</p></FormSection>',
       ),
       description:
-        'Read-only content needs ordinary Section or Surface semantics rather than form-specific organization.',
+        'Read-only content belongs in Section or Surface rather than a form-specific container.',
       title: 'Do not use form structure for display content',
     },
   ],
@@ -583,7 +583,7 @@ export const formSectionContract = {
         'SolverFormSectionExample',
         '<FormSection title="Solver setup" description="Configure the run inputs.">\n  <FieldGroup legend="Boundary inputs">\n    <TextField label="Solver" />\n  </FieldGroup>\n</FormSection>',
       ),
-      description: 'Name a form workflow while preserving the nested fieldset relationship.',
+      description: 'Name a form workflow and keep the nested fieldset relationship.',
       title: 'Organize solver setup',
     },
   ],
@@ -592,26 +592,22 @@ export const formSectionContract = {
     'FormSection does not render a form element or own submission; place it inside the application’s native form boundary.',
   ],
   forcedColorBehavior: [
-    'FormSection paints no custom boundary or surface in forced-color mode; its semantic heading and content rhythm remain intact while children own their state treatment.',
+    'FormSection adds no border or background in forced-color mode. Its heading and spacing stay intact, while children render their own states.',
   ],
   importPath: '.',
   inappropriateUses: [
     'the region is read-only content, only one field, or merely needs a visual surface',
   ],
-  keyboardBehavior: [
-    'FormSection adds no keyboard interaction; children remain in document order.',
-  ],
+  keyboardBehavior: ['FormSection adds no keyboard interaction. Children stay in document order.'],
   kind: 'composition',
   labeling: [
-    'title is required and labels the region; headingLevel preserves the surrounding document hierarchy.',
+    'title is required and labels the region. headingLevel follows the surrounding document hierarchy.',
   ],
   localization: [
     'Supply the title and optional section description in the application locale and allow them to wrap within the section width.',
   ],
   name: 'FormSection',
-  parts: [
-    'FormSection owns a visible heading, optional description, and form-specific content region.',
-  ],
+  parts: ['FormSection includes a visible heading, optional description, and form content region.'],
   preferredAlternatives: [
     'Use FieldGroup for one related fieldset, Section for general named content, and Surface for unnamed containment.',
   ],
@@ -620,9 +616,9 @@ export const formSectionContract = {
   ],
   reducedMotionBehavior: ['FormSection adds no motion of its own.'],
   responsiveBehavior: [
-    'FormSection fills its bounded parent and preserves its vertical heading, description, and child rhythm as content wraps or narrows.',
+    'FormSection fills its parent and keeps its vertical spacing as content wraps or narrows.',
   ],
-  purpose: 'FormSection gives a larger form workflow a visible semantic region name.',
+  purpose: 'FormSection gives a larger form workflow a visible region name.',
   relatedExports: [
     'AppearanceProvider',
     'Field',
@@ -634,9 +630,9 @@ export const formSectionContract = {
     'TextField',
   ],
   states: [
-    'Heading levels one through six preserve document hierarchy; content reflows without adding compact divider lines.',
+    'Heading levels one through six follow document hierarchy. Content reflows without adding divider lines.',
   ],
-  summary: 'Organize a larger form workflow under a visible semantic heading.',
+  summary: 'Organize a larger form workflow under a visible heading.',
   validation: [
     'FormSection does not aggregate child validity or move child validation messages into a section-level summary.',
   ],

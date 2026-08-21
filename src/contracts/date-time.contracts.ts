@@ -2,16 +2,16 @@ import type {ComponentContract} from './component-contract.js';
 
 const common = {
   accentBehavior: [
-    'Editable content and calendar text stay neutral; focus, the current-day marker, range route, and inclusive endpoint bookends use bounded accent roles while invalidity remains dangerous.',
+    'Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid state uses danger colors.',
   ],
   appearance: [
-    'Segmented controls retain the compact field geometry and stable support track; pickers add one raised almanac sheet with utility weekday text and a continuous range route.',
+    'Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels and a continuous range fill.',
   ],
   directionality: [
     'Locale determines segment order, numerals, calendar grid direction, and logical previous or next navigation without changing value identity or DOM reading order.',
   ],
   forcedColorBehavior: [
-    'Forced colors preserve field, segment focus, calendar boundaries, unavailable dates, current day, range continuity, and endpoint identities with system colors.',
+    'Forced colors use system colors for fields, segment focus, calendar borders, unavailable dates, today, selected ranges, and endpoints.',
   ],
   localization: [
     'locale and calendar are required initial-render inputs; provide localized labels, support text, errors, and calendar trigger labels.',
@@ -20,7 +20,7 @@ const common = {
     'Reduced motion removes the short popover transition; segment edits and month changes never use positional animation.',
   ],
   responsiveBehavior: [
-    'Fields fill a bounded parent, segments retain operable targets at compact widths, and the single-month calendar sheet remains viewport-contained.',
+    'Fields fill their parent. Segments remain operable on narrow screens, and the single-month calendar stays inside the viewport.',
   ],
   stylesheet: './styles.css',
 } satisfies Pick<
@@ -58,7 +58,7 @@ export const dateFieldContract = {
     'Use a concise persistent label and explain accepted bounds or unavailable dates in durable support copy.',
   ],
   controlBehavior: [
-    'Controlled or uncontrolled ISO calendar dates may be empty; keyboard, pointer, and touch segment edits remain synchronized and preserve the chosen display calendar.',
+    'Controlled or uncontrolled ISO dates may be empty. Keyboard, pointer, and touch edits stay synchronized and keep the chosen display calendar.',
   ],
   counterExamples: [
     {
@@ -70,7 +70,7 @@ export const dateFieldContract = {
       title: 'Do not hide useful availability context',
     },
   ],
-  events: ['onChange reports a complete library-owned ISO calendar date or null.'],
+  events: ["onChange reports a complete value in the library's ISO calendar-date format or null."],
   examples: [
     {
       code: inProvider(
@@ -98,7 +98,7 @@ export const dateFieldContract = {
     'locale and calendar are required initial-render inputs; provide localized labels, support text, and errors.',
   ],
   name: 'DateField',
-  parts: ['DateField owns a label, segmented date input, hidden form input, and support track.'],
+  parts: ['DateField includes a label, segmented date input, hidden form input, and support area.'],
   preferredAlternatives: [
     'Use DatePicker when calendar context helps, DateRangePicker for an inclusive interval, and a future zoned date-time control for an instant.',
   ],
@@ -114,14 +114,14 @@ export const dateFieldContract = {
   states: ['Empty, controlled, uncontrolled, invalid, required, read-only, and disabled states.'],
   summary: 'Enter one known ISO civil date through locale- and calendar-aware segments.',
   validation: [
-    'minValue, maxValue, unavailable dates, required state, custom validate, and external invalidity share the stable error track.',
+    'minValue, maxValue, unavailable dates, required state, custom validate, and application errors share the fixed error area.',
   ],
 } satisfies ComponentContract;
 
 export const timeFieldContract = {
   ...common,
   accessibility: [
-    'TimeField exposes one visible label and separately focusable hour, minute, second, and day-period segments as required by its explicit format.',
+    'TimeField exposes one visible label and separate focus targets for the hour, minute, second, and day period required by its format.',
   ],
   appropriateUses: ['a user enters a wall-clock time that does not identify an instant'],
   composition: [
@@ -131,7 +131,7 @@ export const timeFieldContract = {
     'State the operational context when the wall-clock time could otherwise be ambiguous.',
   ],
   controlBehavior: [
-    'Controlled or uncontrolled zone-free times may be empty; hourCycle and granularity are explicit, and values cannot hide precision below the visible segments.',
+    'Controlled or uncontrolled zone-free times may be empty. hourCycle and granularity define the format, and values cannot contain more precision than the visible segments.',
   ],
   counterExamples: [
     {
@@ -144,7 +144,7 @@ export const timeFieldContract = {
       title: 'Do not represent an instant as a wall-clock time',
     },
   ],
-  events: ['onChange reports a complete library-owned wall-clock value or null.'],
+  events: ["onChange reports a complete value in the library's wall-clock format or null."],
   examples: [
     {
       code: inProvider(
@@ -172,7 +172,7 @@ export const timeFieldContract = {
     'locale, hourCycle, and granularity are required initial-render inputs; provide localized labels, support text, and errors.',
   ],
   name: 'TimeField',
-  parts: ['TimeField owns a label, segmented time input, hidden form input, and support track.'],
+  parts: ['TimeField includes a label, segmented time input, hidden form input, and support area.'],
   preferredAlternatives: [
     'Use DateField for a civil day, NumberField for a duration, and a future zoned date-time control for an instant.',
   ],
@@ -180,7 +180,7 @@ export const timeFieldContract = {
   purpose: 'TimeField collects one zone-free wall-clock time through localized segmented entry.',
   relatedExports: ['AppearanceProvider', 'DateField', 'FieldGroup', 'FormSection'],
   states: ['Empty, controlled, uncontrolled, invalid, required, read-only, and disabled states.'],
-  summary: 'Enter one zone-free wall-clock time with explicit localized formatting.',
+  summary: 'Enter a zone-free wall-clock time with localized formatting.',
   validation: [
     'minValue, maxValue, required state, visible precision, custom validate, and external invalidity share the support track.',
   ],
@@ -189,14 +189,14 @@ export const timeFieldContract = {
 export const datePickerContract = {
   ...dateFieldContract,
   accessibility: [
-    'DatePicker combines labeled segmented entry with a distinctly named calendar trigger and a dialog whose grid owns navigation, selection, focus restoration, and dismissal.',
+    'DatePicker combines labeled segmented entry with a named calendar button. The calendar dialog handles navigation, selection, focus restoration, and dismissal.',
   ],
   appropriateUses: ['one civil date is easier to choose by comparing nearby days or availability'],
   composition: [
     'Render DatePicker inside AppearanceProvider and let it own trigger, dialog, and calendar.',
   ],
   controlBehavior: [
-    'Segment edits and calendar selection update the same controlled or uncontrolled ISO value; placeholderValue deterministically anchors an empty calendar without selecting a date, and the picker owns optional controlled open state, bounds, and unavailable dates.',
+    'Segment edits and calendar selection update the same controlled or uncontrolled ISO value. placeholderValue anchors an empty calendar without selecting a date. The picker also supports controlled open state, limits, and unavailable dates.',
   ],
   counterExamples: [
     {
@@ -218,7 +218,7 @@ export const datePickerContract = {
         'ReviewDatePicker',
         '<DatePicker calendar="gregory" calendarButtonLabel="Choose review date" label="Review date" locale="en-US" minValue={{year: 2026, month: 8, day: 18}} maxValue={{year: 2026, month: 8, day: 31}} placeholderValue={{year: 2026, month: 8, day: 20}} />',
       ),
-      description: 'Choose one nearby bounded day with direct entry retained.',
+      description: 'Choose an available day while keeping direct entry.',
       title: 'Choose a review date',
     },
   ],
@@ -237,7 +237,7 @@ export const datePickerContract = {
   ],
   name: 'DatePicker',
   parts: [
-    'DatePicker owns a label, date segments, trigger, hidden input, support track, popover dialog, heading, navigation, grid, and day cells.',
+    'DatePicker includes a label, date segments, trigger, hidden input, support area, popover dialog, heading, navigation, grid, and day cells.',
   ],
   preferredAlternatives: [
     'Use DateField for direct entry, DateRangePicker for an interval, and a future zoned date-time control for an instant.',
@@ -252,15 +252,15 @@ export const datePickerContract = {
     'FormSection',
   ],
   states: [
-    'Empty, open, closed, controlled, uncontrolled, unavailable, bounded, invalid, required, read-only, and disabled states.',
+    'Empty, open, closed, controlled, uncontrolled, unavailable, limited, invalid, required, read-only, and disabled states.',
   ],
-  summary: 'Choose one ISO civil date with synchronized segments and a bounded calendar.',
+  summary: 'Choose an ISO civil date with synchronized segments and a constrained calendar.',
 } satisfies ComponentContract;
 
 export const dateRangePickerContract = {
   ...common,
   accessibility: [
-    'DateRangePicker exposes two ordered segmented endpoint inputs, one named calendar trigger, and a dialog grid whose range endpoints and continuous selected interval remain programmatic.',
+    'DateRangePicker exposes two ordered segmented inputs, one named calendar button, and a dialog grid that identifies both endpoints and the selected interval to assistive technology.',
   ],
   appropriateUses: ['two inclusive civil dates define one continuous interval'],
   composition: [
@@ -270,7 +270,7 @@ export const dateRangePickerContract = {
     'Name the interval as a whole and explain whether both inclusive endpoint dates count.',
   ],
   controlBehavior: [
-    'Controlled or uncontrolled ranges may be empty; each value is one continuous interval, placeholderValue deterministically anchors the empty calendar without selecting a range, start never follows end, ranges containing unavailable dates remain representable but invalid, and entry and calendar selection remain synchronized.',
+    'Controlled or uncontrolled ranges may be empty. Each value is one continuous interval. placeholderValue anchors the empty calendar without selecting a range. Start never follows end. A range may contain unavailable dates, but it is then invalid. Entry and calendar selection stay synchronized.',
   ],
   counterExamples: [
     {
@@ -283,7 +283,7 @@ export const dateRangePickerContract = {
     },
   ],
   events: [
-    'onChange reports a complete inclusive ISO range or null; onOpenChange reports every owned overlay transition.',
+    'onChange reports a complete inclusive ISO range or null. onOpenChange reports every open-state transition.',
   ],
   examples: [
     {
@@ -304,7 +304,7 @@ export const dateRangePickerContract = {
     'one date is selected, the dates are unrelated, or the interval contains time-zone-aware instants',
   ],
   keyboardBehavior: [
-    'Each endpoint supports segmented entry; the calendar owns spatial navigation, range anchoring, selection completion, Escape dismissal, and focus restoration.',
+    'Each endpoint supports segmented entry. The calendar handles spatial navigation, range anchoring, selection completion, Escape dismissal, and focus restoration.',
   ],
   kind: 'component',
   labeling: [
@@ -312,7 +312,7 @@ export const dateRangePickerContract = {
   ],
   name: 'DateRangePicker',
   parts: [
-    'DateRangePicker owns a label, start and end segments, separator, trigger, two hidden inputs, support track, popover dialog, and range calendar.',
+    'DateRangePicker includes a label, start and end segments, separator, trigger, two hidden inputs, support area, popover dialog, and range calendar.',
   ],
   preferredAlternatives: [
     'Use DateField for one known date, DatePicker for one calendar-assisted date, or two independent fields when the dates do not define an interval.',
@@ -321,11 +321,11 @@ export const dateRangePickerContract = {
   purpose: 'DateRangePicker collects one inclusive continuous civil-date interval.',
   relatedExports: ['AppearanceProvider', 'DateField', 'DatePicker', 'FieldGroup', 'FormSection'],
   states: [
-    'Empty, partial, complete, open, closed, controlled, uncontrolled, unavailable, bounded, invalid, required, read-only, and disabled states.',
+    'Empty, partial, complete, open, closed, controlled, uncontrolled, unavailable, limited, invalid, required, read-only, and disabled states.',
   ],
   summary:
     'Choose one inclusive ISO civil-date interval through synchronized endpoints and calendar.',
   validation: [
-    'Ordering, bounds, unavailable dates, required state, custom validate, and external invalidity apply to the complete interval and stable error track.',
+    'Ordering, limits, unavailable dates, required state, custom validate, and application errors apply to the complete interval and share one fixed error area.',
   ],
 } satisfies ComponentContract;

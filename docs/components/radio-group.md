@@ -12,12 +12,12 @@ RadioGroup selects one visible mutually exclusive value with native radio behavi
 
 ## Prefer instead
 
-- Use CheckboxGroup for multiple selection, Switch for one immediate setting, and SegmentedControl for a compact bounded mode set.
+- Use CheckboxGroup for multiple selection, Switch for an immediate setting, and SegmentedControl for a few compact modes.
 
 ## Composition and parts
 
-- Render RadioGroup inside AppearanceProvider and supply a stable options tuple; keep all mutually exclusive options in the same group.
-- RadioGroup owns a group label, radio option track, indicators, and support track.
+- Render RadioGroup inside AppearanceProvider and supply durable option keys. Keep every mutually exclusive option in the same group.
+- RadioGroup includes a group label, option list, indicators, and support area.
 
 ## Preferred higher-level compositions
 
@@ -25,7 +25,7 @@ RadioGroup selects one visible mutually exclusive value with native radio behavi
 
 ## Content
 
-- Use parallel option labels and stable submitted values; descriptions clarify individual consequences without becoming option names.
+- Use parallel option labels and durable submitted keys. Descriptions may explain each consequence but must not replace option names.
 
 ## States
 
@@ -33,9 +33,9 @@ RadioGroup selects one visible mutually exclusive value with native radio behavi
 
 ## Control, events, validation, and forms
 
-- RadioGroup owns controlled or uncontrolled exclusive string selection; a controlled value uses one option value or null for the unselected state, while focus movement remains distinct from the group container.
+- RadioGroup supports controlled or uncontrolled string selection. A controlled value is one option key or null. Focus moves among the options, not the group container.
 - onChange reports the newly selected option value.
-- Use isRequired when no empty answer is valid and isInvalid with errorMessage for externally owned invalidity.
+- Use isRequired when an empty answer is invalid. Use isInvalid with errorMessage for errors supplied by the application.
 - name and form serialize the selected native radio value; reset restores defaultValue.
 
 ## Accessibility
@@ -51,12 +51,12 @@ RadioGroup selects one visible mutually exclusive value with native radio behavi
 
 ## Appearance and responsive behavior
 
-- RadioGroup uses aligned circular indicators and stable vertical option rows with neutral labels.
-- Choice rows fill their bounded parent; option copy wraps, and segmented peers remain equal while their labels wrap at compact widths.
+- RadioGroup uses aligned circular indicators and vertical option rows with neutral labels.
+- Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
-- Labels remain neutral; selected indicators, focus structure, and the segmented rail use the exact or saturated same-hue accent role appropriate to the surface.
+- Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.
 - Forced-color mode maps boundaries, selected indicators, focus outlines, switch state, and the segmented rail to system colors without hiding native inputs.
 - Reduced motion removes indicator, switch-thumb, hover, and segmented-rail transitions while retaining the final state.
 

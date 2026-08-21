@@ -1,28 +1,28 @@
 # ScrollRegion
 
-ScrollRegion keeps bounded overflow content labeled, focusable, and reachable.
+ScrollRegion labels overflow content and keeps it focusable and reachable.
 
 ## Use for
 
-- bounded history, source, logs, or dense content must remain reachable within a surrounding layout
+- history, source, logs, or dense content needs a constrained scrollable area within the surrounding layout
 
 ## Do not use for
 
-- ordinary page content can grow naturally or nested scrolling would hide essential actions and context
+- page content can grow naturally or nested scrolling would hide essential actions and context
 
 ## Prefer instead
 
-- Use normal document flow when content does not require a bounded viewport.
+- Use normal document flow when content does not need a constrained viewport.
 
 ## Composition and parts
 
-- Render ScrollRegion inside AppearanceProvider so its owned containment and focus tokens are available.
+- Render ScrollRegion inside AppearanceProvider to load its container and focus tokens.
 - Provide a concise label, one semantic size, and the overflow orientation that matches the content.
 - ScrollRegion exposes one labeled, focusable overflow content region.
 
 ## Preferred higher-level compositions
 
-- Place ScrollRegion inside Surface or Section when a bounded history or source view belongs to that named region.
+- Place ScrollRegion inside Surface or Section when a constrained history or source view belongs to that region.
 
 ## Content
 
@@ -34,10 +34,10 @@ ScrollRegion keeps bounded overflow content labeled, focusable, and reachable.
 
 ## Control, events, validation, and forms
 
-- Size and overflow orientation are controlled by bounded props; native scrolling owns position and input behavior.
+- Preset props control size and overflow direction. The browser controls scroll position and input.
 - Native overflow determines whether a scrollbar appears; the library changes only its transient thumb visibility.
-- ScrollRegion exposes no callback events and owns only transient scrollbar visibility state; native scrolling remains the source of position and input behavior.
-- The TypeScript API rejects arbitrary classes, inline styles, token values, and unsupported semantic options.
+- ScrollRegion emits no callbacks and manages only temporary scrollbar visibility. The browser controls scroll position and input.
+- The TypeScript API rejects custom classes, inline styles, token values, and unsupported options.
 - The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.
 
 ## Accessibility
@@ -53,20 +53,20 @@ ScrollRegion keeps bounded overflow content labeled, focusable, and reachable.
 
 ## Appearance and responsive behavior
 
-- ScrollRegion uses the library-owned subtle surface, border, and focus roles in both appearances.
-- The region fills available inline size and preserves its semantic maximum block size at compact and wide widths.
+- ScrollRegion uses the library subtle background, border, and focus styles.
+- The region fills the available width and keeps its preset maximum height at every viewport size.
 
 ## Accent, forced colors, and reduced motion
 
 - ScrollRegion uses the derived focus accent only for keyboard focus and does not tint its content surface.
 - Forced-color mode uses Canvas and CanvasText for containment and a continuously visible native scrollbar, plus Highlight for visible focus.
-- Reduced motion removes the scrollbar fade transition while preserving the same activity, focus, idle visibility, and native scrolling behavior.
+- Reduced motion removes the scrollbar fade. Activity, focus, idle visibility, and native scrolling work the same way.
 
 ## Examples
 
 ### Bound solver history
 
-Name a compact log region and preserve keyboard scrolling.
+Name a compact log region and keep native keyboard scrolling.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
@@ -85,9 +85,9 @@ export function SolverHistory() {
 
 ## Counterexamples
 
-### Do not replace ordinary page flow
+### Do not replace normal page flow
 
-Let primary page content grow when it does not need a bounded context.
+Let primary page content grow when it does not need a constrained scroll region.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

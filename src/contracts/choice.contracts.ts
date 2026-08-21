@@ -2,7 +2,7 @@ import type {ComponentContract} from './component-contract.js';
 
 const commonChoiceGuidance = {
   accentBehavior: [
-    'Labels remain neutral; selected indicators, focus structure, and the segmented rail use the exact or saturated same-hue accent role appropriate to the surface.',
+    'Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.',
   ],
   directionality: [
     'Indicators, option copy, switch movement, and segmented rail placement follow inherited writing direction without changing option order.',
@@ -17,7 +17,7 @@ const commonChoiceGuidance = {
     'Reduced motion removes indicator, switch-thumb, hover, and segmented-rail transitions while retaining the final state.',
   ],
   responsiveBehavior: [
-    'Choice rows fill their bounded parent; option copy wraps, and segmented peers remain equal while their labels wrap at compact widths.',
+    'Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.',
   ],
   stylesheet: './styles.css',
 } satisfies Pick<
@@ -79,7 +79,7 @@ export const checkboxContract = {
     'Use a concise affirmative label that makes both checked and unchecked meaning clear; reserve description for durable consequences or scope.',
   ],
   controlBehavior: [
-    'Checkbox supports controlled or uncontrolled boolean selection; isIndeterminate is a separate visual and semantic state that does not replace the submitted checked value.',
+    'Checkbox supports controlled or uncontrolled boolean selection. isIndeterminate changes its visual and accessible state but not the submitted checked value.',
   ],
   counterExamples: [
     {
@@ -98,7 +98,7 @@ export const checkboxContract = {
         'IncludeMeshChoice',
         '<Checkbox defaultSelected label="Include mesh" name="features" value="mesh" />',
       ),
-      description: 'Serialize one independently optional result feature.',
+      description: 'Submit one optional result feature.',
       title: 'Choose an optional result feature',
     },
   ],
@@ -116,7 +116,7 @@ export const checkboxContract = {
     'label is always visible; description and error text are referenced without consumer-authored ids.',
   ],
   name: 'Checkbox',
-  parts: ['Checkbox owns one indicator, visible label, and optional support track.'],
+  parts: ['Checkbox includes one indicator, visible label, and optional support area.'],
   preferredAlternatives: [
     'Use Switch for an immediately applied setting, CheckboxGroup for related multiple selection, RadioGroup or SegmentedControl for exclusive selection, and ToggleButton for a persistent action state.',
   ],
@@ -131,7 +131,7 @@ export const checkboxContract = {
     'ToggleButton',
   ],
   states: [
-    'Checked, unchecked, indeterminate, required, invalid, read-only, and disabled states remain geometrically stable.',
+    'Checked, unchecked, indeterminate, required, invalid, read-only, and disabled states do not change the control size.',
   ],
   summary: 'Select one independent optional or indeterminate value.',
   validation: [
@@ -144,18 +144,16 @@ export const checkboxGroupContract = {
   accessibility: [
     'CheckboxGroup exposes one named group and native checkbox options with generated group description, error, required, disabled, and read-only relationships.',
   ],
-  appearance: [
-    'CheckboxGroup aligns equivalent option rows and indicators in one stable vertical choice track.',
-  ],
+  appearance: ['CheckboxGroup aligns option rows and indicators in one vertical list.'],
   appropriateUses: ['a user may choose zero, one, or several related values under one question'],
   composition: [
-    'Render CheckboxGroup inside AppearanceProvider and supply a stable options tuple; option descriptions belong to their specific values.',
+    'Render CheckboxGroup inside AppearanceProvider and supply durable option keys. Each option description must describe that value.',
   ],
   contentRules: [
-    'Use one concise group label and parallel option labels; each option value must be stable and suitable for state and form serialization.',
+    'Use a concise group label and parallel option labels. Option keys must work for state and form submission.',
   ],
   controlBehavior: [
-    'CheckboxGroup owns controlled or uncontrolled string-array selection while preserving each option as an independent checkbox tab stop.',
+    'CheckboxGroup supports controlled or uncontrolled string-array selection. Each option remains an independent checkbox tab stop.',
   ],
   counterExamples: [
     {
@@ -174,7 +172,7 @@ export const checkboxGroupContract = {
         'ResultLayerChoices',
         `<CheckboxGroup defaultValue={['thermal']} label="Result layers" name="layers" ${resultLayers} />`,
       ),
-      description: 'Choose any number of independently combinable result layers.',
+      description: 'Choose any combination of result layers.',
       title: 'Choose multiple result layers',
     },
   ],
@@ -195,7 +193,7 @@ export const checkboxGroupContract = {
   ],
   name: 'CheckboxGroup',
   parts: [
-    'CheckboxGroup owns a group label, option track, checkbox indicators, and support track.',
+    'CheckboxGroup includes a group label, option list, checkbox indicators, and support area.',
   ],
   preferredAlternatives: [
     'Use Checkbox for one independent value and RadioGroup or SegmentedControl for mutually exclusive selection.',
@@ -210,7 +208,7 @@ export const checkboxGroupContract = {
   ],
   summary: 'Select zero or more related values under one question.',
   validation: [
-    'isRequired requires at least one selected option; isInvalid and errorMessage describe externally owned invalidity for the group.',
+    'isRequired requires at least one selected option. isInvalid and errorMessage report group errors supplied by the application.',
   ],
 } satisfies ComponentContract;
 
@@ -220,17 +218,17 @@ export const radioGroupContract = {
     'RadioGroup exposes one named native radio group with one tab stop and generated group description, error, required, disabled, and read-only relationships.',
   ],
   appearance: [
-    'RadioGroup uses aligned circular indicators and stable vertical option rows with neutral labels.',
+    'RadioGroup uses aligned circular indicators and vertical option rows with neutral labels.',
   ],
   appropriateUses: ['a user must choose at most or exactly one answer from a visible set'],
   composition: [
-    'Render RadioGroup inside AppearanceProvider and supply a stable options tuple; keep all mutually exclusive options in the same group.',
+    'Render RadioGroup inside AppearanceProvider and supply durable option keys. Keep every mutually exclusive option in the same group.',
   ],
   contentRules: [
-    'Use parallel option labels and stable submitted values; descriptions clarify individual consequences without becoming option names.',
+    'Use parallel option labels and durable submitted keys. Descriptions may explain each consequence but must not replace option names.',
   ],
   controlBehavior: [
-    'RadioGroup owns controlled or uncontrolled exclusive string selection; a controlled value uses one option value or null for the unselected state, while focus movement remains distinct from the group container.',
+    'RadioGroup supports controlled or uncontrolled string selection. A controlled value is one option key or null. Focus moves among the options, not the group container.',
   ],
   counterExamples: [
     {
@@ -270,9 +268,9 @@ export const radioGroupContract = {
     'label names the radiogroup; every radio has visible option text and may reference one option description.',
   ],
   name: 'RadioGroup',
-  parts: ['RadioGroup owns a group label, radio option track, indicators, and support track.'],
+  parts: ['RadioGroup includes a group label, option list, indicators, and support area.'],
   preferredAlternatives: [
-    'Use CheckboxGroup for multiple selection, Switch for one immediate setting, and SegmentedControl for a compact bounded mode set.',
+    'Use CheckboxGroup for multiple selection, Switch for an immediate setting, and SegmentedControl for a few compact modes.',
   ],
   preferredCompositions: ['Place RadioGroup inside FormSection for a larger configuration flow.'],
   purpose: 'RadioGroup selects one visible mutually exclusive value with native radio behavior.',
@@ -282,7 +280,7 @@ export const radioGroupContract = {
   ],
   summary: 'Select one value from a visible mutually exclusive set.',
   validation: [
-    'Use isRequired when no empty answer is valid and isInvalid with errorMessage for externally owned invalidity.',
+    'Use isRequired when an empty answer is invalid. Use isInvalid with errorMessage for errors supplied by the application.',
   ],
 } satisfies ComponentContract;
 
@@ -295,9 +293,7 @@ export const switchContract = {
     'Switch uses a compact pill track and logical-direction thumb movement beside a neutral label without changing row geometry.',
   ],
   appropriateUses: ['a user turns one setting on or off and the change takes effect immediately'],
-  composition: [
-    'Render Switch inside AppearanceProvider and use one stable label for the setting.',
-  ],
+  composition: ['Render Switch inside AppearanceProvider and use the same label in both states.'],
   contentRules: [
     'Name the setting rather than the action; the on and off states must both make sense with the same persistent label.',
   ],
@@ -332,16 +328,18 @@ export const switchContract = {
   ],
   keyboardBehavior: ['Space toggles the focused switch; Tab moves to or from the enabled switch.'],
   kind: 'component',
-  labeling: ['label is required and remains the switch name; description supplies optional scope.'],
+  labeling: ['label is required and does not change with state. description may add context.'],
   name: 'Switch',
-  parts: ['Switch owns one track, moving thumb, visible label, and optional description.'],
+  parts: ['Switch includes one track, moving thumb, visible label, and optional description.'],
   preferredAlternatives: [
     'Use Checkbox for acknowledgement or deferred form choice and RadioGroup or SegmentedControl for exclusive modes.',
   ],
   preferredCompositions: ['Place related Switch peers in FieldGroup or FormSection.'],
   purpose: 'Switch changes one immediately applied binary setting.',
   relatedExports: ['AppearanceProvider', 'Checkbox', 'RadioGroup', 'SegmentedControl'],
-  states: ['On, off, read-only, and disabled states remain visible and geometrically stable.'],
+  states: [
+    'On, off, read-only, and disabled states remain visible without changing the control size.',
+  ],
   summary: 'Turn one immediately applied setting on or off.',
   validation: [
     'Switch does not expose required or invalid state; use Checkbox when a binary value participates in acknowledgement validation.',
@@ -354,19 +352,19 @@ export const segmentedControlContract = {
     'SegmentedControl exposes one named native radio group with one tab stop, equivalent segment labels, and generated group support relationships.',
   ],
   appearance: [
-    'SegmentedControl keeps equal adjacent segments on one neutral surface; one group-owned accent bottom rail glides between selected segments while every label remains neutral and no selected fill or elevation persists.',
+    'SegmentedControl places equal adjacent segments on a neutral background. One accent rail moves below the selection. Labels stay neutral, and selection adds no fill or shadow.',
   ],
   appropriateUses: [
     'a user switches among two or more compact, visible, mutually exclusive views or modes',
   ],
   composition: [
-    'Render SegmentedControl inside AppearanceProvider and provide at least two stable options whose short labels fit adjacent comparison.',
+    'Render SegmentedControl inside AppearanceProvider. Provide at least two options with durable keys and short labels that fit side by side.',
   ],
   contentRules: [
-    'Use short parallel labels and stable values; move verbose explanation to the group description rather than individual segments.',
+    'Use short parallel labels and durable keys. Put longer explanations in the group description.',
   ],
   controlBehavior: [
-    'SegmentedControl owns controlled or uncontrolled exclusive string selection; a controlled value uses one option value or null for the unselected state, while disabled options remain visible and the selected rail follows current state.',
+    'SegmentedControl supports controlled or uncontrolled exclusive string selection. A controlled value is one option key or null. Disabled options remain visible, and the rail follows the selection.',
   ],
   counterExamples: [
     {
@@ -388,7 +386,7 @@ export const segmentedControlContract = {
         'DensitySegments',
         `<SegmentedControl defaultValue="balanced" label="Display density" name="density" ${modes} />`,
       ),
-      description: 'Compare and switch among a compact bounded set of modes.',
+      description: 'Compare and switch among a few compact modes.',
       title: 'Choose display density',
     },
   ],
@@ -409,7 +407,7 @@ export const segmentedControlContract = {
   ],
   name: 'SegmentedControl',
   parts: [
-    'SegmentedControl owns one group label, equal segment track, single moving rail, and support track.',
+    'SegmentedControl includes one group label, equal segment row, moving rail, and support area.',
   ],
   preferredAlternatives: [
     'Use RadioGroup for verbose visible choices, CheckboxGroup for multiple selection, and later Select for a larger or open collection.',
@@ -418,10 +416,10 @@ export const segmentedControlContract = {
   purpose: 'SegmentedControl selects one compact mode through equal adjacent radio segments.',
   relatedExports: ['AppearanceProvider', 'CheckboxGroup', 'RadioGroup'],
   states: [
-    'Selected, unselected, required, invalid, read-only, group-disabled, and option-disabled states preserve equal segment geometry.',
+    'Selected, unselected, required, invalid, read-only, group-disabled, and option-disabled states keep segments equal.',
   ],
-  summary: 'Switch among a compact bounded set with one gliding selection rail.',
+  summary: 'Switch among a few compact modes with a moving selection rail.',
   validation: [
-    'Use isRequired when an empty selection is invalid and isInvalid with errorMessage for externally owned invalidity.',
+    'Use isRequired when an empty selection is invalid. Use isInvalid with errorMessage for errors supplied by the application.',
   ],
 } satisfies ComponentContract;

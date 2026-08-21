@@ -1,6 +1,6 @@
 # ResponsiveGrid
 
-ResponsiveGrid forms stable columns from bounded semantic minimum item sizes.
+ResponsiveGrid forms columns from preset minimum item widths.
 
 ## Use for
 
@@ -16,8 +16,8 @@ ResponsiveGrid forms stable columns from bounded semantic minimum item sizes.
 
 ## Composition and parts
 
-- Render ResponsiveGrid inside AppearanceProvider so its owned spacing tokens are available.
-- Place one coherent item in each direct child and choose the minimum width from compact, regular, or wide.
+- Render ResponsiveGrid inside AppearanceProvider to load its spacing tokens.
+- Put one complete item in each direct child and choose a compact, regular, or wide minimum width.
 - ResponsiveGrid exposes one item-children region and no named parts.
 
 ## Preferred higher-level compositions
@@ -26,17 +26,17 @@ ResponsiveGrid forms stable columns from bounded semantic minimum item sizes.
 
 ## Content
 
-- Keep each child independently understandable when it reflows to its own row.
+- Each child must still make sense when it moves to its own row.
 
 ## States
 
-- The primitive has no internal state; changing a bounded prop deterministically updates its structural attributes.
+- The primitive has no internal state. Changing a prop updates its structural attributes.
 
 ## Control, events, validation, and forms
 
-- Minimum item width, gap, and optional equal row sizing are controlled by bounded props.
-- The primitive emits no callback events and owns no interactive state.
-- The TypeScript API rejects arbitrary classes, inline styles, token values, and unsupported semantic options.
+- Preset props control minimum item width, gap, and optional equal row sizing.
+- The primitive emits no callbacks and has no interactive state.
+- The TypeScript API rejects custom classes, inline styles, token values, and unsupported options.
 - The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.
 
 ## Accessibility
@@ -45,21 +45,21 @@ ResponsiveGrid forms stable columns from bounded semantic minimum item sizes.
 
 ## Keyboard, labeling, localization, and direction
 
-- ResponsiveGrid preserves child focus order and adds no keyboard behavior.
+- ResponsiveGrid keeps child focus order and adds no keyboard behavior.
 - ResponsiveGrid creates no semantic collection and receives no label.
 - The primitive renders consumer content without translating, reordering, or constructing localized sentences.
 - Logical block and inline properties follow the inherited writing direction without a direction override.
 
 ## Appearance and responsive behavior
 
-- ResponsiveGrid uses library-owned spacing and minimum item widths in both appearances and paints no decorative color.
+- ResponsiveGrid uses preset spacing and minimum item widths and adds no color.
 - Columns are derived from available inline size with auto-fit and collapse without a consumer breakpoint.
 
 ## Accent, forced colors, and reduced motion
 
 - ResponsiveGrid does not apply the application accent.
 - Forced colors do not change grid geometry because ResponsiveGrid paints no decorative color.
-- The primitive introduces no motion, so reduced motion preserves the same structure without an alternate transition.
+- The primitive has no motion, so the reduced-motion setting does not change it.
 
 ## Examples
 

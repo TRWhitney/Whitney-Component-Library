@@ -1,6 +1,6 @@
 # Stack
 
-Stack establishes bounded vertical rhythm between related elements.
+Stack arranges related elements vertically with consistent spacing.
 
 ## Use for
 
@@ -16,7 +16,7 @@ Stack establishes bounded vertical rhythm between related elements.
 
 ## Composition and parts
 
-- Render Stack inside AppearanceProvider so its owned spacing tokens are available.
+- Render Stack inside AppearanceProvider to load its spacing tokens.
 - Place related siblings directly inside Stack and nest another layout primitive only when the relationship changes.
 - Stack exposes one ordered children region and no named parts.
 
@@ -26,22 +26,22 @@ Stack establishes bounded vertical rhythm between related elements.
 
 ## Content
 
-- Order children in reading order and keep each child responsible for its own semantic element.
+- Keep children in reading order and give each one the appropriate HTML element.
 
 ## States
 
-- The primitive has no internal state; changing a bounded prop deterministically updates its structural attributes.
+- The primitive has no internal state. Changing a prop updates its structural attributes.
 
 ## Control, events, validation, and forms
 
-- Gap and cross-axis alignment are controlled by bounded props with regular spacing and stretch alignment as defaults.
-- The primitive emits no callback events and owns no interactive state.
-- The TypeScript API rejects arbitrary classes, inline styles, token values, and unsupported semantic options.
+- The gap and alignment props use preset values. They default to regular spacing and stretch alignment.
+- The primitive emits no callbacks and has no interactive state.
+- The TypeScript API rejects custom classes, inline styles, token values, and unsupported options.
 - The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.
 
 ## Accessibility
 
-- Stack contributes layout only; use semantic child elements for lists, navigation, regions, and headings.
+- Stack changes layout only. Use the appropriate child elements for lists, navigation, regions, and headings.
 
 ## Keyboard, labeling, localization, and direction
 
@@ -52,14 +52,14 @@ Stack establishes bounded vertical rhythm between related elements.
 
 ## Appearance and responsive behavior
 
-- Stack uses library-owned spacing in both appearances and paints no decorative color.
-- Stack remains vertical at every width; children wrap or reflow according to their own contracts.
+- Stack uses the library spacing scale and adds no color.
+- Stack stays vertical at every width. Its children decide how they wrap or reflow.
 
 ## Accent, forced colors, and reduced motion
 
 - Stack does not apply the application accent.
 - Forced colors do not change Stack geometry because Stack paints no decorative color.
-- The primitive introduces no motion, so reduced motion preserves the same structure without an alternate transition.
+- The primitive has no motion, so the reduced-motion setting does not change it.
 
 ## Examples
 

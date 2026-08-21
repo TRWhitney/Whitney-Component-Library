@@ -35,18 +35,16 @@ function withinAppearanceProvider(lines: readonly string[]): string {
 export const buttonContract = {
   ...commonActionGuidance,
   accentBehavior: [
-    'Primary emphasis uses the exact application accent with an independently readable foreground and a saturated same-hue supporting boundary only when the fill is too close to its surrounding surface.',
-    'Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary labels stay neutral. Danger keeps its semantic color, and pending uses warning rather than accent.',
+    'Primary emphasis uses the application accent unchanged, with a separately chosen readable foreground. A more saturated border with the same hue appears only when the fill blends into its background.',
+    'Hover colors keep the accent hue. Focus and interactive edges use the exact accent or a more saturated version of the same hue. Labels stay neutral, danger uses its status color, and pending uses warning.',
   ],
   accessibility: [
-    'The rendered element is a native button with a stable visible label and visible focus indication.',
+    'The rendered element is a native button with an unchanged visible label and a visible focus outline.',
     'Pending keeps the button focusable but inert and exposes pendingLabel as a live status description without replacing the visible label.',
   ],
-  appropriateUses: [
-    'a user initiates an immediate command, confirms a choice, or explicitly submits or resets a form',
-  ],
+  appropriateUses: ['a user runs a command, confirms a choice, or submits or resets a form'],
   appearance: [
-    'Button uses library-owned control height, rounded shape, type, and secondary, primary, quiet, or danger treatment in both appearances.',
+    'Button uses the library control height, rounded shape, type, and secondary, primary, quiet, or danger style.',
   ],
   composition: [
     'Render Button inside AppearanceProvider and place adjacent peer commands in ButtonGroup or Toolbar according to their keyboard relationship.',
@@ -78,7 +76,7 @@ export const buttonContract = {
   examples: [
     {
       title: 'Run a profile',
-      description: 'Keep the command label stable and describe its pending work separately.',
+      description: 'Keep the command label unchanged and describe pending work separately.',
       code: withinAppearanceProvider([
         'export function RunProfileAction() {',
         '  return (',
@@ -95,14 +93,14 @@ export const buttonContract = {
     'Forced-color mode maps the button boundary, label, focus outline, and pending rail to system colors.',
   ],
   formBehavior: [
-    'type defaults to button; set submit or reset explicitly to retain native form behavior, and use form, name, value, or formNoValidate only for that native relationship.',
+    'type defaults to button. Set it to submit or reset when needed. Use form, name, value, or formNoValidate only for their native form behavior.',
   ],
   importPath: '.',
   inappropriateUses: [
     'activation changes the current URL, represents persistent binary selection, or needs an icon without visible text',
   ],
   keyboardBehavior: [
-    'Enter and Space activate the native button; ordinary buttons remain individual tab stops in ButtonGroup and participate in Toolbar arrow navigation.',
+    'Enter and Space activate the native button. Buttons remain individual tab stops in ButtonGroup and use arrow navigation in Toolbar.',
   ],
   kind: 'component',
   labeling: [
@@ -116,9 +114,9 @@ export const buttonContract = {
     'Use Link for navigation, ToggleButton for persistent binary selection, and IconButton only for a familiar icon-only command.',
   ],
   preferredCompositions: [
-    'Use ButtonGroup for a small ordinary cluster and Toolbar for a compact command surface whose items share arrow-key navigation.',
+    'Use ButtonGroup for a few related commands and Toolbar when compact commands share arrow-key navigation.',
   ],
-  purpose: 'Button initiates a command while preserving native button and form semantics.',
+  purpose: 'Button runs a command with native button and form behavior.',
   reducedMotionBehavior: [
     'Reduced motion stops the traveling pending rail and removes state transitions while keeping a static warning rail and every state boundary.',
   ],
@@ -137,13 +135,13 @@ export const buttonContract = {
   responsiveBehavior: [
     'Button keeps its minimum regular or compact control height and wraps long labels instead of clipping them when its container narrows.',
   ],
-  summary: 'Initiate a command with native button and explicit form behavior.',
+  summary: 'Run a command with native button and form behavior.',
 } satisfies ComponentContract;
 
 export const iconButtonContract = {
   ...commonActionGuidance,
   accentBehavior: [
-    'Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary icon content stays neutral. Danger keeps its semantic color.',
+    'Hover colors keep the accent hue. Focus and interactive edges use the exact accent or a more saturated version of the same hue. Icons stay neutral, and danger uses its status color.',
   ],
   accessibility: [
     'The required label supplies the native button accessible name and the same text appears in an automatic hover and focus tooltip.',
@@ -210,9 +208,7 @@ export const iconButtonContract = {
     'Enter and Space activate the native button; focus also reveals the tooltip after its short guidance delay.',
   ],
   kind: 'component',
-  labeling: [
-    'label is required, becomes the accessible name, and is reused verbatim as the library-owned tooltip text.',
-  ],
+  labeling: ['label is required. It becomes the accessible name and the tooltip text.'],
   name: 'IconButton',
   parts: ['IconButton exposes one icon region and one automatic provider-scoped tooltip.'],
   preferredAlternatives: [
@@ -223,11 +219,11 @@ export const iconButtonContract = {
   ],
   purpose: 'IconButton presents a familiar icon-only command with required accessible guidance.',
   reducedMotionBehavior: [
-    'Reduced motion removes control and tooltip transitions while preserving hover, focus, press, disabled, and tooltip meaning.',
+    'Reduced motion removes control and tooltip transitions. Hover, focus, press, disabled, and tooltip states remain visible.',
   ],
   relatedExports: ['AppearanceProvider', 'Button', 'ToggleButton', 'Toolbar'],
   states: [
-    'Secondary is the default; quiet and danger offer bounded emphasis while hover, focus, press, and disabled remain visible without movement.',
+    'Secondary is the default. Quiet lowers emphasis, and danger marks a destructive command. Hover, focus, press, and disabled states use no movement.',
   ],
   responsiveBehavior: [
     'IconButton keeps its square regular or compact dimensions while its containing layout determines wrapping or overflow.',
@@ -249,13 +245,13 @@ export const linkContract = {
     'Link paints neutral text with an accent-bearing underline and no resting control surface; current, hover, focus, and disabled treatments remain distinct in both appearances.',
   ],
   composition: [
-    'Render Link inside AppearanceProvider and place it in prose, navigation, or a region that owns the surrounding destination context.',
+    'Render Link inside AppearanceProvider and place it in prose, navigation, or a region that supplies the destination context.',
   ],
   contentRules: [
     'Use destination-oriented text that remains understandable outside its surrounding sentence.',
   ],
   controlBehavior: [
-    'href is required; current, isDisabled, and newWindow describe bounded navigation state without an activation callback.',
+    'href is required. current, isDisabled, and newWindow describe navigation state without an activation callback.',
   ],
   counterExamples: [
     {
@@ -289,7 +285,7 @@ export const linkContract = {
   ],
   exportName: 'Link',
   forcedColorBehavior: [
-    'Forced-color mode uses the system link color and focus highlight while preserving native underline and current-destination emphasis.',
+    'Forced-color mode uses the system link color and focus highlight while keeping the native underline and current-page emphasis.',
   ],
   formBehavior: ['Link does not submit, reset, validate, or contribute a value to a form.'],
   importPath: '.',
@@ -297,7 +293,7 @@ export const linkContract = {
     'activation changes local application state, submits a form, performs a command, or toggles persistent selection',
   ],
   keyboardBehavior: [
-    'Enter follows the native anchor destination; Link participates in ordinary document tab order.',
+    'Enter follows the native anchor destination. Link participates in normal document tab order.',
   ],
   kind: 'component',
   labeling: [
@@ -328,7 +324,7 @@ export const linkContract = {
 export const toggleButtonContract = {
   ...commonActionGuidance,
   accentBehavior: [
-    'Ordinary label text stays neutral; hover tint preserves the accent hue, while focus and the persistent selected under-rail use exact or saturated same-hue accent structure without implying semantic status.',
+    'Label text stays neutral, and hover colors keep the accent hue. Focus and the selection rail use the exact accent or a more saturated version of the same hue without implying status.',
   ],
   accessibility: [
     'ToggleButton renders a button with aria-pressed so selected, disabled, focus, and press state remain distinct.',
@@ -337,13 +333,13 @@ export const toggleButtonContract = {
     'one command-like control represents a persistent binary selection such as pinned, muted, or bold',
   ],
   appearance: [
-    'ToggleButton uses library-owned control height, rounded shape, type, and secondary or quiet treatment with a rail-only selected state in both appearances.',
+    'ToggleButton uses the library control height, rounded shape, type, and secondary or quiet style with a selection rail.',
   ],
   composition: [
     'Render ToggleButton inside AppearanceProvider and place related editor or tool toggles in Toolbar.',
   ],
   contentRules: [
-    'Use a stable label whose meaning is valid in both selected and unselected state.',
+    'Use one label that works in both selected and unselected states.',
     'Use secondary for a standalone toggle with its own neutral boundary and quiet inside a toolbar or another contained command surface.',
   ],
   controlBehavior: [
@@ -388,14 +384,14 @@ export const toggleButtonContract = {
     'activation is a one-time command, navigates, or represents a submitted form value that needs checkbox semantics',
   ],
   keyboardBehavior: [
-    'Enter and Space toggle pressed state; ordinary placement preserves its tab stop and Toolbar placement adds orientation-aware arrow navigation.',
+    'Enter and Space toggle the pressed state. Outside a Toolbar, the button keeps its tab stop. Inside one, it uses orientation-aware arrow navigation.',
   ],
   kind: 'component',
   labeling: [
     'Visible children provide the accessible name, while aria-pressed communicates selection without changing that label.',
   ],
   name: 'ToggleButton',
-  parts: ['ToggleButton exposes one stable visible-label region and one selected-state rail.'],
+  parts: ['ToggleButton exposes one visible label region and one selection rail.'],
   preferredAlternatives: [
     'Use Button for a one-time command, Link for navigation, and a future checkbox field for submitted binary data.',
   ],
@@ -404,7 +400,7 @@ export const toggleButtonContract = {
   ],
   purpose: 'ToggleButton represents a persistent binary selection with pressed-button semantics.',
   reducedMotionBehavior: [
-    'Reduced motion removes state transitions while preserving hover, focus, press, selected, and disabled boundaries.',
+    'Reduced motion removes state transitions. Hover, focus, press, selected, and disabled states remain visible.',
   ],
   relatedExports: ['AppearanceProvider', 'Button', 'Link', 'Toolbar'],
   states: [
@@ -424,11 +420,9 @@ export const buttonGroupContract = {
   accessibility: [
     'ButtonGroup creates a named group while every child action retains its own role, accessible name, and tab stop.',
   ],
-  appropriateUses: [
-    'a small set of related ordinary commands needs shared grouping and optionally consistent adjacent sizing',
-  ],
+  appropriateUses: ['a few related commands need a shared group and optional equal sizing'],
   appearance: [
-    'ButtonGroup owns gap, orientation, and optional equal-item geometry but paints no group surface, border, text, or state color.',
+    'ButtonGroup sets the gap, orientation, and optional equal-item layout but adds no background, border, text, or state color.',
   ],
   composition: [
     'Render ButtonGroup inside AppearanceProvider with Button or IconButton children and use equalItems for equivalent adjacent choices.',
@@ -455,7 +449,7 @@ export const buttonGroupContract = {
     },
   ],
   events: [
-    'ButtonGroup emits no group event; each child action owns its activation or selection callback.',
+    'ButtonGroup emits no group event. Each child handles its activation or selection callback.',
   ],
   examples: [
     {
@@ -475,10 +469,10 @@ export const buttonGroupContract = {
   ],
   exportName: 'ButtonGroup',
   forcedColorBehavior: [
-    'ButtonGroup geometry is unchanged in forced colors while each child preserves its own system-color treatment.',
+    'Forced colors do not change ButtonGroup geometry. Each child keeps its system-color treatment.',
   ],
   formBehavior: [
-    'ButtonGroup itself has no form behavior; child Button types retain their explicit native submit or reset behavior.',
+    'ButtonGroup has no form behavior. Each Button keeps its native submit or reset behavior.',
   ],
   importPath: '.',
   inappropriateUses: [
@@ -503,15 +497,13 @@ export const buttonGroupContract = {
     'ButtonGroup introduces no motion; child actions apply their own reduced-motion behavior.',
   ],
   relatedExports: ['AppearanceProvider', 'Button', 'IconButton', 'Toolbar'],
-  states: [
-    'The group has no selection or disabled state; its geometry remains stable while children expose their own states.',
-  ],
+  states: ['The group has no selection or disabled state. Child states do not change its layout.'],
   responsiveBehavior: [
     'Horizontal groups keep their declared axis and allow equal child labels to wrap without clipping; choose vertical orientation when the complete horizontal group does not fit the containing region.',
   ],
-  summary: 'Group related ordinary commands while preserving each tab stop.',
+  summary: 'Group related commands while keeping each tab stop.',
   validation: [
-    'The TypeScript API rejects arbitrary classes, inline styles, and unsupported geometry options; runtime DOM validation accepts consumer component boundaries while rejecting rendered direct children other than Button, IconButton, or library-owned action support nodes.',
+    'The TypeScript API rejects custom classes, inline styles, and unsupported layout options. Runtime validation accepts consumer component boundaries but requires rendered direct children to be Button, IconButton, or internal support nodes.',
   ],
 } satisfies ComponentContract;
 
@@ -527,7 +519,7 @@ export const toolbarContract = {
     'a compact, frequently used command surface needs one tab entry followed by orientation-aware arrow navigation',
   ],
   appearance: [
-    'Toolbar paints a rounded neutral subtle surface and border around its bounded gap and orientation in both appearances.',
+    'Toolbar draws a rounded neutral background and border around its preset gap and orientation.',
   ],
   composition: [
     'Render Toolbar inside AppearanceProvider with Button, IconButton, and ToggleButton children that belong to one command context.',
@@ -541,7 +533,7 @@ export const toolbarContract = {
   ],
   counterExamples: [
     {
-      title: 'Do not turn an ordinary action row into a toolbar',
+      title: 'Do not turn a simple action row into a toolbar',
       description: 'A short confirmation row should keep each action directly reachable by Tab.',
       code: withinAppearanceProvider([
         'export function ConfirmationAsToolbar() {',
@@ -562,7 +554,7 @@ export const toolbarContract = {
     {
       title: 'Compose editor commands',
       description:
-        'Combine a consumer-owned command bundle and persistent formatting state under one arrow-key model.',
+        'Combine an application command bundle and a persistent formatting choice under one arrow-key model.',
       code: withinAppearanceProvider([
         'const HistoryActions = () => (',
         '  <>',
@@ -584,14 +576,12 @@ export const toolbarContract = {
   ],
   exportName: 'Toolbar',
   forcedColorBehavior: [
-    'Forced-color mode maps the toolbar border and surface to system colors while each child preserves its own system-color states.',
+    'Forced-color mode maps the toolbar border and background to system colors. Each child keeps its system-color states.',
   ],
-  formBehavior: [
-    'Toolbar itself has no form behavior; child Button types retain their explicit native form behavior.',
-  ],
+  formBehavior: ['Toolbar has no form behavior. Each Button keeps its native form behavior.'],
   importPath: '.',
   inappropriateUses: [
-    'a small ordinary action row should keep every control in tab order, or the children do not share one command context',
+    'a short action row should keep every control in tab order, or the children do not share one command context',
   ],
   keyboardBehavior: [
     'Tab enters or leaves the toolbar as one stop; horizontal toolbars use Left and Right arrows, vertical toolbars use Up and Down arrows, and horizontal direction follows the inherited writing direction.',
@@ -599,11 +589,9 @@ export const toolbarContract = {
   kind: 'composition',
   labeling: ['label is required and names the toolbar without adding visible text.'],
   name: 'Toolbar',
-  parts: [
-    'Toolbar exposes one ordered rendered control region within its bounded command surface.',
-  ],
+  parts: ['Toolbar exposes one ordered control region.'],
   preferredAlternatives: [
-    'Use ButtonGroup for a short ordinary command cluster whose children should all remain Tab stops.',
+    'Use ButtonGroup for a short command group whose children should all remain Tab stops.',
   ],
   preferredCompositions: [
     'Combine compact Button, IconButton, and ToggleButton controls only when they operate on the same editor, canvas, or selected object.',
@@ -618,10 +606,10 @@ export const toolbarContract = {
     'The toolbar surface remains neutral while child commands carry hover, focus, press, selected, pending, and disabled meaning.',
   ],
   responsiveBehavior: [
-    'Horizontal toolbars preserve one command row with reachable inline overflow; vertical toolbars stack and stretch their children.',
+    'Horizontal toolbars keep one command row with reachable inline overflow. Vertical toolbars stack and stretch their children.',
   ],
   summary: 'Compose frequent commands with orientation-aware arrow navigation.',
   validation: [
-    'The TypeScript API rejects arbitrary classes, inline styles, and unsupported orientation values; runtime DOM validation accepts consumer component boundaries while rejecting rendered direct children other than Button, IconButton, ToggleButton, or library-owned action support nodes.',
+    'The TypeScript API rejects custom classes, inline styles, and unsupported orientations. Runtime validation accepts consumer component boundaries but requires rendered direct children to be Button, IconButton, ToggleButton, or internal support nodes.',
   ],
 } satisfies ComponentContract;

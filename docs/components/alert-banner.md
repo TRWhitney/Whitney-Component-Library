@@ -1,6 +1,6 @@
 # AlertBanner
 
-AlertBanner explains a semantic condition with broad page or workspace scope.
+AlertBanner explains a condition that affects a page or workspace.
 
 ## Use for
 
@@ -17,7 +17,7 @@ AlertBanner explains a semantic condition with broad page or workspace scope.
 ## Composition and parts
 
 - Render inside AppearanceProvider and place AlertBanner at the start of the region its condition affects; do not nest it inside an unrelated local card.
-- AlertBanner owns one full-width boundary, glyph, visible title, and optional description.
+- AlertBanner includes one full-width border, icon, visible title, and optional description.
 
 ## Preferred higher-level compositions
 
@@ -29,12 +29,12 @@ AlertBanner explains a semantic condition with broad page or workspace scope.
 
 ## States
 
-- Neutral, success, warning, and danger share one stable geometry; announcement off, polite, and assertive remain deliberate separate modes.
+- Neutral, success, warning, and danger share one layout. Announcements may be off, polite, or assertive.
 
 ## Control, events, validation, and forms
 
 - announcement supports off, polite, and assertive; off is the default, polite reports non-urgent changes, and assertive is reserved for an immediate interruption.
-- The alert emits no event and owns no dismissal; consumers update or remove it and place any recovery Button outside its message semantics.
+- The alert emits no events and has no dismissal control. The application updates or removes it and places any recovery Button outside the message.
 - Consumer data determines meaning; the component validates only representable numeric domains and threshold ordering where applicable.
 - This display component is not a successful form control and does not serialize, validate, or respond to form reset.
 
@@ -45,19 +45,19 @@ AlertBanner explains a semantic condition with broad page or workspace scope.
 ## Keyboard, labeling, localization, and direction
 
 - The component adds no tab stop or keyboard command; interactive recovery actions belong in adjacent action components.
-- title is required and visible; the description remains part of the same note or live region, so no aria-label duplication is needed.
+- title is required and visible. The description belongs to the same note or live region, so it needs no duplicate aria-label.
 - Supply localized labels, titles, descriptions, status copy, value labels, units, threshold labels, and completion meaning as applicable.
 - Copy and logical edges follow inherited writing direction; numeric source values and consumer-provided wording are not reordered.
 
 ## Appearance and responsive behavior
 
-- AlertBanner spans its containing region with rounded continuous containment, a constant icon column, semantic surface, title, and optional description.
-- The banner fills available inline space and wraps copy beneath no arbitrary breakpoint while preserving its glyph column.
+- AlertBanner spans its container with a rounded background, fixed icon column, status color, title, and optional description.
+- The banner fills the available width and wraps text while keeping its icon column.
 
 ## Accent, forced colors, and reduced motion
 
 - Alerts never accept application accent as severity; neutral, success, warning, and danger retain independent meaning.
-- Forced colors preserve the stable boundary, leading edge, tone-specific glyph shape, title, and description using system colors.
+- Forced colors use system colors for the border, leading edge, status icon, title, and description.
 - Alert tone changes use no layout or continuous motion and settle immediately under reduced motion.
 
 ## Examples
@@ -83,7 +83,7 @@ export function SolverOutageBanner() {
 
 ### Do not overstate local feedback
 
-One field-group condition should remain local through InlineAlert.
+Keep a field-group condition local with InlineAlert.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

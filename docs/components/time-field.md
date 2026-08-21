@@ -17,7 +17,7 @@ TimeField collects one zone-free wall-clock time through localized segmented ent
 ## Composition and parts
 
 - Render TimeField inside AppearanceProvider and keep time-zone meaning outside it.
-- TimeField owns a label, segmented time input, hidden form input, and support track.
+- TimeField includes a label, segmented time input, hidden form input, and support area.
 
 ## Preferred higher-level compositions
 
@@ -33,14 +33,14 @@ TimeField collects one zone-free wall-clock time through localized segmented ent
 
 ## Control, events, validation, and forms
 
-- Controlled or uncontrolled zone-free times may be empty; hourCycle and granularity are explicit, and values cannot hide precision below the visible segments.
-- onChange reports a complete library-owned wall-clock value or null.
+- Controlled or uncontrolled zone-free times may be empty. hourCycle and granularity define the format, and values cannot contain more precision than the visible segments.
+- onChange reports a complete value in the library's wall-clock format or null.
 - minValue, maxValue, required state, visible precision, custom validate, and external invalidity share the support track.
 - name and form serialize a complete value as HH:mm:ss; native reset restores defaultValue and a named empty field contributes an empty string.
 
 ## Accessibility
 
-- TimeField exposes one visible label and separately focusable hour, minute, second, and day-period segments as required by its explicit format.
+- TimeField exposes one visible label and separate focus targets for the hour, minute, second, and day period required by its format.
 
 ## Keyboard, labeling, localization, and direction
 
@@ -51,13 +51,13 @@ TimeField collects one zone-free wall-clock time through localized segmented ent
 
 ## Appearance and responsive behavior
 
-- Segmented controls retain the compact field geometry and stable support track; pickers add one raised almanac sheet with utility weekday text and a continuous range route.
-- Fields fill a bounded parent, segments retain operable targets at compact widths, and the single-month calendar sheet remains viewport-contained.
+- Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels and a continuous range fill.
+- Fields fill their parent. Segments remain operable on narrow screens, and the single-month calendar stays inside the viewport.
 
 ## Accent, forced colors, and reduced motion
 
-- Editable content and calendar text stay neutral; focus, the current-day marker, range route, and inclusive endpoint bookends use bounded accent roles while invalidity remains dangerous.
-- Forced colors preserve field, segment focus, calendar boundaries, unavailable dates, current day, range continuity, and endpoint identities with system colors.
+- Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid state uses danger colors.
+- Forced colors use system colors for fields, segment focus, calendar borders, unavailable dates, today, selected ranges, and endpoints.
 - Reduced motion removes the short popover transition; segment edits and month changes never use positional animation.
 
 ## Examples

@@ -16,7 +16,7 @@ Divider separates adjacent groups with one complete neutral rule.
 
 ## Composition and parts
 
-- Render Divider inside AppearanceProvider so its owned neutral border role is available.
+- Render Divider inside AppearanceProvider to load its neutral border color.
 - Place Divider between complete sibling groups; let the parent layout own spacing around it.
 - Divider is one complete horizontal or vertical rule with no named parts.
 
@@ -30,13 +30,13 @@ Divider separates adjacent groups with one complete neutral rule.
 
 ## States
 
-- The primitive has no internal state; changing a bounded prop deterministically updates its structural attributes.
+- The primitive has no internal state. Changing a prop updates its structural attributes.
 
 ## Control, events, validation, and forms
 
-- Orientation and whether the line is semantic or decorative are controlled by bounded props.
-- The primitive emits no callback events and owns no interactive state.
-- The TypeScript API rejects arbitrary classes, inline styles, token values, and unsupported semantic options.
+- Props set the orientation and whether the line is meaningful or decorative.
+- The primitive emits no callbacks and has no interactive state.
+- The TypeScript API rejects custom classes, inline styles, token values, and unsupported options.
 - The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.
 
 ## Accessibility
@@ -52,14 +52,14 @@ Divider separates adjacent groups with one complete neutral rule.
 
 ## Appearance and responsive behavior
 
-- Divider paints one complete rule with the library-owned neutral border role in both appearances.
+- Divider draws one complete rule with the library neutral border color.
 - A horizontal Divider fills available inline size and a vertical Divider stretches with its parent group.
 
 ## Accent, forced colors, and reduced motion
 
 - Divider uses the neutral border role rather than the application accent.
 - Forced-color mode paints Divider with the CanvasText system color.
-- The primitive introduces no motion, so reduced motion preserves the same structure without an alternate transition.
+- The primitive has no motion, so the reduced-motion setting does not change it.
 
 ## Examples
 

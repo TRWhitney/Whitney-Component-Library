@@ -4,12 +4,12 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 
 ## Use for
 
-- an application or a deliberately isolated application region needs the library appearance and accent
+- an application or isolated region needs the library appearance and accent
 
 ## Do not use for
 
 - a component needs a semantic success, warning, or danger state
-- an application wants to replace spacing, typography, shape, or other owned design tokens
+- an application wants to replace library spacing, typography, shape, or other design tokens
 
 ## Prefer instead
 
@@ -18,18 +18,18 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 
 ## Composition and parts
 
-- Place one provider around the library-owned interface region.
+- Place one provider around the interface that uses library components.
 - Nest a provider only when a contained region intentionally uses a different appearance or accent.
 - The provider exposes one children region and no named parts or slots.
 
 ## Preferred higher-level compositions
 
-- Place the provider around the application shell, or around a deliberately isolated interface region when a nested identity is required.
+- Place the provider around the application shell. Nest one only for a region with a different appearance or identity.
 
 ## Content
 
 - Pass rendered application content as children.
-- Use exactly one six-digit hexadecimal accent and one explicit appearance.
+- Provide one six-digit hexadecimal accent and a light or dark appearance.
 
 ## States
 
@@ -46,10 +46,10 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 
 ## Accessibility
 
-- Choose an accent freely; primary fill retains it exactly while readable foreground content is selected independently.
+- Choose any valid accent. Primary fills use it unchanged and select a readable foreground separately.
 - When the exact primary fill is too close to its actual surrounding surface, the library adds saturated same-hue structural support instead of recoloring the accent.
 - Contrast applies to the specific surface a structural role actually meets; filled rest and hover states choose readable foreground content independently.
-- Black and white accents use neutral structural support because they have no hue to preserve.
+- Black and white accents use neutral borders because they have no hue.
 - Do not use the application accent in place of success, warning, or danger meaning.
 
 ## Keyboard, labeling, localization, and direction
@@ -62,14 +62,14 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 ## Appearance and responsive behavior
 
 - Light and dark are the only supported appearances.
-- Appearance selects the library-owned neutral canvas, surface, text, and border roles within the provider region.
+- Appearance selects the library canvas, background, text, and border colors within the provider.
 - The provider does not introduce viewport-specific behavior or mutate the document root.
 
 ## Accent, forced colors, and reduced motion
 
 - The application accent feeds focus, selection, progress, active structure, and relationship rails.
-- The provider preserves the exact application accent for primary fill and other identity-bearing uses.
-- Rich hover tint preserves the chosen hue while ordinary content text remains neutral.
+- Primary fills and other identity elements use the application accent unchanged.
+- Hover colors keep the chosen hue while body text stays neutral.
 - Focus, rail, edge, underline, and conditional-boundary roles use the exact accent when it is visible and otherwise derive a saturated same-hue signal.
 - Forced-color mode replaces decorative color roles with system colors through the static stylesheet.
 - Reduced motion changes transition duration without changing state meaning or removing feedback.

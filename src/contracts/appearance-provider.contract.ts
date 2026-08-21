@@ -3,31 +3,29 @@ import type {ComponentContract} from './component-contract.js';
 export const appearanceProviderContract = {
   accentBehavior: [
     'The application accent feeds focus, selection, progress, active structure, and relationship rails.',
-    'The provider preserves the exact application accent for primary fill and other identity-bearing uses.',
-    'Rich hover tint preserves the chosen hue while ordinary content text remains neutral.',
+    'Primary fills and other identity elements use the application accent unchanged.',
+    'Hover colors keep the chosen hue while body text stays neutral.',
     'Focus, rail, edge, underline, and conditional-boundary roles use the exact accent when it is visible and otherwise derive a saturated same-hue signal.',
   ],
   accessibility: [
-    'Choose an accent freely; primary fill retains it exactly while readable foreground content is selected independently.',
+    'Choose any valid accent. Primary fills use it unchanged and select a readable foreground separately.',
     'When the exact primary fill is too close to its actual surrounding surface, the library adds saturated same-hue structural support instead of recoloring the accent.',
     'Contrast applies to the specific surface a structural role actually meets; filled rest and hover states choose readable foreground content independently.',
-    'Black and white accents use neutral structural support because they have no hue to preserve.',
+    'Black and white accents use neutral borders because they have no hue.',
     'Do not use the application accent in place of success, warning, or danger meaning.',
   ],
   appearance: [
     'Light and dark are the only supported appearances.',
-    'Appearance selects the library-owned neutral canvas, surface, text, and border roles within the provider region.',
+    'Appearance selects the library canvas, background, text, and border colors within the provider.',
   ],
-  appropriateUses: [
-    'an application or a deliberately isolated application region needs the library appearance and accent',
-  ],
+  appropriateUses: ['an application or isolated region needs the library appearance and accent'],
   composition: [
-    'Place one provider around the library-owned interface region.',
+    'Place one provider around the interface that uses library components.',
     'Nest a provider only when a contained region intentionally uses a different appearance or accent.',
   ],
   contentRules: [
     'Pass rendered application content as children.',
-    'Use exactly one six-digit hexadecimal accent and one explicit appearance.',
+    'Provide one six-digit hexadecimal accent and a light or dark appearance.',
   ],
   controlBehavior: [
     'Appearance and accent are required controlled props; the provider has no defaults or internal uncontrolled state.',
@@ -78,7 +76,7 @@ export const appearanceProviderContract = {
   importPath: '.',
   inappropriateUses: [
     'a component needs a semantic success, warning, or danger state',
-    'an application wants to replace spacing, typography, shape, or other owned design tokens',
+    'an application wants to replace library spacing, typography, shape, or other design tokens',
   ],
   keyboardBehavior: [
     'The provider introduces no keyboard interaction, focus target, or focus-management behavior.',
@@ -97,7 +95,7 @@ export const appearanceProviderContract = {
     'Use supported component variants instead of replacing internal design tokens.',
   ],
   preferredCompositions: [
-    'Place the provider around the application shell, or around a deliberately isolated interface region when a nested identity is required.',
+    'Place the provider around the application shell. Nest one only for a region with a different appearance or identity.',
   ],
   purpose:
     'AppearanceProvider scopes the library visual system to light or dark appearance and one application accent.',

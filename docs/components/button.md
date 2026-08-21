@@ -1,10 +1,10 @@
 # Button
 
-Button initiates a command while preserving native button and form semantics.
+Button runs a command with native button and form behavior.
 
 ## Use for
 
-- a user initiates an immediate command, confirms a choice, or explicitly submits or resets a form
+- a user runs a command, confirms a choice, or submits or resets a form
 
 ## Do not use for
 
@@ -21,7 +21,7 @@ Button initiates a command while preserving native button and form semantics.
 
 ## Preferred higher-level compositions
 
-- Use ButtonGroup for a small ordinary cluster and Toolbar for a compact command surface whose items share arrow-key navigation.
+- Use ButtonGroup for a few related commands and Toolbar when compact commands share arrow-key navigation.
 
 ## Content
 
@@ -38,29 +38,29 @@ Button initiates a command while preserving native button and form semantics.
 - Button is controlled by isDisabled and isPending; pending requires a localized pendingLabel and prevents activation without removing focus.
 - onPress reports one modality-independent activation and is not called while disabled or pending.
 - The TypeScript API rejects arbitrary classes, inline styles, polymorphic elements, and unsupported visual variants.
-- type defaults to button; set submit or reset explicitly to retain native form behavior, and use form, name, value, or formNoValidate only for that native relationship.
+- type defaults to button. Set it to submit or reset when needed. Use form, name, value, or formNoValidate only for their native form behavior.
 
 ## Accessibility
 
-- The rendered element is a native button with a stable visible label and visible focus indication.
+- The rendered element is a native button with an unchanged visible label and a visible focus outline.
 - Pending keeps the button focusable but inert and exposes pendingLabel as a live status description without replacing the visible label.
 
 ## Keyboard, labeling, localization, and direction
 
-- Enter and Space activate the native button; ordinary buttons remain individual tab stops in ButtonGroup and participate in Toolbar arrow navigation.
+- Enter and Space activate the native button. Buttons remain individual tab stops in ButtonGroup and use arrow navigation in Toolbar.
 - The visible children provide the accessible name; pendingLabel describes progress and must not duplicate or replace the command label.
 - Supply all visible and accessible labels in the application locale and allow labels to grow without relying on a fixed text width.
 - Logical sizing and placement follow inherited writing direction; authored content remains in DOM reading order.
 
 ## Appearance and responsive behavior
 
-- Button uses library-owned control height, rounded shape, type, and secondary, primary, quiet, or danger treatment in both appearances.
+- Button uses the library control height, rounded shape, type, and secondary, primary, quiet, or danger style.
 - Button keeps its minimum regular or compact control height and wraps long labels instead of clipping them when its container narrows.
 
 ## Accent, forced colors, and reduced motion
 
-- Primary emphasis uses the exact application accent with an independently readable foreground and a saturated same-hue supporting boundary only when the fill is too close to its surrounding surface.
-- Hover tint preserves the accent hue; focus and interactive edges use exact or saturated same-hue structure while ordinary labels stay neutral. Danger keeps its semantic color, and pending uses warning rather than accent.
+- Primary emphasis uses the application accent unchanged, with a separately chosen readable foreground. A more saturated border with the same hue appears only when the fill blends into its background.
+- Hover colors keep the accent hue. Focus and interactive edges use the exact accent or a more saturated version of the same hue. Labels stay neutral, danger uses its status color, and pending uses warning.
 - Forced-color mode maps the button boundary, label, focus outline, and pending rail to system colors.
 - Reduced motion stops the traveling pending rail and removes state transitions while keeping a static warning rail and every state boundary.
 
@@ -68,7 +68,7 @@ Button initiates a command while preserving native button and form semantics.
 
 ### Run a profile
 
-Keep the command label stable and describe its pending work separately.
+Keep the command label unchanged and describe pending work separately.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

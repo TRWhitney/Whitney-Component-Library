@@ -4,7 +4,7 @@ ButtonGroup names and aligns related commands without changing their normal tab 
 
 ## Use for
 
-- a small set of related ordinary commands needs shared grouping and optionally consistent adjacent sizing
+- a few related commands need a shared group and optional equal sizing
 
 ## Do not use for
 
@@ -30,14 +30,14 @@ ButtonGroup names and aligns related commands without changing their normal tab 
 
 ## States
 
-- The group has no selection or disabled state; its geometry remains stable while children expose their own states.
+- The group has no selection or disabled state. Child states do not change its layout.
 
 ## Control, events, validation, and forms
 
 - label names the group; orientation controls layout and equalItems gives direct children consistent dimensions.
-- ButtonGroup emits no group event; each child action owns its activation or selection callback.
-- The TypeScript API rejects arbitrary classes, inline styles, and unsupported geometry options; runtime DOM validation accepts consumer component boundaries while rejecting rendered direct children other than Button, IconButton, or library-owned action support nodes.
-- ButtonGroup itself has no form behavior; child Button types retain their explicit native submit or reset behavior.
+- ButtonGroup emits no group event. Each child handles its activation or selection callback.
+- The TypeScript API rejects custom classes, inline styles, and unsupported layout options. Runtime validation accepts consumer component boundaries but requires rendered direct children to be Button, IconButton, or internal support nodes.
+- ButtonGroup has no form behavior. Each Button keeps its native submit or reset behavior.
 
 ## Accessibility
 
@@ -52,13 +52,13 @@ ButtonGroup names and aligns related commands without changing their normal tab 
 
 ## Appearance and responsive behavior
 
-- ButtonGroup owns gap, orientation, and optional equal-item geometry but paints no group surface, border, text, or state color.
+- ButtonGroup sets the gap, orientation, and optional equal-item layout but adds no background, border, text, or state color.
 - Horizontal groups keep their declared axis and allow equal child labels to wrap without clipping; choose vertical orientation when the complete horizontal group does not fit the containing region.
 
 ## Accent, forced colors, and reduced motion
 
 - ButtonGroup paints no accent itself; its Button and IconButton children apply accent and semantic colors according to their own contracts.
-- ButtonGroup geometry is unchanged in forced colors while each child preserves its own system-color treatment.
+- Forced colors do not change ButtonGroup geometry. Each child keeps its system-color treatment.
 - ButtonGroup introduces no motion; child actions apply their own reduced-motion behavior.
 
 ## Examples

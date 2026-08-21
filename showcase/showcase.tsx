@@ -117,10 +117,7 @@ function AddIcon() {
 function LayoutSpecimens() {
   return (
     <>
-      <Specimen
-        description="Own vertical rhythm without requiring consumers to coordinate child margins."
-        name="Stack"
-      >
+      <Specimen description="Stack related items vertically with consistent gaps." name="Stack">
         <Stack gap="tight">
           <div className="showcase-measure">Prepare geometry</div>
           <div className="showcase-measure">Resolve boundaries</div>
@@ -129,7 +126,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Align related peers in one row, with deliberate wrapping and equal sizing when needed."
+        description="Align related items in a row, with optional wrapping and equal sizing."
         name="InlineGroup"
       >
         <InlineGroup equalItems gap="tight" wrap>
@@ -140,7 +137,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Reflow repeated peers from columns to a single track at the component’s owned threshold."
+        description="Fit repeated items into columns, then collapse them as space runs out."
         name="ResponsiveGrid"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -160,7 +157,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Separate neighboring regions when spacing alone does not communicate the boundary."
+        description="Draw a divider when spacing alone does not separate neighboring regions."
         name="Divider"
       >
         <Stack gap="regular">
@@ -175,7 +172,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Provide neutral containment with bounded padding, border, and elevation choices."
+        description="Group related content with preset padding, border, and elevation."
         name="Surface"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -192,7 +189,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Give a content region a visible semantic heading, description, and optional action."
+        description="Give a content region a visible heading, description, and optional action."
         name="Section"
       >
         <Surface padding="regular" variant="subtle">
@@ -208,7 +205,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Keep bounded overflow labeled and keyboard reachable; reveal its native thumb during activity, fade it after idle, and retain it during focus."
+        description="Label a scrollable region and keep it keyboard accessible. Its scrollbar appears during activity or focus and fades when idle."
         name="ScrollRegion"
       >
         <ScrollRegion label="Solver event log" size="compact">
@@ -229,7 +226,7 @@ function ActionSpecimens() {
   return (
     <>
       <Specimen
-        description="Issue a command with explicit emphasis, state, and native form behavior."
+        description="Run a command with a chosen emphasis while retaining native form behavior."
         name="Button"
       >
         <InlineGroup gap="regular" wrap>
@@ -257,7 +254,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Present a compact icon-only command with one required accessible label and matching tooltip."
+        description="Use an icon-only command with a required accessible label and matching tooltip."
         name="IconButton"
       >
         <InlineGroup gap="regular">
@@ -301,7 +298,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Control a persistent binary choice whose selected state remains visible through the rail."
+        description="Control a persistent binary choice with a visible selection rail."
         name="ToggleButton"
       >
         <InlineGroup gap="regular" wrap>
@@ -322,7 +319,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Keep a small set of ordinary commands adjacent while preserving every tab stop."
+        description="Group a few related commands without changing their tab order."
         name="ButtonGroup"
       >
         <Example label="2 secondary Buttons + IconButton">
@@ -337,7 +334,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Coordinate related commands with orientation-aware arrow-key navigation."
+        description="Group frequent commands under horizontal or vertical arrow-key navigation."
         name="Toolbar"
       >
         <Example label="2 quiet Buttons + ToggleButton + IconButton">
@@ -359,7 +356,7 @@ function FieldSpecimens() {
   return (
     <>
       <Specimen
-        description="Apply shared label and support relationships to one direct custom control through a guarded accessibility seam, including readable native option entries."
+        description="Connect a label and support text to one custom control, including readable native option entries."
         name="Field"
       >
         <Field description="Select the compute queue for this run." label="Compute queue">
@@ -373,7 +370,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Collect one line of text with persistent labeling and support that does not move the control."
+        description="Collect one line of text with a fixed label and support area."
         name="TextField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -393,7 +390,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Collect multiline plain text with a bounded three-, five-, or eight-row initial height and native editing behavior."
+        description="Collect multiline plain text in a three-, five-, or eight-row native text area."
         name="TextArea"
       >
         <TextArea
@@ -405,7 +402,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Format, parse, bound, and step a numeric value—including opt-in focused wheel stepping—without exposing intermediate parser state."
+        description="Format, parse, limit, and step a number. Focused wheel stepping is optional, and partial input stays internal."
         name="NumberField"
       >
         <NumberField
@@ -433,7 +430,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Name and arrange one related native fieldset with equal responsive columns, aligned controls when a peer label wraps, and group-owned disabled propagation."
+        description="Name related fields, arrange them in equal responsive columns, align controls when labels wrap, and disable them as a group."
         name="FieldGroup"
       >
         <FieldGroup
@@ -450,7 +447,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Organize a larger form workflow with owned vertical rhythm under a visible semantic heading without adding a divider."
+        description="Organize a form section under a visible heading with consistent vertical spacing."
         name="FormSection"
       >
         <FormSection
@@ -471,7 +468,7 @@ function ChoiceSpecimens() {
   return (
     <>
       <Specimen
-        description="Select one independent optional or indeterminate value with a stable native form meaning."
+        description="Select one optional value, including an indeterminate state, with native form behavior."
         name="Checkbox"
       >
         <InlineGroup align="start" gap="regular" wrap>
@@ -540,7 +537,7 @@ function ChoiceSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Switch among compact bounded modes with equal peers and one gliding rail below neutral selected text."
+        description="Switch among a few compact modes with equal segments and a moving selection rail."
         name="SegmentedControl"
       >
         <SegmentedControl
@@ -558,7 +555,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one stable value from a bounded collapsible collection with typeahead, native form behavior, and viewport-aware overlay placement."
+        description="Choose one value from a collapsible list with typeahead, native form behavior, and viewport-aware placement."
         name="Select"
       >
         <Select
@@ -572,7 +569,7 @@ function SelectionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Filter and choose one stable value from local, dynamic, or asynchronously supplied options while input and selection ownership remain explicit."
+        description="Filter local, dynamic, or asynchronous options and choose one value. Input text and selection stay separate."
         name="ComboBox"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -607,7 +604,7 @@ function RangeSpecimens() {
   return (
     <>
       <Specimen
-        description="Adjust one approximate bounded value on a calibrated scale with explicit domain, formatting, and direct keyboard, pointer, or touch operation."
+        description="Adjust an approximate value on a formatted scale with keyboard, pointer, or touch input."
         name="Slider"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -639,7 +636,7 @@ function RangeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Adjust one ordered interval with separately named non-crossing bounds and offset caliper thumbs that remain distinct when close together."
+        description="Adjust an interval with named, non-crossing bounds and offset thumbs that stay distinct when close."
         name="RangeSlider"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -678,7 +675,7 @@ function DateTimeSpecimens() {
   return (
     <>
       <Specimen
-        description="Enter one known ISO civil date through locale- and calendar-aware segments without unnecessary calendar interaction."
+        description="Enter an ISO civil date through locale- and calendar-aware segments."
         name="DateField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -703,7 +700,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Enter one zone-free wall-clock time with an explicit localized hour cycle and visible precision."
+        description="Enter a zone-free wall-clock time with a chosen hour cycle and visible precision."
         name="TimeField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -730,7 +727,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose one ISO civil date through synchronized segmented entry and a bounded calendar when nearby context helps."
+        description="Choose an ISO civil date through synchronized segments and a calendar."
         name="DatePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -762,7 +759,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose one inclusive continuous ISO date interval whose synchronized endpoints retain separate form identities."
+        description="Choose an inclusive ISO date interval with a separate form value for each endpoint."
         name="DateRangePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -813,7 +810,7 @@ function FileSpecimens() {
   return (
     <>
       <Specimen
-        description="Open a constrained native picker, report accepted and rejected files explicitly, and leave every acquired File with the consumer."
+        description="Open a native picker with file constraints and report which files it accepted or rejected. The application manages the files afterward."
         name="FileTrigger"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -841,7 +838,7 @@ function FileSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Unify drag, focused paste, and a correctly named native-picker action without taking on upload or storage."
+        description="Accept files by drag, focused paste, or a named native picker. Upload and storage remain application concerns."
         name="DropZone"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -880,7 +877,7 @@ function FeedbackSpecimens() {
   return (
     <>
       <Specimen
-        description="Present one concise semantic state with distinct neutral, success, in-progress, and danger meaning; announcements remain deliberate."
+        description="Show a concise neutral, success, in-progress, or danger state. Announcements are opt-in."
         name="StatusIndicator"
       >
         <InlineGroup gap="regular" wrap>
@@ -900,7 +897,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Qualify an object with short static metadata or identity context without creating a live status region."
+        description="Add short metadata or an identifier to an object without creating a live status region."
         name="Badge"
       >
         <InlineGroup gap="regular" wrap>
@@ -917,7 +914,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Explain semantic feedback scoped to one nearby region with stable geometry and optional deliberate announcement."
+        description="Explain feedback for a nearby region without shifting its layout. Announcements are optional."
         name="InlineAlert"
       >
         <InlineAlert title="Boundary review" tone="warning">
@@ -926,7 +923,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Explain a broad page or workspace condition without disguising a local message as application-wide feedback."
+        description="Explain a condition that affects the whole page or workspace."
         name="AlertBanner"
       >
         <AlertBanner title="Solver disconnected" tone="danger">
@@ -935,7 +932,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Report known or unknown advancement toward completion with explicit operation, value or active status, and completion meaning."
+        description="Report progress toward completion, whether the amount is known or indeterminate."
         name="ProgressBar"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -974,7 +971,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Present a bounded quantity with unit-bearing current value and programmatically connected semantic thresholds."
+        description="Show a measured value with units and named warning or danger thresholds."
         name="Meter"
       >
         <Meter
@@ -992,7 +989,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Present one brief labeled generic busy state only while work remains active, reserving the same footprint when inactive."
+        description="Show a labeled busy indicator while work is active, with an option to reserve its space while idle."
         name="Spinner"
       >
         <InlineGroup gap="regular" wrap>
@@ -1019,7 +1016,7 @@ export function Showcase() {
           <div className="showcase-identity">
             <span className="showcase-kicker">Whitney component library</span>
             <h1>Component showcase</h1>
-            <p>Browse the current public surface through working, intent-specific examples.</p>
+            <p>Browse working examples of every public component.</p>
           </div>
           <div aria-hidden="true" className="showcase-route">
             <span className="showcase-route-origin" />
@@ -1080,10 +1077,10 @@ export function Showcase() {
             <section aria-labelledby="foundation-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Foundation</span>
-                <h2 id="foundation-heading">One bounded visual environment</h2>
+                <h2 id="foundation-heading">Shared appearance and accent</h2>
               </header>
               <Specimen
-                description="Establish the appearance and propagated application accent for every library descendant."
+                description="Set the appearance and accent for every library component below the provider."
                 name="AppearanceProvider"
               >
                 <div className="showcase-provider-sample">
@@ -1133,7 +1130,7 @@ export function Showcase() {
             <section aria-labelledby="selection-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Selection</span>
-                <h2 id="selection-heading">Collections stay bounded and searchable</h2>
+                <h2 id="selection-heading">Choose or search a collection</h2>
               </header>
               <SelectionSpecimens />
             </section>

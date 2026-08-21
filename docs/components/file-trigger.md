@@ -1,6 +1,6 @@
 # FileTrigger
 
-FileTrigger acquires consumer-owned files through a named native-picker action.
+FileTrigger acquires application-managed files through a named native-picker action.
 
 ## Use for
 
@@ -16,12 +16,12 @@ FileTrigger acquires consumer-owned files through a named native-picker action.
 
 ## Composition and parts
 
-- Render FileTrigger inside AppearanceProvider, provide explicit type and size constraints with matching human guidance, and transfer accepted File references to application logic through onFiles.
-- FileTrigger owns one secondary action, hidden native file input, and stable support track.
+- Render FileTrigger inside AppearanceProvider. Provide type and size constraints with matching guidance, then handle accepted File objects in onFiles.
+- FileTrigger includes one secondary action, hidden native file input, and fixed support area.
 
 ## Preferred higher-level compositions
 
-- Compose the accepted files into a workflow that explicitly owns upload, storage, asset insertion, or local processing.
+- Pass accepted files to the workflow responsible for upload, storage, asset insertion, or local processing.
 
 ## Content
 
@@ -29,14 +29,14 @@ FileTrigger acquires consumer-owned files through a named native-picker action.
 
 ## States
 
-- Idle, focused, disabled, invalid, pending, accepted, and rejected states remain distinct; a result does not become an owned selected-file state.
+- Idle, focused, disabled, invalid, pending, accepted, and rejected states are visually distinct. Results do not become selected-file state.
 
 ## Control, events, validation, and forms
 
-- Each picker selection produces one immutable result with accepted files, rejected files and their reasons, and the picker source; File objects remain browser-created and consumer-owned.
+- Each picker selection returns accepted files, rejected files with reasons, and the picker source. The browser creates each File object, and the application manages it.
 - onFiles reports accepted and rejected browser File objects after a non-cancelled picker selection; cancellation produces no callback, and getAnnouncement supplies localized live-region copy.
 - acceptedFileTypes checks MIME types, wildcards, and filename extensions; maxFileSize is a per-file byte limit; multiplicity rejects the whole multi-file attempt when allowsMultiple is false.
-- The hidden picker deliberately has no name and does not serialize files; native form reset clears browser picker state and component feedback without recalling onFiles or changing consumer-owned File references.
+- The hidden picker has no name and does not submit files. Native form reset clears picker state and feedback without calling onFiles or changing File references held by the application.
 
 ## Accessibility
 
@@ -45,26 +45,26 @@ FileTrigger acquires consumer-owned files through a named native-picker action.
 ## Keyboard, labeling, localization, and direction
 
 - Tab reaches the named action and Enter or Space opens the native picker; disabled and pending states prevent another picker request without moving focus.
-- label is the action name rather than a generic “Browse”; description explains constraints, errorMessage explains external invalidity, and getAnnouncement localizes each accepted or rejected result.
-- Supply localized labels, descriptions, errors, pending copy, action labels, and getAnnouncement output; file type strings and byte limits remain machine constraints and need matching human guidance.
-- The action and support copy follow inherited writing direction while consumer-owned file order remains unchanged.
+- label names the action rather than using a generic "Browse." description explains constraints, errorMessage explains application errors, and getAnnouncement localizes each result.
+- Localize labels, descriptions, errors, pending text, action labels, and getAnnouncement output. Explain file type and byte constraints in human-readable text.
+- The action and support text follow inherited writing direction. File order stays unchanged.
 
 ## Appearance and responsive behavior
 
-- FileTrigger uses the standard secondary action geometry with one stable support track for guidance, errors, pending work, and acquisition results.
-- The control fills a bounded parent, wraps its guidance, and keeps its picker action operable without horizontal overflow at compact widths.
+- FileTrigger uses the standard secondary action and one fixed support area for guidance, errors, pending work, and results.
+- The control fills its parent, wraps guidance, and keeps the picker action usable without horizontal overflow on narrow screens.
 
 ## Accent, forced colors, and reduced motion
 
-- Focus uses saturated same-hue structure; invalidity and rejected-file feedback remain dangerous rather than becoming the application accent.
-- Forced colors preserve the picker action, focus, invalid state, and rejected-file state with system colors and non-color structure.
+- Focus uses a more saturated version of the accent hue. Invalid and rejected-file feedback use danger colors.
+- Forced colors use system colors and non-color cues for the picker action, focus, invalid state, and rejected files.
 - Reduced motion removes pending transitions while retaining settled pending structure and live announcements.
 
 ## Examples
 
 ### Choose reference images
 
-Choose several bounded image files without implying what happens after acquisition.
+Choose several size-limited image files without implying what happens next.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

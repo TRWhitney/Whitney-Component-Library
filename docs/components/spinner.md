@@ -4,36 +4,36 @@ Spinner presents a brief labeled generic busy state only while work is active.
 
 ## Use for
 
-- brief generic busy state is active but no meaningful amount or completion estimate exists
+- a brief generic busy state is active but no amount or completion estimate exists
 
 ## Do not use for
 
-- known or indeterminate operation progress needing completion meaning, a final semantic state, decorative idle motion, or an unlabeled loading glyph
+- known or indeterminate operation progress that needs a completion description, a final state, decorative idle motion, or an unlabeled loading icon
 
 ## Prefer instead
 
-- Use ProgressBar when the operation and its completion meaning should remain visible, or StatusIndicator after work settles.
+- Use ProgressBar when the operation and its completion description should stay visible, or StatusIndicator after work finishes.
 
 ## Composition and parts
 
 - Render inside AppearanceProvider, place Spinner next to the region or action whose work it describes, and update isActive from that same operation state.
-- Spinner owns one routed activity glyph and one visible label in a stable inline slot.
+- Spinner includes one activity icon and one visible label in a fixed inline slot.
 
 ## Preferred higher-level compositions
 
-- Compose next to a pending Button or inside a stable status field without adding a second live label for the same work.
+- Place Spinner next to a pending Button or inside a fixed status field. Do not add a second live label for the same work.
 
 ## Content
 
-- label names the work in active voice; do not use generic “Loading” when a specific operation name is available.
+- label names the work in active voice. Use the operation name instead of a generic "Loading" label.
 
 ## States
 
-- Active and inactive are explicit; only active has visible or accessible status content and activity motion, while the inactive visual slot remains reserved.
+- Only the active state has visible or accessible status content and motion. The inactive state reserves the same space.
 
 ## Control, events, validation, and forms
 
-- isActive is required; true exposes and animates the busy status, while false hides it semantically and visually but preserves its footprint.
+- isActive is required. true shows and animates the busy status. false hides it visually and from assistive technology but reserves its space.
 - Spinner emits no events and does not own cancellation or operation lifecycle.
 - Consumer data determines meaning; the component validates only representable numeric domains and threshold ordering where applicable.
 - This display component is not a successful form control and does not serialize, validate, or respond to form reset.
@@ -51,8 +51,8 @@ Spinner presents a brief labeled generic busy state only while work is active.
 
 ## Appearance and responsive behavior
 
-- One compact routed arc sits beside a visible activity label; the complete slot remains stable when inactive.
-- The inline glyph remains fixed while the activity label wraps without overflow; inactive state reserves the same footprint.
+- One compact arc sits beside a visible activity label. The slot keeps its size when inactive.
+- The icon stays fixed while the activity label wraps without overflow. The inactive state reserves the same space.
 
 ## Accent, forced colors, and reduced motion
 
@@ -64,7 +64,7 @@ Spinner presents a brief labeled generic busy state only while work is active.
 
 ### Generic solver activity
 
-Expose a brief busy state before a meaningful progress estimate exists.
+Show a brief busy state before a progress estimate exists.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
@@ -81,7 +81,7 @@ export function SolverSpinner() {
 
 ## Counterexamples
 
-### Do not hide meaningful progress
+### Do not hide measurable progress
 
 Known advancement should expose numeric value and completion through ProgressBar.
 

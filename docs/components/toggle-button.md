@@ -17,7 +17,7 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 ## Composition and parts
 
 - Render ToggleButton inside AppearanceProvider and place related editor or tool toggles in Toolbar.
-- ToggleButton exposes one stable visible-label region and one selected-state rail.
+- ToggleButton exposes one visible label region and one selection rail.
 
 ## Preferred higher-level compositions
 
@@ -25,7 +25,7 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 
 ## Content
 
-- Use a stable label whose meaning is valid in both selected and unselected state.
+- Use one label that works in both selected and unselected states.
 - Use secondary for a standalone toggle with its own neutral boundary and quiet inside a toolbar or another contained command surface.
 
 ## States
@@ -45,21 +45,21 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 
 ## Keyboard, labeling, localization, and direction
 
-- Enter and Space toggle pressed state; ordinary placement preserves its tab stop and Toolbar placement adds orientation-aware arrow navigation.
+- Enter and Space toggle the pressed state. Outside a Toolbar, the button keeps its tab stop. Inside one, it uses orientation-aware arrow navigation.
 - Visible children provide the accessible name, while aria-pressed communicates selection without changing that label.
 - Supply all visible and accessible labels in the application locale and allow labels to grow without relying on a fixed text width.
 - Logical sizing and placement follow inherited writing direction; authored content remains in DOM reading order.
 
 ## Appearance and responsive behavior
 
-- ToggleButton uses library-owned control height, rounded shape, type, and secondary or quiet treatment with a rail-only selected state in both appearances.
+- ToggleButton uses the library control height, rounded shape, type, and secondary or quiet style with a selection rail.
 - ToggleButton keeps its minimum regular or compact control height and wraps long labels instead of clipping them when its container narrows.
 
 ## Accent, forced colors, and reduced motion
 
-- Ordinary label text stays neutral; hover tint preserves the accent hue, while focus and the persistent selected under-rail use exact or saturated same-hue accent structure without implying semantic status.
+- Label text stays neutral, and hover colors keep the accent hue. Focus and the selection rail use the exact accent or a more saturated version of the same hue without implying status.
 - Forced-color mode maps the button boundary, label, focus outline, and selected rail to system colors.
-- Reduced motion removes state transitions while preserving hover, focus, press, selected, and disabled boundaries.
+- Reduced motion removes state transitions. Hover, focus, press, selected, and disabled states remain visible.
 
 ## Examples
 

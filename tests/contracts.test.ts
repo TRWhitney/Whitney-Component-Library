@@ -110,7 +110,7 @@ describe('canonical component contracts', () => {
     expect(contractFor('Spinner')?.preferredAlternatives.join(' ')).toMatch(/ProgressBar/i);
   });
 
-  it('keeps file acquisition separate from upload and makes rejection ownership explicit', () => {
+  it('keeps file acquisition separate from upload and reports rejected files', () => {
     const contractFor = (exportName: string) =>
       componentContracts.find((contract) => contract.exportName === exportName);
 
@@ -123,7 +123,7 @@ describe('canonical component contracts', () => {
     expect(contractFor('DropZone')?.keyboardBehavior.join(' ')).toMatch(/paste.*picker/i);
     expect(contractFor('DropZone')?.states.join(' ')).toMatch(/drag.*rejected.*invalid.*pending/i);
     expect(contractFor('DropZone')?.formBehavior.join(' ')).toMatch(
-      /does not serialize.*reset.*feedback/i,
+      /does not submit.*reset.*feedback/i,
     );
     const triggerAdaptationGuidance = [
       ...(contractFor('FileTrigger')?.accentBehavior ?? []),
@@ -149,10 +149,10 @@ describe('canonical component contracts', () => {
     expect(contractFor('RadioGroup')?.controlBehavior.join(' ')).toMatch(/controlled.*null/i);
     expect(contractFor('Switch')?.appropriateUses.join(' ')).toMatch(/on or off.*immediately/i);
     expect(contractFor('SegmentedControl')?.appearance.join(' ')).toMatch(
-      /equal.*bottom rail.*label.*neutral.*no selected fill/i,
+      /equal.*rail.*labels.*neutral.*no fill/i,
     );
     expect(contractFor('SegmentedControl')?.controlBehavior.join(' ')).toMatch(
-      /controlled or uncontrolled.*exclusive/i,
+      /controlled or uncontrolled exclusive string selection/i,
     );
     expect(contractFor('SegmentedControl')?.controlBehavior.join(' ')).toMatch(/controlled.*null/i);
   });
@@ -171,11 +171,11 @@ describe('canonical component contracts', () => {
     expect(contractFor('TimeField')?.inappropriateUses.join(' ')).toMatch(/time-zone.*instant/i);
   });
 
-  it('distinguishes bounded selection from editable autocomplete', () => {
+  it('distinguishes finite selection from editable autocomplete', () => {
     const contractFor = (exportName: string) =>
       componentContracts.find((contract) => contract.exportName === exportName);
 
-    expect(contractFor('Select')?.appropriateUses.join(' ')).toMatch(/bounded.*collection/i);
+    expect(contractFor('Select')?.appropriateUses.join(' ')).toMatch(/finite list/i);
     expect(contractFor('Select')?.preferredAlternatives.join(' ')).toMatch(
       /ComboBox.*editable|ComboBox.*filter/i,
     );
@@ -184,15 +184,15 @@ describe('canonical component contracts', () => {
       /typing.*filtering.*dynamic.*asynchronous/i,
     );
     expect(contractFor('ComboBox')?.controlBehavior.join(' ')).toMatch(
-      /Selection and input text.*independent.*controlled or uncontrolled/i,
+      /Selection and input text.*each.*controlled or uncontrolled/i,
     );
     expect(contractFor('ComboBox')?.composition.join(' ')).toMatch(
       /manual.*dynamic.*asynchronous/i,
     );
   });
 
-  it('distinguishes one approximate value from a bounded interval and exact entry', () => {
-    expect(sliderContract.appropriateUses.join(' ')).toMatch(/one.*bounded.*approximate/i);
+  it('distinguishes approximate adjustment from interval and exact entry', () => {
+    expect(sliderContract.appropriateUses.join(' ')).toMatch(/one approximate.*finite range/i);
     expect(sliderContract.preferredAlternatives.join(' ')).toMatch(/NumberField.*exact/i);
     expect(sliderContract.controlBehavior.join(' ')).toMatch(
       /finite.*minValue.*maxValue.*step.*controlled or uncontrolled/i,
@@ -281,7 +281,7 @@ describe('canonical component contracts', () => {
     expect(providerGuidance).toMatch(/saturated.*same-hue/i);
     expect(providerGuidance).toMatch(/actual|specific|role.local/i);
     expect(button?.accentBehavior.join(' ')).toMatch(/exact.*accent/i);
-    expect(button?.accentBehavior.join(' ')).toMatch(/boundary/i);
+    expect(button?.accentBehavior.join(' ')).toMatch(/border/i);
     for (const exportName of ['IconButton', 'Link', 'ToggleButton']) {
       const contract = componentContracts.find((candidate) => candidate.exportName === exportName);
       expect(contract?.accentBehavior.join(' ')).toMatch(/saturated|same-hue|role-specific/i);
@@ -317,13 +317,13 @@ describe('canonical component contracts', () => {
 
   it('describes each layout primitive only in terms of the visual roles it paints', () => {
     const expectedAppearance = new Map([
-      ['Divider', /border role/],
-      ['InlineGroup', /paints no decorative color/],
-      ['ResponsiveGrid', /paints no decorative color/],
-      ['ScrollRegion', /subtle surface.*border.*focus/i],
+      ['Divider', /border color/],
+      ['InlineGroup', /spacing scale.*adds no color/],
+      ['ResponsiveGrid', /preset spacing.*adds no color/],
+      ['ScrollRegion', /subtle background.*border.*focus/i],
       ['Section', /text.*spacing/i],
-      ['Stack', /paints no decorative color/],
-      ['Surface', /shape.*surface.*text.*border/i],
+      ['Stack', /spacing scale.*adds no color/],
+      ['Surface', /shape.*background.*text.*border/i],
     ]);
 
     for (const contract of componentContracts) {
@@ -340,12 +340,12 @@ describe('canonical component contracts', () => {
     );
 
     expect(scrollRegion?.states.join(' ')).toMatch(/activity.*idle/i);
-    expect(scrollRegion?.events.join(' ')).toMatch(/no callback.*transient/i);
+    expect(scrollRegion?.events.join(' ')).toMatch(/no callback.*temporary/i);
     expect(scrollRegion?.controlBehavior.join(' ')).toMatch(/native.*whether.*scrollbar/i);
-    expect(scrollRegion?.reducedMotionBehavior.join(' ')).toMatch(/fade transition.*visibility/i);
+    expect(scrollRegion?.reducedMotionBehavior.join(' ')).toMatch(/fade.*idle visibility/i);
   });
 
-  it('uses owned layout rhythm in the canonical Surface example', () => {
+  it('uses Stack for spacing in the canonical Surface example', () => {
     const surface = componentContracts.find((contract) => contract.exportName === 'Surface');
 
     expect(surface?.examples[0]?.code).toContain('<Stack');

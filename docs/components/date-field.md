@@ -17,7 +17,7 @@ DateField collects one known civil date through localized segmented entry.
 ## Composition and parts
 
 - Render DateField inside AppearanceProvider and let it own every date segment.
-- DateField owns a label, segmented date input, hidden form input, and support track.
+- DateField includes a label, segmented date input, hidden form input, and support area.
 
 ## Preferred higher-level compositions
 
@@ -33,9 +33,9 @@ DateField collects one known civil date through localized segmented entry.
 
 ## Control, events, validation, and forms
 
-- Controlled or uncontrolled ISO calendar dates may be empty; keyboard, pointer, and touch segment edits remain synchronized and preserve the chosen display calendar.
-- onChange reports a complete library-owned ISO calendar date or null.
-- minValue, maxValue, unavailable dates, required state, custom validate, and external invalidity share the stable error track.
+- Controlled or uncontrolled ISO dates may be empty. Keyboard, pointer, and touch edits stay synchronized and keep the chosen display calendar.
+- onChange reports a complete value in the library's ISO calendar-date format or null.
+- minValue, maxValue, unavailable dates, required state, custom validate, and application errors share the fixed error area.
 - name and form serialize a complete value as YYYY-MM-DD; native reset restores defaultValue and a named empty field contributes an empty string.
 
 ## Accessibility
@@ -51,13 +51,13 @@ DateField collects one known civil date through localized segmented entry.
 
 ## Appearance and responsive behavior
 
-- Segmented controls retain the compact field geometry and stable support track; pickers add one raised almanac sheet with utility weekday text and a continuous range route.
-- Fields fill a bounded parent, segments retain operable targets at compact widths, and the single-month calendar sheet remains viewport-contained.
+- Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels and a continuous range fill.
+- Fields fill their parent. Segments remain operable on narrow screens, and the single-month calendar stays inside the viewport.
 
 ## Accent, forced colors, and reduced motion
 
-- Editable content and calendar text stay neutral; focus, the current-day marker, range route, and inclusive endpoint bookends use bounded accent roles while invalidity remains dangerous.
-- Forced colors preserve field, segment focus, calendar boundaries, unavailable dates, current day, range continuity, and endpoint identities with system colors.
+- Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid state uses danger colors.
+- Forced colors use system colors for fields, segment focus, calendar borders, unavailable dates, today, selected ranges, and endpoints.
 - Reduced motion removes the short popover transition; segment edits and month changes never use positional animation.
 
 ## Examples

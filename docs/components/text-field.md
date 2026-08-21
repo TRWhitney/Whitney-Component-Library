@@ -17,7 +17,7 @@ TextField collects one line of text with native form and validation behavior.
 ## Composition and parts
 
 - Render TextField inside AppearanceProvider and place related peers in FieldGroup rather than rebuilding label or support parts.
-- TextField owns a label, single-line input shell, native input, and stable support track.
+- TextField includes a label, single-line input shell, native input, and fixed support area.
 
 ## Preferred higher-level compositions
 
@@ -29,13 +29,13 @@ TextField collects one line of text with native form and validation behavior.
 
 ## States
 
-- Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states preserve one control size.
+- Controlled, uncontrolled, required, invalid, read-only, disabled, and pending states use the same control size.
 
 ## Control, events, validation, and forms
 
 - TextField supports controlled or uncontrolled string ownership and becomes read-only while pending so its value stays focusable and copyable.
 - onChange reports the complete current string after each accepted text edit.
-- Native length, pattern, required, custom validate, and externally owned invalidity share the stable error track.
+- Native length, pattern, required, custom validate, and application errors share the fixed error area.
 - name and form use native string serialization and reset; validationBehavior defaults to native and validate may return localized errors.
 
 ## Accessibility
@@ -44,15 +44,15 @@ TextField collects one line of text with native form and validation behavior.
 
 ## Keyboard, labeling, localization, and direction
 
-- Native text editing, selection, composition, and browser autofill behavior remain intact.
-- label is required and remains visible; descriptions, errors, and required state are linked automatically.
-- Supply visible labels, descriptions, errors, pending messages, and explicit command labels in the application locale, and allow them to wrap.
+- Native text editing, selection, composition, and browser autofill continue to work.
+- label is required and always visible. Descriptions, errors, and required state are linked automatically.
+- Localize visible labels, descriptions, errors, pending messages, and command labels. Allow them to wrap.
 - Logical padding, group placement, icons, and step controls follow the inherited writing direction without changing DOM reading order.
 
 ## Appearance and responsive behavior
 
 - The field family uses compact rounded controls, one consistent single-line control height, neutral surfaces, and a reserved support track beneath each control.
-- Fields fill their bounded parent width; support text grows below without moving or resizing the control, and responsive groups collapse through content-owned minimums.
+- Fields fill their parent width. Support text grows below without moving or resizing the control. Responsive groups collapse when their content no longer fits.
 
 ## Accent, forced colors, and reduced motion
 

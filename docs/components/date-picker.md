@@ -17,7 +17,7 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 ## Composition and parts
 
 - Render DatePicker inside AppearanceProvider and let it own trigger, dialog, and calendar.
-- DatePicker owns a label, date segments, trigger, hidden input, support track, popover dialog, heading, navigation, grid, and day cells.
+- DatePicker includes a label, date segments, trigger, hidden input, support area, popover dialog, heading, navigation, grid, and day cells.
 
 ## Preferred higher-level compositions
 
@@ -29,18 +29,18 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 
 ## States
 
-- Empty, open, closed, controlled, uncontrolled, unavailable, bounded, invalid, required, read-only, and disabled states.
+- Empty, open, closed, controlled, uncontrolled, unavailable, limited, invalid, required, read-only, and disabled states.
 
 ## Control, events, validation, and forms
 
-- Segment edits and calendar selection update the same controlled or uncontrolled ISO value; placeholderValue deterministically anchors an empty calendar without selecting a date, and the picker owns optional controlled open state, bounds, and unavailable dates.
+- Segment edits and calendar selection update the same controlled or uncontrolled ISO value. placeholderValue anchors an empty calendar without selecting a date. The picker also supports controlled open state, limits, and unavailable dates.
 - onChange reports an ISO date or null; onOpenChange reports trigger, selection, Escape, and outside-dismissal changes.
-- minValue, maxValue, unavailable dates, required state, custom validate, and external invalidity share the stable error track.
+- minValue, maxValue, unavailable dates, required state, custom validate, and application errors share the fixed error area.
 - name and form serialize YYYY-MM-DD, calendar selection commits the same value as direct entry, and reset restores defaultValue.
 
 ## Accessibility
 
-- DatePicker combines labeled segmented entry with a distinctly named calendar trigger and a dialog whose grid owns navigation, selection, focus restoration, and dismissal.
+- DatePicker combines labeled segmented entry with a named calendar button. The calendar dialog handles navigation, selection, focus restoration, and dismissal.
 
 ## Keyboard, labeling, localization, and direction
 
@@ -51,20 +51,20 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 
 ## Appearance and responsive behavior
 
-- Segmented controls retain the compact field geometry and stable support track; pickers add one raised almanac sheet with utility weekday text and a continuous range route.
-- Fields fill a bounded parent, segments retain operable targets at compact widths, and the single-month calendar sheet remains viewport-contained.
+- Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels and a continuous range fill.
+- Fields fill their parent. Segments remain operable on narrow screens, and the single-month calendar stays inside the viewport.
 
 ## Accent, forced colors, and reduced motion
 
-- Editable content and calendar text stay neutral; focus, the current-day marker, range route, and inclusive endpoint bookends use bounded accent roles while invalidity remains dangerous.
-- Forced colors preserve field, segment focus, calendar boundaries, unavailable dates, current day, range continuity, and endpoint identities with system colors.
+- Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid state uses danger colors.
+- Forced colors use system colors for fields, segment focus, calendar borders, unavailable dates, today, selected ranges, and endpoints.
 - Reduced motion removes the short popover transition; segment edits and month changes never use positional animation.
 
 ## Examples
 
 ### Choose a review date
 
-Choose one nearby bounded day with direct entry retained.
+Choose an available day while keeping direct entry.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

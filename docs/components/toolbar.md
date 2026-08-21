@@ -8,17 +8,17 @@ Toolbar composes frequent related commands under one labeled arrow-key navigatio
 
 ## Do not use for
 
-- a small ordinary action row should keep every control in tab order, or the children do not share one command context
+- a short action row should keep every control in tab order, or the children do not share one command context
 
 ## Prefer instead
 
-- Use ButtonGroup for a short ordinary command cluster whose children should all remain Tab stops.
+- Use ButtonGroup for a short command group whose children should all remain Tab stops.
 
 ## Composition and parts
 
 - Render Toolbar inside AppearanceProvider with Button, IconButton, and ToggleButton children that belong to one command context.
 - A consumer component may bundle commands when it renders Button, IconButton, or ToggleButton as direct DOM children; it must not add a DOM wrapper inside Toolbar.
-- Toolbar exposes one ordered rendered control region within its bounded command surface.
+- Toolbar exposes one ordered control region.
 
 ## Preferred higher-level compositions
 
@@ -36,8 +36,8 @@ Toolbar composes frequent related commands under one labeled arrow-key navigatio
 
 - label names the toolbar and orientation controls both its visual axis and arrow-key focus behavior.
 - Toolbar emits no command event; child controls own activation and selection callbacks.
-- The TypeScript API rejects arbitrary classes, inline styles, and unsupported orientation values; runtime DOM validation accepts consumer component boundaries while rejecting rendered direct children other than Button, IconButton, ToggleButton, or library-owned action support nodes.
-- Toolbar itself has no form behavior; child Button types retain their explicit native form behavior.
+- The TypeScript API rejects custom classes, inline styles, and unsupported orientations. Runtime validation accepts consumer component boundaries but requires rendered direct children to be Button, IconButton, ToggleButton, or internal support nodes.
+- Toolbar has no form behavior. Each Button keeps its native form behavior.
 
 ## Accessibility
 
@@ -52,20 +52,20 @@ Toolbar composes frequent related commands under one labeled arrow-key navigatio
 
 ## Appearance and responsive behavior
 
-- Toolbar paints a rounded neutral subtle surface and border around its bounded gap and orientation in both appearances.
-- Horizontal toolbars preserve one command row with reachable inline overflow; vertical toolbars stack and stretch their children.
+- Toolbar draws a rounded neutral background and border around its preset gap and orientation.
+- Horizontal toolbars keep one command row with reachable inline overflow. Vertical toolbars stack and stretch their children.
 
 ## Accent, forced colors, and reduced motion
 
 - Toolbar paints no accent itself; Button, IconButton, and ToggleButton children apply focus, emphasis, and selection accent according to their own contracts.
-- Forced-color mode maps the toolbar border and surface to system colors while each child preserves its own system-color states.
+- Forced-color mode maps the toolbar border and background to system colors. Each child keeps its system-color states.
 - Toolbar introduces no group motion; child commands apply their own reduced-motion behavior.
 
 ## Examples
 
 ### Compose editor commands
 
-Combine a consumer-owned command bundle and persistent formatting state under one arrow-key model.
+Combine an application command bundle and a persistent formatting choice under one arrow-key model.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
@@ -92,7 +92,7 @@ export function EditorToolbar() {
 
 ## Counterexamples
 
-### Do not turn an ordinary action row into a toolbar
+### Do not turn a simple action row into a toolbar
 
 A short confirmation row should keep each action directly reachable by Tab.
 

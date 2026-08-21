@@ -1,23 +1,23 @@
 # StatusIndicator
 
-StatusIndicator presents one concise semantic state with optional deliberate announcement.
+StatusIndicator shows one concise state with optional announcement.
 
 ## Use for
 
-- one concise current state such as stable, solving, failed, or not started must remain visible beside the object it describes
+- a concise state such as stable, solving, failed, or not started must stay visible beside the object it describes
 
 ## Do not use for
 
-- metadata, a category tag, long explanatory feedback, numeric completion, a bounded measurement, or generic unlabeled activity
+- metadata, a category tag, explanatory feedback, operation progress, a measured value, or unlabeled activity
 
 ## Prefer instead
 
-- Use Badge for static metadata, InlineAlert or AlertBanner for explanatory feedback, ProgressBar for operation completion, Meter for a bounded quantity, or Spinner for generic busy state.
+- Use Badge for static metadata, InlineAlert or AlertBanner for an explanation, ProgressBar for operation progress, Meter for a measured value, or Spinner for a generic busy state.
 
 ## Composition and parts
 
 - Render inside AppearanceProvider and place StatusIndicator beside the named object or inside a separately labeled region; keep its label short and complete.
-- StatusIndicator owns one tone glyph and one visible text label.
+- StatusIndicator includes one status icon and one visible text label.
 
 ## Preferred higher-level compositions
 
@@ -25,7 +25,7 @@ StatusIndicator presents one concise semantic state with optional deliberate ann
 
 ## Content
 
-- label names the actual state; choose success only for achieved outcomes, warning for review or in-progress work, danger for failure, and neutral when no semantic outcome applies.
+- label names the state. Use success only for achieved outcomes, warning for review or work in progress, danger for failure, and neutral when no status applies.
 
 ## States
 
@@ -51,20 +51,20 @@ StatusIndicator presents one concise semantic state with optional deliberate ann
 
 ## Appearance and responsive behavior
 
-- One compact rounded indicator combines a tone-specific glyph, semantic surface, and readable label while preserving identical geometry across tones.
+- One compact rounded indicator combines a status icon, tinted background, and readable label. Every tone uses the same layout.
 - The compact indicator keeps its glyph aligned while its text can wrap without horizontal overflow.
 
 ## Accent, forced colors, and reduced motion
 
 - Application accent is not a StatusIndicator tone and must never substitute for success, warning or in-progress, danger, or neutral status meaning.
-- Forced colors retain distinct glyph shapes and visible text when authored semantic colors map to system colors.
+- Forced colors keep distinct icon shapes and visible text when status colors map to system colors.
 - StatusIndicator has no continuous motion; changing tone and label settles without animation under reduced motion.
 
 ## Examples
 
 ### Announced running status
 
-Announce one meaningful transition into an active solve state.
+Announce the transition into an active solve state.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
