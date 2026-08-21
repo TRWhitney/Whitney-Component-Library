@@ -795,6 +795,7 @@
   }
 
   [data-wcl-date-segment] {
+    position: relative;
     box-sizing: border-box;
     min-inline-size: 0.55em;
     padding: 0.125rem 0.075rem;
@@ -802,9 +803,7 @@
     outline: 0;
     color: var(--wcl-text);
     text-align: center;
-    transition:
-      background-color var(--wcl-motion-duration) var(--wcl-motion-easing),
-      box-shadow var(--wcl-motion-duration) var(--wcl-motion-easing);
+    transition: background-color var(--wcl-motion-duration) var(--wcl-motion-easing);
   }
 
   [data-wcl-date-segment][data-placeholder] {
@@ -813,7 +812,18 @@
 
   [data-wcl-date-segment][data-focused] {
     background: var(--wcl-accent-soft);
-    box-shadow: inset 0 -3px var(--wcl-accent-rail);
+  }
+
+  [data-wcl-date-segment][data-focused]::after {
+    position: absolute;
+    z-index: 2;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--wcl-accent-rail);
+    content: '';
+    pointer-events: none;
   }
 
   [data-wcl-date-segment][data-focus-visible] {
@@ -2843,10 +2853,18 @@
       forced-color-adjust: auto;
     }
 
-    [data-wcl-date-segment][data-focused],
+    [data-wcl-date-segment][data-focused] {
+      background: Canvas;
+    }
+
     [data-wcl-calendar-cell][data-selected] {
       background: Canvas;
       box-shadow: inset 0 -3px Highlight;
+    }
+
+    [data-wcl-date-segment][data-focused]::after {
+      background: Highlight;
+      forced-color-adjust: none;
     }
 
     [data-wcl-date-segment][data-focus-visible],

@@ -313,6 +313,36 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('uses toggle rail geometry for focused date segments', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const dateSegment = styles.match(/\[data-wcl-date-segment\]\s*\{([^}]*)\}/)?.[1];
+    const focusedSegment = styles.match(
+      /\[data-wcl-date-segment\]\[data-focused\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const dateRail = styles.match(
+      /\[data-wcl-date-segment\]\[data-focused\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+    const toggleRail = styles.match(
+      /\[data-wcl-toggle-button\]\[data-selected\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(dateSegment).toContain('position: relative');
+    expect(focusedSegment).not.toContain('box-shadow: inset');
+    for (const declaration of [
+      'inset-inline: 0',
+      'inset-block-end: 0',
+      'block-size: 3px',
+      'border-radius: 3px 3px 0 0',
+      'background: var(--wcl-accent-rail)',
+    ]) {
+      expect(dateRail).toContain(declaration);
+      expect(toggleRail).toContain(declaration);
+    }
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-date-segment\]\[data-focused\]::after[\s\S]*background:\s*Highlight[\s\S]*forced-color-adjust:\s*none/,
+    );
+  });
+
   it('distinguishes drop activity, rejection, invalidity, and pending without color alone', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const dropTarget = styles.match(
