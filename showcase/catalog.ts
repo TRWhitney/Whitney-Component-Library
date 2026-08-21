@@ -44,6 +44,18 @@ export const showcaseGroups = [
   },
   {label: 'Ranges', components: ['Slider', 'RangeSlider']},
   {label: 'Files', components: ['FileTrigger', 'DropZone']},
+  {
+    label: 'Feedback',
+    components: [
+      'StatusIndicator',
+      'Badge',
+      'InlineAlert',
+      'AlertBanner',
+      'ProgressBar',
+      'Meter',
+      'Spinner',
+    ],
+  },
 ] as const satisfies readonly ShowcaseGroup[];
 
 export const showcasedComponentNames = showcaseGroups.flatMap((group) => group.components);

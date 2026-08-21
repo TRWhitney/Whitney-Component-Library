@@ -4,7 +4,9 @@ import React from 'react';
 import {JSDOM} from 'jsdom';
 import {renderToString} from 'react-dom/server';
 import {
+  AlertBanner,
   AppearanceProvider,
+  Badge,
   Button,
   ButtonGroup,
   Checkbox,
@@ -18,9 +20,12 @@ import {
   FieldGroup,
   FormSection,
   IconButton,
+  InlineAlert,
   InlineGroup,
   Link,
+  Meter,
   NumberField,
+  ProgressBar,
   RadioGroup,
   RangeSlider,
   ResponsiveGrid,
@@ -30,7 +35,9 @@ import {
   Select,
   SegmentedControl,
   Slider,
+  Spinner,
   Stack,
+  StatusIndicator,
   Surface,
   Switch,
   TextArea,
@@ -41,7 +48,7 @@ import {
 } from '${packageName}';
 
 const manifest = (await import('${packageName}/manifest.json', {with: {type: 'json'}})).default;
-if (manifest.exports[0]?.name !== 'AppearanceProvider') {
+if (!manifest.exports.some((component) => component.name === 'AppearanceProvider')) {
   throw new Error('Generated manifest is not available from its public subpath.');
 }
 for (const subpath of ['styles.css', 'agent-index.md']) {
@@ -275,6 +282,60 @@ const view = React.createElement(
           step: 5,
           thumbLabels: ['Window start', 'Window end'],
         }),
+        React.createElement(StatusIndicator, {
+          announcement: 'polite',
+          label: 'Solving',
+          tone: 'warning',
+        }),
+        React.createElement(Badge, {tone: 'accent'}, 'RUN 0284'),
+        React.createElement(
+          InlineAlert,
+          {title: 'Boundary review', tone: 'warning'},
+          'Check the north wall coefficient.',
+        ),
+        React.createElement(
+          AlertBanner,
+          {title: 'Solver connected', tone: 'success'},
+          'Runs can start.',
+        ),
+        React.createElement(ProgressBar, {
+          completionLabel: 'Complete when all 25 boundary passes are solved.',
+          isActive: true,
+          label: 'Solving boundary passes',
+          maxValue: 25,
+          minValue: 0,
+          value: 18,
+          valueLabel: '18 of 25 passes',
+        }),
+        React.createElement(ProgressBar, {
+          completionLabel: 'Complete after convergence.',
+          isActive: true,
+          isIndeterminate: true,
+          label: 'Preparing solver',
+          statusLabel: 'Estimating remaining work',
+        }),
+        React.createElement(ProgressBar, {
+          completionLabel: 'Complete when all 25 boundary passes are solved.',
+          isActive: false,
+          label: 'Boundary solve paused',
+          maxValue: 25,
+          minValue: 0,
+          value: 18,
+          valueLabel: '18 of 25 passes',
+        }),
+        React.createElement(Meter, {
+          label: 'Thermal load',
+          maxValue: 100,
+          minValue: 0,
+          thresholds: [
+            {label: 'Review begins', tone: 'warning', value: 70, valueLabel: '70 kilowatts'},
+            {label: 'Unsafe begins', tone: 'danger', value: 90, valueLabel: '90 kilowatts'},
+          ],
+          tone: 'warning',
+          value: 76,
+          valueLabel: '76 kilowatts',
+        }),
+        React.createElement(Spinner, {isActive: true, label: 'Preparing solver'}),
         React.createElement(
           Toolbar,
           {label: 'Inspector commands'},
@@ -399,6 +460,26 @@ if (document.querySelectorAll('[data-wcl-range-field] input[type="range"]').leng
 }
 if (document.querySelectorAll('[data-wcl-date-segment]').length < 12) {
   throw new Error('Packed date and time family did not render localized segmented controls.');
+}
+const packedProgress = document.querySelector('[data-wcl-progress-bar]:not([data-indeterminate])');
+const packedPausedProgress = document.querySelector(
+  '[data-wcl-progress-bar]:not([data-indeterminate]):not([data-active])',
+);
+const packedMeter = document.querySelector('[data-wcl-meter]');
+const packedSpinner = document.querySelector('[data-wcl-spinner][data-active]');
+if (
+  document.querySelector('[data-wcl-status-indicator]')?.getAttribute('role') !== 'status' ||
+  !document.querySelector('[data-wcl-badge]') ||
+  document.querySelector('[data-wcl-inline-alert]')?.getAttribute('role') !== 'note' ||
+  !document.querySelector('[data-wcl-alert-banner]') ||
+  packedProgress?.getAttribute('aria-valuenow') !== '18' ||
+  !packedPausedProgress ||
+  packedMeter?.getAttribute('aria-valuetext') !== '76 kilowatts' ||
+  document.querySelectorAll('[data-wcl-meter-threshold]').length !== 2 ||
+  packedSpinner?.querySelector('[role="status"]')?.textContent !== 'Preparing solver' ||
+  packedSpinner.querySelector('[role="status"]').hasAttribute('aria-busy')
+) {
+  throw new Error('Packed feedback family did not preserve semantic relationships.');
 }
 const packedChoiceForm = document.getElementById('packed-choice-form');
 const packedChoiceEntries = [...new dom.window.FormData(packedChoiceForm).entries()];

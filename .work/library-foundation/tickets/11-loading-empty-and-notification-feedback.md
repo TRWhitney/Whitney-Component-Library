@@ -6,7 +6,7 @@ placement behavior that complements rather than duplicates inline alerts and sta
 **Blocked by:** [Status, Progress, and Alerts](10-status-progress-and-alerts.md),
 [Action Family](03-action-family.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Skeletons preserve the eventual region's approximate layout and are hidden appropriately
       from assistive technology.

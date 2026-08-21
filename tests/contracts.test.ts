@@ -36,7 +36,9 @@ describe('canonical component contracts', () => {
 
   it('covers every public component with one canonical contract', () => {
     const exportNames = [
+      'AlertBanner',
       'AppearanceProvider',
+      'Badge',
       'Button',
       'ButtonGroup',
       'Checkbox',
@@ -52,9 +54,12 @@ describe('canonical component contracts', () => {
       'FileTrigger',
       'FormSection',
       'IconButton',
+      'InlineAlert',
       'InlineGroup',
       'Link',
+      'Meter',
       'NumberField',
+      'ProgressBar',
       'RadioGroup',
       'RangeSlider',
       'ResponsiveGrid',
@@ -64,7 +69,9 @@ describe('canonical component contracts', () => {
       'SegmentedControl',
       'Select',
       'Slider',
+      'Spinner',
       'Stack',
+      'StatusIndicator',
       'Surface',
       'Switch',
       'TextArea',
@@ -78,6 +85,29 @@ describe('canonical component contracts', () => {
       exportNames.length,
     );
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+  });
+
+  it('keeps status, metadata, alerts, progress, meters, and generic busy state distinct', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('StatusIndicator')?.accentBehavior.join(' ')).toMatch(
+      /accent.*not.*status|never.*accent/i,
+    );
+    expect(contractFor('Badge')?.appropriateUses.join(' ')).toMatch(
+      /metadata|category|identifier/i,
+    );
+    expect(contractFor('Badge')?.inappropriateUses.join(' ')).toMatch(/changing status|live/i);
+    expect(contractFor('InlineAlert')?.controlBehavior.join(' ')).toMatch(
+      /off.*polite.*assertive/i,
+    );
+    expect(contractFor('AlertBanner')?.appropriateUses.join(' ')).toMatch(/broad.*scope|page/i);
+    expect(contractFor('ProgressBar')?.controlBehavior.join(' ')).toMatch(
+      /determinate.*indeterminate.*completion/i,
+    );
+    expect(contractFor('Meter')?.appropriateUses.join(' ')).toMatch(/quantity.*known range/i);
+    expect(contractFor('Meter')?.contentRules.join(' ')).toMatch(/threshold.*unit/i);
+    expect(contractFor('Spinner')?.preferredAlternatives.join(' ')).toMatch(/ProgressBar/i);
   });
 
   it('keeps file acquisition separate from upload and makes rejection ownership explicit', () => {

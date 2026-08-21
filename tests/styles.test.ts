@@ -12,6 +12,78 @@ describe('static appearance styles', () => {
     expect(reducedMotion).not.toBeNull();
   });
 
+  it('keeps semantic feedback colors independent from application accent', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const statusRules = styles.match(
+      /:is\(\[data-wcl-status-indicator\], \[data-wcl-badge\], \[data-wcl-alert\], \[data-wcl-meter\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(styles).toContain("[data-tone='success']");
+    expect(styles).toContain("[data-tone='warning']");
+    expect(styles).toContain("[data-tone='danger']");
+    expect(statusRules).toContain('--wcl-feedback-color: var(--wcl-text-muted)');
+    expect(styles).toMatch(
+      /:is\([\s\S]*?\[data-wcl-status-indicator\][\s\S]*?\)\[data-tone='success'\][\s\S]*?--wcl-feedback-color:\s*var\(--wcl-success\)/,
+    );
+    expect(styles).toMatch(
+      /:is\([\s\S]*?\[data-wcl-status-indicator\][\s\S]*?\)\[data-tone='warning'\][\s\S]*?--wcl-feedback-color:\s*var\(--wcl-warning\)/,
+    );
+    expect(styles).toMatch(
+      /:is\([\s\S]*?\[data-wcl-status-indicator\][\s\S]*?\)\[data-tone='danger'\][\s\S]*?--wcl-feedback-color:\s*var\(--wcl-danger\)/,
+    );
+  });
+
+  it('animates feedback activity only in active states and settles it for reduced motion', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const progressActivity = styles.match(
+      /\[data-wcl-progress-bar\]\[data-active\]\s+\[data-wcl-progress-fill\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+    const spinnerActivity = styles.match(
+      /\[data-wcl-spinner\]\[data-active\]\s+\[data-wcl-spinner-glyph\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const reducedMotion = styles.match(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)([\s\S]*)/,
+    )?.[1];
+
+    expect(progressActivity).toContain('animation: wcl-progress-route');
+    expect(spinnerActivity).toContain('animation: wcl-spinner-route');
+    expect(reducedMotion).toMatch(
+      /\[data-wcl-progress-fill\]::after[\s\S]*animation-iteration-count:\s*1/,
+    );
+    expect(reducedMotion).toMatch(
+      /\[data-wcl-spinner-glyph\][\s\S]*animation-iteration-count:\s*1/,
+    );
+  });
+
+  it('contains long progress values inside narrow label rows', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const value = styles.match(
+      /:is\(\[data-wcl-progress-value\], \[data-wcl-meter-value\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(value).toContain('flex: 0 1 auto');
+    expect(value).toContain('min-inline-size: 0');
+    expect(value).toContain('overflow-wrap: anywhere');
+  });
+
+  it('keeps every alert tone on the same stable geometry', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const alerts = styles.match(/\[data-wcl-alert\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(alerts).toContain('grid-template-columns: 1.125rem minmax(0, 1fr)');
+    expect(alerts).toContain('border: 1px solid var(--wcl-feedback-border)');
+    expect(styles).not.toMatch(
+      /\[data-wcl-alert\]\[data-tone='(?:warning|danger)'\][^{]*\{[^}]*(?:padding|margin|border-width)/,
+    );
+  });
+
+  it('keeps broad alerts within the rounded containment grammar', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const banner = styles.match(/\[data-wcl-alert\]\[data-kind='banner'\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(banner).not.toMatch(/border-radius:\s*0/);
+  });
+
   it('maps identity and surface roles to system colors in forced-color mode', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/);
@@ -25,6 +97,13 @@ describe('static appearance styles', () => {
     expect(forcedColors?.[1]).toContain('--wcl-accent-rail: Highlight !important');
     expect(forcedColors?.[1]).toContain('--wcl-surface: Canvas');
     expect(forcedColors?.[1]).toContain('--wcl-text: CanvasText');
+    expect(forcedColors?.[1]).toMatch(
+      /:is\(\[data-wcl-status-indicator\], \[data-wcl-badge\], \[data-wcl-alert\], \[data-wcl-meter\]\)[\s\S]*--wcl-feedback-color:\s*CanvasText/,
+    );
+    expect(forcedColors?.[1]).toMatch(/\[data-wcl-progress-fill\][\s\S]*background:\s*Highlight/);
+    expect(forcedColors?.[1]).toMatch(
+      /:is\(\[data-wcl-progress-track\], \[data-wcl-meter-track\]\)[\s\S]*border-color:\s*CanvasText/,
+    );
   });
 
   it('owns the bounded spatial grammar and equal-item behavior', async () => {

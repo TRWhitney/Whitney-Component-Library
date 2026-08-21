@@ -167,7 +167,9 @@ async function verifyConsumer({
 function createTypeConsumerSource(packageName) {
   return `
 import {
+  AlertBanner,
   AppearanceProvider,
+  Badge,
   Button,
   ButtonGroup,
   Checkbox,
@@ -181,9 +183,12 @@ import {
   FieldGroup,
   FormSection,
   IconButton,
+  InlineAlert,
   InlineGroup,
   Link,
+  Meter,
   NumberField,
+  ProgressBar,
   RadioGroup,
   RangeSlider,
   ResponsiveGrid,
@@ -193,7 +198,9 @@ import {
   Select,
   SegmentedControl,
   Slider,
+  Spinner,
   Stack,
+  StatusIndicator,
   Surface,
   Switch,
   TextArea,
@@ -313,6 +320,52 @@ export const provider = (
           step={5}
           thumbLabels={['Window start', 'Window end']}
         />
+        <StatusIndicator announcement="polite" label="Solving" tone="warning" />
+        <Badge tone="accent">RUN 0284</Badge>
+        <InlineAlert title="Boundary review" tone="warning">
+          Check the north wall coefficient.
+        </InlineAlert>
+        <AlertBanner title="Solver connected" tone="success">
+          Runs can start.
+        </AlertBanner>
+        <ProgressBar
+          completionLabel="Complete when all 25 boundary passes are solved."
+          isActive
+          label="Solving boundary passes"
+          maxValue={25}
+          minValue={0}
+          value={18}
+          valueLabel="18 of 25 passes"
+        />
+        <ProgressBar
+          completionLabel="Complete after convergence."
+          isActive
+          isIndeterminate
+          label="Preparing solver"
+          statusLabel="Estimating remaining work"
+        />
+        <ProgressBar
+          completionLabel="Complete when all 25 boundary passes are solved."
+          isActive={false}
+          label="Boundary solve paused"
+          maxValue={25}
+          minValue={0}
+          value={18}
+          valueLabel="18 of 25 passes"
+        />
+        <Meter
+          label="Thermal load"
+          maxValue={100}
+          minValue={0}
+          thresholds={[
+            {label: 'Review begins', tone: 'warning', value: 70, valueLabel: '70 kilowatts'},
+            {label: 'Unsafe begins', tone: 'danger', value: 90, valueLabel: '90 kilowatts'},
+          ]}
+          tone="warning"
+          value={76}
+          valueLabel="76 kilowatts"
+        />
+        <Spinner isActive label="Preparing solver" />
         <Toolbar label="Inspector commands">
           <IconButton label="More actions" variant="quiet">
             <span aria-hidden="true">•••</span>
@@ -346,7 +399,9 @@ function createBrowserConsumerSource(packageName) {
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {
+  AlertBanner,
   AppearanceProvider,
+  Badge,
   Button,
   ButtonGroup,
   ComboBox,
@@ -355,13 +410,18 @@ import {
   DateRangePicker,
   FieldGroup,
   IconButton,
+  InlineAlert,
   Link,
+  Meter,
   NumberField,
+  ProgressBar,
   RangeSlider,
   ResponsiveGrid,
   Section,
   Select,
   Slider,
+  Spinner,
+  StatusIndicator,
   Surface,
   TextField,
   TimeField,
@@ -402,6 +462,13 @@ createRoot(document.getElementById('root')).render(
         React.createElement(DateRangePicker, {calendar: 'gregory', calendarButtonLabel: 'Choose range', label: 'Review window', locale: 'en-US', placeholderValue: {year: 2026, month: 8, day: 20}}),
         React.createElement(Slider, {defaultValue: 0.4, formatOptions: {style: 'percent'}, label: 'Confidence', locale: 'en-US', minValue: 0, maxValue: 1, step: 0.05}),
         React.createElement(RangeSlider, {defaultValue: [20, 80], label: 'Review window', locale: 'en-US', minValue: 0, maxValue: 100, step: 5, thumbLabels: ['Window start', 'Window end']}),
+        React.createElement(StatusIndicator, {label: 'Solving', tone: 'warning'}),
+        React.createElement(Badge, {tone: 'accent'}, 'RUN 0284'),
+        React.createElement(InlineAlert, {title: 'Boundary review', tone: 'warning'}, 'Check one coefficient.'),
+        React.createElement(AlertBanner, {title: 'Solver connected', tone: 'success'}, 'Runs can start.'),
+        React.createElement(ProgressBar, {completionLabel: 'Complete after all passes.', isActive: true, label: 'Boundary solve', value: 18, valueLabel: '18 passes'}),
+        React.createElement(Meter, {label: 'Thermal load', minValue: 0, maxValue: 100, value: 76, valueLabel: '76 kilowatts'}),
+        React.createElement(Spinner, {isActive: true, label: 'Preparing solver'}),
         React.createElement(Toolbar, {label: 'Inspector commands'},
           React.createElement(IconButton, {label: 'More actions'},
             React.createElement('span', {'aria-hidden': true}, '•••')),

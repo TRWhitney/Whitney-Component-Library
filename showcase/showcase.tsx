@@ -1,7 +1,9 @@
 import {useState, type ReactNode} from 'react';
 
 import {
+  AlertBanner,
   AppearanceProvider,
+  Badge,
   Button,
   ButtonGroup,
   Checkbox,
@@ -17,9 +19,12 @@ import {
   FileTrigger,
   FormSection,
   IconButton,
+  InlineAlert,
   InlineGroup,
   Link,
+  Meter,
   NumberField,
+  ProgressBar,
   RangeSlider,
   ResponsiveGrid,
   RadioGroup,
@@ -28,7 +33,9 @@ import {
   Section,
   Select,
   Slider,
+  Spinner,
   Stack,
+  StatusIndicator,
   SegmentedControl,
   Surface,
   Switch,
@@ -869,6 +876,138 @@ function FileSpecimens() {
   );
 }
 
+function FeedbackSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Present one concise semantic state with distinct neutral, success, in-progress, and danger meaning; announcements remain deliberate."
+        name="StatusIndicator"
+      >
+        <InlineGroup gap="regular" wrap>
+          <Example label="Success StatusIndicator">
+            <StatusIndicator label="Stable" tone="success" />
+          </Example>
+          <Example label="Warning StatusIndicator">
+            <StatusIndicator label="Solving" tone="warning" />
+          </Example>
+          <Example label="Danger StatusIndicator">
+            <StatusIndicator label="Failed" tone="danger" />
+          </Example>
+          <Example label="Neutral StatusIndicator">
+            <StatusIndicator label="Not started" tone="neutral" />
+          </Example>
+        </InlineGroup>
+      </Specimen>
+
+      <Specimen
+        description="Qualify an object with short static metadata or identity context without creating a live status region."
+        name="Badge"
+      >
+        <InlineGroup gap="regular" wrap>
+          <Example label="Accent identity Badge">
+            <Badge tone="accent">RUN 0284</Badge>
+          </Example>
+          <Example label="Neutral metadata Badge">
+            <Badge>THERMAL</Badge>
+          </Example>
+          <Example label="Success metadata Badge">
+            <Badge tone="success">25 PASSES</Badge>
+          </Example>
+        </InlineGroup>
+      </Specimen>
+
+      <Specimen
+        description="Explain semantic feedback scoped to one nearby region with stable geometry and optional deliberate announcement."
+        name="InlineAlert"
+      >
+        <InlineAlert title="Boundary review" tone="warning">
+          Check the north wall coefficient before running the profile.
+        </InlineAlert>
+      </Specimen>
+
+      <Specimen
+        description="Explain a broad page or workspace condition without disguising a local message as application-wide feedback."
+        name="AlertBanner"
+      >
+        <AlertBanner title="Solver disconnected" tone="danger">
+          Reconnect the solver before starting or resuming runs.
+        </AlertBanner>
+      </Specimen>
+
+      <Specimen
+        description="Report known or unknown advancement toward completion with explicit operation, value or active status, and completion meaning."
+        name="ProgressBar"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Determinate ProgressBar">
+            <ProgressBar
+              completionLabel="Complete when all 25 boundary passes are solved."
+              isActive
+              label="Solving boundary passes"
+              maxValue={25}
+              minValue={0}
+              value={18}
+              valueLabel="18 of 25 passes"
+            />
+          </Example>
+          <Example label="Indeterminate ProgressBar">
+            <ProgressBar
+              completionLabel="Complete when the solver returns a converged result."
+              isActive
+              isIndeterminate
+              label="Preparing solver"
+              statusLabel="Estimating remaining work"
+            />
+          </Example>
+          <Example label="Paused ProgressBar">
+            <ProgressBar
+              completionLabel="Complete when all 25 boundary passes are solved."
+              isActive={false}
+              label="Boundary solve paused"
+              maxValue={25}
+              minValue={0}
+              value={18}
+              valueLabel="18 of 25 passes"
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Present a bounded quantity with unit-bearing current value and programmatically connected semantic thresholds."
+        name="Meter"
+      >
+        <Meter
+          label="Thermal load"
+          maxValue={100}
+          minValue={0}
+          thresholds={[
+            {label: 'Review begins', tone: 'warning', value: 70, valueLabel: '70 kilowatts'},
+            {label: 'Unsafe begins', tone: 'danger', value: 90, valueLabel: '90 kilowatts'},
+          ]}
+          tone="warning"
+          value={76}
+          valueLabel="76 kilowatts"
+        />
+      </Specimen>
+
+      <Specimen
+        description="Present one brief labeled generic busy state only while work remains active, reserving the same footprint when inactive."
+        name="Spinner"
+      >
+        <InlineGroup gap="regular" wrap>
+          <Example label="Active Spinner">
+            <Spinner isActive label="Preparing solver" />
+          </Example>
+          <Example label="Inactive reserved Spinner">
+            <Spinner isActive={false} label="Preparing solver" />
+          </Example>
+        </InlineGroup>
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -1021,6 +1160,14 @@ export function Showcase() {
                 <h2 id="files-heading">Acquisition stops at the application boundary</h2>
               </header>
               <FileSpecimens />
+            </section>
+
+            <section aria-labelledby="feedback-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Feedback</span>
+                <h2 id="feedback-heading">Meaning stays distinct from momentum</h2>
+              </header>
+              <FeedbackSpecimens />
             </section>
           </main>
         </div>

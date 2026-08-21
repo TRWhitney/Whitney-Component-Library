@@ -42,6 +42,15 @@ export {
 } from './date-time.contracts.js';
 export {dropZoneContract, fileTriggerContract} from './file.contracts.js';
 export {
+  alertBannerContract,
+  badgeContract,
+  inlineAlertContract,
+  meterContract,
+  progressBarContract,
+  spinnerContract,
+  statusIndicatorContract,
+} from './feedback.contracts.js';
+export {
   renderAgentIndex,
   renderContractDocumentation,
   renderTypeScriptExamples,
@@ -95,9 +104,20 @@ import {
   timeFieldContract,
 } from './date-time.contracts.js';
 import {dropZoneContract, fileTriggerContract} from './file.contracts.js';
+import {
+  alertBannerContract,
+  badgeContract,
+  inlineAlertContract,
+  meterContract,
+  progressBarContract,
+  spinnerContract,
+  statusIndicatorContract,
+} from './feedback.contracts.js';
 
 export const componentContracts = [
+  alertBannerContract,
   appearanceProviderContract,
+  badgeContract,
   buttonContract,
   buttonGroupContract,
   checkboxContract,
@@ -114,8 +134,11 @@ export const componentContracts = [
   formSectionContract,
   iconButtonContract,
   inlineGroupContract,
+  inlineAlertContract,
   linkContract,
+  meterContract,
   numberFieldContract,
+  progressBarContract,
   rangeSliderContract,
   responsiveGridContract,
   radioGroupContract,
@@ -124,8 +147,10 @@ export const componentContracts = [
   sectionContract,
   selectContract,
   sliderContract,
+  spinnerContract,
   segmentedControlContract,
   stackContract,
+  statusIndicatorContract,
   surfaceContract,
   switchContract,
   textAreaContract,

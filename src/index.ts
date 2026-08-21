@@ -7,6 +7,26 @@ export {
 } from './appearance/appearance-provider.js';
 export type {AccentColor} from './appearance/accent.js';
 export {
+  AlertBanner,
+  Badge,
+  InlineAlert,
+  Meter,
+  ProgressBar,
+  Spinner,
+  StatusIndicator,
+  type AlertBannerProps,
+  type AnnouncementMode,
+  type BadgeProps,
+  type BadgeTone,
+  type InlineAlertProps,
+  type MeterProps,
+  type MeterThreshold,
+  type ProgressBarProps,
+  type SpinnerProps,
+  type StatusIndicatorProps,
+  type StatusTone,
+} from './feedback/index.js';
+export {
   DropZone,
   FileTrigger,
   type DropZoneProps,

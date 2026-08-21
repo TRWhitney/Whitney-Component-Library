@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 09, including the intervening Ticket 03A accent correction, are complete.
-Ticket 10 is ready. The maintained human showcase covers every contracted public component. Manual
+Tickets 01 through 10, including the intervening Ticket 03A accent correction, are complete.
+Ticket 11 is ready. The maintained human showcase covers every contracted public component. Manual
 screen-reader operation is intentionally consolidated in the Ticket 30 pre-`1.0` release gate
 rather than repeated for every component ticket.
 
@@ -170,10 +170,27 @@ semantic success and danger, forced colors, reduced motion, SSR, hydration, and 
 consumption are covered. The same callback boundary composes with later Markdown asset insertion
 without specializing the file controls to Markdown.
 
+### Ticket 10 — status, progress, and alerts
+
+StatusIndicator, Badge, InlineAlert, AlertBanner, ProgressBar, Meter, and Spinner preserve concise
+state, static metadata, local explanation, broad explanation, operation completion, bounded
+measurement, and generic activity as separate public concepts. Semantic status, alert, and meter
+tones cannot accept application accent; accent remains available for identity metadata and
+progress structure without replacing green success, yellow warning or in-progress, or red danger.
+
+Static and announced feedback use the same visible copy without hidden duplicate labels.
+Determinate progress publishes finite bounds, current value, units, and completion meaning;
+indeterminate progress publishes no fabricated value. Both progress modes require an explicit
+activity state so paused work remains still. Meters connect ordered unit-bearing threshold
+descriptions, while Spinner reserves one stable visual slot and updates a mounted, non-busy live
+region only while active. Broad alerts retain the same rounded containment grammar as local alerts.
+Light, dark, compact, forced-color, reduced-motion, SSR, hydration, public package, and generated
+contract behavior are covered.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is [Ticket 10 — Status, Progress, and
-Alerts](tickets/10-status-progress-and-alerts.md).
+See the [decision map](map.md). The next implementation unit is [Ticket 11 — Loading, Empty, and
+Notification Feedback](tickets/11-loading-empty-and-notification-feedback.md).
 
 ## Accepted sources
 
@@ -200,7 +217,7 @@ Alerts](tickets/10-status-progress-and-alerts.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 238
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 257
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
@@ -234,11 +251,17 @@ Alerts](tickets/10-status-progress-and-alerts.md).
   Firefox and WebKit cover keyboard picker activation, rejection, focused file paste, compact light
   layout, live announcements, and accessibility-tree state. All inspected browser flows completed
   without overflow, console errors, or page errors; screenshots were discarded after validation.
+- Chromium direct evidence covers StatusIndicator, Badge, InlineAlert, AlertBanner, ProgressBar,
+  Meter, and Spinner in light and dark appearance, wide and compact layout, forced colors, reduced
+  motion, arbitrary accent change, semantic contrast, stable geometry, progress and meter value
+  relationships, threshold descriptions, active/inactive busy exposure, and the accessibility
+  tree. The inspected page had no overflow, console errors, or page errors; screenshots were
+  discarded after validation.
 - Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
-Resume Ticket 10 from novel-work implementation with
+Resume Ticket 11 from novel-work implementation with
 `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`
-and begin the status, progress, and alert slice. Current branch: `master`. Ticket 09 is delivered by
-the commit containing this record; no Ticket 10 implementation has started.
+and begin the loading, empty, and notification feedback slice. Current branch: `master`. Ticket 10
+is delivered by the commit containing this record; no Ticket 11 implementation has started.

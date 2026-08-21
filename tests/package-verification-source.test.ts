@@ -3,6 +3,15 @@ import {describe, expect, it} from 'vitest';
 import {createConsumerVerificationSource} from '../scripts/consumer-verification-source.mjs';
 
 describe('packed consumer verification source', () => {
+  it('locates provider guidance without depending on manifest ordering', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    expect(source).toContain(
+      "manifest.exports.some((component) => component.name === 'AppearanceProvider')",
+    );
+    expect(source).not.toContain("manifest.exports[0]?.name !== 'AppearanceProvider'");
+  });
+
   it('captures server and hydration warnings before rendering starts', () => {
     const source = createConsumerVerificationSource('@fixture/component-library');
     const serverRender = source.indexOf('renderToString(view)');
@@ -112,5 +121,26 @@ describe('packed consumer verification source', () => {
     expect(source).toContain("['window-end', '80']");
     expect(source).toContain('Packed ranges did not accept stepped changes.');
     expect(source).toContain('Packed ranges did not restore defaults on form reset.');
+  });
+
+  it('exercises the complete feedback family through packed SSR and hydration', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of [
+      'AlertBanner',
+      'Badge',
+      'InlineAlert',
+      'Meter',
+      'ProgressBar',
+      'Spinner',
+      'StatusIndicator',
+    ]) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-status-indicator');
+    expect(source).toContain('data-wcl-alert-banner');
+    expect(source).toContain("getAttribute('aria-valuenow') !== '18'");
+    expect(source).toContain("getAttribute('aria-valuetext') !== '76 kilowatts'");
+    expect(source).toContain('Packed feedback family did not preserve semantic relationships.');
   });
 });
