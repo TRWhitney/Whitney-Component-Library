@@ -555,7 +555,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one value from a collapsible list with typeahead, native form behavior, and viewport-aware placement."
+        description="Choose one value from a centered trigger with typeahead, native form behavior, and viewport-aware placement."
         name="Select"
       >
         <Select

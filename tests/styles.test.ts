@@ -459,6 +459,13 @@ describe('static appearance styles', () => {
     expect(subtleChoices).toContain('--wcl-accent-soft: var(--wcl-accent-soft-on-subtle)');
   });
 
+  it('centers content within the Select trigger', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const selectTrigger = styles.match(/\[data-wcl-select-trigger\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(selectTrigger).toContain('align-items: center');
+  });
+
   it('bounds collection overlays and keeps selected option labels neutral', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const popover = styles.match(/\[data-wcl-selection-popover\]\s*\{([^}]*)\}/)?.[1];
