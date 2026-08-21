@@ -17,7 +17,7 @@ Spinner presents a brief labeled generic busy state only while work is active.
 ## Composition and parts
 
 - Render inside AppearanceProvider, place Spinner next to the region or action whose work it describes, and update isActive from that same operation state.
-- Spinner includes one activity icon and one visible label in a fixed inline slot.
+- Spinner includes one six-capsule activity icon and one visible label in a fixed inline slot.
 
 ## Preferred higher-level compositions
 
@@ -51,14 +51,14 @@ Spinner presents a brief labeled generic busy state only while work is active.
 
 ## Appearance and responsive behavior
 
-- One compact arc sits beside a visible activity label. The slot keeps its size when inactive.
+- Six thick, rounded accent capsules rotate beside a visible activity label. They appear and disappear one complete capsule at a time, and the slot keeps its size when inactive.
 - The icon stays fixed while the activity label wraps without overflow. The inactive state reserves the same space.
 
 ## Accent, forced colors, and reduced motion
 
 - Spinner uses application accent only as active structure and never claims success, warning, or failure.
-- Forced colors retain a system-highlight active arc, a system-colored route, and visible label.
-- Reduced motion settles the active arc to one effectively instantaneous iteration while retaining its visible busy structure.
+- Forced colors retain system-highlight activity capsules and a visible label.
+- Reduced motion stops the rotation and shows all six capsules as a static busy structure.
 
 ## Examples
 

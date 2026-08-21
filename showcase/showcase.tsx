@@ -993,7 +993,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Show a labeled busy indicator while work is active, with an option to reserve its space while idle."
+        description="Show a labeled six-capsule busy indicator while work is active, with an option to reserve its space while idle."
         name="Spinner"
       >
         <InlineGroup gap="regular" wrap>

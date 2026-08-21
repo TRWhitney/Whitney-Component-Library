@@ -41,18 +41,31 @@ describe('static appearance styles', () => {
     const spinnerActivity = styles.match(
       /\[data-wcl-spinner\]\[data-active\]\s+\[data-wcl-spinner-glyph\]\s*\{([^}]*)\}/,
     )?.[1];
+    const spinnerSegmentActivity = styles.match(
+      /\[data-wcl-spinner\]\[data-active\]\s+\[data-wcl-spinner-segment\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const spinnerGlyph = styles.match(/\[data-wcl-spinner-glyph\]\s*\{([^}]*)\}/)?.[1];
+    const spinnerSegments = styles.match(/\[data-wcl-spinner-segments\]\s*\{([^}]*)\}/)?.[1];
     const reducedMotion = styles.match(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)([\s\S]*)/,
     )?.[1];
 
     expect(progressActivity).toContain('animation: wcl-progress-route');
-    expect(spinnerActivity).toContain('animation: wcl-spinner-route');
+    expect(spinnerActivity).toContain('animation: wcl-spinner-route 1.65s');
+    expect(spinnerSegmentActivity).toContain('animation: wcl-spinner-segment 1.65s');
+    expect(spinnerSegmentActivity).toContain('var(--wcl-spinner-segment-index) * 132ms');
+    expect(spinnerGlyph).toContain('inline-size: 1.375rem');
+    expect(spinnerSegments).toContain('stroke-width: 3.5');
+    expect(styles).toMatch(
+      /\[data-wcl-spinner-segment\]:nth-child\(6\)\s*\{[^}]*--wcl-spinner-segment-index:\s*5/,
+    );
     expect(reducedMotion).toMatch(
       /\[data-wcl-progress-fill\]::after[\s\S]*animation-iteration-count:\s*1/,
     );
     expect(reducedMotion).toMatch(
-      /\[data-wcl-spinner-glyph\][\s\S]*animation-iteration-count:\s*1/,
+      /\[data-wcl-spinner-glyph\],[\s\S]*\[data-wcl-spinner-segment\][\s\S]*animation:\s*none !important/,
     );
+    expect(reducedMotion).toMatch(/\[data-wcl-spinner-segment\]\s*\{[^}]*opacity:\s*1/);
   });
 
   it('contains long progress values inside narrow label rows', async () => {

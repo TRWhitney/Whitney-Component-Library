@@ -234,6 +234,7 @@ describe('status, progress, and alerts', () => {
     expect(screen.getByRole('status').textContent).toBe('Solving profile');
     expect(spinner.hasAttribute('data-active')).toBe(true);
     expect(screen.getByRole('status').getAttribute('aria-busy')).toBeNull();
+    expect(container.querySelectorAll('[data-wcl-spinner-segment]')).toHaveLength(6);
   });
 
   it('server-renders and hydrates the complete family without warnings', () => {

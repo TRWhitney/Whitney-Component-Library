@@ -2539,21 +2539,51 @@
   }
 
   [data-wcl-spinner-glyph] {
-    inline-size: 1.125rem;
-    block-size: 1.125rem;
+    inline-size: 1.375rem;
+    block-size: 1.375rem;
     fill: none;
-    stroke: var(--wcl-border-strong);
-    stroke-linecap: round;
-    stroke-width: 2;
     transform-origin: center;
   }
 
-  [data-wcl-spinner-glyph] path {
+  [data-wcl-spinner-segments] {
     stroke: var(--wcl-accent);
+    stroke-linecap: round;
+    stroke-width: 3.5;
+  }
+
+  [data-wcl-spinner-segment] {
+    --wcl-spinner-segment-index: 0;
+
+    opacity: 0;
   }
 
   [data-wcl-spinner][data-active] [data-wcl-spinner-glyph] {
-    animation: wcl-spinner-route 0.85s linear infinite;
+    animation: wcl-spinner-route 1.65s linear infinite;
+  }
+
+  [data-wcl-spinner-segment]:nth-child(2) {
+    --wcl-spinner-segment-index: 1;
+  }
+
+  [data-wcl-spinner-segment]:nth-child(3) {
+    --wcl-spinner-segment-index: 2;
+  }
+
+  [data-wcl-spinner-segment]:nth-child(4) {
+    --wcl-spinner-segment-index: 3;
+  }
+
+  [data-wcl-spinner-segment]:nth-child(5) {
+    --wcl-spinner-segment-index: 4;
+  }
+
+  [data-wcl-spinner-segment]:nth-child(6) {
+    --wcl-spinner-segment-index: 5;
+  }
+
+  [data-wcl-spinner][data-active] [data-wcl-spinner-segment] {
+    animation: wcl-spinner-segment 1.65s linear calc(var(--wcl-spinner-segment-index) * 132ms)
+      infinite;
   }
 
   [data-wcl-action-tooltip] {
@@ -2621,6 +2651,22 @@
       rotate: 1turn;
     }
   }
+
+  @keyframes wcl-spinner-segment {
+    0%,
+    100% {
+      opacity: 0;
+    }
+
+    4%,
+    52% {
+      opacity: 1;
+    }
+
+    56% {
+      opacity: 0;
+    }
+  }
 }
 
 @layer wcl.utilities {
@@ -2644,10 +2690,18 @@
   }
 
   @layer wcl.components {
-    [data-wcl-progress-fill]::after,
-    [data-wcl-spinner-glyph] {
+    [data-wcl-progress-fill]::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
+    }
+
+    [data-wcl-spinner-glyph],
+    [data-wcl-spinner-segment] {
+      animation: none !important;
+    }
+
+    [data-wcl-spinner-segment] {
+      opacity: 1;
     }
 
     [data-wcl-progress-fill] {
@@ -2786,11 +2840,7 @@
       forced-color-adjust: none;
     }
 
-    [data-wcl-spinner-glyph] {
-      stroke: CanvasText;
-    }
-
-    [data-wcl-spinner-glyph] path {
+    [data-wcl-spinner-segments] {
       stroke: Highlight;
     }
 

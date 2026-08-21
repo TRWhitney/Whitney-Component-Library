@@ -508,7 +508,7 @@ export const spinnerContract = {
     'Spinner keeps one empty atomic status mounted while inactive, then supplies the visible label when active without marking that live region aria-busy, so assistive technology can announce the transition without deferral.',
   ],
   appearance: [
-    'One compact arc sits beside a visible activity label. The slot keeps its size when inactive.',
+    'Six thick, rounded accent capsules rotate beside a visible activity label. They appear and disappear one complete capsule at a time, and the slot keeps its size when inactive.',
   ],
   appropriateUses: [
     'a brief generic busy state is active but no amount or completion estimate exists',
@@ -543,7 +543,7 @@ export const spinnerContract = {
   ],
   exportName: 'Spinner',
   forcedColorBehavior: [
-    'Forced colors retain a system-highlight active arc, a system-colored route, and visible label.',
+    'Forced colors retain system-highlight activity capsules and a visible label.',
   ],
   importPath: '.',
   inappropriateUses: [
@@ -554,7 +554,9 @@ export const spinnerContract = {
     'label is required and visible; do not duplicate it through a surrounding status live region.',
   ],
   name: 'Spinner',
-  parts: ['Spinner includes one activity icon and one visible label in a fixed inline slot.'],
+  parts: [
+    'Spinner includes one six-capsule activity icon and one visible label in a fixed inline slot.',
+  ],
   preferredAlternatives: [
     'Use ProgressBar when the operation and its completion description should stay visible, or StatusIndicator after work finishes.',
   ],
@@ -563,7 +565,7 @@ export const spinnerContract = {
   ],
   purpose: 'Spinner presents a brief labeled generic busy state only while work is active.',
   reducedMotionBehavior: [
-    'Reduced motion settles the active arc to one effectively instantaneous iteration while retaining its visible busy structure.',
+    'Reduced motion stops the rotation and shows all six capsules as a static busy structure.',
   ],
   relatedExports: ['AppearanceProvider', 'Button', 'ProgressBar', 'StatusIndicator'],
   responsiveBehavior: [
