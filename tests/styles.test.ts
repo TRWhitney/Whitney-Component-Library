@@ -466,9 +466,10 @@ describe('static appearance styles', () => {
     expect(selectTrigger).toContain('align-items: center');
   });
 
-  it('bounds collection overlays and keeps selected option labels neutral', async () => {
+  it('bounds collection overlays and rounds their inset option states', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const popover = styles.match(/\[data-wcl-selection-popover\]\s*\{([^}]*)\}/)?.[1];
+    const list = styles.match(/\[data-wcl-selection-list\]\s*\{([^}]*)\}/)?.[1];
     const option = styles.match(/\[data-wcl-selection-option\]\s*\{([^}]*)\}/)?.[1];
     const selectedRail = styles.match(
       /\[data-wcl-selection-rail\]\[data-selected\]\s*\{([^}]*)\}/,
@@ -479,10 +480,12 @@ describe('static appearance styles', () => {
     expect(popover).toContain('max-inline-size: calc(100vw');
     expect(popover).toContain('max-block-size: min(20rem, var(--available-height))');
     expect(popover).toContain('background: var(--wcl-surface-raised)');
+    expect(list).toContain('padding: calc(var(--wcl-space) * 0.5)');
     expect(option).toContain('padding-block: calc(var(--wcl-space) * 0.75)');
     expect(option).toContain(
       'padding-inline: calc(var(--wcl-space) * 0.75) calc(var(--wcl-space) * 1.25)',
     );
+    expect(option).toContain('border-radius: calc(var(--wcl-control-radius) * 0.5)');
     expect(option).not.toMatch(/\bpadding:/);
     expect(selectedRail).toContain('background: var(--wcl-accent-rail-on-raised)');
     expect(optionLabel).toContain('color: inherit');

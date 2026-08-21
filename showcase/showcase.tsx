@@ -555,7 +555,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one value from a centered trigger with typeahead, native form behavior, and viewport-aware placement."
+        description="Choose one value from a centered trigger and rounded list options with typeahead, native form behavior, and viewport-aware placement."
         name="Select"
       >
         <Select
@@ -569,7 +569,7 @@ function SelectionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Filter local, dynamic, or asynchronous options and choose one value. Input text and selection stay separate."
+        description="Filter local, dynamic, or asynchronous options and choose one value from rounded list options. Input text and selection stay separate."
         name="ComboBox"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
