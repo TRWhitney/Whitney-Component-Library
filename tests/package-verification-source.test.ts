@@ -75,6 +75,7 @@ describe('packed consumer verification source', () => {
     expect(source).toContain('aria-describedby');
     expect(source).toContain("locale: 'en-US'");
     expect(source).toContain('globalThis.InputEvent = dom.window.InputEvent');
+    expect(source).toContain('globalThis.CustomEvent = dom.window.CustomEvent');
     expect(source).toContain('globalThis.HTMLTemplateElement = dom.window.HTMLTemplateElement');
   });
 
@@ -129,9 +130,12 @@ describe('packed consumer verification source', () => {
     for (const exportName of [
       'AlertBanner',
       'Badge',
+      'EmptyState',
       'InlineAlert',
       'Meter',
+      'NotificationProvider',
       'ProgressBar',
+      'Skeleton',
       'Spinner',
       'StatusIndicator',
     ]) {
@@ -139,6 +143,9 @@ describe('packed consumer verification source', () => {
     }
     expect(source).toContain('data-wcl-status-indicator');
     expect(source).toContain('data-wcl-alert-banner');
+    expect(source).toContain('data-wcl-skeleton');
+    expect(source).toContain('data-wcl-empty-state');
+    expect(source).toContain('data-wcl-notification');
     expect(source).toContain("getAttribute('aria-valuenow') !== '18'");
     expect(source).toContain("getAttribute('aria-valuetext') !== '76 kilowatts'");
     expect(source).toContain('Packed feedback family did not preserve semantic relationships.');

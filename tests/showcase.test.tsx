@@ -90,4 +90,16 @@ describe('component showcase', () => {
 
     expect(getByText('Unselected ToggleButton')).toBeTruthy();
   });
+
+  it('demonstrates a working notification without moving focus', () => {
+    const {getByRole, getByText} = render(<Showcase />);
+    const trigger = getByRole('button', {name: 'Show export notification'});
+    trigger.focus();
+
+    fireEvent.click(trigger);
+
+    expect(getByText('Export ready')).toBeTruthy();
+    expect(document.activeElement).toBe(trigger);
+    expect(getByRole('region', {name: 'Showcase notifications'})).toBeTruthy();
+  });
 });

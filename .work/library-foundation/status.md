@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 10, including the intervening Ticket 03A accent correction, are complete.
-Ticket 11 is ready. The maintained human showcase covers every contracted public component. Manual
+Tickets 01 through 11, including the intervening Ticket 03A accent correction, are complete.
+Ticket 12 is ready. The maintained human showcase covers every contracted public component. Manual
 screen-reader operation is intentionally consolidated in the Ticket 30 pre-`1.0` release gate
 rather than repeated for every component ticket.
 
@@ -187,10 +187,23 @@ region only while active. Broad alerts retain the same rounded containment gramm
 Light, dark, compact, forced-color, reduced-motion, SSR, hydration, public package, and generated
 contract behavior are covered.
 
+### Ticket 11 — loading, empty, and notification feedback
+
+Skeleton, EmptyState, and NotificationProvider keep loading geometry, absent-content explanation,
+and transient announcements as separate public concepts. Skeleton uses bounded heading, text,
+control, and media geometry while staying hidden from assistive technology. EmptyState distinguishes
+no data, no results, and unavailable content with at most one direct recovery action.
+
+Notifications own semantic tone and urgency, four logical viewport placements, bounded timeout or
+persistence, hover/focus pause, Escape and button dismissal, newest-first queuing, and one-to-three
+visible items. Arrival does not move focus, and contracts direct durable recovery or inspection to
+persistent content. Compact reflow, light and dark appearance, forced colors, reduced motion, SSR,
+hydration, React 18/19 package consumption, public types, and live-region structure are covered.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is [Ticket 11 — Loading, Empty, and
-Notification Feedback](tickets/11-loading-empty-and-notification-feedback.md).
+See the [decision map](map.md). The next implementation unit is [Ticket 12 — Dialog and Drawer
+Overlays](tickets/12-dialog-and-drawer-overlays.md).
 
 ## Accepted sources
 
@@ -217,7 +230,7 @@ Notification Feedback](tickets/11-loading-empty-and-notification-feedback.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 257
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 302
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
@@ -257,11 +270,18 @@ Notification Feedback](tickets/11-loading-empty-and-notification-feedback.md).
   relationships, threshold descriptions, active/inactive busy exposure, and the accessibility
   tree. The inspected page had no overflow, console errors, or page errors; screenshots were
   discarded after validation.
+- Chromium, Firefox, and WebKit direct evidence covers visible Skeleton geometry, all three
+  EmptyState meanings, focus-preserving NotificationProvider arrival, keyboard and button dismissal
+  semantics, logical RTL placement under a mismatched browser locale, live-region structure, and
+  compact containment without overflow or console/page errors. Chromium additionally confirms
+  focus-paused timing and covers light and dark appearance, reduced motion, and forced colors.
+  Focused public-seam tests cover programmatic dismissal and post-removal callbacks. Inspected
+  screenshots were discarded after validation.
 - Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
-Resume Ticket 11 from novel-work implementation with
+Resume Ticket 12 from novel-work implementation with
 `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`
-and begin the loading, empty, and notification feedback slice. Current branch: `master`. Ticket 10
-is delivered by the commit containing this record; no Ticket 11 implementation has started.
+and begin the dialog and drawer overlay slice. Current branch: `master`. Ticket 11 is delivered by
+the commit containing this record; no Ticket 12 implementation has started.

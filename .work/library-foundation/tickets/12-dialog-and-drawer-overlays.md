@@ -6,7 +6,7 @@ dismissal, responsive layout, and action composition.
 **Blocked by:** [Action Family](03-action-family.md),
 [Layout and Surface Primitives](02-layout-and-surface-primitives.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Dialog and alert-dialog contracts distinguish ordinary tasks from consequential confirmation.
 - [ ] Focus enters predictably, remains contained where required, and restores on every close path.

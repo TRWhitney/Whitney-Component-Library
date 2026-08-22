@@ -49,6 +49,7 @@ describe('canonical component contracts', () => {
       'DateRangePicker',
       'Divider',
       'DropZone',
+      'EmptyState',
       'Field',
       'FieldGroup',
       'FileTrigger',
@@ -58,6 +59,7 @@ describe('canonical component contracts', () => {
       'InlineGroup',
       'Link',
       'Meter',
+      'NotificationProvider',
       'NumberField',
       'ProgressBar',
       'RadioGroup',
@@ -68,6 +70,7 @@ describe('canonical component contracts', () => {
       'Section',
       'SegmentedControl',
       'Select',
+      'Skeleton',
       'Slider',
       'Spinner',
       'Stack',
@@ -108,6 +111,33 @@ describe('canonical component contracts', () => {
     expect(contractFor('Meter')?.appropriateUses.join(' ')).toMatch(/quantity.*known range/i);
     expect(contractFor('Meter')?.contentRules.join(' ')).toMatch(/threshold.*unit/i);
     expect(contractFor('Spinner')?.preferredAlternatives.join(' ')).toMatch(/ProgressBar/i);
+  });
+
+  it('distinguishes loading placeholders, empty content, notifications, and durable feedback', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Skeleton')?.accessibility.join(' ')).toMatch(/hidden.*assistive/i);
+    expect(contractFor('Skeleton')?.preferredAlternatives.join(' ')).toMatch(
+      /Spinner|ProgressBar/i,
+    );
+    expect(contractFor('EmptyState')?.states.join(' ')).toMatch(
+      /no data.*no results.*unavailable/i,
+    );
+    expect(contractFor('EmptyState')?.controlBehavior.join(' ')).toMatch(/one.*action/i);
+    expect(contractFor('InlineAlert')?.preferredAlternatives.join(' ')).toMatch(
+      /NotificationProvider/i,
+    );
+    expect(contractFor('InlineAlert')?.relatedExports).toContain('NotificationProvider');
+    expect(contractFor('NotificationProvider')?.controlBehavior.join(' ')).toMatch(
+      /queue.*three.*timeout.*pause/i,
+    );
+    expect(contractFor('NotificationProvider')?.inappropriateUses.join(' ')).toMatch(
+      /only path.*recover|persistent.*condition/i,
+    );
+    expect(contractFor('NotificationProvider')?.preferredAlternatives.join(' ')).toMatch(
+      /InlineAlert.*AlertBanner.*dialog/i,
+    );
   });
 
   it('keeps file acquisition separate from upload and reports rejected files', () => {

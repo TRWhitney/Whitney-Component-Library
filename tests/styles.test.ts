@@ -97,6 +97,36 @@ describe('static appearance styles', () => {
     expect(banner).not.toMatch(/border-radius:\s*0/);
   });
 
+  it('keeps loading structure legible while settling its motion when requested', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const skeleton = styles.match(/\[data-wcl-skeleton\]\s*\{([^}]*)\}/)?.[1];
+    const skeletonLine = styles.match(/\[data-wcl-skeleton-line\]\s*\{([^}]*)\}/)?.[1];
+    const reducedMotion = styles.match(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)([\s\S]*)/,
+    )?.[1];
+
+    expect(skeleton).toContain('min-inline-size: 8rem');
+    expect(skeletonLine).toContain('animation: wcl-skeleton-route');
+    expect(reducedMotion).toMatch(/\[data-wcl-skeleton-line\][\s\S]*animation:\s*none !important/);
+  });
+
+  it('bounds notification placement and preserves keyboard focus treatment', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const region = styles.match(/\[data-wcl-notification-region\]\s*\{([^}]*)\}/)?.[1];
+    const notification = styles.match(/\[data-wcl-notification\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(region).toContain('position: fixed');
+    expect(region).toContain('direction: inherit');
+    expect(region).toContain('max-inline-size: 22rem');
+    expect(notification).toContain('pointer-events: auto');
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]:focus-visible[\s\S]*var\(--wcl-accent-focus\)/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-notification\][\s\S]*CanvasText/,
+    );
+  });
+
   it('maps identity and surface roles to system colors in forced-color mode', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/);

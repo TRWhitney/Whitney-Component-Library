@@ -12,7 +12,7 @@ InlineAlert explains feedback for one nearby region.
 
 ## Prefer instead
 
-- Use AlertBanner for broad scope, StatusIndicator for concise state, Badge for metadata, or a later toast for transient notification.
+- Use AlertBanner for broad scope, StatusIndicator for concise state, Badge for metadata, or NotificationProvider for transient notification.
 
 ## Composition and parts
 

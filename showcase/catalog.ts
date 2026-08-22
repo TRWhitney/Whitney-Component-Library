@@ -54,6 +54,9 @@ export const showcaseGroups = [
       'ProgressBar',
       'Meter',
       'Spinner',
+      'Skeleton',
+      'EmptyState',
+      'NotificationProvider',
     ],
   },
 ] as const satisfies readonly ShowcaseGroup[];

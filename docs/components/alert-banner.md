@@ -12,7 +12,7 @@ AlertBanner explains a condition that affects a page or workspace.
 
 ## Prefer instead
 
-- Use InlineAlert for local scope, StatusIndicator for terse state, or a later toast for transient background completion.
+- Use InlineAlert for local scope, StatusIndicator for terse state, or NotificationProvider for transient background completion.
 
 ## Composition and parts
 

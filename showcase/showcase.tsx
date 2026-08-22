@@ -20,6 +20,7 @@ import {
   DateRangePicker,
   Divider,
   DropZone,
+  EmptyState,
   Field,
   FieldGroup,
   FileTrigger,
@@ -29,6 +30,7 @@ import {
   InlineGroup,
   Link,
   Meter,
+  NotificationProvider,
   NumberField,
   ProgressBar,
   RangeSlider,
@@ -39,6 +41,7 @@ import {
   Section,
   Select,
   Slider,
+  Skeleton,
   Spinner,
   Stack,
   StatusIndicator,
@@ -1105,6 +1108,89 @@ function FeedbackSpecimens() {
             <Spinner isActive={false} label="Preparing solver" />
           </Example>
         </InlineGroup>
+      </Specimen>
+
+      <Specimen
+        description="Reserve the approximate geometry of known content while it loads. The placeholder stays hidden from assistive technology, so name and mark the surrounding region as busy."
+        name="Skeleton"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Result-summary Skeleton">
+            <div
+              aria-busy="true"
+              aria-label="Loading result summary"
+              className="showcase-skeleton-region"
+            >
+              <Stack gap="regular">
+                <Skeleton shape="heading" width="half" />
+                <Skeleton lines={3} shape="text" />
+              </Stack>
+            </div>
+          </Example>
+          <Example label="Media Skeleton">
+            <div className="showcase-skeleton-region">
+              <Skeleton shape="media" />
+            </div>
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Explain why a loaded content region has no data, no matching results, or unavailable content. Keep recovery to one direct action."
+        name="EmptyState"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="No-data EmptyState">
+            <EmptyState
+              actionLabel="Add boundary"
+              description="Add a boundary condition before running the profile."
+              kind="no-data"
+              onAction={() => undefined}
+              title="No boundary conditions"
+            />
+          </Example>
+          <Example label="No-results EmptyState">
+            <EmptyState
+              description="Change or clear the current filters."
+              kind="no-results"
+              title="No matching runs"
+            />
+          </Example>
+          <Example label="Unavailable EmptyState">
+            <EmptyState
+              actionLabel="Try again"
+              description="The solver could not load this result."
+              kind="unavailable"
+              onAction={() => undefined}
+              title="Result unavailable"
+            />
+          </Example>
+        </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        description="Queue brief confirmations for background events without moving focus. Messages pause on hover or focus and remain dismissible; use durable alerts or a dialog when recovery matters."
+        name="NotificationProvider"
+      >
+        <NotificationProvider
+          dismissLabel="Dismiss notification"
+          label="Showcase notifications"
+          maxVisible={2}
+        >
+          {({notify}) => (
+            <Button
+              onPress={() =>
+                notify({
+                  description: 'The export is available in run history.',
+                  title: 'Export ready',
+                  tone: 'success',
+                })
+              }
+            >
+              Show export notification
+            </Button>
+          )}
+        </NotificationProvider>
       </Specimen>
     </>
   );

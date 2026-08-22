@@ -329,6 +329,11 @@
     text-transform: uppercase;
   }
 
+  .showcase-skeleton-region {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
   .showcase-measure {
     --wcl-accent-rail: var(--wcl-accent-rail-on-subtle);
 

@@ -72,3 +72,67 @@ export interface SpinnerProps {
   readonly isActive: boolean;
   readonly label: string;
 }
+
+export type SkeletonShape = 'text' | 'heading' | 'control' | 'media';
+export type SkeletonWidth = 'full' | 'three-quarters' | 'half';
+export type SkeletonLineCount = 1 | 2 | 3 | 4 | 5;
+
+interface SkeletonBaseProps {
+  readonly width?: SkeletonWidth;
+}
+
+export type SkeletonProps =
+  | (SkeletonBaseProps & {
+      readonly lines?: SkeletonLineCount;
+      readonly shape?: 'text';
+    })
+  | (SkeletonBaseProps & {
+      readonly lines?: never;
+      readonly shape: Exclude<SkeletonShape, 'text'>;
+    });
+
+export type EmptyStateKind = 'no-data' | 'no-results' | 'unavailable';
+
+interface EmptyStateBaseProps {
+  readonly description: string;
+  readonly kind: EmptyStateKind;
+  readonly title: string;
+}
+
+export type EmptyStateProps = EmptyStateBaseProps &
+  (
+    | {
+        readonly actionLabel?: never;
+        readonly onAction?: never;
+      }
+    | {
+        readonly actionLabel: string;
+        readonly onAction: () => void;
+      }
+  );
+
+export type NotificationPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end';
+export type NotificationUrgency = Exclude<AnnouncementMode, 'off'>;
+export type NotificationVisibleLimit = 1 | 2 | 3;
+
+export interface NotificationInput {
+  readonly description?: string;
+  readonly onDismiss?: () => void;
+  readonly timeout?: number | null;
+  readonly title: string;
+  readonly tone: StatusTone;
+  readonly urgency?: NotificationUrgency;
+}
+
+export interface NotificationControls {
+  readonly dismiss: (key: string) => void;
+  readonly notify: (notification: NotificationInput) => string;
+}
+
+export interface NotificationProviderProps {
+  readonly children: (controls: NotificationControls) => ReactNode;
+  readonly dismissLabel: string;
+  readonly label: string;
+  readonly maxVisible?: NotificationVisibleLimit;
+  readonly placement?: NotificationPlacement;
+}

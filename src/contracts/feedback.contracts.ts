@@ -263,7 +263,7 @@ export const inlineAlertContract = {
   name: 'InlineAlert',
   parts: ['InlineAlert includes one icon, visible title, and optional visible description.'],
   preferredAlternatives: [
-    'Use AlertBanner for broad scope, StatusIndicator for concise state, Badge for metadata, or a later toast for transient notification.',
+    'Use AlertBanner for broad scope, StatusIndicator for concise state, Badge for metadata, or NotificationProvider for transient notification.',
   ],
   preferredCompositions: [
     'Compose beneath a FieldGroup, FormSection, Surface, or local action cluster whose scope is already evident.',
@@ -276,6 +276,7 @@ export const inlineAlertContract = {
     'Button',
     'FieldGroup',
     'FormSection',
+    'NotificationProvider',
     'StatusIndicator',
     'Surface',
   ],
@@ -327,13 +328,19 @@ export const alertBannerContract = {
     'AlertBanner includes one full-width border, icon, visible title, and optional description.',
   ],
   preferredAlternatives: [
-    'Use InlineAlert for local scope, StatusIndicator for terse state, or a later toast for transient background completion.',
+    'Use InlineAlert for local scope, StatusIndicator for terse state, or NotificationProvider for transient background completion.',
   ],
   preferredCompositions: [
     'Compose at the beginning of an application shell, workspace, or page content region before the affected controls.',
   ],
   purpose: 'AlertBanner explains a condition that affects a page or workspace.',
-  relatedExports: ['AppearanceProvider', 'Button', 'InlineAlert', 'StatusIndicator'],
+  relatedExports: [
+    'AppearanceProvider',
+    'Button',
+    'InlineAlert',
+    'NotificationProvider',
+    'StatusIndicator',
+  ],
   responsiveBehavior: [
     'The banner fills the available width and wraps text while keeping its icon column.',
   ],
@@ -575,4 +582,279 @@ export const spinnerContract = {
     'Only the active state has visible or accessible status content and motion. The inactive state reserves the same space.',
   ],
   summary: 'Show a brief labeled busy state only while work is active.',
+} satisfies ComponentContract;
+
+export const skeletonContract = {
+  ...commonFeedbackGuidance,
+  accentBehavior: [
+    'Skeleton uses neutral surface and boundary colors. Application accent and semantic status colors do not decorate unfinished content.',
+  ],
+  accessibility: [
+    'The complete placeholder is hidden from assistive technology. The surrounding region must expose its own loading state and accessible label when a reader needs progress context.',
+  ],
+  appearance: [
+    'Text, heading, control, and media shapes use calibrated neutral rails. Text may reserve one to five lines, and the last line shortens to avoid looking like finished copy.',
+  ],
+  appropriateUses: [
+    'a content region is loading and preserving its approximate eventual geometry prevents disruptive layout movement',
+  ],
+  composition: [
+    'Render inside AppearanceProvider and arrange one or more Skeleton instances with the same public layout components that will contain the loaded content.',
+  ],
+  contentRules: [
+    'Choose the shape and bounded width that most closely matches the expected content. Do not use skeleton rails as decoration or as a substitute for a loading label.',
+  ],
+  controlBehavior: [
+    'Skeleton is visual only. Text accepts one to five lines; heading, control, and media each reserve one shaped block.',
+  ],
+  counterExamples: [
+    {
+      code: inProvider('UnknownWaitSkeletonCounterexample', '<Skeleton shape="control" />'),
+      description:
+        'A generic wait with no known eventual layout needs a labeled Spinner or ProgressBar.',
+      title: 'Do not invent a content shape',
+    },
+  ],
+  events: ['Skeleton emits no event and does not infer when loading begins or ends.'],
+  examples: [
+    {
+      code: inProvider(
+        'ResultSummarySkeleton',
+        '<div aria-busy="true" aria-label="Loading result summary">\n  <Skeleton lines={3} shape="text" width="three-quarters" />\n</div>',
+      ),
+      description: 'Reserve a short result summary while its named region is busy.',
+      title: 'Structured result loading',
+    },
+  ],
+  exportName: 'Skeleton',
+  forcedColorBehavior: [
+    'Forced colors retain each placeholder boundary with system colors and remove the moving tonal gradient.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'an unknown loading shape, operation progress, a generic busy label, empty content, unavailable content, or decorative striping',
+  ],
+  kind: 'component',
+  labeling: [
+    'Skeleton accepts no label because it is hidden. Name the loading region or use Spinner or ProgressBar when the operation itself must be announced.',
+  ],
+  name: 'Skeleton',
+  parts: ['Skeleton includes one shaped block or a bounded sequence of text rails.'],
+  preferredAlternatives: [
+    'Use Spinner for a brief labeled wait, ProgressBar for an operation with completion meaning, or EmptyState after loading completes without content.',
+  ],
+  preferredCompositions: [
+    'Compose several Skeleton instances inside Stack, InlineGroup, ResponsiveGrid, or Surface to approximate the loaded region without recreating its private content.',
+  ],
+  purpose: 'Skeleton reserves the approximate shape of content while its region loads.',
+  reducedMotionBehavior: [
+    'Reduced motion removes the route sweep and keeps the same neutral placeholder geometry.',
+  ],
+  relatedExports: [
+    'AppearanceProvider',
+    'EmptyState',
+    'InlineGroup',
+    'ProgressBar',
+    'ResponsiveGrid',
+    'Spinner',
+    'Stack',
+    'Surface',
+  ],
+  responsiveBehavior: [
+    'Full, three-quarter, and half widths remain relative to the containing region. Media keeps a bounded aspect ratio without horizontal overflow.',
+  ],
+  states: [
+    'Text, heading, control, and media are separate approximate shapes. Width and text line count are finite choices.',
+  ],
+  summary: 'Reserve approximate content geometry during a known loading state.',
+  validation: [
+    'shape, width, and text line count are finite TypeScript choices. Non-text shapes do not accept a line count.',
+  ],
+} satisfies ComponentContract;
+
+export const emptyStateContract = {
+  ...commonFeedbackGuidance,
+  accentBehavior: [
+    'No-data and no-results states remain neutral. Unavailable content uses warning structure without borrowing the application accent or claiming an error outcome.',
+  ],
+  accessibility: [
+    'The visible title and description form one ordinary content group. The kind glyph is hidden, so wording rather than color or shape identifies the condition.',
+  ],
+  appearance: [
+    'A reserved open field pairs one stable condition glyph with left-aligned copy. An optional compact secondary Button stays with the copy rather than turning the state into a dialog.',
+  ],
+  appropriateUses: [
+    'a loaded content region has no data, no matching results, or temporarily unavailable content and can explain the next useful step',
+  ],
+  composition: [
+    'Render inside AppearanceProvider where the missing collection or content would appear. Supply at most one bounded recovery action through actionLabel and onAction.',
+  ],
+  contentRules: [
+    'title names the condition and description explains what the reader can do next. Distinguish an empty source from filters with no matches and from content that failed to become available.',
+  ],
+  controlBehavior: [
+    'EmptyState adds no behavior without actionLabel and onAction. Supplying both renders exactly one compact secondary action; neither may appear alone.',
+  ],
+  counterExamples: [
+    {
+      code: inProvider(
+        'FailedSaveEmptyCounterexample',
+        '<EmptyState description="Your draft was not saved." kind="unavailable" title="Save failed" />',
+      ),
+      description:
+        'A failed operation needs durable explanatory feedback and a recovery path, not an empty-content treatment.',
+      title: 'Do not hide an operation failure',
+    },
+  ],
+  events: [
+    'onAction runs when the optional recovery Button is pressed. EmptyState emits no event when it appears.',
+  ],
+  examples: [
+    {
+      code: inProvider(
+        'NoBoundaryConditions',
+        '<EmptyState actionLabel="Add boundary" description="Add a boundary condition before running the profile." kind="no-data" onAction={() => undefined} title="No boundary conditions" />',
+      ),
+      description: 'Explain the missing source data and offer one direct next step.',
+      title: 'Empty source with one action',
+    },
+  ],
+  exportName: 'EmptyState',
+  forcedColorBehavior: [
+    'Forced colors preserve the field, glyph, text, and action boundaries with system colors.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'content still loading, a failed command, field validation, broad application conditions, transient notifications, or multiple competing recovery choices',
+  ],
+  keyboardBehavior: [
+    'The optional recovery Button follows ordinary Tab and activation behavior. EmptyState itself adds no tab stop or keyboard command.',
+  ],
+  kind: 'component',
+  labeling: [
+    'title and description are visible and required. actionLabel is visible when a recovery action exists.',
+  ],
+  name: 'EmptyState',
+  parts: [
+    'EmptyState includes one hidden condition glyph, visible title, visible description, and at most one Button.',
+  ],
+  preferredAlternatives: [
+    'Use Skeleton while known content loads, InlineAlert for a local condition, AlertBanner for broad scope, or a dialog when recovery needs a decision.',
+  ],
+  preferredCompositions: [
+    'Place EmptyState inside the same Section, Surface, list, table, or chart region that owns the absent content.',
+  ],
+  purpose: 'EmptyState explains why a loaded content region has nothing to show.',
+  reducedMotionBehavior: ['EmptyState has no motion or transient state.'],
+  relatedExports: [
+    'AlertBanner',
+    'AppearanceProvider',
+    'Button',
+    'InlineAlert',
+    'Section',
+    'Skeleton',
+    'Surface',
+  ],
+  responsiveBehavior: [
+    'The glyph and copy use two columns when space permits. Long localized text and the optional action wrap without horizontal overflow.',
+  ],
+  states: [
+    'No data means the source is empty, no results means current criteria match nothing, and unavailable means expected content cannot currently load.',
+  ],
+  summary: 'Explain no data, no results, or unavailable content with at most one action.',
+  validation: [
+    'kind is a finite choice. TypeScript requires actionLabel and onAction together and prevents either from appearing alone.',
+  ],
+} satisfies ComponentContract;
+
+export const notificationProviderContract = {
+  ...commonFeedbackGuidance,
+  accentBehavior: [
+    'Notifications use neutral, success, warning, or danger meaning. Application accent appears only in keyboard focus and never replaces semantic tone.',
+  ],
+  accessibility: [
+    'Each notification is a focusable non-modal alert dialog with one visible atomic status or alert message and a labeled dismiss Button. Arrival never moves focus.',
+  ],
+  appearance: [
+    'Raised notifications use one semantic leading rail, a stable glyph and copy grid, and a compact dismiss control. One short entry settles into a bounded viewport corner.',
+  ],
+  appropriateUses: [
+    'a background event or completed action needs brief transient confirmation without interrupting the current task',
+  ],
+  composition: [
+    'Render one NotificationProvider inside AppearanceProvider. Its render child receives notify and dismiss controls while the provider owns a portal-backed notification region.',
+  ],
+  contentRules: [
+    'title and optional description are plain text. Keep messages concise and informational; notification copy cannot contain links, buttons, or another recovery path.',
+  ],
+  controlBehavior: [
+    'The provider queues newest notifications first, shows one to three at once, and reveals older queued messages after dismissal. Timeouts default to 6000 milliseconds, accept 4000 through 30000 milliseconds, or stay persistent with null. Hover and focus pause visible timers.',
+  ],
+  counterExamples: [
+    {
+      code: inProvider(
+        'ReconnectNotificationCounterexample',
+        '<NotificationProvider dismissLabel="Dismiss" label="Notifications">\n  {({notify}) => <Button onPress={() => notify({title: \'Solver disconnected\', tone: \'danger\'})}>Reconnect</Button>}\n</NotificationProvider>',
+      ),
+      description:
+        'A condition that blocks work needs a durable AlertBanner or dialog with an explicit recovery action.',
+      title: 'Do not make recovery transient',
+    },
+  ],
+  events: [
+    'notify returns a key, dismiss removes that key, and onDismiss runs after user dismissal, timeout, or programmatic dismissal.',
+  ],
+  examples: [
+    {
+      code: inProvider(
+        'ExportNotification',
+        "<NotificationProvider dismissLabel=\"Dismiss notification\" label=\"Notifications\" maxVisible={3}>\n  {({notify}) => (\n    <Button onPress={() => notify({description: 'The export is available in run history.', title: 'Export ready', tone: 'success'})}>\n      Export run\n    </Button>\n  )}\n</NotificationProvider>",
+      ),
+      description: 'Confirm a background export without interrupting the current control.',
+      title: 'Transient background completion',
+    },
+  ],
+  exportName: 'NotificationProvider',
+  forcedColorBehavior: [
+    'Forced colors retain the raised boundary, leading rail, glyph, copy, dismiss control, and focus outline with system colors.',
+  ],
+  formBehavior: [
+    'NotificationProvider and its messages are not form controls and do not serialize, validate, or respond to form reset.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'the only path to recover or inspect important information, a persistent condition, field feedback, page-wide interruption, confirmation requiring a decision, or arbitrary interactive content',
+  ],
+  keyboardBehavior: [
+    'Notifications do not receive focus on arrival. Readers may Tab to a notification and its dismiss Button; Escape dismisses a focused notification while hover or focus pauses its timer.',
+  ],
+  kind: 'provider',
+  labeling: [
+    'label names the notification region and dismissLabel names every dismiss control. Each message title remains visible and supplies its non-modal dialog name.',
+  ],
+  name: 'NotificationProvider',
+  parts: [
+    'NotificationProvider includes one bounded portal region, a queue, and one raised notification with tone glyph, title, optional description, and dismiss Button per visible item.',
+  ],
+  preferredAlternatives: [
+    'Use InlineAlert for durable local feedback, AlertBanner for a broad condition, StatusIndicator for a concise state, or a dialog when the reader must decide or recover.',
+  ],
+  preferredCompositions: [
+    'Place one provider around an application shell or workbench and issue notifications from completed background commands without duplicating durable status history.',
+  ],
+  purpose: 'NotificationProvider queues and presents brief dismissible application notifications.',
+  reducedMotionBehavior: [
+    'Reduced motion removes entry translation and preserves immediate appearance, placement, tone, and dismissal.',
+  ],
+  relatedExports: ['AlertBanner', 'AppearanceProvider', 'Button', 'InlineAlert', 'StatusIndicator'],
+  responsiveBehavior: [
+    'The region stays within its chosen logical corner, caps width at 22rem, and uses the compact viewport inset without clipping long localized copy.',
+  ],
+  states: [
+    'Neutral, success, warning, and danger tones combine with polite or assertive urgency. Messages may be timed or persistent, visible or queued, paused, focused, or dismissed.',
+  ],
+  summary: 'Queue brief notifications without interrupting focus or hiding recovery.',
+  validation: [
+    'maxVisible accepts one, two, or three. timeout must be finite between 4000 and 30000 milliseconds or null. Copy is plain text, and placement is one of four logical viewport corners.',
+  ],
 } satisfies ComponentContract;

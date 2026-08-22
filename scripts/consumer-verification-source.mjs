@@ -16,6 +16,7 @@ import {
   DatePicker,
   DateRangePicker,
   Divider,
+  EmptyState,
   Field,
   FieldGroup,
   FormSection,
@@ -24,6 +25,7 @@ import {
   InlineGroup,
   Link,
   Meter,
+  NotificationProvider,
   NumberField,
   ProgressBar,
   RadioGroup,
@@ -35,6 +37,7 @@ import {
   Select,
   SegmentedControl,
   Slider,
+  Skeleton,
   Spinner,
   Stack,
   StatusIndicator,
@@ -336,6 +339,25 @@ const view = React.createElement(
           valueLabel: '76 kilowatts',
         }),
         React.createElement(Spinner, {isActive: true, label: 'Preparing solver'}),
+        React.createElement(Skeleton, {lines: 2, shape: 'text', width: 'three-quarters'}),
+        React.createElement(EmptyState, {
+          description: 'Add a boundary condition before running.',
+          kind: 'no-data',
+          title: 'No boundary conditions',
+        }),
+        React.createElement(
+          NotificationProvider,
+          {dismissLabel: 'Dismiss notification', label: 'Packed notifications'},
+          ({notify}) => React.createElement(
+            'button',
+            {
+              id: 'packed-notification-trigger',
+              onClick: () => notify({title: 'Export ready', tone: 'success'}),
+              type: 'button',
+            },
+            'Show notification',
+          ),
+        ),
         React.createElement(
           Toolbar,
           {label: 'Inspector commands'},
@@ -358,6 +380,7 @@ const serverMarkup = renderToString(view);
 const dom = new JSDOM('<div id="root">' + serverMarkup + '</div>');
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
+globalThis.CustomEvent = dom.window.CustomEvent;
 globalThis.Element = dom.window.Element;
 globalThis.Event = dom.window.Event;
 globalThis.FocusEvent = dom.window.FocusEvent;
@@ -406,13 +429,19 @@ hydrateRoot(document.getElementById('root'), view, {
   onRecoverableError(error) { recoverableErrors.push(error); },
 });
 await new Promise((resolve) => setTimeout(resolve, 25));
+document
+  .getElementById('packed-notification-trigger')
+  ?.dispatchEvent(new dom.window.MouseEvent('click', {bubbles: true}));
+await new Promise((resolve) => setTimeout(resolve, 25));
 console.error = originalConsoleError;
 console.warn = originalConsoleWarn;
 
 if (consoleMessages.length > 0 || recoverableErrors.length > 0) {
   const details = [
-    ...consoleMessages.map((messages) => messages.map(String).join(' ')),
-    ...recoverableErrors.map(String),
+    ...consoleMessages.map((messages) =>
+      messages.map((message) => message?.stack ?? String(message)).join(' '),
+    ),
+    ...recoverableErrors.map((error) => error?.stack ?? String(error)),
   ].join('\\n');
   throw new Error('SSR or hydration emitted warnings or recoverable errors.\\n' + details);
 }
@@ -477,7 +506,10 @@ if (
   packedMeter?.getAttribute('aria-valuetext') !== '76 kilowatts' ||
   document.querySelectorAll('[data-wcl-meter-threshold]').length !== 2 ||
   packedSpinner?.querySelector('[role="status"]')?.textContent !== 'Preparing solver' ||
-  packedSpinner.querySelector('[role="status"]').hasAttribute('aria-busy')
+  packedSpinner.querySelector('[role="status"]').hasAttribute('aria-busy') ||
+  document.querySelector('[data-wcl-skeleton]')?.getAttribute('aria-hidden') !== 'true' ||
+  document.querySelector('[data-wcl-empty-state]')?.getAttribute('data-kind') !== 'no-data' ||
+  document.querySelector('[data-wcl-notification] [role="status"]')?.textContent !== 'Export ready'
 ) {
   throw new Error('Packed feedback family did not preserve semantic relationships.');
 }
