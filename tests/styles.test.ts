@@ -362,7 +362,7 @@ describe('static appearance styles', () => {
       /\[data-wcl-calendar-cell\]\[data-selected\]:not\(\[data-wcl-range-calendar\] \*\)\s*\{([^}]*)\}/,
     )?.[1];
     const rangeEndpoint = styles.match(
-      /\[data-wcl-range-calendar\][\s\S]*?\[data-wcl-calendar-cell\]:is\(\[data-selection-start\], \[data-selection-end\]\)\s*\{([^}]*)\}/,
+      /\[data-wcl-range-calendar\]\s+\[data-wcl-calendar-cell\]:is\(\s*\[data-selection-start\],\s*\[data-selection-end\],[\s\S]*?\)\s*\{([^}]*)\}/,
     )?.[1];
     const calendarRail = styles.match(
       /\[data-wcl-calendar-cell\]\[data-selected\]:not\(\[data-wcl-range-calendar\] \*\)::before\s*,[\s\S]*?\{([^}]*)\}/,
@@ -390,6 +390,40 @@ describe('static appearance styles', () => {
     expect(styles).toMatch(/\[data-wcl-calendar-cell\]\[data-today\]::after\s*\{/);
     expect(styles).toMatch(
       /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-calendar-cell\]\[data-selected\]:not\(\[data-wcl-range-calendar\] \*\)::before[\s\S]*background:\s*Highlight[\s\S]*forced-color-adjust:\s*none/,
+    );
+  });
+
+  it('keeps calendar picker fields compact and hides duplicate range-month dates', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const pickerControl = styles.match(/\[data-wcl-date-picker-control\]\s*\{([^}]*)\}/)?.[1];
+    const outsideMonth = styles.match(
+      /\[data-wcl-range-calendar\]\s+\[data-wcl-calendar-cell\]\[data-outside-month\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const outsideVisibleRange = styles.match(
+      /\[data-wcl-calendar-cell\]\[data-outside-visible-range\]:not\(\[data-outside-month\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const hierarchy = styles.match(/\[data-wcl-calendar-hierarchy\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(pickerControl).toContain('justify-self: start');
+    expect(pickerControl).toContain('inline-size: fit-content');
+    expect(pickerControl).toContain('max-inline-size: 100%');
+    expect(hierarchy).toContain('block-size: 15.25rem');
+    expect(hierarchy).toContain('grid-auto-rows: minmax(0, 1fr)');
+    expect(outsideMonth).toContain('visibility: hidden');
+    expect(outsideVisibleRange).toContain('visibility: hidden');
+    expect(styles).not.toMatch(/\[data-wcl-calendar-cell\]\[data-outside-visible-range\]\s*\{/);
+  });
+
+  it('reveals range drag paging handles at the calendar edges', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const handles = styles.match(
+      /\[data-wcl-calendar-sheet-range\]::before,[\s\S]*?\[data-wcl-calendar-sheet-range\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(handles).toContain('inline-size: 1.25rem');
+    expect(handles).toContain('opacity: 0');
+    expect(styles).toMatch(
+      /\[data-wcl-calendar-sheet-range\]\[data-edge='previous'\]::before,[\s\S]*?\[data-wcl-calendar-sheet-range\]\[data-edge='next'\]::after\s*\{[^}]*opacity:\s*1/,
     );
   });
 

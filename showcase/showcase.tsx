@@ -731,7 +731,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an ISO civil date through synchronized segments and a calendar. Focused segments and selected days use the same low-profile rail as selected actions; invalid boundaries thicken on enabled hover."
+        description="Choose an ISO civil date through synchronized segments and a fixed six-week calendar. Select the month or year heading to move through months, years, decades, and broader periods without paging month by month."
         name="DatePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -763,7 +763,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an inclusive ISO date interval with a separate form value for each endpoint. Focused segments and selected endpoints use the same low-profile rail as selected actions, while disabled fields remain neutral on hover."
+        description="Choose an inclusive ISO interval from two adjacent months. Opening edits start first; a start click retains the old end, an end click completes and closes, and dragging either endpoint keeps the calendar open. Month and year headings provide long-distance navigation."
         name="DateRangePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -773,9 +773,9 @@ function DateTimeSpecimens() {
               calendarButtonLabel="Choose review window"
               defaultValue={{
                 start: {day: 20, month: 8, year: 2026},
-                end: {day: 24, month: 8, year: 2026},
+                end: {day: 27, month: 8, year: 2026},
               }}
-              description="Both endpoint dates are included."
+              description="Both dates are included. Drag either endpoint or click start, then end."
               label="Review window"
               locale="en-US"
               placeholderValue={{day: 20, month: 8, year: 2026}}

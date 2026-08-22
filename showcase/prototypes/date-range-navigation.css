@@ -1,0 +1,393 @@
+/* stylelint-disable no-descending-specificity -- the isolated prototype groups interaction states after structural rules */
+@layer prototype {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #11171b;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .prototype-shell {
+    min-block-size: 100vh;
+    padding: clamp(1rem, 4vw, 3rem);
+    background: var(--wcl-canvas);
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+  }
+
+  .prototype-intro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    align-items: end;
+    justify-content: space-between;
+    max-inline-size: 70rem;
+    margin-inline: auto;
+  }
+
+  .prototype-intro h1,
+  .prototype-intro p {
+    margin: 0;
+  }
+
+  .prototype-intro h1 {
+    margin-block: 0.25rem;
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    letter-spacing: -0.035em;
+  }
+
+  .prototype-intro > div > p:last-child,
+  .prototype-announcement,
+  .prototype-notes {
+    color: var(--wcl-text-muted);
+  }
+
+  .prototype-kicker {
+    color: var(--wcl-accent-rail);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .prototype-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .prototype-controls label {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+    font-size: 0.8125rem;
+  }
+
+  .prototype-controls > button {
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--wcl-border-strong);
+    border-radius: var(--wcl-control-radius);
+    background: var(--wcl-surface-subtle);
+    color: var(--wcl-text);
+    cursor: pointer;
+  }
+
+  .prototype-identifier {
+    position: fixed;
+    z-index: 10;
+    inset-block-end: 1rem;
+    inset-inline-end: 1rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--wcl-accent-fill-boundary);
+    border-radius: 999px;
+    background: var(--wcl-surface-raised);
+    box-shadow: var(--wcl-shadow);
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.6875rem;
+  }
+
+  :is([data-identify], body[data-identify]) [data-prototype-part]:is(:hover, :focus-visible) {
+    outline: 1px dashed var(--wcl-warning);
+    outline-offset: 2px;
+  }
+
+  .prototype-stage {
+    display: grid;
+    justify-items: start;
+    max-inline-size: 70rem;
+    margin: 3rem auto 0;
+  }
+
+  [data-prototype-active-endpoint] [data-wcl-date-input] {
+    position: relative;
+  }
+
+  [data-prototype-active-endpoint='start'] [data-wcl-date-input][slot='start']::after,
+  [data-prototype-active-endpoint='end'] [data-wcl-date-input][slot='end']::after {
+    position: absolute;
+    z-index: 3;
+    inset-inline: calc(var(--wcl-space) * 0.75);
+    inset-block-end: 0;
+    block-size: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--wcl-accent-rail);
+    content: '';
+    pointer-events: none;
+  }
+
+  .prototype-announcement {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .prototype-calendar {
+    position: relative;
+    inline-size: min(42rem, calc(100vw - 2rem));
+    padding: 0.75rem;
+    overflow: hidden;
+  }
+
+  .prototype-calendar-inner {
+    min-inline-size: 0;
+  }
+
+  .prototype-calendar::before,
+  .prototype-calendar::after {
+    position: absolute;
+    z-index: 4;
+    inset-block: 0;
+    inline-size: 1.25rem;
+    background: color-mix(in srgb, var(--wcl-accent-soft-on-raised) 75%, transparent);
+    opacity: 0;
+    content: '';
+    pointer-events: none;
+    transition: opacity var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  .prototype-calendar::before {
+    inset-inline-start: 0;
+  }
+
+  .prototype-calendar::after {
+    inset-inline-end: 0;
+  }
+
+  .prototype-calendar[data-edge='previous']::before,
+  .prototype-calendar[data-edge='next']::after {
+    opacity: 1;
+  }
+
+  .prototype-calendar-header {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr) 2.25rem;
+    gap: 0.5rem;
+    align-items: center;
+    margin-block-end: 0.5rem;
+  }
+
+  .prototype-calendar-header > button,
+  .prototype-month-headings button,
+  .prototype-hierarchy button {
+    border: 0;
+    border-radius: 6px;
+    outline: 0;
+    background: transparent;
+    color: var(--wcl-text);
+    cursor: pointer;
+  }
+
+  .prototype-calendar-header > button:where(:first-child, :last-child) {
+    display: grid;
+    place-items: center;
+    block-size: 2.25rem;
+    color: var(--wcl-text-muted);
+  }
+
+  .prototype-calendar-header svg {
+    inline-size: 1.25rem;
+    fill: none;
+    stroke: currentcolor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+  }
+
+  .prototype-calendar-header svg[data-direction='next'] {
+    rotate: 180deg;
+  }
+
+  .prototype-month-headings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .prototype-month-headings > div {
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .prototype-month-headings button,
+  .prototype-period-heading {
+    padding: 0.35rem 0.2rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .prototype-period-heading {
+    justify-self: stretch;
+  }
+
+  .prototype-months {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .prototype-months table {
+    inline-size: 100%;
+    border-spacing: 0;
+    table-layout: fixed;
+  }
+
+  .prototype-months caption {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .prototype-months th {
+    block-size: 1.75rem;
+    color: var(--wcl-text-muted);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .prototype-months td {
+    block-size: 2.25rem;
+    padding: 0;
+  }
+
+  .prototype-months td > button {
+    position: relative;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    outline: 0;
+    background: transparent;
+    color: var(--wcl-text);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .prototype-months td > button:hover {
+    background: var(--wcl-accent-soft-on-raised);
+  }
+
+  .prototype-months td > button[data-selected] {
+    border-radius: 0;
+    background: color-mix(in srgb, var(--wcl-accent-soft-on-raised) 32%, var(--wcl-surface-raised));
+  }
+
+  .prototype-months td > button[data-endpoint] {
+    z-index: 1;
+    border-radius: 5px;
+    cursor: grab;
+  }
+
+  .prototype-months td > button[data-dragging] {
+    cursor: grabbing;
+  }
+
+  .prototype-months td > button[data-endpoint]::before {
+    position: absolute;
+    z-index: 2;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--wcl-accent-rail-on-raised);
+    content: '';
+  }
+
+  .prototype-months td > button[data-active-endpoint] {
+    outline: 2px solid var(--wcl-accent-focus-on-raised);
+    outline-offset: -2px;
+  }
+
+  .prototype-hierarchy {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.5rem;
+    min-block-size: 15.25rem;
+  }
+
+  .prototype-hierarchy button {
+    min-block-size: 3.5rem;
+    padding: 0.5rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+  }
+
+  .prototype-calendar-header button:hover,
+  .prototype-hierarchy button:hover {
+    background: var(--wcl-accent-soft-on-raised);
+    color: var(--wcl-accent-hover-contrast-on-raised);
+  }
+
+  .prototype-calendar-header button:focus-visible,
+  .prototype-hierarchy button:focus-visible,
+  .prototype-months button:focus-visible {
+    outline: 2px solid var(--wcl-accent-focus-on-raised);
+    outline-offset: -2px;
+  }
+
+  .prototype-shell .prototype-controls > button:hover {
+    border-color: var(--wcl-accent-hover-edge);
+  }
+
+  .prototype-notes {
+    max-inline-size: 70rem;
+    margin: 2rem auto 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .prototype-notes strong {
+    color: var(--wcl-text);
+  }
+
+  .prototype-notes ol {
+    margin-block: 0.5rem 0;
+    padding-inline-start: 1.25rem;
+  }
+
+  @media (width <= 44rem) {
+    .prototype-calendar .prototype-months,
+    .prototype-calendar .prototype-month-headings {
+      gap: 0.5rem;
+    }
+
+    .prototype-controls {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prototype-calendar::before,
+    .prototype-calendar::after {
+      transition: none;
+    }
+  }
+}

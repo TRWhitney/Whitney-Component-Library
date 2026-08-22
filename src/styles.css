@@ -847,10 +847,25 @@
   [data-wcl-date-picker-control] {
     display: flex;
     align-items: stretch;
+    justify-self: start;
+    inline-size: fit-content;
+    max-inline-size: 100%;
   }
 
   [data-wcl-date-range-control] [data-wcl-date-input] {
+    position: relative;
     padding-inline: calc(var(--wcl-space) * 0.75);
+  }
+
+  [data-wcl-date-range-control] [data-wcl-date-input][data-wcl-active-endpoint]::after {
+    position: absolute;
+    inset-inline: calc(var(--wcl-space) * 0.75);
+    inset-block-end: 0;
+    block-size: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--wcl-accent-rail);
+    content: '';
+    pointer-events: none;
   }
 
   [data-wcl-date-range-separator] {
@@ -919,7 +934,7 @@
     box-sizing: border-box;
     max-inline-size: calc(100vw - calc(var(--wcl-space) * 2));
     max-block-size: var(--available-height);
-    overflow: auto;
+    overflow: hidden;
     border: 1px solid var(--wcl-border-strong);
     border-radius: var(--wcl-control-radius);
     background: var(--wcl-surface-raised);
@@ -946,6 +961,10 @@
     padding: var(--wcl-space);
   }
 
+  [data-wcl-range-calendar] {
+    inline-size: min(42rem, calc(100vw - calc(var(--wcl-space) * 2)));
+  }
+
   [data-wcl-calendar-header] {
     display: grid;
     grid-template-columns: 2.25rem minmax(0, 1fr) 2.25rem;
@@ -954,13 +973,142 @@
     margin-block-end: calc(var(--wcl-space) * 0.5);
   }
 
-  [data-wcl-calendar-heading] {
+  [data-wcl-calendar-sheet-range] {
+    position: relative;
+    padding-inline: calc(var(--wcl-space) * 0.75);
+  }
+
+  [data-wcl-calendar-sheet-range]::before,
+  [data-wcl-calendar-sheet-range]::after {
+    position: absolute;
+    z-index: 4;
+    inset-block: 0;
+    inline-size: 1.25rem;
+    background: color-mix(in srgb, var(--wcl-accent-soft-on-raised) 75%, transparent);
+    content: '';
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  [data-wcl-calendar-sheet-range]::before {
+    inset-inline-start: 0;
+  }
+
+  [data-wcl-calendar-sheet-range]::after {
+    inset-inline-end: 0;
+  }
+
+  [data-wcl-calendar-sheet-range][data-edge='previous']::before,
+  [data-wcl-calendar-sheet-range][data-edge='next']::after {
+    opacity: 1;
+  }
+
+  [data-wcl-calendar-heading],
+  [data-wcl-calendar-period-heading] {
     margin: 0;
     color: var(--wcl-text);
     font-size: 0.875rem;
     font-weight: 700;
     line-height: 1.35;
     text-align: center;
+  }
+
+  [data-wcl-calendar-headings][data-wcl-calendar-headings-range],
+  [data-wcl-calendar-months] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--wcl-space) * 1.5);
+    min-inline-size: 0;
+  }
+
+  [data-wcl-calendar-headings]:not([data-wcl-calendar-headings-range]) {
+    display: grid;
+  }
+
+  [data-wcl-calendar-heading] {
+    display: flex;
+    gap: calc(var(--wcl-space) * 0.25);
+    justify-content: center;
+  }
+
+  [data-wcl-calendar-heading-part],
+  [data-wcl-calendar-period-heading],
+  [data-wcl-calendar-hierarchy-item] {
+    padding: calc(var(--wcl-space) * 0.375) calc(var(--wcl-space) * 0.25);
+    border: 0;
+    border-radius: 6px;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  [data-wcl-calendar-period-heading] {
+    justify-self: stretch;
+  }
+
+  :is(
+      [data-wcl-calendar-heading-part],
+      [data-wcl-calendar-period-heading],
+      [data-wcl-calendar-hierarchy-item]
+    ):not([disabled]):is([data-hovered], :hover) {
+    background: var(--wcl-accent-soft-on-raised);
+    color: var(--wcl-accent-hover-contrast-on-raised);
+  }
+
+  :is(
+    [data-wcl-calendar-heading-part],
+    [data-wcl-calendar-period-heading],
+    [data-wcl-calendar-hierarchy-item]
+  ):is([data-focus-visible], :focus-visible) {
+    outline: 2px solid var(--wcl-accent-focus-on-raised);
+    outline-offset: -2px;
+  }
+
+  [data-wcl-calendar-hierarchy] {
+    display: grid;
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    gap: calc(var(--wcl-space) * 0.5);
+    block-size: 15.25rem;
+    min-block-size: 15.25rem;
+  }
+
+  [data-wcl-calendar-hierarchy] > [role='row'] {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: calc(var(--wcl-space) * 0.5);
+    min-block-size: 0;
+  }
+
+  [data-wcl-calendar-hierarchy] > [role='row'] > [role='gridcell'] {
+    min-inline-size: 0;
+  }
+
+  [data-wcl-calendar-hierarchy-item] {
+    inline-size: 100%;
+    block-size: 100%;
+    min-inline-size: 0;
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+  }
+
+  [data-wcl-calendar-hierarchy-item][disabled] {
+    color: var(--wcl-text-muted);
+    cursor: not-allowed;
+    opacity: 0.52;
+  }
+
+  [data-wcl-calendar-announcement] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   [data-wcl-calendar-navigation] {
@@ -995,6 +1143,10 @@
     inline-size: 100%;
     border-spacing: 0;
     table-layout: fixed;
+  }
+
+  [data-wcl-calendar-months] [data-wcl-calendar-grid] {
+    min-inline-size: 0;
   }
 
   [data-wcl-calendar-weekday] {
@@ -1045,15 +1197,52 @@
     content: '';
   }
 
-  [data-wcl-range-calendar] [data-wcl-calendar-cell][data-selected] {
+  [data-wcl-range-calendar] [data-wcl-calendar-cell][data-outside-month] {
+    visibility: hidden;
+  }
+
+  [data-wcl-range-calendar] [data-wcl-calendar-cell]:is([data-selected], [data-wcl-drag-selected]) {
     border-radius: 0;
     background: color-mix(in srgb, var(--wcl-accent-soft-on-raised) 32%, var(--wcl-surface-raised));
   }
 
   [data-wcl-range-calendar]
-    [data-wcl-calendar-cell]:is([data-selection-start], [data-selection-end]) {
+    [data-wcl-calendar-cell]:is(
+      [data-selection-start],
+      [data-selection-end],
+      [data-wcl-drag-selection-start],
+      [data-wcl-drag-selection-end]
+    ) {
     z-index: 1;
     border-radius: 5px;
+  }
+
+  [data-wcl-range-calendar]
+    [data-wcl-calendar-cell]:is([data-selection-start], [data-wcl-drag-selection-start]) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  [data-wcl-range-calendar]
+    [data-wcl-calendar-cell]:is([data-selection-end], [data-wcl-drag-selection-end]) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+
+  [data-wcl-range-calendar]
+    [data-wcl-calendar-cell]:is(
+      [data-selection-start][data-selection-end],
+      [data-wcl-drag-selection-start][data-wcl-drag-selection-end]
+    ) {
+    border-radius: 5px;
+  }
+
+  [data-wcl-calendar-sheet][data-active-endpoint='start']
+    [data-wcl-calendar-cell]:is([data-selection-start], [data-wcl-drag-selection-start]),
+  [data-wcl-calendar-sheet][data-active-endpoint='end']
+    [data-wcl-calendar-cell]:is([data-selection-end], [data-wcl-drag-selection-end]) {
+    outline: 2px solid var(--wcl-accent-focus-on-raised);
+    outline-offset: -2px;
   }
 
   [data-wcl-calendar-cell][data-selected]:not([data-wcl-range-calendar] *) {
@@ -1062,7 +1251,12 @@
 
   [data-wcl-calendar-cell][data-selected]:not([data-wcl-range-calendar] *)::before,
   [data-wcl-range-calendar]
-    [data-wcl-calendar-cell]:is([data-selection-start], [data-selection-end])::before {
+    [data-wcl-calendar-cell]:is(
+      [data-selection-start],
+      [data-selection-end],
+      [data-wcl-drag-selection-start],
+      [data-wcl-drag-selection-end]
+    )::before {
     position: absolute;
     z-index: 2;
     inset-inline: 0;
@@ -1087,7 +1281,7 @@
     opacity: 0.5;
   }
 
-  [data-wcl-calendar-cell][data-outside-visible-range] {
+  [data-wcl-calendar-cell][data-outside-visible-range]:not([data-outside-month]) {
     visibility: hidden;
   }
 
@@ -2773,6 +2967,8 @@
     [data-wcl-selection-popover],
     [data-wcl-calendar-popover],
     [data-wcl-calendar-trigger],
+    [data-wcl-calendar-sheet-range]::before,
+    [data-wcl-calendar-sheet-range]::after,
     [data-wcl-date-segment],
     [data-wcl-selection-chevron],
     [data-wcl-selection-rail],

@@ -9,7 +9,7 @@ import {Dialog} from 'react-aria-components/Dialog';
 import {Group} from 'react-aria-components/Group';
 import {Label} from 'react-aria-components/Label';
 import {Popover} from 'react-aria-components/Popover';
-import type {ReactElement} from 'react';
+import {useState, type ReactElement} from 'react';
 
 import {useFieldGroupDisabled} from '../fields/field-group-context.js';
 import {FieldSupport} from '../fields/field-support.js';
@@ -22,7 +22,8 @@ import {
   toDisplayDate,
   toDisplayRange,
 } from './date-time-domain.js';
-import {CalendarIcon, CalendarSheet, DateSegments} from './date-time-parts.js';
+import {CalendarSheet} from './calendar-sheet.js';
+import {CalendarIcon, DateSegments} from './date-time-parts.js';
 import type {DateRangePickerProps, DateRangeValue} from './date-time-types.js';
 
 export function DateRangePicker({
@@ -54,6 +55,14 @@ export function DateRangePicker({
   value,
 }: DateRangePickerProps): ReactElement {
   const disabled = useFieldGroupDisabled() || isDisabled;
+  const [activeEndpoint, setActiveEndpoint] = useState<'end' | 'start'>('start');
+  const [internalCalendarOpen, setInternalCalendarOpen] = useState(defaultOpen ?? false);
+  const calendarOpen = isOpen ?? internalCalendarOpen;
+  const [observedCalendarOpen, setObservedCalendarOpen] = useState(calendarOpen);
+  if (calendarOpen !== observedCalendarOpen) {
+    setObservedCalendarOpen(calendarOpen);
+    if (calendarOpen && activeEndpoint !== 'start') setActiveEndpoint('start');
+  }
   assertDateBounds(minValue, maxValue);
   if (defaultValue) assertDateRange(defaultValue);
   if (value) assertDateRange(value);
@@ -73,6 +82,7 @@ export function DateRangePicker({
     <I18nProvider locale={localeWithCalendar(locale, calendar)}>
       <AriaDateRangePicker<CalendarDate>
         allowsNonContiguousRanges={false}
+        data-wcl-active-endpoint={calendarOpen ? activeEndpoint : undefined}
         data-wcl-date-range-picker=""
         data-wcl-field=""
         isDisabled={disabled}
@@ -80,6 +90,7 @@ export function DateRangePicker({
         isRequired={isRequired}
         placeholderValue={toDisplayDate(placeholderValue, calendar)}
         validationBehavior={validationBehavior}
+        shouldCloseOnSelect={false}
         {...(defaultOpen === undefined ? {} : {defaultOpen})}
         {...(defaultValue === undefined
           ? {}
@@ -97,7 +108,11 @@ export function DateRangePicker({
         {...(onChange === undefined
           ? {}
           : {onChange: (range) => onChange(range === null ? null : toPublicRange(range))})}
-        {...(onOpenChange === undefined ? {} : {onOpenChange})}
+        onOpenChange={(nextOpen) => {
+          setInternalCalendarOpen(nextOpen);
+          if (nextOpen) setActiveEndpoint('start');
+          onOpenChange?.(nextOpen);
+        }}
         {...(shouldForceLeadingZeros === undefined ? {} : {shouldForceLeadingZeros})}
         {...(validate === undefined && isDateUnavailable === undefined
           ? {}
@@ -119,11 +134,14 @@ export function DateRangePicker({
           data-wcl-date-range-control=""
           data-wcl-field-control=""
         >
-          <DateSegments slot="start" />
+          <DateSegments
+            isActiveEndpoint={calendarOpen && activeEndpoint === 'start'}
+            slot="start"
+          />
           <span aria-hidden="true" data-wcl-date-range-separator="">
             –
           </span>
-          <DateSegments slot="end" />
+          <DateSegments isActiveEndpoint={calendarOpen && activeEndpoint === 'end'} slot="end" />
           <Button aria-label={calendarButtonLabel} data-wcl-calendar-trigger="">
             <CalendarIcon />
           </Button>
@@ -131,8 +149,18 @@ export function DateRangePicker({
         <FieldSupport description={description} errorMessage={errorMessage} isPending={false} />
         <Popover data-wcl-calendar-popover="" offset={6} placement="bottom start">
           <Dialog data-wcl-calendar-dialog="">
-            <RangeCalendar data-wcl-calendar="" data-wcl-range-calendar="">
-              <CalendarSheet />
+            <RangeCalendar
+              data-wcl-calendar=""
+              data-wcl-range-calendar=""
+              pageBehavior="single"
+              visibleDuration={{months: 2}}
+              weeksInMonth={6}
+            >
+              <CalendarSheet
+                activeEndpoint={activeEndpoint}
+                onActiveEndpointChange={setActiveEndpoint}
+                range
+              />
             </RangeCalendar>
           </Dialog>
         </Popover>

@@ -17,7 +17,7 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 ## Composition and parts
 
 - Render DatePicker inside AppearanceProvider and let it own trigger, dialog, and calendar.
-- DatePicker includes a label, date segments, trigger, hidden input, support area, popover dialog, heading, navigation, grid, and day cells.
+- DatePicker includes a label, a compact control with date segments and trigger, hidden input, support area, popover dialog, selectable month and year headings, shared navigation, a six-week day grid, and fixed-height hierarchy grids.
 
 ## Preferred higher-level compositions
 
@@ -33,18 +33,18 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 
 ## Control, events, validation, and forms
 
-- Segment edits and calendar selection update the same controlled or uncontrolled ISO value. placeholderValue anchors an empty calendar without selecting a date. The picker also supports controlled open state, limits, and unavailable dates.
+- The content-sized field does not reserve space beyond its date and trigger. Segment edits and calendar selection update the same controlled or uncontrolled ISO value. placeholderValue anchors an empty six-week calendar without selecting a date. Month and year headings promote to fixed-size hierarchy grids for long-distance navigation without changing the value.
 - onChange reports an ISO date or null; onOpenChange reports trigger, selection, Escape, and outside-dismissal changes.
 - minValue, maxValue, unavailable dates, required state, custom validate, and application errors share the fixed error area.
 - name and form serialize YYYY-MM-DD, calendar selection commits the same value as direct entry, and reset restores defaultValue.
 
 ## Accessibility
 
-- DatePicker combines labeled segmented entry with a named calendar button. The calendar dialog handles navigation, selection, focus restoration, and dismissal.
+- DatePicker combines labeled segmented entry with a named calendar button. Its fixed-height calendar exposes day, month, year, decade, and broader period grids with named navigation, spatial keyboard movement, announcements, focus restoration, and dismissal.
 
 ## Keyboard, labeling, localization, and direction
 
-- The trigger opens the dialog; calendar arrows move by day or week, Page keys move by month, Enter selects, Escape dismisses, and focus returns to the trigger.
+- The trigger opens the dialog; day-grid arrows move spatially, Page keys move by month, and Enter selects. Month or year headings open a four-column hierarchy grid whose arrows move spatially, Page keys change periods, and Enter drills down. Escape dismisses and restores trigger focus.
 - label is always visible and generated relationships apply to every editable segment.
 - locale and calendar are required initial-render inputs; provide localized labels, support text, errors, and the calendar trigger label.
 - Locale determines segment order, numerals, calendar grid direction, and logical previous or next navigation without changing value identity or DOM reading order.
@@ -52,7 +52,7 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 ## Appearance and responsive behavior
 
 - Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels, a continuous range fill, and selected-day or endpoint rails that match selected actions.
-- Fields fill their parent. Segments remain operable on narrow screens, and the single-month calendar stays inside the viewport.
+- The content-sized control clamps to its parent on narrow screens, its segments remain operable, and the single-month calendar stays inside the viewport.
 
 ## Accent, forced colors, and reduced motion
 

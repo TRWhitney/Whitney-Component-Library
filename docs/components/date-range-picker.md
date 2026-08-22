@@ -17,7 +17,7 @@ DateRangePicker collects one inclusive continuous civil-date interval.
 ## Composition and parts
 
 - Render DateRangePicker inside AppearanceProvider and let it own both endpoints and the range calendar.
-- DateRangePicker includes a label, start and end segments, separator, trigger, two hidden inputs, support area, popover dialog, and range calendar.
+- DateRangePicker includes a label, a compact control with railed start and end segments, separator, trigger, two hidden inputs, support area, popover dialog, two fixed six-week own-month grids, shared paging, selectable headings, and hierarchy grids.
 
 ## Preferred higher-level compositions
 
@@ -29,22 +29,22 @@ DateRangePicker collects one inclusive continuous civil-date interval.
 
 ## States
 
-- Empty, partial, complete, open, closed, controlled, uncontrolled, unavailable, limited, invalid, required, read-only, and disabled states.
+- Empty, internally pending, complete, start-active, end-active, dragging, open, closed, controlled, uncontrolled, unavailable, limited, invalid, required, read-only, and disabled states.
 
 ## Control, events, validation, and forms
 
-- Controlled or uncontrolled ranges may be empty. Each value is one continuous interval. placeholderValue anchors the empty calendar without selecting a range. Start never follows end. A range may contain unavailable dates, but it is then invalid. Entry and calendar selection stay synchronized.
-- onChange reports a complete inclusive ISO range or null. onOpenChange reports every open-state transition.
+- The complete value represents one continuous interval; controlled or uncontrolled ranges may be empty. The content-sized field does not reserve space beyond its two dates and trigger. Opening activates start. A start click updates it while retaining the old end and advances to end; an end click commits and closes. Endpoint drags remain open, cross by swapping identities, and page through side gutters after a guarded dwell. Each range pane shows only dates from its own month because the adjacent month is already visible. Direct entry remains closed-field behavior, and opening settles a descending complete entry chronologically.
+- onChange reports only a complete inclusive ISO range or null; an empty first calendar choice stays internal until the end is chosen. onOpenChange reports every open-state transition.
 - Ordering, limits, unavailable dates, required state, custom validate, and application errors apply to the complete interval and share one fixed error area.
 - names supplies ordered start and end field names; each endpoint serializes as YYYY-MM-DD and reset restores the complete default range.
 
 ## Accessibility
 
-- DateRangePicker exposes two ordered segmented inputs, one named calendar button, and a dialog grid that identifies both endpoints and the selected interval to assistive technology.
+- DateRangePicker exposes two ordered segmented inputs, one named calendar button, an announced active endpoint, and two adjacent calendar grids that identify both endpoints and the selected interval to assistive technology.
 
 ## Keyboard, labeling, localization, and direction
 
-- Each endpoint supports segmented entry. The calendar handles spatial navigation, range anchoring, selection completion, Escape dismissal, and focus restoration.
+- Each endpoint supports segmented entry. In the calendar, arrows navigate days, activation edits start then end, an ordinary end activation closes, and Escape restores trigger focus. Selectable month and year headings open the same spatial hierarchy used by DatePicker.
 - label names the complete interval while generated context distinguishes start and end segments.
 - locale and calendar are required initial-render inputs; provide localized labels, support text, errors, and calendar trigger labels.
 - Locale determines segment order, numerals, calendar grid direction, and logical previous or next navigation without changing value identity or DOM reading order.
@@ -52,7 +52,7 @@ DateRangePicker collects one inclusive continuous civil-date interval.
 ## Appearance and responsive behavior
 
 - Segmented controls use the compact field layout and a fixed support area. Pickers add a raised calendar with weekday labels, a continuous range fill, and selected-day or endpoint rails that match selected actions.
-- Fields fill their parent. Segments remain operable on narrow screens, and the single-month calendar stays inside the viewport.
+- The content-sized control clamps to its parent on narrow screens. Both adjacent calendar panes contract within the viewport without adding a popup scrollbar.
 
 ## Accent, forced colors, and reduced motion
 

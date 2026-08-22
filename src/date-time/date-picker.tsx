@@ -19,7 +19,8 @@ import {
   localeWithCalendar,
   toDisplayDate,
 } from './date-time-domain.js';
-import {CalendarIcon, CalendarSheet, DateSegments} from './date-time-parts.js';
+import {CalendarSheet} from './calendar-sheet.js';
+import {CalendarIcon, DateSegments} from './date-time-parts.js';
 import type {DatePickerProps} from './date-time-types.js';
 
 export function DatePicker({
@@ -104,7 +105,7 @@ export function DatePicker({
         <FieldSupport description={description} errorMessage={errorMessage} isPending={false} />
         <Popover data-wcl-calendar-popover="" offset={6} placement="bottom start">
           <Dialog data-wcl-calendar-dialog="">
-            <Calendar data-wcl-calendar="">
+            <Calendar data-wcl-calendar="" weeksInMonth={6}>
               <CalendarSheet />
             </Calendar>
           </Dialog>
