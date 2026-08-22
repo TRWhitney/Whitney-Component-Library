@@ -56,7 +56,7 @@ EmptyState explains why a loaded content region has nothing to show.
 
 ## Accent, forced colors, and reduced motion
 
-- No-data and no-results states remain neutral. Unavailable content uses warning structure without borrowing the application accent or claiming an error outcome.
+- No-data and no-results use the application accent on the leading rail. Unavailable content uses warning for the rail, glyph, and recovery Button without claiming an error outcome.
 - Forced colors preserve the field, glyph, text, and action boundaries with system colors.
 - EmptyState has no motion or transient state.
 

@@ -110,6 +110,26 @@ describe('static appearance styles', () => {
     expect(reducedMotion).toMatch(/\[data-wcl-skeleton-line\][\s\S]*animation:\s*none !important/);
   });
 
+  it('coordinates EmptyState rails and recovery actions with their condition colors', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const emptyState = styles.match(/\[data-wcl-empty-state\]\s*\{([^}]*)\}/)?.[1];
+    const unavailable = styles.match(
+      /\[data-wcl-empty-state\]\[data-kind='unavailable'\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const unavailableAction = styles.match(
+      /\[data-wcl-empty-state\]\[data-kind='unavailable'\]\s+\[data-wcl-button\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(emptyState).toContain('border-inline-start: 3px solid var(--wcl-accent-rail)');
+    expect(unavailable).toContain('border-inline-start-color: var(--wcl-warning)');
+    expect(unavailable).toContain('--wcl-accent-focus: var(--wcl-warning)');
+    expect(unavailable).toContain('--wcl-accent-muted: var(--wcl-warning)');
+    expect(unavailable).toContain('--wcl-accent-soft: var(--wcl-warning-surface)');
+    expect(unavailableAction).toContain('border-color: var(--wcl-warning)');
+    expect(unavailableAction).toContain('background: var(--wcl-warning-surface)');
+    expect(unavailableAction).toContain('color: var(--wcl-warning)');
+  });
+
   it('bounds notification placement and preserves keyboard focus treatment', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const region = styles.match(/\[data-wcl-notification-region\]\s*\{([^}]*)\}/)?.[1];

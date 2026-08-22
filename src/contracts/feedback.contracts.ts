@@ -675,7 +675,7 @@ export const skeletonContract = {
 export const emptyStateContract = {
   ...commonFeedbackGuidance,
   accentBehavior: [
-    'No-data and no-results states remain neutral. Unavailable content uses warning structure without borrowing the application accent or claiming an error outcome.',
+    'No-data and no-results use the application accent on the leading rail. Unavailable content uses warning for the rail, glyph, and recovery Button without claiming an error outcome.',
   ],
   accessibility: [
     'The visible title and description form one ordinary content group. The kind glyph is hidden, so wording rather than color or shape identifies the condition.',

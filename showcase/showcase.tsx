@@ -1139,7 +1139,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Explain why a loaded content region has no data, no matching results, or unavailable content. Keep recovery to one direct action."
+        description="Explain why a loaded content region has no data, no matching results, or unavailable content. Accent rails mark ordinary empty states; warning color ties an unavailable state to its recovery action."
         name="EmptyState"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
