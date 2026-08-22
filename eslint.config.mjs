@@ -14,7 +14,13 @@ const typedTypescriptFiles = [
 ];
 
 export default defineConfig(
-  globalIgnores(['dist/**', 'node_modules/**', 'coverage/**', '.typecheck-*/**']),
+  globalIgnores([
+    'dist/**',
+    '.showcase-dist/**',
+    'node_modules/**',
+    'coverage/**',
+    '.typecheck-*/**',
+  ]),
   {
     files: javascriptFiles,
     extends: [js.configs.recommended],
