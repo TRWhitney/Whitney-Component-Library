@@ -293,7 +293,7 @@ export const drawerContract = {
   ],
   relatedExports: ['AlertDialog', 'AppearanceProvider', 'Button', 'Dialog'],
   responsiveBehavior: [
-    'At compact widths Drawer becomes a full-screen visual-viewport surface; at larger widths it remains edge-attached with a bounded inline size.',
+    'At compact widths Drawer becomes a full-screen visual-viewport surface; at larger widths it remains edge-attached with a bounded inline size. Edge motion stays clipped to the viewport without introducing horizontal scrolling.',
   ],
   states: [
     'Closed and open may be controlled or uncontrolled. placement is logical start or end, and nested overlays retain independent focus boundaries.',

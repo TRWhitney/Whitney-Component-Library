@@ -150,6 +150,9 @@ describe('static appearance styles', () => {
   it('contains modal work surfaces and reflows drawers at compact widths', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const underlay = styles.match(/\[data-wcl-overlay\]\s*\{([^}]*)\}/)?.[1];
+    const drawerUnderlay = styles.match(
+      /\[data-wcl-overlay\]\[data-kind='drawer'\]\s*\{([^}]*)\}/,
+    )?.[1];
     const modal = styles.match(/\[data-wcl-overlay-modal\]\s*\{([^}]*)\}/)?.[1];
     const header = styles.match(/\[data-wcl-overlay-header\]\s*\{([^}]*)\}/)?.[1];
     const compact = styles.match(/@media\s*\(width\s*<=\s*40rem\)([\s\S]*)/)?.[1];
@@ -159,6 +162,7 @@ describe('static appearance styles', () => {
 
     expect(underlay).toContain('position: fixed');
     expect(underlay).toContain('var(--visual-viewport-height');
+    expect(drawerUnderlay).toContain('overflow-x: hidden');
     expect(modal).toContain('max-block-size: calc(var(--visual-viewport-height');
     expect(header).toContain('max-block-size: calc(var(--visual-viewport-height');
     expect(header).toContain('overflow: auto');

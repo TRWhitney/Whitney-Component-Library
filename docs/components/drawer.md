@@ -55,7 +55,7 @@ Drawer hosts a supplemental workflow or larger focused task at a logical viewpor
 ## Appearance and responsive behavior
 
 - Drawer is a raised panel attached to a logical viewport edge, with its accent threshold rail on the content-facing edge and a dimmed underlay behind it.
-- At compact widths Drawer becomes a full-screen visual-viewport surface; at larger widths it remains edge-attached with a bounded inline size.
+- At compact widths Drawer becomes a full-screen visual-viewport surface; at larger widths it remains edge-attached with a bounded inline size. Edge motion stays clipped to the viewport without introducing horizontal scrolling.
 
 ## Accent, forced colors, and reduced motion
 

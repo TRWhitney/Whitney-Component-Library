@@ -1,4 +1,4 @@
-import {cleanup, fireEvent, render} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {afterEach, describe, expect, it} from 'vitest';
 
 import {componentContracts} from '../src/contracts/index.js';
@@ -101,5 +101,27 @@ describe('component showcase', () => {
     expect(getByText('Export ready')).toBeTruthy();
     expect(document.activeElement).toBe(trigger);
     expect(getByRole('region', {name: 'Showcase notifications'})).toBeTruthy();
+  });
+
+  it('demonstrates drawers from both logical viewport edges', async () => {
+    const {container} = render(<Showcase />);
+    const specimen = container.querySelector('[data-showcase-component="Drawer"]');
+    if (!(specimen instanceof HTMLElement)) throw new Error('The Drawer specimen is missing.');
+
+    const examples = specimen.querySelectorAll('[data-showcase-example-label]');
+    const triggers = within(specimen).getAllByRole('button');
+    expect(examples).toHaveLength(2);
+    expect(triggers).toHaveLength(2);
+
+    for (const [index, placement] of ['start', 'end'].entries()) {
+      fireEvent.click(triggers[index]!);
+      const drawer = await screen.findByRole('dialog');
+      expect(drawer.closest('[data-wcl-overlay]')?.getAttribute('data-placement')).toBe(placement);
+
+      const close = drawer.querySelector('[data-wcl-overlay-close]');
+      if (!(close instanceof HTMLElement)) throw new Error('The Drawer close action is missing.');
+      fireEvent.click(close);
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    }
   });
 });

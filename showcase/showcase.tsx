@@ -1255,19 +1255,35 @@ function OverlaySpecimens() {
         description="Open supplemental work from a logical viewport edge. Start and end follow writing direction, and the panel becomes full-screen at compact widths."
         name="Drawer"
       >
-        <Drawer
-          actions={({close}) => <Button onPress={close}>Done</Button>}
-          closeLabel="Close result inspector"
-          description="Review solver output without leaving the run list."
-          placement="end"
-          title="Result inspector"
-          trigger={<Button>Inspect result</Button>}
-        >
-          <Stack gap="regular">
-            <StatusIndicator label="Stable" tone="success" />
-            <p>RUN 0284 converged after 18 of 25 available boundary passes.</p>
-          </Stack>
-        </Drawer>
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Start-edge Drawer">
+            <Drawer
+              actions={({close}) => <Button onPress={close}>Apply filters</Button>}
+              closeLabel="Close run filters"
+              description="Limit the visible run history without leaving the current page."
+              placement="start"
+              title="Run filters"
+              trigger={<Button variant="secondary">Filter runs</Button>}
+            >
+              <p>Choose the statuses and profiles included in the run list.</p>
+            </Drawer>
+          </Example>
+          <Example label="End-edge Drawer">
+            <Drawer
+              actions={({close}) => <Button onPress={close}>Done</Button>}
+              closeLabel="Close result inspector"
+              description="Review solver output without leaving the run list."
+              placement="end"
+              title="Result inspector"
+              trigger={<Button>Inspect result</Button>}
+            >
+              <Stack gap="regular">
+                <StatusIndicator label="Stable" tone="success" />
+                <p>RUN 0284 converged after 18 of 25 available boundary passes.</p>
+              </Stack>
+            </Drawer>
+          </Example>
+        </ResponsiveGrid>
       </Specimen>
     </>
   );

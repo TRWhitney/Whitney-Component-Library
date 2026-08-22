@@ -3268,6 +3268,7 @@
   [data-wcl-overlay][data-kind='drawer'] {
     place-items: stretch;
     padding: 0;
+    overflow-x: hidden;
   }
 
   [data-wcl-overlay][data-kind='drawer'][data-placement='start'] {
