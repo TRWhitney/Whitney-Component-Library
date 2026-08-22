@@ -1,22 +1,57 @@
-import {useCallback, useEffect, useRef, useState, type RefCallback, type RefObject} from 'react';
+import {
+  createContext,
+  createElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactElement,
+  type ReactNode,
+  type RefCallback,
+  type RefObject,
+} from 'react';
 
 export type ActionPartKind = 'button' | 'icon-button' | 'support' | 'toggle-button';
 
 const actionParts = new WeakMap<Element, ActionPartKind>();
+type ActionPartRegistration = (
+  element: HTMLElement,
+  kind: ActionPartKind,
+  isRegistered: boolean,
+) => void;
+const ActionPartRegistrationContext = createContext<ActionPartRegistration | null>(null);
+
+export function ActionPartRegistrationProvider({
+  children,
+  onRegistration,
+}: {
+  readonly children: ReactNode;
+  readonly onRegistration: ActionPartRegistration;
+}): ReactElement {
+  return createElement(ActionPartRegistrationContext.Provider, {value: onRegistration}, children);
+}
 
 export function useActionPartRef<ElementType extends HTMLElement>(
   kind: ActionPartKind,
 ): RefCallback<ElementType> {
   const currentRef = useRef<ElementType | null>(null);
+  const registerWithOwner = useContext(ActionPartRegistrationContext);
 
   return useCallback(
     (element) => {
       const current = currentRef.current;
-      if (current && actionParts.get(current) === kind) actionParts.delete(current);
-      if (element) actionParts.set(element, kind);
+      if (current && actionParts.get(current) === kind) {
+        actionParts.delete(current);
+        registerWithOwner?.(current, kind, false);
+      }
+      if (element) {
+        actionParts.set(element, kind);
+        registerWithOwner?.(element, kind, true);
+      }
       currentRef.current = element;
     },
-    [kind],
+    [kind, registerWithOwner],
   );
 }
 

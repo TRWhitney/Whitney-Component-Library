@@ -127,6 +127,45 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('contains modal work surfaces and reflows drawers at compact widths', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const underlay = styles.match(/\[data-wcl-overlay\]\s*\{([^}]*)\}/)?.[1];
+    const modal = styles.match(/\[data-wcl-overlay-modal\]\s*\{([^}]*)\}/)?.[1];
+    const header = styles.match(/\[data-wcl-overlay-header\]\s*\{([^}]*)\}/)?.[1];
+    const compact = styles.match(/@media\s*\(width\s*<=\s*40rem\)([\s\S]*)/)?.[1];
+    const reducedMotion = styles.match(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)([\s\S]*)/,
+    )?.[1];
+
+    expect(underlay).toContain('position: fixed');
+    expect(underlay).toContain('var(--visual-viewport-height');
+    expect(modal).toContain('max-block-size: calc(var(--visual-viewport-height');
+    expect(header).toContain('max-block-size: calc(var(--visual-viewport-height');
+    expect(header).toContain('overflow: auto');
+    expect(underlay).toMatch(/--wcl-overlay-rail:\s*var\(--wcl-accent-rail\)/);
+    expect(styles).toMatch(
+      /\[data-wcl-overlay\]\[data-kind='dialog'\]\s+\[data-wcl-overlay-modal\][\s\S]*border-block-start:\s*3px solid var\(--wcl-overlay-rail\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-overlay\]\[data-action-kind='destructive'\][\s\S]*--wcl-overlay-rail:\s*var\(--wcl-danger\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-overlay\]\[data-kind='drawer'\]\[data-placement='start'\][\s\S]*justify-items:\s*start/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-overlay\]\[data-kind='drawer'\]\[data-placement='end'\][\s\S]*justify-items:\s*end/,
+    );
+    expect(compact).toMatch(
+      /\[data-wcl-overlay\]\[data-kind='drawer'\][\s\S]*inline-size:\s*100%[\s\S]*border-radius:\s*0/,
+    );
+    expect(reducedMotion).toMatch(
+      /\[data-wcl-overlay\],[\s\S]*\[data-wcl-overlay-modal\][\s\S]*animation:\s*none !important/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-overlay-modal\][\s\S]*border-color:\s*CanvasText/,
+    );
+  });
+
   it('maps identity and surface roles to system colors in forced-color mode', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/);

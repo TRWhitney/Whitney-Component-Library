@@ -6,7 +6,7 @@ activation, focus, dismissal, and anchored-placement contracts.
 **Blocked by:** [Action Family](03-action-family.md),
 [Dialog and Drawer Overlays](12-dialog-and-drawer-overlays.md)
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] Contracts distinguish supplemental non-interactive description, interactive anchored content,
       command menus, and context actions.

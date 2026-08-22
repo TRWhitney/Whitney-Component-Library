@@ -5,6 +5,7 @@ import {JSDOM} from 'jsdom';
 import {renderToString} from 'react-dom/server';
 import {
   AlertBanner,
+  AlertDialog,
   AppearanceProvider,
   Badge,
   Button,
@@ -15,7 +16,9 @@ import {
   DateField,
   DatePicker,
   DateRangePicker,
+  Dialog,
   Divider,
+  Drawer,
   EmptyState,
   Field,
   FieldGroup,
@@ -359,6 +362,49 @@ const view = React.createElement(
           ),
         ),
         React.createElement(
+          Dialog,
+          {
+            actions: ({close}) => React.createElement(Button, {onPress: close}, 'Done'),
+            closeLabel: 'Close packed dialog',
+            description: 'Review the packed component output.',
+            title: 'Packed dialog',
+            trigger: React.createElement(
+              Button,
+              null,
+              'Open packed dialog',
+            ),
+          },
+          React.createElement('p', null, 'Packed dialog body'),
+        ),
+        React.createElement(AlertDialog, {
+          actionKind: 'destructive',
+          cancelLabel: 'Keep packed run',
+          confirmLabel: 'Delete packed run',
+          description: 'This permanently removes the packed run.',
+          onConfirm: () => {},
+          title: 'Delete packed run?',
+          trigger: React.createElement(
+            Button,
+            {variant: 'danger'},
+            'Delete packed run',
+          ),
+        }),
+        React.createElement(
+          Drawer,
+          {
+            closeLabel: 'Close packed drawer',
+            description: 'Inspect packed solver output.',
+            placement: 'end',
+            title: 'Packed drawer',
+            trigger: React.createElement(
+              Button,
+              null,
+              'Open packed drawer',
+            ),
+          },
+          React.createElement('p', null, 'Packed drawer body'),
+        ),
+        React.createElement(
           Toolbar,
           {label: 'Inspector commands'},
           React.createElement(
@@ -393,9 +439,12 @@ globalThis.HTMLTextAreaElement = dom.window.HTMLTextAreaElement;
 globalThis.InputEvent = dom.window.InputEvent;
 globalThis.KeyboardEvent = dom.window.KeyboardEvent;
 globalThis.MouseEvent = dom.window.MouseEvent;
+globalThis.MutationObserver = dom.window.MutationObserver;
 globalThis.Node = dom.window.Node;
 globalThis.NodeFilter = dom.window.NodeFilter;
 globalThis.SVGElement = dom.window.SVGElement;
+globalThis.requestAnimationFrame = (callback) => setTimeout(() => callback(performance.now()), 0);
+globalThis.cancelAnimationFrame = (handle) => clearTimeout(handle);
 Object.defineProperty(globalThis, 'navigator', {value: dom.window.navigator, configurable: true});
 
 // React Aria installs these browser-only template hooks when its client bundle is evaluated.
@@ -433,6 +482,50 @@ document
   .getElementById('packed-notification-trigger')
   ?.dispatchEvent(new dom.window.MouseEvent('click', {bubbles: true}));
 await new Promise((resolve) => setTimeout(resolve, 25));
+let packedOverlaySemantics = true;
+const findPackedButton = (label) =>
+  [...document.querySelectorAll('[data-wcl-button]')].find(
+    (button) => button.textContent === label,
+  );
+const packedDialogTrigger = findPackedButton('Open packed dialog');
+packedDialogTrigger?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+const packedDialog = document.querySelector('[data-wcl-overlay][data-kind="dialog"] [role="dialog"]');
+if (
+  packedDialog?.getAttribute('role') !== 'dialog' ||
+  !packedDialog.getAttribute('aria-labelledby') ||
+  !packedDialog.getAttribute('aria-describedby')
+) {
+  packedOverlaySemantics = false;
+}
+document.querySelector('[aria-label="Close packed dialog"]')?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+const packedAlertDialogTrigger = findPackedButton('Delete packed run');
+packedAlertDialogTrigger?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+const packedAlertDialog = document.querySelector(
+  '[data-wcl-overlay][data-kind="alert-dialog"] [role="alertdialog"]',
+);
+if (
+  packedAlertDialog?.getAttribute('role') !== 'alertdialog' ||
+  packedAlertDialog.closest('[data-wcl-overlay]')?.getAttribute('data-action-kind') !== 'destructive'
+) {
+  packedOverlaySemantics = false;
+}
+document.querySelector('[data-kind="alert-dialog"] [data-variant="secondary"]')?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+const packedDrawerTrigger = findPackedButton('Open packed drawer');
+packedDrawerTrigger?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+const packedDrawer = document.querySelector('[data-wcl-overlay][data-kind="drawer"] [role="dialog"]');
+if (
+  packedDrawer?.getAttribute('role') !== 'dialog' ||
+  packedDrawer.closest('[data-wcl-overlay]')?.getAttribute('data-placement') !== 'end'
+) {
+  packedOverlaySemantics = false;
+}
+document.querySelector('[aria-label="Close packed drawer"]')?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
 console.error = originalConsoleError;
 console.warn = originalConsoleWarn;
 
@@ -444,6 +537,9 @@ if (consoleMessages.length > 0 || recoverableErrors.length > 0) {
     ...recoverableErrors.map((error) => error?.stack ?? String(error)),
   ].join('\\n');
   throw new Error('SSR or hydration emitted warnings or recoverable errors.\\n' + details);
+}
+if (!packedOverlaySemantics) {
+  throw new Error('Packed overlays did not preserve modal semantics.');
 }
 if (!document.querySelector('[data-wcl-responsive-grid]')?.textContent?.includes('Adaptive mesh')) {
   throw new Error('Packed layout primitives did not hydrate their server-rendered content.');

@@ -7,6 +7,18 @@ export {
 } from './appearance/appearance-provider.js';
 export type {AccentColor} from './appearance/accent.js';
 export {
+  AlertDialog,
+  Dialog,
+  Drawer,
+  type AlertDialogActionKind,
+  type AlertDialogProps,
+  type DialogProps,
+  type DrawerPlacement,
+  type DrawerProps,
+  type OverlayControls,
+  type OverlayOpenStateProps,
+} from './overlays/index.js';
+export {
   AlertBanner,
   Badge,
   EmptyState,

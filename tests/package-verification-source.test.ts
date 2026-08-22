@@ -77,6 +77,7 @@ describe('packed consumer verification source', () => {
     expect(source).toContain('globalThis.InputEvent = dom.window.InputEvent');
     expect(source).toContain('globalThis.CustomEvent = dom.window.CustomEvent');
     expect(source).toContain('globalThis.HTMLTemplateElement = dom.window.HTMLTemplateElement');
+    expect(source).toContain('globalThis.requestAnimationFrame =');
   });
 
   it('exercises every choice-family export and its packed native semantics', () => {
@@ -149,5 +150,18 @@ describe('packed consumer verification source', () => {
     expect(source).toContain("getAttribute('aria-valuenow') !== '18'");
     expect(source).toContain("getAttribute('aria-valuetext') !== '76 kilowatts'");
     expect(source).toContain('Packed feedback family did not preserve semantic relationships.');
+  });
+
+  it('exercises every overlay through packed SSR and hydration', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of ['AlertDialog', 'Dialog', 'Drawer']) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('packedDialogTrigger');
+    expect(source).toContain('packedAlertDialogTrigger');
+    expect(source).toContain('packedDrawerTrigger');
+    expect(source).toContain("getAttribute('role') !== 'alertdialog'");
+    expect(source).toContain('Packed overlays did not preserve modal semantics.');
   });
 });

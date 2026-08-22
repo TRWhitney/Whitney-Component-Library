@@ -37,6 +37,7 @@ describe('canonical component contracts', () => {
   it('covers every public component with one canonical contract', () => {
     const exportNames = [
       'AlertBanner',
+      'AlertDialog',
       'AppearanceProvider',
       'Badge',
       'Button',
@@ -47,7 +48,9 @@ describe('canonical component contracts', () => {
       'DateField',
       'DatePicker',
       'DateRangePicker',
+      'Dialog',
       'Divider',
+      'Drawer',
       'DropZone',
       'EmptyState',
       'Field',
@@ -88,6 +91,37 @@ describe('canonical component contracts', () => {
       exportNames.length,
     );
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+  });
+
+  it('distinguishes ordinary dialogs, consequential confirmations, and drawers', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Dialog')?.appropriateUses.join(' ')).toMatch(/bounded.*task|focused/i);
+    expect(contractFor('Dialog')?.inappropriateUses.join(' ')).toMatch(
+      /irreversible|destructive|consequential/i,
+    );
+    expect(contractFor('Dialog')?.controlBehavior.join(' ')).toMatch(/backdrop.*Escape.*close/i);
+    expect(contractFor('AlertDialog')?.appropriateUses.join(' ')).toMatch(
+      /consequential|destructive|irreversible/i,
+    );
+    expect(contractFor('AlertDialog')?.controlBehavior.join(' ')).toMatch(
+      /backdrop.*does not dismiss|not dismiss/i,
+    );
+    expect(contractFor('AlertDialog')?.keyboardBehavior.join(' ')).toMatch(
+      /cancel.*initial focus|initial focus.*cancel/i,
+    );
+    expect(contractFor('AlertDialog')?.formBehavior.join(' ')).not.toMatch(/form.*in.*body/i);
+    expect(contractFor('AlertDialog')?.localization.join(' ')).not.toMatch(/close.*label/i);
+    expect(contractFor('AlertDialog')?.localization.join(' ')).not.toMatch(/body copy/i);
+    expect(contractFor('AlertDialog')?.validation.join(' ')).toMatch(
+      /runtime.*exactly one.*Button or IconButton/i,
+    );
+    expect(contractFor('Drawer')?.directionality.join(' ')).toMatch(/logical.*start.*end/i);
+    expect(contractFor('Drawer')?.responsiveBehavior.join(' ')).toMatch(
+      /compact.*full.*viewport|full.*screen/i,
+    );
+    expect(contractFor('Drawer')?.inappropriateUses.join(' ')).toMatch(/persistent.*navigation/i);
   });
 
   it('keeps status, metadata, alerts, progress, meters, and generic busy state distinct', () => {

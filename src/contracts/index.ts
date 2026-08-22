@@ -53,6 +53,7 @@ export {
   spinnerContract,
   statusIndicatorContract,
 } from './feedback.contracts.js';
+export {alertDialogContract, dialogContract, drawerContract} from './overlay.contracts.js';
 export {
   renderAgentIndex,
   renderContractDocumentation,
@@ -119,9 +120,11 @@ import {
   spinnerContract,
   statusIndicatorContract,
 } from './feedback.contracts.js';
+import {alertDialogContract, dialogContract, drawerContract} from './overlay.contracts.js';
 
 export const componentContracts = [
   alertBannerContract,
+  alertDialogContract,
   appearanceProviderContract,
   badgeContract,
   buttonContract,
@@ -133,7 +136,9 @@ export const componentContracts = [
   datePickerContract,
   dateRangePickerContract,
   dividerContract,
+  dialogContract,
   dropZoneContract,
+  drawerContract,
   emptyStateContract,
   fieldContract,
   fieldGroupContract,

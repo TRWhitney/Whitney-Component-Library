@@ -8,6 +8,7 @@ import {
 
 import {
   AlertBanner,
+  AlertDialog,
   AppearanceProvider,
   Badge,
   Button,
@@ -18,8 +19,10 @@ import {
   DateField,
   DatePicker,
   DateRangePicker,
+  Dialog,
   Divider,
   DropZone,
+  Drawer,
   EmptyState,
   Field,
   FieldGroup,
@@ -1196,6 +1199,80 @@ function FeedbackSpecimens() {
   );
 }
 
+function OverlaySpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Keep an ordinary bounded task in context. Backdrop, Escape, the close control, or an action can dismiss it; use AlertDialog for consequential confirmation."
+        name="Dialog"
+      >
+        <Dialog
+          actions={({close}) => (
+            <>
+              <Button onPress={close} variant="secondary">
+                Cancel
+              </Button>
+              <Button onPress={close}>Save name</Button>
+            </>
+          )}
+          closeLabel="Close run editor"
+          description="Update the display name used throughout this workspace."
+          title="Edit run name"
+          trigger={<Button>Edit run name</Button>}
+        >
+          <Stack gap="regular">
+            <TextField defaultValue="North wall study" label="Run name" />
+            <Drawer
+              actions={({close}) => <Button onPress={close}>Done</Button>}
+              closeLabel="Close current run inspector"
+              description="Inspect solver inputs without leaving the editing task."
+              placement="end"
+              title="Current run inspector"
+              trigger={<Button variant="secondary">Inspect current run</Button>}
+            >
+              <p>RUN 0284 uses the balanced profile with 25 boundary passes.</p>
+            </Drawer>
+          </Stack>
+        </Dialog>
+      </Specimen>
+
+      <Specimen
+        description="Confirm consequential work with cancellation focused first. The backdrop cannot dismiss the decision, and destructive emphasis is semantic rather than accent-colored."
+        name="AlertDialog"
+      >
+        <AlertDialog
+          actionKind="destructive"
+          cancelLabel="Keep archived run"
+          confirmLabel="Delete archived run"
+          description="This permanently removes RUN 0197 and its saved solver results."
+          onConfirm={() => undefined}
+          title="Delete this archived run?"
+          trigger={<Button variant="danger">Delete archived run</Button>}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Open supplemental work from a logical viewport edge. Start and end follow writing direction, and the panel becomes full-screen at compact widths."
+        name="Drawer"
+      >
+        <Drawer
+          actions={({close}) => <Button onPress={close}>Done</Button>}
+          closeLabel="Close result inspector"
+          description="Review solver output without leaving the run list."
+          placement="end"
+          title="Result inspector"
+          trigger={<Button>Inspect result</Button>}
+        >
+          <Stack gap="regular">
+            <StatusIndicator label="Stable" tone="success" />
+            <p>RUN 0284 converged after 18 of 25 available boundary passes.</p>
+          </Stack>
+        </Drawer>
+      </Specimen>
+    </>
+  );
+}
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -1356,6 +1433,14 @@ export function Showcase() {
                 <h2 id="feedback-heading">Report status, progress, and problems</h2>
               </header>
               <FeedbackSpecimens />
+            </section>
+
+            <section aria-labelledby="overlays-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Overlays</span>
+                <h2 id="overlays-heading">Focus temporary tasks and consequential decisions</h2>
+              </header>
+              <OverlaySpecimens />
             </section>
           </main>
         </div>

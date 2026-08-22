@@ -44,6 +44,7 @@ export const showcaseGroups = [
   },
   {label: 'Ranges', components: ['Slider', 'RangeSlider']},
   {label: 'Files', components: ['FileTrigger', 'DropZone']},
+  {label: 'Overlays', components: ['Dialog', 'AlertDialog', 'Drawer']},
   {
     label: 'Feedback',
     components: [

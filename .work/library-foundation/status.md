@@ -9,8 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 11, including the intervening Ticket 03A accent correction, are complete.
-Ticket 12 is ready. The maintained human showcase covers every contracted public component. Manual
+Tickets 01 through 12, including the intervening Ticket 03A accent correction, are complete.
+Ticket 13 is ready. The maintained human showcase covers every contracted public component. Manual
 screen-reader operation is intentionally consolidated in the Ticket 30 pre-`1.0` release gate
 rather than repeated for every component ticket.
 
@@ -200,10 +200,26 @@ visible items. Arrival does not move focus, and contracts direct durable recover
 persistent content. Compact reflow, light and dark appearance, forced colors, reduced motion, SSR,
 hydration, React 18/19 package consumption, public types, and live-region structure are covered.
 
+### Ticket 12 — dialog and drawer overlays
+
+Dialog, AlertDialog, and Drawer preserve ordinary bounded work, consequential confirmation, and
+supplemental edge-attached work as separate public concepts. Controlled and uncontrolled state,
+required visible titles and descriptions, explicit close or confirmation labels, action
+composition, and logical drawer placement remain library-owned without exposing React Aria parts.
+
+Focus enters, remains contained, restores through nested and sequential overlay stacks, and returns
+on Escape, backdrop, close-control, action, and programmatic paths according to each contract.
+AlertDialog keeps cancellation first, blocks backdrop dismissal, and separates confirm from
+destructive semantics. Drawer retains modal behavior while moving its threshold rail with logical
+start/end placement and becoming full-screen at compact widths. Triggers render exactly one library
+Button or IconButton, locally scoped RTL survives portal rendering, and long AlertDialog copy
+scrolls without clipping its fixed decisions. Light, dark, RTL, compact, touch, forced-color,
+reduced-motion, SSR, hydration, public-package, and typed behavior are covered.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is [Ticket 12 — Dialog and Drawer
-Overlays](tickets/12-dialog-and-drawer-overlays.md).
+See the [decision map](map.md). The next implementation unit is
+[Ticket 13 — Popover, Tooltip, and Menu Overlays](tickets/13-popover-tooltip-and-menu-overlays.md).
 
 ## Accepted sources
 
@@ -230,7 +246,7 @@ Overlays](tickets/12-dialog-and-drawer-overlays.md).
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 302
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 315
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
@@ -277,11 +293,21 @@ Overlays](tickets/12-dialog-and-drawer-overlays.md).
   focus-paused timing and covers light and dark appearance, reduced motion, and forced colors.
   Focused public-seam tests cover programmatic dismissal and post-removal callbacks. Inspected
   screenshots were discarded after validation.
+- Chromium, Firefox, and WebKit direct evidence covers Dialog, AlertDialog, and Drawer focus entry,
+  containment, nested and sequential restoration, explicit dismissal paths, alert backdrop
+  protection, scroll locking, locally scoped logical RTL placement through the portal, compact
+  full-screen geometry, dark and light appearance, keyboard interaction, inert background content,
+  and labeled/described dialog structure without overflow or console/page errors. Focused tests
+  cover runtime rejection of initially or dynamically invalid and ambiguous triggers, wrapper-free
+  consumer components, and direct Toolbar and ButtonGroup composition. Chromium additionally covers
+  bounded scrolling for long localized AlertDialog copy without clipping its decisions, touch
+  activation, reduced motion, and forced colors. Inspected screenshots were discarded after
+  validation.
 - Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
-Resume Ticket 12 from novel-work implementation with
+Resume Ticket 13 from novel-work implementation with
 `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`
-and begin the dialog and drawer overlay slice. Current branch: `master`. Ticket 11 is delivered by
-the commit containing this record; no Ticket 12 implementation has started.
+and begin the popover, tooltip, and menu overlay slice. Current branch: `master`. Ticket 12 is
+delivered by the commit containing this record; no Ticket 13 implementation has started.
