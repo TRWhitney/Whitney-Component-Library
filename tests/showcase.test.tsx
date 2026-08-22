@@ -28,14 +28,17 @@ describe('component showcase', () => {
     expect([...showcasedComponentNames].sort()).toEqual(contractNames.sort());
   });
 
-  it('describes the Field behavior demonstrated by its custom select', () => {
+  it('uses Field for a control without a specialized library component', () => {
     const {container} = render(<Showcase />);
-    const description = container.querySelector(
-      '[data-showcase-component="Field"] .showcase-specimen-header p',
-    );
+    const specimen = container.querySelector('[data-showcase-component="Field"]');
 
-    expect(description?.textContent).toMatch(/label.*support.*custom control.*option entries/i);
-    expect(description?.textContent).not.toMatch(/read-only/i);
+    const dial = specimen?.querySelector('[data-showcase-phase-dial][role="slider"]');
+
+    expect(dial?.getAttribute('aria-valuenow')).toBe('135');
+    fireEvent.keyDown(dial as Element, {key: 'ArrowRight'});
+    expect(dial?.getAttribute('aria-valuenow')).toBe('140');
+    expect(specimen?.querySelector('select')).toBeNull();
+    expect(specimen?.querySelector('[data-wcl-slider]')).toBeNull();
   });
 
   it('lets a reader change the propagated accent and see its exact value', () => {

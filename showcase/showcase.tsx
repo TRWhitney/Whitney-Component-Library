@@ -1,4 +1,10 @@
-import {useState, type ReactNode} from 'react';
+import {
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+} from 'react';
 
 import {
   AlertBanner,
@@ -46,6 +52,7 @@ import {
   Toolbar,
   type AccentColor,
   type Appearance,
+  type FieldControlProps,
   type FileAcquisitionResult,
 } from '../src/index.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
@@ -114,10 +121,96 @@ function AddIcon() {
   );
 }
 
+function normalizeAngle(value: number): number {
+  return ((value % 360) + 360) % 360;
+}
+
+function PhaseAngleDial(controlProps: FieldControlProps) {
+  const [angle, setAngle] = useState(135);
+  const isInteractive = !controlProps.disabled && !controlProps.readOnly;
+
+  const setAngleFromPointer = (event: PointerEvent<HTMLDivElement>) => {
+    const orbit = event.currentTarget.querySelector('[data-showcase-phase-orbit]');
+    if (!orbit) return;
+
+    const bounds = orbit.getBoundingClientRect();
+    const radians = Math.atan2(
+      event.clientY - (bounds.top + bounds.height / 2),
+      event.clientX - (bounds.left + bounds.width / 2),
+    );
+    setAngle(normalizeAngle(Math.round((radians * 180) / Math.PI + 90)));
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!isInteractive) return;
+
+    const increments: Partial<Record<string, number>> = {
+      ArrowDown: -5,
+      ArrowLeft: -5,
+      ArrowRight: 5,
+      ArrowUp: 5,
+      PageDown: -30,
+      PageUp: 30,
+    };
+    const increment = increments[event.key];
+
+    if (increment !== undefined) {
+      event.preventDefault();
+      setAngle((current) => normalizeAngle(current + increment));
+    } else if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      setAngle(event.key === 'Home' ? 0 : 359);
+    }
+  };
+
+  const style = {'--showcase-phase-angle': `${angle}deg`} as CSSProperties;
+
+  return (
+    <div
+      {...controlProps}
+      aria-valuemax={359}
+      aria-valuemin={0}
+      aria-valuenow={angle}
+      aria-valuetext={`${angle} degrees clockwise`}
+      className="showcase-phase-control"
+      data-showcase-phase-dial=""
+      onKeyDown={handleKeyDown}
+      onPointerDown={(event) => {
+        if (!isInteractive) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setAngleFromPointer(event);
+      }}
+      onPointerMove={(event) => {
+        if (isInteractive && event.currentTarget.hasPointerCapture(event.pointerId)) {
+          setAngleFromPointer(event);
+        }
+      }}
+      role="slider"
+      tabIndex={controlProps.tabIndex ?? 0}
+    >
+      <span
+        aria-hidden="true"
+        className="showcase-phase-orbit"
+        data-showcase-phase-orbit=""
+        style={style}
+      >
+        <span className="showcase-phase-arm" />
+      </span>
+      <span aria-hidden="true" className="showcase-phase-copy">
+        <strong>Rotor B offset</strong>
+        <span>{angle}° clockwise</span>
+      </span>
+    </div>
+  );
+}
+
 function LayoutSpecimens() {
   return (
     <>
-      <Specimen description="Stack related items vertically with consistent gaps." name="Stack">
+      <Specimen
+        description="Arrange one sequence vertically with a consistent gap. Use ResponsiveGrid when peers should share rows at wider widths."
+        name="Stack"
+      >
         <Stack gap="tight">
           <div className="showcase-measure">Prepare geometry</div>
           <div className="showcase-measure">Resolve boundaries</div>
@@ -126,7 +219,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Align related items in a row, with optional wrapping and equal sizing."
+        description="Keep related items on one row when space allows, then wrap them as a sequence rather than a column grid. equalItems gives every peer the same width."
         name="InlineGroup"
       >
         <InlineGroup equalItems gap="tight" wrap>
@@ -137,7 +230,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Fit repeated items into columns, then collapse them as space runs out."
+        description="Lay out repeated peers in responsive columns that collapse as space narrows. Use it for card or field grids rather than one horizontal sequence."
         name="ResponsiveGrid"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -157,7 +250,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Draw a divider when spacing alone does not separate neighboring regions."
+        description="Mark a boundary when spacing alone does not explain the separation. Divider works horizontally in a stack or vertically in an inline group."
         name="Divider"
       >
         <Stack gap="regular">
@@ -172,7 +265,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Group related content with preset padding, border, and elevation."
+        description="Give related content a shared background, padding, boundary, and elevation. Surface changes presentation but adds no heading or section semantics."
         name="Surface"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -189,7 +282,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Give a content region a visible heading, description, and optional action."
+        description="Give a content region a visible heading, optional description, and optional action. Add Surface separately when the region also needs a container treatment."
         name="Section"
       >
         <Surface padding="regular" variant="subtle">
@@ -205,7 +298,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Label a scrollable region and keep it keyboard accessible. Its scrollbar appears during activity or focus and fades when idle."
+        description="Bound overflowing content without losing its accessible name or keyboard access. The scrollbar appears during activity or focus and fades when idle."
         name="ScrollRegion"
       >
         <ScrollRegion label="Solver event log" size="compact">
@@ -226,7 +319,7 @@ function ActionSpecimens() {
   return (
     <>
       <Specimen
-        description="Run a command with a chosen emphasis while retaining native form behavior."
+        description="Run a one-time action with emphasis matched to its consequence. Use Link for navigation and ToggleButton for an action that retains an on or off state."
         name="Button"
       >
         <InlineGroup gap="regular" wrap>
@@ -254,7 +347,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Use an icon-only command with a required accessible label and matching tooltip."
+        description="Fit a familiar action into icon-sized space. The required label supplies its accessible name and tooltip; use Button when visible wording would help."
         name="IconButton"
       >
         <InlineGroup gap="regular">
@@ -277,7 +370,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Navigate to a destination without disguising navigation as a command."
+        description="Navigate to another destination. Use Button for an action that changes the current page without taking the user somewhere else."
         name="Link"
       >
         <InlineGroup gap="regular" wrap>
@@ -298,7 +391,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Control a persistent binary choice with a visible selection rail."
+        description="Keep an action visibly on or off, such as pinning a result. Use Switch for an immediately applied setting and Button for a one-time command."
         name="ToggleButton"
       >
         <InlineGroup gap="regular" wrap>
@@ -319,7 +412,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Group a few related commands without changing their tab order."
+        description="Present a few related commands as one visual set while keeping every control in normal Tab order. Use Toolbar when arrow-key navigation is expected."
         name="ButtonGroup"
       >
         <Example label="2 secondary Buttons + IconButton">
@@ -334,7 +427,7 @@ function ActionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Group frequent commands under horizontal or vertical arrow-key navigation."
+        description="Collect frequent controls into one named keyboard region with arrow-key navigation. Use ButtonGroup when every control should remain a separate Tab stop."
         name="Toolbar"
       >
         <Example label="2 quiet Buttons + ToggleButton + IconButton">
@@ -356,21 +449,19 @@ function FieldSpecimens() {
   return (
     <>
       <Specimen
-        description="Connect a label and support text to one custom control, including readable native option entries. The full enabled control boundary responds to hover, including padding around its content."
+        description="Use Field when an application-owned control has no library equivalent. It supplies the shared label, support text, and state wiring around this circular phase dial, while the dial owns its value and interaction."
         name="Field"
       >
-        <Field description="Select the compute queue for this run." label="Compute queue">
-          {(controlProps) => (
-            <select {...controlProps} defaultValue="standard">
-              <option value="standard">Standard</option>
-              <option value="priority">Priority</option>
-            </select>
-          )}
+        <Field
+          description="Drag around the orbit or use arrow keys. Page Up and Page Down move by 30°."
+          label="Rotor phase relationship"
+        >
+          {(controlProps) => <PhaseAngleDial {...controlProps} />}
         </Field>
       </Specimen>
 
       <Specimen
-        description="Collect one line of text with a fixed label and support area."
+        description="Collect one line of general text. Use SearchField for query submission, TextArea for meaningful line breaks, and NumberField for parsed numeric values."
         name="TextField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -390,7 +481,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Collect multiline plain text in a three-, five-, or eight-row native text area."
+        description="Collect multiline plain text with a deliberate initial height. Use TextField when line breaks carry no meaning."
         name="TextArea"
       >
         <TextArea
@@ -402,7 +493,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Format, parse, limit, and step a number. Faint separators keep both step actions distinct from the value."
+        description="Collect a numeric value with locale formatting, bounds, and step controls. Use TextField when the entered characters must remain text instead of being parsed as a number."
         name="NumberField"
       >
         <NumberField
@@ -418,7 +509,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Enter, submit, and clear an editable query with native search semantics and one conditional clear action inset into the field."
+        description="Collect a query that can be submitted or cleared. Unlike TextField, it has search semantics and shows a clear action only while it contains text."
         name="SearchField"
       >
         <SearchField
@@ -430,7 +521,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Name related fields, arrange them in equal responsive columns, align controls when labels wrap, and disable them as a group."
+        description="Give one related set of fields a legend, align their labels and controls, and optionally disable them together. Use FormSection for a larger workflow that may contain several groups."
         name="FieldGroup"
       >
         <FieldGroup
@@ -447,7 +538,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Organize a form section under a visible heading with consistent vertical spacing."
+        description="Divide a larger form workflow under a visible heading and description. It provides structure and spacing, not shared field state; use FieldGroup for one related set of inputs."
         name="FormSection"
       >
         <FormSection
@@ -468,7 +559,7 @@ function ChoiceSpecimens() {
   return (
     <>
       <Specimen
-        description="Select one optional value, including an indeterminate state, with native form behavior. Invalid rows use a thin danger outline that thickens on enabled hover."
+        description="Include one optional value or acknowledge one condition. Use CheckboxGroup for related multi-select options and Switch for an immediately applied setting. Indeterminate reports mixed child state rather than a third value."
         name="Checkbox"
       >
         <InlineGroup align="start" gap="regular" wrap>
@@ -490,7 +581,7 @@ function ChoiceSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose zero or more related values under one accessible group question. If one option has supporting text, every checkbox aligns with its first line."
+        description="Choose any number of related values under one accessible question. If one option has supporting text, every checkbox stays aligned with its first line."
         name="CheckboxGroup"
       >
         <CheckboxGroup
@@ -511,7 +602,7 @@ function ChoiceSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose one visible mutually exclusive answer with native radio and arrow-key behavior. If one option has supporting text, every radio aligns with its first line."
+        description="Choose exactly one answer while keeping every option visible. Use Select to collapse a longer list and SegmentedControl for a few compact modes."
         name="RadioGroup"
       >
         <RadioGroup
@@ -524,7 +615,7 @@ function ChoiceSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Turn one immediately applied setting on or off without changing its label."
+        description="Turn one immediately applied setting on or off. Use Checkbox for optional inclusion or acknowledgement and ToggleButton for a retained command state."
         name="Switch"
       >
         <InlineGroup align="start" gap="regular" wrap>
@@ -541,7 +632,7 @@ function ChoiceSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Switch among a few compact modes with equal segments and a moving selection rail."
+        description="Choose one of a few compact peer modes that should stay visible. Use RadioGroup for longer labels or supporting text and Select when the choices should collapse."
         name="SegmentedControl"
       >
         <SegmentedControl
@@ -559,7 +650,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one value from a centered trigger whose full enabled boundary responds to hover, with rounded list options, typeahead, native form behavior, and viewport-aware placement. Invalid boundaries retain their danger color and thicken on enabled hover."
+        description="Choose one value from a finite list that stays collapsed until opened. Select owns the styled trigger and list, option states, typeahead, form behavior, and viewport-aware placement."
         name="Select"
       >
         <Select
@@ -573,7 +664,7 @@ function SelectionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Filter local, dynamic, or asynchronous options and choose one value from rounded list options. Input text and selection stay separate; invalid boundaries retain their danger color and thicken on enabled hover."
+        description="Choose one value from a list the user can filter by typing. Use Select when text entry would not help; ComboBox keeps the typed query separate from the selected value."
         name="ComboBox"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -608,7 +699,7 @@ function RangeSpecimens() {
   return (
     <>
       <Specimen
-        description="Adjust an approximate value on a formatted scale with keyboard, pointer, or touch input. Only interactive thumbs dilate on hover."
+        description="Adjust an approximate value on a formatted scale with keyboard, pointer, or touch input. Use NumberField when users must enter or read an exact value. Only interactive thumbs dilate on hover."
         name="Slider"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -640,7 +731,7 @@ function RangeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Adjust an interval with named, non-crossing bounds and offset thumbs that stay distinct when close."
+        description="Adjust numeric lower and upper bounds on one shared scale. The named bounds cannot cross, and their offset thumbs stay distinct when close."
         name="RangeSlider"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -679,7 +770,7 @@ function DateTimeSpecimens() {
   return (
     <>
       <Specimen
-        description="Enter an ISO civil date through locale- and calendar-aware segments. The full enabled field boundary responds to hover, while focused segments use the same low-profile rail as selected actions."
+        description="Enter a date directly through editable locale-aware segments without opening a calendar. Use DatePicker when visual day selection helps."
         name="DateField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -704,7 +795,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Enter a zone-free wall-clock time with a chosen hour cycle and visible precision. Focused segments use the same low-profile rail as selected actions."
+        description="Enter a wall-clock time without attaching a time zone or date. The chosen hour cycle and granularity control which editable segments appear."
         name="TimeField"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -731,7 +822,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an ISO civil date through synchronized segments and a fixed six-week calendar. Select the month or year heading to move through months, years, decades, and broader periods without paging month by month."
+        description="Enter a date through segments or choose it from a fixed six-week calendar. Use DateField when the calendar adds no value. Select the month or year heading for long-distance navigation."
         name="DatePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -763,7 +854,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose an inclusive ISO interval from two adjacent months. Opening edits start first; a start click retains the old end, an end click completes and closes, and dragging either endpoint keeps the calendar open. Month and year headings provide long-distance navigation."
+        description="Choose an inclusive date interval from two adjacent months. A start click keeps the old end visible, an end click completes and closes, and dragging either endpoint keeps the calendar open."
         name="DateRangePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -814,7 +905,7 @@ function FileSpecimens() {
   return (
     <>
       <Specimen
-        description="Open a native picker with file constraints and report which files it accepted or rejected. The application manages the files afterward."
+        description="Open the native file picker from a compact labeled button. Use DropZone when drag and paste should work too. FileTrigger applies constraints and reports accepted or rejected files, then the application manages them."
         name="FileTrigger"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -842,7 +933,7 @@ function FileSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Accept files by drag, focused paste, or the named file-icon picker. The icon moves on enabled hover without adding another button row; disabled targets remain still."
+        description="Use a large acquisition target when drag, focused paste, and browsing should all work. Use FileTrigger for a compact button-only flow. The file icon moves only while the target is enabled."
         name="DropZone"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -891,7 +982,7 @@ function FeedbackSpecimens() {
   return (
     <>
       <Specimen
-        description="Show a concise neutral, success, in-progress, or danger state. Announcements are opt-in."
+        description="Label the current state of an object or process with a tone. Use Badge for static metadata and InlineAlert when the user needs an explanation or action. Announcements are opt-in."
         name="StatusIndicator"
       >
         <InlineGroup gap="regular" wrap>
@@ -911,7 +1002,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Add short metadata or an identifier to an object without creating a live status region."
+        description="Attach short metadata or an identifier to an object without creating a live status region. Use StatusIndicator when the text represents current state."
         name="Badge"
       >
         <InlineGroup gap="regular" wrap>
@@ -928,7 +1019,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Explain feedback for a nearby region without shifting its layout. Announcements are optional."
+        description="Explain feedback tied to a nearby region without shifting its layout. Use AlertBanner for a condition that affects the whole page or workspace. Announcements are optional."
         name="InlineAlert"
       >
         <InlineAlert title="Boundary review" tone="warning">
@@ -937,7 +1028,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Explain a condition that affects the whole page or workspace."
+        description="Explain a condition that affects the whole page or workspace. Use InlineAlert when the message belongs to one nearby region."
         name="AlertBanner"
       >
         <AlertBanner title="Solver disconnected" tone="danger">
@@ -946,7 +1037,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Report progress toward completion, whether the amount is known or indeterminate."
+        description="Report how far a task has progressed. Provide a value when completion is measurable; use the indeterminate state while the total is unknown and Spinner when only a compact busy signal fits."
         name="ProgressBar"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -985,7 +1076,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Show a measured value with units and named warning or danger thresholds."
+        description="Show a current measurement against a known range and named warning or danger thresholds. Meter describes a level, not task completion."
         name="Meter"
       >
         <Meter
@@ -1003,7 +1094,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Show a labeled six-capsule busy indicator while work is active, with an option to reserve its space while idle."
+        description="Show a compact busy signal when detailed progress is unavailable or unnecessary. Six capsules animate while active, and the inactive state can reserve the same layout space."
         name="Spinner"
       >
         <InlineGroup gap="regular" wrap>
@@ -1030,7 +1121,7 @@ export function Showcase() {
           <div className="showcase-identity">
             <span className="showcase-kicker">Whitney component library</span>
             <h1>Component showcase</h1>
-            <p>Browse working examples of every public component.</p>
+            <p>Compare intended uses, working interactions, and component states.</p>
           </div>
           <div aria-hidden="true" className="showcase-route">
             <span className="showcase-route-origin" />
@@ -1091,10 +1182,10 @@ export function Showcase() {
             <section aria-labelledby="foundation-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Foundation</span>
-                <h2 id="foundation-heading">Shared appearance and accent</h2>
+                <h2 id="foundation-heading">Theme every component together</h2>
               </header>
               <Specimen
-                description="Set the appearance and accent for every library component below the provider."
+                description="Choose light or dark appearance and one accent at the application boundary. Every library component below the provider uses those values."
                 name="AppearanceProvider"
               >
                 <div className="showcase-provider-sample">
@@ -1112,7 +1203,7 @@ export function Showcase() {
             <section aria-labelledby="layout-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Layout</span>
-                <h2 id="layout-heading">Relationships before decoration</h2>
+                <h2 id="layout-heading">Arrange and contain related content</h2>
               </header>
               <LayoutSpecimens />
             </section>
@@ -1120,7 +1211,7 @@ export function Showcase() {
             <section aria-labelledby="actions-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Actions</span>
-                <h2 id="actions-heading">Commands keep their meaning</h2>
+                <h2 id="actions-heading">Run commands, navigate, and retain state</h2>
               </header>
               <ActionSpecimens />
             </section>
@@ -1128,7 +1219,7 @@ export function Showcase() {
             <section aria-labelledby="fields-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Fields</span>
-                <h2 id="fields-heading">Values keep their own semantics</h2>
+                <h2 id="fields-heading">Enter values and organize forms</h2>
               </header>
               <FieldSpecimens />
             </section>
@@ -1136,7 +1227,7 @@ export function Showcase() {
             <section aria-labelledby="choices-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Choices</span>
-                <h2 id="choices-heading">Selection keeps its model visible</h2>
+                <h2 id="choices-heading">Present choices that remain visible</h2>
               </header>
               <ChoiceSpecimens />
             </section>
@@ -1144,7 +1235,7 @@ export function Showcase() {
             <section aria-labelledby="selection-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Selection</span>
-                <h2 id="selection-heading">Choose or search a collection</h2>
+                <h2 id="selection-heading">Choose from collapsible collections</h2>
               </header>
               <SelectionSpecimens />
             </section>
@@ -1152,7 +1243,7 @@ export function Showcase() {
             <section aria-labelledby="ranges-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Ranges</span>
-                <h2 id="ranges-heading">Values stay measurable</h2>
+                <h2 id="ranges-heading">Adjust approximate numeric values</h2>
               </header>
               <RangeSpecimens />
             </section>
@@ -1160,7 +1251,7 @@ export function Showcase() {
             <section aria-labelledby="date-time-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Date and time</span>
-                <h2 id="date-time-heading">Civil values keep their context</h2>
+                <h2 id="date-time-heading">Enter dates, times, and intervals</h2>
               </header>
               <DateTimeSpecimens />
             </section>
@@ -1168,7 +1259,7 @@ export function Showcase() {
             <section aria-labelledby="files-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Files</span>
-                <h2 id="files-heading">Acquisition stops at the application boundary</h2>
+                <h2 id="files-heading">Acquire files through picker, drop, or paste</h2>
               </header>
               <FileSpecimens />
             </section>
@@ -1176,7 +1267,7 @@ export function Showcase() {
             <section aria-labelledby="feedback-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Feedback</span>
-                <h2 id="feedback-heading">Meaning stays distinct from momentum</h2>
+                <h2 id="feedback-heading">Report status, progress, and problems</h2>
               </header>
               <FeedbackSpecimens />
             </section>
