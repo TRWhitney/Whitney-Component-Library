@@ -5,12 +5,14 @@ import {
   type EmptyStateKind,
   type NotificationControls,
   type NotificationPlacement,
+  type NotificationTone,
   type SkeletonShape,
   type SkeletonWidth,
 } from '../src/index.js';
 
 const emptyKind: EmptyStateKind = 'no-results';
 const placement: NotificationPlacement = 'top-end';
+const successNotificationTone: NotificationTone = 'success';
 const skeletonShape: SkeletonShape = 'text';
 const skeletonWidth: SkeletonWidth = 'three-quarters';
 
@@ -33,7 +35,7 @@ export const loadingFeedback = (
               description: 'The export is available in run history.',
               timeout: 8000,
               title: 'Export ready',
-              tone: 'success',
+              tone: successNotificationTone,
               urgency: 'polite',
             })
           }
@@ -85,7 +87,7 @@ export const emptyHandlerWithoutAction = (
 );
 
 export const tooManyNotifications = (
-  // @ts-expect-error Notification regions show at most three messages.
+  // @ts-expect-error Notification viewport caps accept one, two, or three cards.
   <NotificationProvider dismissLabel="Dismiss" label="Notifications" maxVisible={4}>
     {() => null}
   </NotificationProvider>
@@ -100,8 +102,76 @@ export const interactiveNotificationCopy = (
             // @ts-expect-error Notification descriptions are plain text and cannot contain recovery controls.
             description: <button type="button">Retry</button>,
             title: 'Export failed',
-            tone: 'danger',
+            tone: 'error',
           })
+        }
+        type="button"
+      >
+        Notify
+      </button>
+    )}
+  </NotificationProvider>
+);
+
+export const notificationWithAction = (
+  <NotificationProvider dismissLabel="Dismiss" label="Notifications">
+    {({notify}) => (
+      <button
+        onClick={() =>
+          notify({
+            actionLabel: 'Retry',
+            onAction: () => undefined,
+            title: 'Export failed',
+            tone: 'error',
+          })
+        }
+        type="button"
+      >
+        Notify
+      </button>
+    )}
+  </NotificationProvider>
+);
+
+export const notificationActionWithoutHandler = (
+  <NotificationProvider dismissLabel="Dismiss" label="Notifications">
+    {({notify}) => (
+      <button
+        onClick={() =>
+          // @ts-expect-error Notification action labels require action handlers.
+          notify({actionLabel: 'Retry', title: 'Export failed', tone: 'error'})
+        }
+        type="button"
+      >
+        Notify
+      </button>
+    )}
+  </NotificationProvider>
+);
+
+export const notificationHandlerWithoutLabel = (
+  <NotificationProvider dismissLabel="Dismiss" label="Notifications">
+    {({notify}) => (
+      <button
+        onClick={() =>
+          // @ts-expect-error Notification action handlers require visible action labels.
+          notify({onAction: () => undefined, title: 'Export failed', tone: 'error'})
+        }
+        type="button"
+      >
+        Notify
+      </button>
+    )}
+  </NotificationProvider>
+);
+
+export const invalidNotificationTone = (
+  <NotificationProvider dismissLabel="Dismiss" label="Notifications">
+    {({notify}) => (
+      <button
+        onClick={() =>
+          // @ts-expect-error Notification tones are general, success, warning, or error.
+          notify({title: 'Export ready', tone: 'neutral'})
         }
         type="button"
       >

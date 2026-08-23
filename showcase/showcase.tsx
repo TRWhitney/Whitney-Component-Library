@@ -997,6 +997,8 @@ function FileSpecimens() {
 }
 
 function FeedbackSpecimens() {
+  const [isNotificationStackCapped, setNotificationStackCapped] = useState(false);
+
   return (
     <>
       <Specimen
@@ -1184,26 +1186,75 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Queue brief confirmations for background events without moving focus. Messages pause on hover or focus and remain dismissible; use durable alerts or a dialog when recovery matters."
+        description="Compare general, success, warning, and error notifications directly. Toggle the three-message scroll viewport before adding messages to compare capped and uncapped stacking. Hover or focus the region to pause its lifetime rails."
         name="NotificationProvider"
       >
         <NotificationProvider
+          key={isNotificationStackCapped ? 'capped' : 'uncapped'}
           dismissLabel="Dismiss notification"
           label="Showcase notifications"
-          maxVisible={2}
+          {...(isNotificationStackCapped ? {maxVisible: 3 as const} : {})}
         >
           {({notify}) => (
-            <Button
-              onPress={() =>
-                notify({
-                  description: 'The export is available in run history.',
-                  title: 'Export ready',
-                  tone: 'success',
-                })
-              }
-            >
-              Show export notification
-            </Button>
+            <Stack gap="tight">
+              <InlineGroup gap="tight">
+                <ToggleButton
+                  isSelected={isNotificationStackCapped}
+                  onChange={setNotificationStackCapped}
+                >
+                  Cap stack at three
+                </ToggleButton>
+              </InlineGroup>
+              <InlineGroup gap="tight" wrap>
+                <Button
+                  onPress={() =>
+                    notify({
+                      description: 'The latest solver inputs are in run history.',
+                      title: 'Draft saved',
+                      tone: 'general',
+                    })
+                  }
+                >
+                  Show general notification
+                </Button>
+                <Button
+                  onPress={() =>
+                    notify({
+                      description: 'The export is available in run history.',
+                      title: 'Export ready',
+                      tone: 'success',
+                    })
+                  }
+                >
+                  Show success notification
+                </Button>
+                <Button
+                  onPress={() =>
+                    notify({
+                      description: 'Archive older runs before the next batch.',
+                      title: 'Storage nearly full',
+                      tone: 'warning',
+                    })
+                  }
+                >
+                  Show warning notification
+                </Button>
+                <Button
+                  onPress={() =>
+                    notify({
+                      actionLabel: 'Retry export',
+                      description: 'The result remains available in run history.',
+                      onAction: () => undefined,
+                      title: 'Export failed',
+                      tone: 'error',
+                      urgency: 'assertive',
+                    })
+                  }
+                >
+                  Show error notification
+                </Button>
+              </InlineGroup>
+            </Stack>
           )}
         </NotificationProvider>
       </Specimen>

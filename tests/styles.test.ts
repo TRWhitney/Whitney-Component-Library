@@ -130,20 +130,71 @@ describe('static appearance styles', () => {
     expect(unavailableAction).toContain('color: var(--wcl-warning)');
   });
 
-  it('bounds notification placement and preserves keyboard focus treatment', async () => {
+  it('colors, stacks, and times notifications while preserving pause and focus treatment', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const region = styles.match(/\[data-wcl-notification-region\]\s*\{([^}]*)\}/)?.[1];
     const notification = styles.match(/\[data-wcl-notification\]\s*\{([^}]*)\}/)?.[1];
+    const timer = styles.match(/\[data-wcl-notification-timer\]\s*\{([^}]*)\}/)?.[1];
+    const reducedMotion = styles.match(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)([\s\S]*)/,
+    )?.[1];
 
     expect(region).toContain('position: fixed');
     expect(region).toContain('direction: inherit');
     expect(region).toContain('max-inline-size: 22rem');
     expect(notification).toContain('pointer-events: auto');
     expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='general'\]\s*\{[^}]*--wcl-feedback-border:\s*var\(--wcl-accent-rail-on-raised\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='general'\]\s*\{[^}]*--wcl-feedback-color:\s*var\(--wcl-accent-rail-on-raised\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='general'\]\s*\{[^}]*--wcl-feedback-focus:\s*var\(--wcl-accent-focus-on-raised\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='general'\]\s*\{[^}]*--wcl-feedback-title-color:\s*var\(--wcl-text\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='general'\]\s*\{[^}]*--wcl-feedback-surface:\s*var\(--wcl-accent-soft-on-raised\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='success'\][\s\S]*--wcl-feedback-border:\s*var\(--wcl-success\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='warning'\][\s\S]*--wcl-feedback-border:\s*var\(--wcl-warning\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification\]\[data-tone='error'\][\s\S]*--wcl-feedback-border:\s*var\(--wcl-danger\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification-count\][^}]*z-index:\s*10[^}]*font-variant-numeric:\s*tabular-nums/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification-list\]\s*\{[^}]*overflow:\s*auto[^}]*scrollbar-color:\s*transparent transparent/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification-list\]\[data-scrollbar-active\][\s\S]*scrollbar-color:\s*var\(--wcl-border-strong\) transparent/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification-list\]:focus-visible\s*\{[^}]*outline-color:\s*var\(--wcl-accent-focus\)/,
+    );
+    expect(timer).toContain('animation: wcl-notification-timeout');
+    expect(timer).toContain('var(--wcl-notification-timeout)');
+    expect(styles).toMatch(
+      /\[data-wcl-notification-region\]:is\(\[data-hovered\], :focus-within\)[\s\S]*animation-play-state:\s*paused/,
+    );
+    expect(reducedMotion).toMatch(
+      /\[data-wcl-notification-timer\][\s\S]*animation:\s*none !important/,
+    );
+    expect(styles).toMatch(
       /\[data-wcl-notification\]:focus-visible[\s\S]*var\(--wcl-accent-focus\)/,
     );
     expect(styles).toMatch(
       /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-notification\][\s\S]*CanvasText/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-notification-list\][\s\S]*scrollbar-color:\s*CanvasText Canvas/,
     );
   });
 
@@ -195,7 +246,10 @@ describe('static appearance styles', () => {
       /\[data-wcl-provider\]\s*\{[^}]*padding:\s*var\(--wcl-drawer-reserved-top[^;]*var\(--wcl-drawer-reserved-right[^;]*var\(--wcl-drawer-reserved-bottom[^;]*var\(--wcl-drawer-reserved-left/,
     );
     expect(styles).toMatch(
-      /\[data-wcl-notification-region\]\s*\{[^}]*inline-size:[^;]*--wcl-drawer-reserved-left[^;]*--wcl-drawer-reserved-right[^}]*max-block-size:[^;]*--wcl-drawer-reserved-top[^;]*--wcl-drawer-reserved-bottom/,
+      /\[data-wcl-notification-region\]\s*\{[^}]*--wcl-notification-region-max-block-size:[^;]*--wcl-drawer-reserved-top[^;]*--wcl-drawer-reserved-bottom/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification-region\]\s*\{[^}]*inline-size:[^;]*--wcl-drawer-reserved-left[^;]*--wcl-drawer-reserved-right[^}]*max-block-size:\s*var\(--wcl-notification-region-max-block-size\)/,
     );
     expect(styles).toMatch(
       /\[data-wcl-notification-region\]:dir\(rtl\)\s*\{[^}]*--wcl-drawer-notification-inline-start:\s*var\(--wcl-drawer-reserved-right[^}]*--wcl-drawer-notification-inline-end:\s*var\(--wcl-drawer-reserved-left/,

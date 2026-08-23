@@ -91,16 +91,47 @@ describe('component showcase', () => {
     expect(getByText('Unselected ToggleButton')).toBeTruthy();
   });
 
-  it('demonstrates a working notification without moving focus', () => {
+  it('demonstrates every notification variant with separate controls without moving focus', () => {
     const {getByRole, getByText} = render(<Showcase />);
-    const trigger = getByRole('button', {name: 'Show export notification'});
-    trigger.focus();
+    const generalTrigger = getByRole('button', {name: 'Show general notification'});
+    const successTrigger = getByRole('button', {name: 'Show success notification'});
+    const warningTrigger = getByRole('button', {name: 'Show warning notification'});
+    const errorTrigger = getByRole('button', {name: 'Show error notification'});
+    errorTrigger.focus();
 
-    fireEvent.click(trigger);
+    fireEvent.click(generalTrigger);
+    fireEvent.click(successTrigger);
+    fireEvent.click(warningTrigger);
+    fireEvent.click(errorTrigger);
 
+    expect(getByText('Draft saved')).toBeTruthy();
     expect(getByText('Export ready')).toBeTruthy();
-    expect(document.activeElement).toBe(trigger);
+    expect(getByText('Storage nearly full')).toBeTruthy();
+    expect(getByText('Export failed')).toBeTruthy();
+    expect(getByRole('button', {name: 'Retry export'})).toBeTruthy();
+    expect(document.activeElement).toBe(errorTrigger);
     expect(getByRole('region', {name: 'Showcase notifications'})).toBeTruthy();
+  });
+
+  it('toggles a three-card scroll viewport for the same notification controls', () => {
+    const {getByRole} = render(<Showcase />);
+    const capToggle = getByRole('button', {name: 'Cap stack at three'});
+
+    fireEvent.click(capToggle);
+    const selectedCapToggle = getByRole('button', {name: 'Cap stack at three'});
+    const generalTrigger = getByRole('button', {name: 'Show general notification'});
+    for (let message = 0; message < 5; message += 1) {
+      fireEvent.click(generalTrigger);
+    }
+
+    expect(selectedCapToggle.getAttribute('aria-pressed')).toBe('true');
+    const region = getByRole('region', {name: 'Showcase notifications'});
+    expect(region.getAttribute('data-count')).toBe('5');
+    expect(within(region).getAllByRole('alertdialog')).toHaveLength(5);
+    expect(within(region).getAllByText('Draft saved')).toHaveLength(5);
+    expect(
+      region.querySelector('[data-wcl-notification-list]')?.getAttribute('data-max-visible'),
+    ).toBe('3');
   });
 
   it('demonstrates all Drawer placements with no dock, grip, and preview modes', async () => {

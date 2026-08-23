@@ -21,6 +21,7 @@ export type {
   NotificationInput,
   NotificationPlacement,
   NotificationProviderProps,
+  NotificationTone,
   NotificationUrgency,
   NotificationVisibleLimit,
   ProgressBarProps,

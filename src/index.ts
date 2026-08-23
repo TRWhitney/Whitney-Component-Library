@@ -42,6 +42,7 @@ export {
   type NotificationInput,
   type NotificationPlacement,
   type NotificationProviderProps,
+  type NotificationTone,
   type NotificationUrgency,
   type NotificationVisibleLimit,
   type ProgressBarProps,

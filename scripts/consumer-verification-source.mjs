@@ -355,7 +355,12 @@ const view = React.createElement(
             'button',
             {
               id: 'packed-notification-trigger',
-              onClick: () => notify({title: 'Export ready', tone: 'success'}),
+              onClick: () => notify({
+                actionLabel: 'Open history',
+                onAction: () => undefined,
+                title: 'Export ready',
+                tone: 'success',
+              }),
               type: 'button',
             },
             'Show notification',
@@ -605,7 +610,10 @@ if (
   packedSpinner.querySelector('[role="status"]').hasAttribute('aria-busy') ||
   document.querySelector('[data-wcl-skeleton]')?.getAttribute('aria-hidden') !== 'true' ||
   document.querySelector('[data-wcl-empty-state]')?.getAttribute('data-kind') !== 'no-data' ||
-  document.querySelector('[data-wcl-notification] [role="status"]')?.textContent !== 'Export ready'
+  document.querySelector('[data-wcl-notification] [role="status"]')?.textContent !== 'Export readyOpen history' ||
+  document.querySelector('[data-wcl-notification]')?.getAttribute('data-tone') !== 'success' ||
+  document.querySelector('[data-wcl-notification-action]')?.textContent !== 'Open history' ||
+  !document.querySelector('[data-wcl-notification-timer]')
 ) {
   throw new Error('Packed feedback family did not preserve semantic relationships.');
 }

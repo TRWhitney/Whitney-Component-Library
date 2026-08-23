@@ -112,17 +112,30 @@ export type EmptyStateProps = EmptyStateBaseProps &
   );
 
 export type NotificationPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end';
+export type NotificationTone = 'general' | 'success' | 'warning' | 'error';
 export type NotificationUrgency = Exclude<AnnouncementMode, 'off'>;
 export type NotificationVisibleLimit = 1 | 2 | 3;
 
-export interface NotificationInput {
+interface NotificationInputBase {
   readonly description?: string;
   readonly onDismiss?: () => void;
   readonly timeout?: number | null;
   readonly title: string;
-  readonly tone: StatusTone;
+  readonly tone: NotificationTone;
   readonly urgency?: NotificationUrgency;
 }
+
+export type NotificationInput = NotificationInputBase &
+  (
+    | {
+        readonly actionLabel?: never;
+        readonly onAction?: never;
+      }
+    | {
+        readonly actionLabel: string;
+        readonly onAction: () => void;
+      }
+  );
 
 export interface NotificationControls {
   readonly dismiss: (key: string) => void;

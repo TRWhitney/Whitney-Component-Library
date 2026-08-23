@@ -164,7 +164,13 @@ describe('canonical component contracts', () => {
     );
     expect(contractFor('InlineAlert')?.relatedExports).toContain('NotificationProvider');
     expect(contractFor('NotificationProvider')?.controlBehavior.join(' ')).toMatch(
-      /queue.*three.*timeout.*pause/i,
+      /newest.*full stack.*five.*scroll.*maxVisible.*height.*three.*reachable.*scrolling.*total count.*timeout.*pause/i,
+    );
+    expect(contractFor('NotificationProvider')?.states.join(' ')).toMatch(
+      /general.*success.*warning.*error.*timed.*persistent/i,
+    );
+    expect(contractFor('NotificationProvider')?.events.join(' ')).toMatch(
+      /action.*onAction.*dismiss/i,
     );
     expect(contractFor('NotificationProvider')?.inappropriateUses.join(' ')).toMatch(
       /only path.*recover|persistent.*condition/i,
