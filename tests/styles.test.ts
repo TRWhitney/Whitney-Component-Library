@@ -289,7 +289,7 @@ describe('static appearance styles', () => {
       ),
     );
     const anchoredSurface = styles.match(
-      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s*\{([^}]*)\}/,
+      /:is\(\s*\[data-wcl-popover\],\s*\[data-wcl-menu-popover\](?:,\s*\[data-wcl-breadcrumb-popover\])?\s*\)\s*\{([^}]*)\}/,
     )?.[1];
     const menuItem = styles.match(/\[data-wcl-menu-item\]\s*\{([^}]*)\}/)?.[1];
     const reducedMotion = styles.match(
@@ -316,13 +316,13 @@ describe('static appearance styles', () => {
       expect(consumer).toContain('{...anchoredOverlayPositionProps}');
     }
     expect(styles).toMatch(
-      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s+\[data-wcl-anchor-arrow\]\[data-placement='bottom'\]\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='accent-rail'\]/,
+      /:is\(\s*\[data-wcl-popover\],\s*\[data-wcl-menu-popover\](?:,\s*\[data-wcl-breadcrumb-popover\])?\s*\)\s+\[data-wcl-anchor-arrow\]\[data-placement='bottom'\]\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='accent-rail'\]/,
     );
     expect(styles).toMatch(
-      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s+\[data-wcl-anchor-arrow\]\[data-placement='bottom'\]\s+\[data-wcl-anchor-arrow-rail-mask\]\s*\{[^}]*display:\s*block/,
+      /:is\(\s*\[data-wcl-popover\],\s*\[data-wcl-menu-popover\](?:,\s*\[data-wcl-breadcrumb-popover\])?\s*\)\s+\[data-wcl-anchor-arrow\]\[data-placement='bottom'\]\s+\[data-wcl-anchor-arrow-rail-mask\]\s*\{[^}]*display:\s*block/,
     );
     expect(styles).toMatch(
-      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s+\[data-wcl-anchor-arrow\]:not\(\[data-placement='bottom'\]\)\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='accent'\]/,
+      /:is\(\s*\[data-wcl-popover\],\s*\[data-wcl-menu-popover\](?:,\s*\[data-wcl-breadcrumb-popover\])?\s*\)\s+\[data-wcl-anchor-arrow\]:not\(\[data-placement='bottom'\]\)\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='accent'\]/,
     );
     expect(styles).toMatch(
       /\[data-wcl-tooltip\]\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='neutral'\]\s*\{[^}]*stroke:\s*var\(--wcl-border-strong\)/,
@@ -338,10 +338,10 @@ describe('static appearance styles', () => {
       /\[data-wcl-context-menu-target\]:focus-visible[\s\S]*var\(--wcl-accent-focus\)/,
     );
     expect(reducedMotion).toMatch(
-      /:is\(\[data-wcl-popover\], \[data-wcl-tooltip\], \[data-wcl-menu-popover\]\)[\s\S]*transition:\s*none/,
+      /:is\(\s*\[data-wcl-popover\],\s*\[data-wcl-tooltip\],\s*\[data-wcl-menu-popover\](?:,\s*\[data-wcl-breadcrumb-popover\])?\s*\)[\s\S]*transition:\s*none/,
     );
     expect(forcedColors).toMatch(
-      /:is\(\[data-wcl-popover\], \[data-wcl-tooltip\], \[data-wcl-menu-popover\]\)[\s\S]*border-color:\s*CanvasText/,
+      /:is\(\s*\[data-wcl-popover\],\s*\[data-wcl-tooltip\],\s*\[data-wcl-menu-popover\](?:,\s*\[data-wcl-breadcrumb-popover\])?\s*\)[\s\S]*border-color:\s*CanvasText/,
     );
   });
 
@@ -1159,5 +1159,69 @@ describe('static appearance styles', () => {
     expect(nativeCancel).toContain('-webkit-appearance: none !important');
     expect(nativeCancel).toContain('appearance: none !important');
     expect(nativeCancel).toContain('display: none !important');
+  });
+
+  it('presents collapsed breadcrumb destinations in an anchored overlay', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const popover = styles.match(/\[data-wcl-breadcrumb-popover\]\s*\{([^}]*)\}/)?.[1];
+    const overflowList = styles.match(/\[data-wcl-breadcrumb-overflow-list\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(popover).toContain('inline-size: max-content');
+    expect(overflowList).toContain('display: grid');
+    expect(overflowList).not.toContain('border-block-start');
+    expect(styles).not.toMatch(/\[data-wcl-breadcrumb-overflow-list\]\[hidden\]/);
+  });
+
+  it('uses one filled navigation hover for breadcrumb links and overflow', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const breadcrumbLink = styles.match(/\[data-wcl-breadcrumb-link\]\s*\{([^}]*)\}/)?.[1];
+    const sharedHover = styles.match(
+      /:is\(\[data-wcl-breadcrumb-link\], \[data-wcl-breadcrumb-overflow-trigger\]\):is\([\s\S]*?\)\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(sharedHover).toContain('background: var(--wcl-accent-soft)');
+    expect(sharedHover).toContain('color: var(--wcl-accent-hover-contrast)');
+    expect(breadcrumbLink).toContain('text-decoration: none');
+    expect(sharedHover).not.toContain('text-decoration');
+  });
+
+  it('uses the established full-width selection rail for the current page', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const paginationRail = styles.match(
+      /\[data-wcl-page-control\]\[data-current\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(paginationRail).toContain('inset-inline: 0');
+    expect(paginationRail).toContain('inset-block-end: 0');
+    expect(paginationRail).toContain('block-size: 3px');
+    expect(paginationRail).toContain('border-radius: 3px 3px 0 0');
+    expect(paginationRail).toContain('background: var(--wcl-accent-rail)');
+    expect(styles).not.toMatch(
+      /\[data-wcl-page-control\]\[data-current\]\s*\{[^}]*border-block-end-width/,
+    );
+  });
+
+  it('keeps disclosure row height independent of consumer box sizing', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const trigger = styles.match(/\[data-wcl-disclosure-trigger\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(trigger).toContain('box-sizing: border-box');
+    expect(trigger).toContain('min-block-size: 2.75rem');
+  });
+
+  it('isolates disclosure row rhythm from consumer heading margins', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const heading = styles.match(/\[data-wcl-disclosure-heading\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(heading).toContain('margin: 0');
+    expect(heading).not.toContain('!important');
+  });
+
+  it('removes collapsed disclosure panel padding without disabling find-in-page', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const hiddenPanel = styles.match(/\[data-wcl-disclosure-panel\]\[hidden\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(hiddenPanel).toContain('padding-block: 0');
+    expect(hiddenPanel).not.toContain('display: none');
   });
 });

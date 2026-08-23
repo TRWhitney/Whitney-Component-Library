@@ -310,6 +310,29 @@
     inline-size: 100%;
   }
 
+  [data-showcase-breadcrumb-route] {
+    display: grid;
+    gap: 1rem;
+  }
+
+  [data-showcase-breadcrumb-page] {
+    display: grid;
+    gap: 0.4rem;
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--wcl-border);
+  }
+
+  [data-showcase-breadcrumb-page] > p {
+    margin: 0;
+    color: var(--wcl-text-muted);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  [data-showcase-breadcrumb-page] > [data-wcl-link] {
+    justify-self: start;
+  }
+
   .showcase-example {
     display: grid;
     gap: 0.45rem;

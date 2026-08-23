@@ -22,6 +22,10 @@ export const showcaseGroups = [
     components: ['Button', 'IconButton', 'Link', 'ToggleButton', 'ButtonGroup', 'Toolbar'],
   },
   {
+    label: 'Navigation and disclosure',
+    components: ['Tabs', 'Breadcrumbs', 'Pagination', 'Disclosure', 'Accordion', 'SideNavigation'],
+  },
+  {
     label: 'Fields',
     components: [
       'Field',

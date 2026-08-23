@@ -9,10 +9,10 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 13, including the intervening Ticket 03A accent correction, are complete. The
-maintained human showcase covers every contracted public component. Manual screen-reader operation
-is intentionally consolidated in the Ticket 30 pre-`1.0` release gate rather than repeated for
-every component ticket.
+Tickets 01 through 14, including the intervening Ticket 03A accent correction, are complete. Menu
+and ContextMenu now use whole-row item highlights without a leading entry rail. The maintained human
+showcase covers every contracted public component. Manual screen-reader operation is intentionally
+consolidated in the Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
 
 The library remains pre-adoption. Four completed `0.x` integration slices, a broad conventional
 catalog, the accepted Markdown editing surface, the accessible chart family including radar
@@ -216,10 +216,23 @@ Button or IconButton, locally scoped RTL survives portal rendering, and long Ale
 scrolls without clipping its fixed decisions. Light, dark, RTL, compact, touch, forced-color,
 reduced-motion, SSR, hydration, public-package, and typed behavior are covered.
 
+### Ticket 14 — navigation and disclosure
+
+Tabs, Breadcrumbs, Pagination, Disclosure, Accordion, and SideNavigation preserve panel selection,
+hierarchical location, numbered result movement, optional expansion, coordinated expansion, and
+persistent application destinations as separate public concepts. Controlled and uncontrolled
+state stays explicit, while native links preserve consumer routing.
+
+Breadcrumbs keeps root and current locations visible and moves collapsed ancestors into an anchored
+ellipsis overlay without displacing page content. Pagination uses the same full-width selection rail
+as ToggleButton. Disclosure and Accordion keep collapsed rows compact without losing find-in-page
+behavior. SideNavigation owns grouped destination links, current location, and its collapse control
+without owning the application router or generic sidebar layout.
+
 ## Frontier
 
-See the [decision map](map.md). The next implementation unit is
-[Ticket 14 — Navigation and Disclosure Family](tickets/14-navigation-and-disclosure-family.md).
+See the [decision map](map.md). The active implementation unit is
+[Ticket 15 — Basic Data and Collection Family](tickets/15-basic-data-and-collection-family.md).
 
 ## Accepted sources
 
@@ -246,6 +259,27 @@ See the [decision map](map.md). The next implementation unit is
 
 ## Current verification
 
+- Ticket 14 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
+  types, 364 focused and regression tests, generated guidance, and public declarations under
+  TypeScript 5.9, 6, and 7. `npm run showcase:build`, `npm run verify:package`,
+  `npm audit --audit-level=high`, and `git diff --check` pass. Packed React 18.3.1 and React 19.2.8
+  consumers pass SSR, hydration, types, and browser builds. Focused hydration coverage renders all
+  six Ticket 14 components together.
+- Ticket 14 direct Chromium evidence covers Tabs manual activation and panel relationships,
+  collapsed Breadcrumb destination reachability through an anchored ellipsis overlay with no layout
+  shift, and the same filled, underline-free hover treatment for route links and the overflow
+  control. The showcase removes descendants after following an ancestor and exposes the next route
+  from each ancestor page so the hierarchy can be traversed in both directions. It also covers
+  Pagination's full-width selection rail, Disclosure and Accordion expansion and disabled states,
+  and SideNavigation collapse and current destination behavior. A touch-enabled compact viewport
+  directly exercises Tabs, Breadcrumbs, Pagination, Disclosure, Accordion, and SideNavigation. The
+  browser accessibility tree exposes the expected named tablist, navigation landmarks, links, and
+  collapse control. Wide and compact RTL layouts have no component or document overflow; reduced
+  motion, forced colors, light, and dark appearances render correctly. Collapsed Disclosure rows
+  retain the intended 44-pixel minimum independent of consumer box sizing while preserving
+  find-in-page behavior. Whitney accepted SideNavigation's role as the persistent destination list
+  inside an application sidebar, including its owned collapse control. Inspected screenshots were
+  discarded after validation.
 - Ticket 13 direct Chromium interaction covers Popover focus entry and restoration, Menu typeahead
   and action dismissal, ContextMenu keyboard activation, rejection of ambiguous triggers,
   warning-free positioning at distinct pointer invocation points, focus restoration after
@@ -256,7 +290,9 @@ See the [decision map](map.md). The next implementation unit is
   underlying border across whole and fractional device-pixel positions; Tooltip retains its neutral
   edge. Chromium additionally covers nested Menu placement, light and dark appearance, locally
   scoped RTL behavior, reduced motion, and forced colors. Whitney accepted the corrected pointer
-  after direct visual review.
+  after direct visual review. A later navigation-family review removed the leading rail from Menu
+  and ContextMenu entries; direct Chromium inspection confirms whole-row highlights, normal content
+  inset, and no rail element or browser errors.
 - Ticket 13 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
   types, 345 focused and regression tests, generated guidance, and public declarations under
   TypeScript 5.9, 6, and 7. `npm run showcase:build`, `npm run verify:package`,
@@ -325,7 +361,7 @@ See the [decision map](map.md). The next implementation unit is
 
 ## Continuation
 
-Continue to Ticket 14 from novel-work delivery with
+Continue to Ticket 15 from novel-work delivery with
 `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py move novel-work delivery implementation`
-and begin the navigation and disclosure slice. Current branch: `master`. Ticket 13 is delivered by
-the commit containing this record.
+and begin the basic data and collection slice. Current branch: `master`. Ticket 14 is delivered by
+the commits containing this record.

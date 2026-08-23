@@ -63,6 +63,14 @@ export {
   tooltipContract,
 } from './overlay.contracts.js';
 export {
+  accordionContract,
+  breadcrumbsContract,
+  disclosureContract,
+  paginationContract,
+  sideNavigationContract,
+  tabsContract,
+} from './navigation.contracts.js';
+export {
   renderAgentIndex,
   renderContractDocumentation,
   renderTypeScriptExamples,
@@ -137,12 +145,22 @@ import {
   popoverContract,
   tooltipContract,
 } from './overlay.contracts.js';
+import {
+  accordionContract,
+  breadcrumbsContract,
+  disclosureContract,
+  paginationContract,
+  sideNavigationContract,
+  tabsContract,
+} from './navigation.contracts.js';
 
 export const componentContracts = [
+  accordionContract,
   alertBannerContract,
   alertDialogContract,
   appearanceProviderContract,
   badgeContract,
+  breadcrumbsContract,
   buttonContract,
   buttonGroupContract,
   checkboxContract,
@@ -154,6 +172,7 @@ export const componentContracts = [
   dateRangePickerContract,
   dividerContract,
   dialogContract,
+  disclosureContract,
   dropZoneContract,
   drawerContract,
   emptyStateContract,
@@ -170,6 +189,7 @@ export const componentContracts = [
   notificationProviderContract,
   numberFieldContract,
   progressBarContract,
+  paginationContract,
   popoverContract,
   rangeSliderContract,
   responsiveGridContract,
@@ -178,6 +198,7 @@ export const componentContracts = [
   searchFieldContract,
   sectionContract,
   selectContract,
+  sideNavigationContract,
   sliderContract,
   skeletonContract,
   spinnerContract,
@@ -186,6 +207,7 @@ export const componentContracts = [
   statusIndicatorContract,
   surfaceContract,
   switchContract,
+  tabsContract,
   textAreaContract,
   textFieldContract,
   timeFieldContract,

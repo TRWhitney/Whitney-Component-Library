@@ -38,10 +38,12 @@ describe('canonical component contracts', () => {
     const exportNames = [
       'AlertBanner',
       'AlertDialog',
+      'Accordion',
       'AppearanceProvider',
       'Badge',
       'Button',
       'ButtonGroup',
+      'Breadcrumbs',
       'Checkbox',
       'CheckboxGroup',
       'ComboBox',
@@ -50,6 +52,7 @@ describe('canonical component contracts', () => {
       'DatePicker',
       'DateRangePicker',
       'Dialog',
+      'Disclosure',
       'Divider',
       'Drawer',
       'DropZone',
@@ -66,6 +69,7 @@ describe('canonical component contracts', () => {
       'Menu',
       'NotificationProvider',
       'NumberField',
+      'Pagination',
       'ProgressBar',
       'Popover',
       'RadioGroup',
@@ -76,6 +80,7 @@ describe('canonical component contracts', () => {
       'Section',
       'SegmentedControl',
       'Select',
+      'SideNavigation',
       'Skeleton',
       'Slider',
       'Spinner',
@@ -83,6 +88,7 @@ describe('canonical component contracts', () => {
       'StatusIndicator',
       'Surface',
       'Switch',
+      'Tabs',
       'TextArea',
       'TextField',
       'TimeField',
@@ -97,6 +103,27 @@ describe('canonical component contracts', () => {
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(
       [...exportNames].sort(),
     );
+  });
+
+  it('distinguishes panel selection, location navigation, and disclosure', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Tabs')?.inappropriateUses.join(' ')).toMatch(
+      /URL.*destination|navigation/i,
+    );
+    expect(contractFor('Breadcrumbs')?.controlBehavior.join(' ')).toMatch(
+      /current page.*collapsed.*destination/i,
+    );
+    expect(contractFor('Pagination')?.composition.join(' ')).toMatch(/getPageHref.*onPageChange/i);
+    expect(contractFor('Disclosure')?.appropriateUses.join(' ')).toMatch(/one optional.*section/i);
+    expect(contractFor('Accordion')?.controlBehavior.join(' ')).toMatch(
+      /single.*multiple.*controlled.*uncontrolled/i,
+    );
+    expect(contractFor('SideNavigation')?.inappropriateUses.join(' ')).toMatch(
+      /commands.*router|routing/i,
+    );
+    expect(contractFor('SideNavigation')?.name).toBe('SideNavigation');
   });
 
   it('distinguishes ordinary dialogs, consequential confirmations, and drawers', () => {

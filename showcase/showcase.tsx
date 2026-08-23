@@ -2,6 +2,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type MouseEvent,
   type PointerEvent,
   type ReactNode,
 } from 'react';
@@ -9,10 +10,12 @@ import {
 import {
   AlertBanner,
   AlertDialog,
+  Accordion,
   AppearanceProvider,
   Badge,
   Button,
   ButtonGroup,
+  Breadcrumbs,
   Checkbox,
   CheckboxGroup,
   ComboBox,
@@ -22,6 +25,7 @@ import {
   DateRangePicker,
   Dialog,
   Divider,
+  Disclosure,
   DropZone,
   Drawer,
   EmptyState,
@@ -37,6 +41,7 @@ import {
   Menu,
   NotificationProvider,
   NumberField,
+  Pagination,
   ProgressBar,
   Popover,
   RangeSlider,
@@ -46,6 +51,7 @@ import {
   SearchField,
   Section,
   Select,
+  SideNavigation,
   Slider,
   Skeleton,
   Spinner,
@@ -54,6 +60,7 @@ import {
   SegmentedControl,
   Surface,
   Switch,
+  Tabs,
   TextArea,
   TextField,
   TimeField,
@@ -62,6 +69,7 @@ import {
   Tooltip,
   type AccentColor,
   type Appearance,
+  type BreadcrumbItems,
   type DrawerPlacement,
   type FieldControlProps,
   type FileAcquisitionResult,
@@ -69,6 +77,55 @@ import {
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
 
 const defaultAccent: AccentColor = '#2878ff';
+const workspaceBreadcrumb = {href: '#workspace', id: 'workspace', label: 'Workspace'} as const;
+const studiesBreadcrumb = {
+  href: '#thermal-studies',
+  id: 'studies',
+  label: 'Thermal studies',
+} as const;
+const historyBreadcrumb = {href: '#run-history', id: 'runs', label: 'Run history'} as const;
+const runBreadcrumb = {href: '#breadcrumb-current', id: 'run', label: 'RUN 0284'} as const;
+type BreadcrumbShowcaseLocation = 'workspace' | 'studies' | 'runs' | 'run';
+const breadcrumbShowcasePaths = {
+  workspace: [workspaceBreadcrumb],
+  studies: [workspaceBreadcrumb, studiesBreadcrumb],
+  runs: [workspaceBreadcrumb, studiesBreadcrumb, historyBreadcrumb],
+  run: [workspaceBreadcrumb, studiesBreadcrumb, historyBreadcrumb, runBreadcrumb],
+} as const satisfies Record<BreadcrumbShowcaseLocation, BreadcrumbItems>;
+const breadcrumbLocationByHref = {
+  '#breadcrumb-current': 'run',
+  '#run-history': 'runs',
+  '#thermal-studies': 'studies',
+  '#workspace': 'workspace',
+} as const satisfies Record<string, BreadcrumbShowcaseLocation>;
+const breadcrumbShowcasePages = {
+  workspace: {
+    description: 'Browse the thermal studies available in this workspace.',
+    next: studiesBreadcrumb,
+    title: 'Workspace',
+  },
+  studies: {
+    description: 'Review the run history for this thermal study.',
+    next: historyBreadcrumb,
+    title: 'Thermal studies',
+  },
+  runs: {
+    description: 'Open the latest completed run in this history.',
+    next: runBreadcrumb,
+    title: 'Run history',
+  },
+  run: {
+    description: 'RUN 0284 converged after 18 boundary passes.',
+    title: 'RUN 0284',
+  },
+} as const satisfies Record<
+  BreadcrumbShowcaseLocation,
+  {
+    readonly description: string;
+    readonly next?: (typeof breadcrumbShowcasePaths.run)[number];
+    readonly title: string;
+  }
+>;
 const runModeOptions = [
   {label: 'Conservative', value: 'conservative'},
   {description: 'Balances precision and solve time.', label: 'Balanced', value: 'balanced'},
@@ -464,6 +521,162 @@ function ActionSpecimens() {
         </Example>
       </Specimen>
     </>
+  );
+}
+
+function NavigationSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Select one peer content panel without changing location. Tabs owns arrow movement, activation policy, and panel relationships; use route links for destinations."
+        name="Tabs"
+      >
+        <Tabs
+          activationMode="manual"
+          ariaLabel="Run details"
+          defaultSelectedId="summary"
+          items={[
+            {
+              id: 'summary',
+              label: 'Summary',
+              panel: <p>RUN 0284 converged after 18 boundary passes.</p>,
+            },
+            {
+              id: 'inputs',
+              label: 'Inputs',
+              panel: <p>The balanced profile uses 25 available boundary passes.</p>,
+            },
+            {
+              id: 'history',
+              label: 'History',
+              panel: <p>Three prior result revisions remain available.</p>,
+            },
+          ]}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Expose the current page within a hierarchy. A long path keeps its root and current location visible while an ellipsis opens collapsed ancestors without moving page content."
+        name="Breadcrumbs"
+      >
+        <BreadcrumbShowcase />
+      </Specimen>
+
+      <Specimen
+        description="Move through a finite numbered result collection. The current page, first and last pages, neighboring pages, and both direction controls remain explicit."
+        name="Pagination"
+      >
+        <Pagination
+          ariaLabel="Run result pages"
+          currentPage={8}
+          getPageHref={(page) => `#run-page-${page}`}
+          getPageLabel={(_page, formattedPage) => `Page ${formattedPage}`}
+          locale="en-US"
+          nextLabel="Next result page"
+          pageCount={20}
+          previousLabel="Previous result page"
+        />
+      </Specimen>
+
+      <Specimen
+        description="Toggle one optional supporting section under a real heading. Required instructions and primary actions should stay visible."
+        name="Disclosure"
+      >
+        <Disclosure defaultExpanded headingLevel={3} title="Advanced solver settings">
+          <p>Iteration tolerance is 0.0001 with a 400-step limit.</p>
+        </Disclosure>
+      </Specimen>
+
+      <Specimen
+        description="Coordinate related optional sections with single or multiple expansion. Each item keeps its own heading, trigger, disabled state, and labeled panel."
+        name="Accordion"
+      >
+        <Accordion
+          ariaLabel="Run configuration"
+          defaultExpandedIds={['geometry']}
+          expansionMode="single"
+          items={[
+            {
+              content: <p>Mesh scale and north-wall boundary conditions.</p>,
+              id: 'geometry',
+              title: 'Geometry',
+            },
+            {
+              content: <p>Balanced precision with 25 boundary passes.</p>,
+              id: 'solver',
+              title: 'Solver',
+            },
+            {
+              content: <p>Archived output settings are unavailable.</p>,
+              id: 'output',
+              isDisabled: true,
+              title: 'Output',
+            },
+          ]}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Navigate grouped application destinations without coupling the library to a router. The current link, hierarchy, URL, and compact collapse state remain explicit."
+        name="SideNavigation"
+      >
+        <SideNavigation
+          ariaLabel="Workspace navigation"
+          collapseLabel="Collapse workspace navigation"
+          currentId="active-runs"
+          expandLabel="Expand workspace navigation"
+          groups={[
+            {
+              id: 'workspace',
+              items: [
+                {href: '#overview', id: 'overview', label: 'Overview'},
+                {
+                  children: [
+                    {href: '#active-runs', id: 'active-runs', label: 'Active runs'},
+                    {href: '#run-history', id: 'run-history', label: 'Run history'},
+                  ],
+                  href: '#runs',
+                  id: 'runs',
+                  label: 'Runs',
+                },
+              ],
+              label: 'Workspace',
+            },
+          ]}
+        />
+      </Specimen>
+    </>
+  );
+}
+
+function BreadcrumbShowcase() {
+  const [currentLocation, setCurrentLocation] = useState<BreadcrumbShowcaseLocation>('run');
+  const page = breadcrumbShowcasePages[currentLocation];
+
+  function navigateToAncestor(event: MouseEvent<HTMLDivElement>) {
+    if (!(event.target instanceof Element)) return;
+    const link = event.target.closest<HTMLAnchorElement>('a[href]');
+    if (!link) return;
+
+    const href = link.getAttribute('href');
+    if (href && href in breadcrumbLocationByHref) {
+      setCurrentLocation(breadcrumbLocationByHref[href as keyof typeof breadcrumbLocationByHref]);
+    }
+  }
+
+  return (
+    <div data-showcase-breadcrumb-route="" onClickCapture={navigateToAncestor}>
+      <Breadcrumbs
+        ariaLabel="Run location"
+        items={breadcrumbShowcasePaths[currentLocation]}
+        maxVisible={3}
+      />
+      <div data-showcase-breadcrumb-page="">
+        <strong>{page.title}</strong>
+        <p>{page.description}</p>
+        {'next' in page ? <Link href={page.next.href}>{page.next.label}</Link> : null}
+      </div>
+    </div>
   );
 }
 
@@ -1574,6 +1787,14 @@ export function Showcase() {
                 <h2 id="actions-heading">Run commands, navigate, and retain state</h2>
               </header>
               <ActionSpecimens />
+            </section>
+
+            <section aria-labelledby="navigation-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Navigation and disclosure</span>
+                <h2 id="navigation-heading">Move through locations and reveal related content</h2>
+              </header>
+              <NavigationSpecimens />
             </section>
 
             <section aria-labelledby="fields-heading" className="showcase-family">

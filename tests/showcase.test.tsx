@@ -91,6 +91,56 @@ describe('component showcase', () => {
     expect(getByText('Unselected ToggleButton')).toBeTruthy();
   });
 
+  it('demonstrates selection, overflow, expansion, and collapse in the navigation family', () => {
+    const {container} = render(<Showcase />);
+
+    const tabs = container.querySelector('[data-showcase-component="Tabs"]');
+    const inputsTab = within(tabs as HTMLElement).getByRole('tab', {name: 'Inputs'});
+    fireEvent.click(inputsTab);
+    expect(within(tabs as HTMLElement).getByRole('tabpanel').textContent).toMatch(
+      /balanced profile/i,
+    );
+
+    const breadcrumbs = container.querySelector('[data-showcase-component="Breadcrumbs"]');
+    fireEvent.click(
+      within(breadcrumbs as HTMLElement).getByRole('button', {name: 'More locations'}),
+    );
+    const overflow = screen.getByRole('dialog', {name: 'More locations'});
+    fireEvent.click(within(overflow).getByRole('link', {name: 'Thermal studies'}));
+    expect(breadcrumbs?.querySelector('[aria-current="page"]')?.textContent).toBe(
+      'Thermal studies',
+    );
+    const breadcrumbNavigation = within(breadcrumbs as HTMLElement).getByRole('navigation', {
+      name: 'Run location',
+    });
+    expect(within(breadcrumbNavigation).queryByText('Run history')).toBeNull();
+    expect(within(breadcrumbNavigation).queryByText('RUN 0284')).toBeNull();
+    fireEvent.click(within(breadcrumbs as HTMLElement).getByRole('link', {name: 'Run history'}));
+    expect(breadcrumbs?.querySelector('[aria-current="page"]')?.textContent).toBe('Run history');
+    fireEvent.click(within(breadcrumbs as HTMLElement).getByRole('link', {name: 'Workspace'}));
+    expect(breadcrumbs?.querySelector('[aria-current="page"]')?.textContent).toBe('Workspace');
+    expect(
+      within(breadcrumbs as HTMLElement).getByRole('link', {name: 'Thermal studies'}),
+    ).toBeTruthy();
+
+    const accordion = container.querySelector('[data-showcase-component="Accordion"]');
+    fireEvent.click(within(accordion as HTMLElement).getByRole('button', {name: 'Solver'}));
+    expect(within(accordion as HTMLElement).getByRole('region', {name: 'Solver'})).toBeTruthy();
+
+    const sideNavigation = container.querySelector('[data-showcase-component="SideNavigation"]');
+    fireEvent.click(
+      within(sideNavigation as HTMLElement).getByRole('button', {
+        name: 'Collapse workspace navigation',
+      }),
+    );
+    expect(within(sideNavigation as HTMLElement).queryByRole('link')).toBeNull();
+    expect(
+      within(sideNavigation as HTMLElement).getByRole('button', {
+        name: 'Expand workspace navigation',
+      }),
+    ).toBeTruthy();
+  });
+
   it('demonstrates every notification variant with separate controls without moving focus', () => {
     const {getByRole, getByText} = render(<Showcase />);
     const generalTrigger = getByRole('button', {name: 'Show general notification'});
