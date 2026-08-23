@@ -188,6 +188,9 @@ export const timeFieldContract = {
 
 export const datePickerContract = {
   ...dateFieldContract,
+  accentBehavior: [
+    'Editable content and calendar text stay neutral. Focus, today, and selected dates use accent colors. An invalid field keeps danger color on its boundary and focused segments while calendar-cell hover remains accent.',
+  ],
   accessibility: [
     'DatePicker combines labeled segmented entry with a named calendar button. Its fixed-height calendar exposes day, month, year, decade, and broader period grids with named navigation, spatial keyboard movement, announcements, focus restoration, and dismissal.',
   ],

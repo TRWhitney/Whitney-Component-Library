@@ -572,7 +572,7 @@ describe('static appearance styles', () => {
     }
     expect(calendarRail).toContain('background: var(--wcl-accent-rail-on-raised)');
     expect(styles).not.toMatch(/\[data-wcl-calendar-cell\]\[data-invalid\]\s*\{[^}]*box-shadow/);
-    expect(styles).toMatch(
+    expect(styles).not.toMatch(
       /\[data-wcl-calendar-cell\]\[data-selected\]\[data-invalid\]::before\s*\{[^}]*background:\s*var\(--wcl-danger\)/,
     );
     expect(styles).toMatch(/\[data-wcl-calendar-cell\]\[data-today\]::after\s*\{/);
@@ -817,6 +817,45 @@ describe('static appearance styles', () => {
     expect(invalidChoiceHover).toContain('outline-width: 2px');
     expect(invalidFieldHover).toContain('box-shadow: inset 0 0 0 1px var(--wcl-danger)');
     expect(forcedInvalidFieldHover).toContain('outline-width: 3px');
+  });
+
+  it('keeps invalid hover and date-segment emphasis in the danger family', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const invalidChoiceHover = styles.match(
+      /:is\(\[data-wcl-choice-group\], \[data-wcl-choice-field\]\)\[data-invalid\]:not\(\[data-disabled\]\)\s+\[data-wcl-choice-control\]\[data-hovered\]:not\(\[data-disabled\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const invalidDropZoneHover = styles.match(
+      /\[data-wcl-drop-zone\]\[data-invalid\]\[data-hovered\]:where\(:not\(\[data-disabled\]\)\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const invalidDateSegment = styles.match(
+      /\[data-wcl-date-picker\]\[data-invalid\]\s+\[data-wcl-date-segment\]\[data-focused\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const invalidDateSegmentRail = styles.match(
+      /\[data-wcl-date-picker\]\[data-invalid\]\s+\[data-wcl-date-segment\]\[data-focused\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+    const invalidDateSegmentFocus = styles.match(
+      /\[data-wcl-date-picker\]\[data-invalid\]\s+\[data-wcl-date-segment\]\[data-focus-visible\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(invalidChoiceHover).toContain('background: var(--wcl-danger-surface)');
+    expect(invalidChoiceHover).toContain('color: var(--wcl-text)');
+    expect(invalidDropZoneHover).toContain('var(--wcl-danger-surface)');
+    expect(invalidDropZoneHover).not.toContain('var(--wcl-accent-soft)');
+    expect(invalidDateSegment).toContain('background: var(--wcl-danger-surface)');
+    expect(invalidDateSegmentRail).toContain('background: var(--wcl-danger)');
+    expect(invalidDateSegmentFocus).toContain('outline-color: var(--wcl-danger)');
+    expect(styles).not.toMatch(
+      /\[data-wcl-calendar-cell\]\[data-hovered\][^{]*\{[^}]*var\(--wcl-danger(?:-surface)?\)/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-date-picker\]\[data-invalid\]\s+\[data-wcl-date-segment\]\[data-focused\]\s*\{[^}]*background:\s*Canvas/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-date-picker\]\[data-invalid\]\s+\[data-wcl-date-segment\]\[data-focused\]::after\s*\{[^}]*background:\s*Highlight/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-date-picker\]\[data-invalid\]\s+\[data-wcl-date-segment\]\[data-focus-visible\]\s*\{[^}]*outline-color:\s*Highlight/,
+    );
   });
 
   it('keeps choice support stable and derives accents for subtle choice surfaces', async () => {

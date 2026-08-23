@@ -577,7 +577,7 @@ function ChoiceSpecimens() {
   return (
     <>
       <Specimen
-        description="Include one optional value or acknowledge one condition. Use CheckboxGroup for related multi-select options and Switch for an immediately applied setting. Indeterminate reports mixed child state rather than a third value."
+        description="Include one optional value or acknowledge one condition. Use CheckboxGroup for related multi-select options and Switch for an immediately applied setting. Indeterminate reports mixed child state rather than a third value, while invalid hover stays in the danger family."
         name="Checkbox"
       >
         <InlineGroup align="start" gap="regular" wrap>
@@ -840,7 +840,7 @@ function DateTimeSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Enter a date through segments or choose it from a fixed six-week calendar. Use DateField when the calendar adds no value. Select the month or year heading for long-distance navigation."
+        description="Enter a date through segments or choose it from a fixed six-week calendar. Invalid segment focus uses danger emphasis without changing valid calendar-day hover. Use DateField when the calendar adds no value. Select the month or year heading for long-distance navigation."
         name="DatePicker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -951,7 +951,7 @@ function FileSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Use a large acquisition target when drag, focused paste, and browsing should all work. Use FileTrigger for a compact button-only flow. The file icon moves only while the target is enabled."
+        description="Use a large acquisition target when drag, focused paste, and browsing should all work. Use FileTrigger for a compact button-only flow. The file icon moves only while the target is enabled, and invalid hover stays in the danger family."
         name="DropZone"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">

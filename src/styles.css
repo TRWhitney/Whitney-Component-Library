@@ -844,6 +844,18 @@
     outline-offset: 1px;
   }
 
+  [data-wcl-date-picker][data-invalid] [data-wcl-date-segment][data-focused] {
+    background: var(--wcl-danger-surface);
+  }
+
+  [data-wcl-date-picker][data-invalid] [data-wcl-date-segment][data-focused]::after {
+    background: var(--wcl-danger);
+  }
+
+  [data-wcl-date-picker][data-invalid] [data-wcl-date-segment][data-focus-visible] {
+    outline-color: var(--wcl-danger);
+  }
+
   [data-wcl-date-picker-control] {
     display: flex;
     align-items: stretch;
@@ -1283,10 +1295,6 @@
 
   [data-wcl-calendar-cell][data-outside-visible-range]:not([data-outside-month]) {
     visibility: hidden;
-  }
-
-  [data-wcl-calendar-cell][data-selected][data-invalid]::before {
-    background: var(--wcl-danger);
   }
 
   [data-wcl-range-field] {
@@ -1897,6 +1905,8 @@
 
   :is([data-wcl-choice-group], [data-wcl-choice-field])[data-invalid]:not([data-disabled])
     [data-wcl-choice-control][data-hovered]:not([data-disabled]) {
+    background: var(--wcl-danger-surface);
+    color: var(--wcl-text);
     outline-width: 2px;
   }
 
@@ -2334,6 +2344,10 @@
   [data-wcl-drop-zone][data-invalid] {
     border-color: var(--wcl-danger);
     border-style: dotted;
+  }
+
+  [data-wcl-drop-zone][data-invalid][data-hovered]:where(:not([data-disabled])) {
+    background: color-mix(in srgb, var(--wcl-danger-surface) 35%, var(--wcl-surface-subtle));
   }
 
   [data-wcl-drop-zone][data-rejected] {
@@ -4540,10 +4554,22 @@
       forced-color-adjust: none;
     }
 
+    [data-wcl-date-picker][data-invalid] [data-wcl-date-segment][data-focused] {
+      background: Canvas;
+    }
+
+    [data-wcl-date-picker][data-invalid] [data-wcl-date-segment][data-focused]::after {
+      background: Highlight;
+    }
+
     [data-wcl-date-segment][data-focus-visible],
     [data-wcl-calendar-trigger][data-focus-visible],
     [data-wcl-calendar-navigation][data-focus-visible],
     [data-wcl-calendar-cell][data-focus-visible] {
+      outline-color: Highlight;
+    }
+
+    [data-wcl-date-picker][data-invalid] [data-wcl-date-segment][data-focus-visible] {
       outline-color: Highlight;
     }
 

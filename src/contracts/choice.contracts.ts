@@ -3,7 +3,7 @@ import type {ComponentContract} from './component-contract.js';
 const choiceAccentBehavior =
   'Labels stay neutral. Selection indicators, focus outlines, and the segmented rail use the exact accent or a more saturated version of the same hue.';
 const invalidChoiceAccentBehavior = [
-  `${choiceAccentBehavior} Invalid controls use a thin danger outline that thickens on enabled hover.`,
+  `${choiceAccentBehavior} Invalid controls use a thin danger outline that thickens over a danger surface on enabled hover.`,
 ];
 
 const commonChoiceGuidance = {

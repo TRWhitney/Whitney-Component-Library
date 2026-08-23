@@ -56,7 +56,7 @@ DatePicker collects one civil date through synchronized direct entry and calenda
 
 ## Accent, forced colors, and reduced motion
 
-- Editable content and calendar text stay neutral. Focus, today, the selected range, and its endpoints use accent colors. Invalid fields retain their danger boundary and thicken it on enabled hover.
+- Editable content and calendar text stay neutral. Focus, today, and selected dates use accent colors. An invalid field keeps danger color on its boundary and focused segments while calendar-cell hover remains accent.
 - Forced colors use system colors for fields, segment focus, calendar borders, unavailable dates, today, selected ranges, and endpoints.
 - Reduced motion removes the short popover transition; segment edits and month changes never use positional animation.
 
