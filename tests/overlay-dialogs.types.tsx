@@ -111,6 +111,31 @@ export const physicalDrawerPlacement = (
   </Drawer>
 );
 
+export const expandedDrawerPlacements = (
+  <>
+    <Drawer
+      closeLabel="Close top drawer"
+      description="Inspect activity from above."
+      dragHandleLabel="Extend activity drawer"
+      placement="top"
+      title="Activity"
+      trigger={<Button>Open activity</Button>}
+    >
+      <p>Activity content</p>
+    </Drawer>
+    <Drawer
+      closeLabel="Close bottom drawer"
+      description="Inspect output from below."
+      dockedPreview={<span>RUN 0284</span>}
+      placement="bottom"
+      title="Output"
+      trigger={<Button>Open output</Button>}
+    >
+      <p>Output content</p>
+    </Drawer>
+  </>
+);
+
 export const styledDialog = (
   <Dialog
     // @ts-expect-error Dialog does not accept consumer class injection.

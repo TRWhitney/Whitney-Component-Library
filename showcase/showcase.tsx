@@ -58,6 +58,7 @@ import {
   Toolbar,
   type AccentColor,
   type Appearance,
+  type DrawerPlacement,
   type FieldControlProps,
   type FileAcquisitionResult,
 } from '../src/index.js';
@@ -73,6 +74,17 @@ const densityOptions = [
   {label: 'Conservative', value: 'conservative'},
   {label: 'Balanced', value: 'balanced'},
   {label: 'Fast', value: 'fast'},
+] as const;
+const drawerPlacementOptions = [
+  {label: 'Start', value: 'start'},
+  {label: 'End', value: 'end'},
+  {label: 'Top', value: 'top'},
+  {label: 'Bottom', value: 'bottom'},
+] as const;
+const drawerDockOptions = [
+  {label: 'None', value: 'none'},
+  {label: 'Grip only', value: 'grip'},
+  {label: 'Preview strip', value: 'preview'},
 ] as const;
 
 interface SpecimenProps {
@@ -1252,40 +1264,59 @@ function OverlaySpecimens() {
       </Specimen>
 
       <Specimen
-        description="Open supplemental work from a logical viewport edge. Start and end follow writing direction, and the panel becomes full-screen at compact widths."
+        description="Open supplemental work from any viewport edge. A grip can extend the panel directly, while an optional preview strip reserves space instead of covering the page."
         name="Drawer"
       >
-        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
-          <Example label="Start-edge Drawer">
-            <Drawer
-              actions={({close}) => <Button onPress={close}>Apply filters</Button>}
-              closeLabel="Close run filters"
-              description="Limit the visible run history without leaving the current page."
-              placement="start"
-              title="Run filters"
-              trigger={<Button variant="secondary">Filter runs</Button>}
-            >
-              <p>Choose the statuses and profiles included in the run list.</p>
-            </Drawer>
-          </Example>
-          <Example label="End-edge Drawer">
-            <Drawer
-              actions={({close}) => <Button onPress={close}>Done</Button>}
-              closeLabel="Close result inspector"
-              description="Review solver output without leaving the run list."
-              placement="end"
-              title="Result inspector"
-              trigger={<Button>Inspect result</Button>}
-            >
-              <Stack gap="regular">
-                <StatusIndicator label="Stable" tone="success" />
-                <p>RUN 0284 converged after 18 of 25 available boundary passes.</p>
-              </Stack>
-            </Drawer>
-          </Example>
-        </ResponsiveGrid>
+        <DrawerShowcase />
       </Specimen>
     </>
+  );
+}
+
+function DrawerShowcase() {
+  const [placement, setPlacement] = useState<DrawerPlacement>('end');
+  const [dock, setDock] = useState<'none' | 'grip' | 'preview'>('none');
+  const [hasHandle, setHasHandle] = useState(true);
+
+  return (
+    <Stack gap="relaxed">
+      <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+        <SegmentedControl
+          label="Drawer placement"
+          onChange={setPlacement}
+          options={drawerPlacementOptions}
+          value={placement}
+        />
+        <SegmentedControl
+          label="Dock behavior"
+          onChange={setDock}
+          options={drawerDockOptions}
+          value={dock}
+        />
+      </ResponsiveGrid>
+      <InlineGroup align="start" gap="regular" wrap>
+        {dock === 'preview' ? (
+          <Switch isSelected={hasHandle} label="Show drag handle" onChange={setHasHandle} />
+        ) : null}
+        <Drawer
+          actions={({close}) => <Button onPress={close}>Done</Button>}
+          closeLabel="Close result inspector"
+          description="Review solver output without leaving the run list."
+          placement={placement}
+          title="Result inspector"
+          trigger={<Button>Inspect active run</Button>}
+          {...(dock === 'preview' ? {dockedPreview: <span>RUN 0284 · Stable</span>} : {})}
+          {...(dock === 'grip' || (dock === 'preview' && hasHandle)
+            ? {dragHandleLabel: 'Move result inspector'}
+            : {})}
+        >
+          <Stack gap="regular">
+            <StatusIndicator label="Stable" tone="success" />
+            <p>RUN 0284 converged after 18 of 25 available boundary passes.</p>
+          </Stack>
+        </Drawer>
+      </InlineGroup>
+    </Stack>
   );
 }
 

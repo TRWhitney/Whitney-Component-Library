@@ -218,14 +218,16 @@ export const alertDialogContract = {
 export const drawerContract = {
   ...commonOverlayGuidance,
   appearance: [
-    'Drawer is a raised panel attached to a logical viewport edge, with its accent threshold rail on the content-facing edge and a dimmed underlay behind it.',
+    'Drawer is a raised panel attached to a viewport edge, with a short faded accent seam on the content-facing edge and a dimmed underlay behind it.',
+    'A drag handle continues the straight seam through a shallow tapered grip; a docked preview uses the same surface and edge treatment rather than appearing as a separate control.',
   ],
   appropriateUses: [
     'a supplemental workflow or larger focused task should open from a logical viewport edge while retaining the current page context',
   ],
   composition: [
     'Render inside AppearanceProvider so the panel, threshold, text, and focus treatment share the active theme and application accent.',
-    'Pass exactly one Button or IconButton trigger, title, description, closeLabel, optional body and actions, and choose logical placement start or end.',
+    'Pass exactly one Button or IconButton trigger, title, description, closeLabel, optional body and actions, and choose placement start, end, top, or bottom.',
+    'Pass dragHandleLabel to add an accessible grip that can extend the drawer from its docked edge. Pass dockedPreview for a noninteractive preview that remains visible and reserves page space while docked.',
     'Use nested overlays sparingly and keep each trigger mounted so focus can return through the overlay stack.',
   ],
   contentRules: [
@@ -233,6 +235,8 @@ export const drawerContract = {
   ],
   controlBehavior: [
     'Drawer supports controlled isOpen with onOpenChange or uncontrolled defaultOpen. Backdrop press, Escape, the close button, and an action calling close dismiss it.',
+    'When dragHandleLabel is present, pressing the grip toggles the drawer and dragging it toward the page opens it after the distance or velocity threshold. Dragging back toward its edge docks it.',
+    'dockedPreview is presentational and does not replace the trigger or drag handle. Its reserved provider space remains stable while the drawer opens, preventing covered content and layout jumps.',
   ],
   counterExamples: [
     {
@@ -246,7 +250,7 @@ export const drawerContract = {
     },
   ],
   directionality: [
-    'placement uses logical start and end: start maps to the left in left-to-right contexts and right in right-to-left contexts, with end mapping oppositely.',
+    'placement uses logical start and end: start maps to the left in left-to-right contexts and right in right-to-left contexts, with end mapping oppositely. Top and bottom are physical block edges in either direction.',
   ],
   events: [
     'onOpenChange reports every open-state transition; action content owns domain events and calls the provided close function when the task should end.',
@@ -260,10 +264,19 @@ export const drawerContract = {
       description: 'Open supplemental detail from the logical end edge and preserve page context.',
       title: 'Supplemental inspector',
     },
+    {
+      code: inProvider(
+        'DockedRunInspectorDrawer',
+        '<Drawer\n  closeLabel="Close run inspector"\n  description="Inspect solver inputs without leaving the run list."\n  dockedPreview={<span>RUN 0284 · Stable</span>}\n  dragHandleLabel="Move run inspector"\n  placement="end"\n  title="Run inspector"\n  trigger={<Button>Inspect run</Button>}\n>\n  <p>RUN 0284 is ready for review.</p>\n</Drawer>',
+      ),
+      description:
+        'Reserve an edge preview and let the user click, drag, or use the keyboard grip to extend the same drawer surface.',
+      title: 'Docked inspector with preview',
+    },
   ],
   exportName: 'Drawer',
   forcedColorBehavior: [
-    'Forced colors preserve the panel boundary, content-facing threshold, text, close control, and action focus indicators with system colors.',
+    'Forced colors preserve the panel boundary, content-facing seam, grip outline and marks, text, close control, and action focus indicators with system colors.',
   ],
   importPath: '.',
   inappropriateUses: [
@@ -271,14 +284,16 @@ export const drawerContract = {
   ],
   keyboardBehavior: [
     'Opening places focus on the close control, Tab and Shift+Tab remain inside, Escape dismisses, and focus returns to the trigger.',
+    'A drag handle supports Enter or Space to toggle, Home to dock, End to open fully, and placement-relative arrow keys to move in ten-percent steps.',
   ],
   kind: 'component',
   labeling: [
     'title and description are required visible strings. closeLabel names the icon-only close control, and placement never substitutes for a meaningful title.',
+    'dragHandleLabel is required whenever the optional grip is rendered and should name the drawer it moves. dockedPreview is hidden from assistive technology and must not contain interactive or essential content.',
   ],
   name: 'Drawer',
   parts: [
-    'Drawer includes its trigger, underlay, edge-attached dialog surface, title, description, close control, optional scrolling body, and optional action area.',
+    'Drawer includes its trigger, underlay, edge-attached dialog surface, title, description, close control, optional scrolling body and action area, optional drag handle, and optional docked preview.',
   ],
   preferredAlternatives: [
     'Use Dialog for a compact centered task, AlertDialog for consequential confirmation, a page-level navigation region for persistent navigation, or a route for primary work.',
@@ -294,9 +309,12 @@ export const drawerContract = {
   relatedExports: ['AlertDialog', 'AppearanceProvider', 'Button', 'Dialog'],
   responsiveBehavior: [
     'At compact widths Drawer becomes a full-screen visual-viewport surface; at larger widths it remains edge-attached with a bounded inline size. Edge motion stays clipped to the viewport without introducing horizontal scrolling.',
+    'A docked preview reserves 88 pixels at a logical inline edge or 70 pixels at a block edge through AppearanceProvider, so ordinary application content reflows instead of sitting underneath it.',
+    'AppearanceProvider publishes the current physical reservation as --wcl-drawer-reserved-left, --wcl-drawer-reserved-right, --wcl-drawer-reserved-top, and --wcl-drawer-reserved-bottom. Fixed consumer controls add the relevant value to their inset; NotificationProvider does this automatically.',
   ],
   states: [
-    'Closed and open may be controlled or uncontrolled. placement is logical start or end, and nested overlays retain independent focus boundaries.',
+    'Closed and open may be controlled or uncontrolled. placement is start, end, top, or bottom, and nested overlays retain independent focus boundaries.',
+    'With a handle or preview, the closed drawer remains docked at its edge. Grip-only docking exposes the accent seam; preview docking also exposes the supplied presentational strip.',
   ],
-  summary: 'Open a supplemental workflow from a logical edge and become full-screen when compact.',
+  summary: 'Open or extend a supplemental workflow from any viewport edge.',
 } satisfies ComponentContract;

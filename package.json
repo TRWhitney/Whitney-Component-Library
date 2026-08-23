@@ -51,7 +51,8 @@
   "dependencies": {
     "@internationalized/date": "3.12.3",
     "react-aria": "3.51.0",
-    "react-aria-components": "1.20.0"
+    "react-aria-components": "1.20.0",
+    "react-stately": "3.49.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

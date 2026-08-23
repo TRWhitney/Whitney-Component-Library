@@ -28,7 +28,7 @@ import type {
 const OVERLAY_TRIGGER_ACTIONS = ['button', 'icon-button'] as const;
 const useIsomorphicLayoutEffect = typeof document === 'undefined' ? useEffect : useLayoutEffect;
 
-type OverlayDirection = 'ltr' | 'rtl';
+export type OverlayDirection = 'ltr' | 'rtl';
 
 interface OverlayFrameBaseProps {
   readonly description: string;
@@ -66,7 +66,7 @@ function overlayName(kind: OverlayFrameProps['kind']): string {
   return kind === 'dialog' ? 'Dialog' : 'Drawer';
 }
 
-function OverlayTriggerBoundary({
+export function OverlayTriggerBoundary({
   children,
   kind,
   onDirectionChange,
@@ -145,6 +145,56 @@ function CloseGlyph(): ReactElement {
   );
 }
 
+export function TaskOverlayContent({
+  actions,
+  autoFocusClose = true,
+  children,
+  close,
+  closeLabel,
+  description,
+  descriptionId,
+  title,
+  titleId,
+}: {
+  readonly actions?: (controls: OverlayControls) => ReactNode;
+  readonly autoFocusClose?: boolean;
+  readonly children: ReactNode;
+  readonly close: () => void;
+  readonly closeLabel: string;
+  readonly description: string;
+  readonly descriptionId: string;
+  readonly title: string;
+  readonly titleId: string;
+}): ReactElement {
+  return (
+    <>
+      <header data-wcl-overlay-header="">
+        <div data-wcl-overlay-heading="">
+          <h2 data-wcl-overlay-title="" id={titleId}>
+            {title}
+          </h2>
+          <p data-wcl-overlay-description="" id={descriptionId}>
+            {description}
+          </p>
+        </div>
+        <AriaButton
+          aria-label={closeLabel}
+          autoFocus={autoFocusClose}
+          data-wcl-overlay-close=""
+          onPress={close}
+          type="button"
+        >
+          <CloseGlyph />
+        </AriaButton>
+      </header>
+      <div data-wcl-overlay-body="">{children}</div>
+      {actions === undefined ? null : (
+        <footer data-wcl-overlay-actions="">{actions({close})}</footer>
+      )}
+    </>
+  );
+}
+
 function AlertActions({
   actionKind,
   cancelLabel,
@@ -212,47 +262,43 @@ export function OverlayFrame(props: OverlayFrameProps): ReactElement {
             data-wcl-overlay-dialog=""
             role={isAlert ? 'alertdialog' : 'dialog'}
           >
-            {({close}) => (
-              <>
-                <header data-wcl-overlay-header="">
-                  <div data-wcl-overlay-heading="">
-                    <h2 data-wcl-overlay-title="" id={titleId}>
-                      {props.title}
-                    </h2>
-                    <p data-wcl-overlay-description="" id={descriptionId}>
-                      {props.description}
-                    </p>
-                  </div>
-                  {isAlert ? null : (
-                    <AriaButton
-                      aria-label={props.closeLabel}
-                      autoFocus
-                      data-wcl-overlay-close=""
-                      onPress={close}
-                      type="button"
-                    >
-                      <CloseGlyph />
-                    </AriaButton>
-                  )}
-                </header>
-                {isAlert ? null : <div data-wcl-overlay-body="">{props.children}</div>}
-                {isAlert || props.actions !== undefined ? (
+            {({close}) =>
+              isAlert ? (
+                <>
+                  <header data-wcl-overlay-header="">
+                    <div data-wcl-overlay-heading="">
+                      <h2 data-wcl-overlay-title="" id={titleId}>
+                        {props.title}
+                      </h2>
+                      <p data-wcl-overlay-description="" id={descriptionId}>
+                        {props.description}
+                      </p>
+                    </div>
+                  </header>
                   <footer data-wcl-overlay-actions="">
-                    {isAlert ? (
-                      <AlertActions
-                        actionKind={props.actionKind}
-                        cancelLabel={props.cancelLabel}
-                        close={close}
-                        confirmLabel={props.confirmLabel}
-                        onConfirm={props.onConfirm}
-                      />
-                    ) : (
-                      props.actions?.({close})
-                    )}
+                    <AlertActions
+                      actionKind={props.actionKind}
+                      cancelLabel={props.cancelLabel}
+                      close={close}
+                      confirmLabel={props.confirmLabel}
+                      onConfirm={props.onConfirm}
+                    />
                   </footer>
-                ) : null}
-              </>
-            )}
+                </>
+              ) : (
+                <TaskOverlayContent
+                  close={close}
+                  closeLabel={props.closeLabel}
+                  description={props.description}
+                  descriptionId={descriptionId}
+                  title={props.title}
+                  titleId={titleId}
+                  {...(props.actions === undefined ? {} : {actions: props.actions})}
+                >
+                  {props.children}
+                </TaskOverlayContent>
+              )
+            }
           </AriaDialog>
         </AriaModal>
       </AriaModalOverlay>

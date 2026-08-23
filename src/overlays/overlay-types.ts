@@ -41,9 +41,11 @@ interface AlertDialogBaseProps extends OverlayBaseProps {
 
 export type AlertDialogProps = AlertDialogBaseProps & OverlayOpenStateProps;
 
-export type DrawerPlacement = 'start' | 'end';
+export type DrawerPlacement = 'start' | 'end' | 'top' | 'bottom';
 
 interface DrawerBaseProps extends TaskOverlayProps {
+  readonly dockedPreview?: ReactNode;
+  readonly dragHandleLabel?: string;
   readonly placement?: DrawerPlacement;
 }
 

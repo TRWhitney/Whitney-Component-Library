@@ -162,7 +162,7 @@ describe('static appearance styles', () => {
 
     expect(underlay).toContain('position: fixed');
     expect(underlay).toContain('var(--visual-viewport-height');
-    expect(drawerUnderlay).toContain('overflow-x: hidden');
+    expect(drawerUnderlay).toContain('overflow: hidden');
     expect(modal).toContain('max-block-size: calc(var(--visual-viewport-height');
     expect(header).toContain('max-block-size: calc(var(--visual-viewport-height');
     expect(header).toContain('overflow: auto');
@@ -179,8 +179,44 @@ describe('static appearance styles', () => {
     expect(styles).toMatch(
       /\[data-wcl-overlay\]\[data-kind='drawer'\]\[data-placement='end'\][\s\S]*justify-items:\s*end/,
     );
+    expect(styles).toMatch(
+      /\[data-wcl-overlay\]\[data-kind='drawer'\]\[data-placement='top'\][\s\S]*align-items:\s*start/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-overlay\]\[data-kind='drawer'\]\[data-placement='bottom'\][\s\S]*align-items:\s*end/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-drawer-surface\]::after[\s\S]*mask-image:\s*linear-gradient/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-provider\]:has\([\s\S]*?\[data-physical-placement='left'\][\s\S]*?\[data-wcl-drawer-preview\][\s\S]*?--wcl-drawer-reserved-left/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-provider\]\s*\{[^}]*padding:\s*var\(--wcl-drawer-reserved-top[^;]*var\(--wcl-drawer-reserved-right[^;]*var\(--wcl-drawer-reserved-bottom[^;]*var\(--wcl-drawer-reserved-left/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification-region\]\s*\{[^}]*inline-size:[^;]*--wcl-drawer-reserved-left[^;]*--wcl-drawer-reserved-right[^}]*max-block-size:[^;]*--wcl-drawer-reserved-top[^;]*--wcl-drawer-reserved-bottom/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-notification-region\]:dir\(rtl\)\s*\{[^}]*--wcl-drawer-notification-inline-start:\s*var\(--wcl-drawer-reserved-right[^}]*--wcl-drawer-notification-inline-end:\s*var\(--wcl-drawer-reserved-left/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-drawer-panel\]\[data-physical-placement='left'\]\s+\[data-wcl-drawer-preview\],[\s\S]*?width:\s*var\(--wcl-drawer-preview-extent\);[\s\S]*?height:\s*100%/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-drawer-panel\]\[data-physical-placement='left'\]\s+\[data-wcl-drawer-preview\]\s*\{[^}]*right:\s*0/,
+    );
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-drawer-grip-outline\], \[data-wcl-drawer-grip-marks\]\)\s*\{[^}]*stroke:\s*var\(--wcl-overlay-rail\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-drawer-preview\]\s*\{[^}]*opacity:\s*var\(--wcl-drawer-preview-scale\)[^}]*transition:[^}]*width 220ms[^}]*height 220ms/,
+    );
     expect(compact).toMatch(
       /\[data-wcl-overlay\]\[data-kind='drawer'\][\s\S]*inline-size:\s*100%[\s\S]*border-radius:\s*0/,
+    );
+    expect(compact).toMatch(
+      /\[data-wcl-overlay\]\[data-kind='drawer'\]\s+\[data-wcl-overlay-modal\]\s*\{[^}]*block-size:\s*var\(--visual-viewport-height,\s*100dvh\)\s*!important/,
     );
     expect(reducedMotion).toMatch(
       /\[data-wcl-overlay\],[\s\S]*\[data-wcl-overlay-modal\][\s\S]*animation:\s*none !important/,
@@ -252,14 +288,19 @@ describe('static appearance styles', () => {
     const actionRules = styles.match(
       /:is\(\[data-wcl-button\],\s*\[data-wcl-icon-button\],\s*\[data-wcl-toggle-button\]\)\s*\{([^}]*)\}/,
     )?.[1];
+    const actionInteractionRules = [
+      ...styles.matchAll(
+        /:is\(\[data-wcl-button\],\s*\[data-wcl-icon-button\](?:,\s*\[data-wcl-toggle-button\])?\)[^{]*(?:hovered|pressed)[^{]*\{([^}]*)\}/g,
+      ),
+    ]
+      .map((match) => match[1])
+      .join('\n');
 
     expect(actionRules).toContain('min-block-size: 2.5rem');
     expect(actionRules).toContain('white-space: normal');
     expect(actionRules).toContain('overflow-wrap: anywhere');
     expect(styles).toContain("[data-size='compact']");
-    expect(styles).not.toMatch(
-      /:is\(\[data-wcl-button\][\s\S]*?:hover[\s\S]*?transform:\s*(?:translate|scale)/,
-    );
+    expect(actionInteractionRules).not.toMatch(/transform:\s*(?:translate|scale)/);
   });
 
   it('supports literal primary fills with a conditional surface boundary', async () => {

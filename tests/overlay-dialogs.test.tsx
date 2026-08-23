@@ -205,6 +205,228 @@ describe('dialog and drawer overlays', () => {
     await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
+  it('keeps optional dock content mounted and opens it from the grip', async () => {
+    render(
+      <Overlays>
+        <Drawer
+          closeLabel="Close run inspector"
+          description="Inspect the current solver output."
+          dockedPreview={<span>RUN 0284</span>}
+          dragHandleLabel="Extend run inspector"
+          placement="bottom"
+          title="Run inspector"
+          trigger={<Button>Inspect run</Button>}
+        >
+          <p>Solver output</p>
+        </Drawer>
+      </Overlays>,
+    );
+
+    expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull();
+    const dock = document.querySelector('[data-wcl-drawer-dock]');
+    expect(dock?.getAttribute('data-placement')).toBe('bottom');
+    expect(dock?.querySelector('[data-wcl-drawer-preview]')?.getAttribute('aria-hidden')).toBe(
+      'true',
+    );
+    expect(
+      dock?.querySelector('[data-wcl-overlay-dialog]')?.getAttribute('aria-labelledby'),
+    ).toBeTruthy();
+    const panel = dock?.querySelector('[data-wcl-drawer-panel]');
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 1');
+
+    const handle = screen.getByRole('button', {name: 'Extend run inspector'});
+    const trigger = screen.getByRole('button', {name: 'Inspect run'});
+    handle.focus();
+    fireEvent.click(handle);
+    const openedDrawer = await screen.findByRole('dialog', {name: 'Run inspector'});
+    expect(trigger.getAttribute('aria-controls')).toBe(openedDrawer.id);
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 0');
+
+    const underlay = openedDrawer.closest('[data-wcl-overlay]');
+    if (!underlay) throw new Error('Expected the docked drawer underlay.');
+    fireEvent.pointerDown(underlay, {pointerId: 6});
+    fireEvent.pointerUp(underlay, {pointerId: 6});
+    fireEvent.click(underlay);
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(handle));
+
+    fireEvent.click(handle);
+    await screen.findByRole('dialog', {name: 'Run inspector'});
+    fireEvent.click(handle);
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 1');
+    expect(screen.getByRole('button', {name: 'Extend run inspector'})).toBeTruthy();
+
+    trigger.focus();
+    fireEvent.click(trigger);
+    const drawer = await screen.findByRole('dialog', {name: 'Run inspector'});
+    fireEvent.keyDown(drawer, {key: 'Escape'});
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it('keeps controlled dock motion synchronized with the accepted open state', async () => {
+    const changes = vi.fn();
+    const controlledDrawer = (isOpen: boolean) => (
+      <Overlays>
+        <Drawer
+          closeLabel="Close run inspector"
+          description="Inspect the current solver output."
+          dragHandleLabel="Extend run inspector"
+          isOpen={isOpen}
+          onOpenChange={changes}
+          placement="end"
+          title="Run inspector"
+          trigger={<Button>Inspect run</Button>}
+        >
+          <p>Solver output</p>
+        </Drawer>
+      </Overlays>
+    );
+    const view = render(controlledDrawer(false));
+    const panel = document.querySelector('[data-wcl-drawer-panel]');
+    const handle = screen.getByRole('button', {name: 'Extend run inspector'});
+
+    fireEvent.click(handle);
+    expect(changes).toHaveBeenLastCalledWith(true);
+    expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull();
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 1');
+
+    fireEvent.keyDown(handle, {key: 'End'});
+    expect(changes).toHaveBeenLastCalledWith(true);
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 1');
+    fireEvent.pointerDown(handle, {clientX: 900, clientY: 400, pointerId: 10});
+    fireEvent.pointerUp(window, {clientX: 600, clientY: 400, pointerId: 10});
+    expect(changes).toHaveBeenLastCalledWith(true);
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 1');
+    fireEvent.click(handle);
+
+    view.rerender(controlledDrawer(true));
+    expect(await screen.findByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 0');
+
+    fireEvent.click(screen.getByRole('button', {name: 'Extend run inspector'}));
+    expect(changes).toHaveBeenLastCalledWith(false);
+    expect(screen.getByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 0');
+
+    view.rerender(controlledDrawer(false));
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+    expect(panel?.getAttribute('style')).toContain('--wcl-drawer-preview-scale: 1');
+  });
+
+  it.each([
+    ['start', 'ArrowRight', 'ArrowLeft'],
+    ['end', 'ArrowLeft', 'ArrowRight'],
+    ['top', 'ArrowDown', 'ArrowUp'],
+    ['bottom', 'ArrowUp', 'ArrowDown'],
+  ] as const)(
+    'settles a %s drawer after ten placement-relative arrow steps',
+    async (placement, openKey, dockKey) => {
+      render(
+        <Overlays>
+          <Drawer
+            closeLabel="Close run inspector"
+            description="Inspect the current solver output."
+            dragHandleLabel="Extend run inspector"
+            placement={placement}
+            title="Run inspector"
+            trigger={<Button>Inspect run</Button>}
+          >
+            <p>Solver output</p>
+          </Drawer>
+        </Overlays>,
+      );
+
+      const handle = screen.getByRole('button', {name: 'Extend run inspector'});
+      for (let step = 0; step < 9; step += 1) fireEvent.keyDown(handle, {key: openKey});
+      expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull();
+      fireEvent.keyDown(handle, {key: openKey});
+      expect(await screen.findByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+
+      for (let step = 0; step < 9; step += 1) fireEvent.keyDown(handle, {key: dockKey});
+      expect(screen.getByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+      fireEvent.keyDown(handle, {key: dockKey});
+      await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+    },
+  );
+
+  it('settles pointer drags at the distance and velocity boundaries', async () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(0);
+    render(
+      <Overlays>
+        <Drawer
+          closeLabel="Close run inspector"
+          description="Inspect the current solver output."
+          dragHandleLabel="Extend run inspector"
+          placement="end"
+          title="Run inspector"
+          trigger={<Button>Inspect run</Button>}
+        >
+          <p>Solver output</p>
+        </Drawer>
+      </Overlays>,
+    );
+
+    const handle = screen.getByRole('button', {name: 'Extend run inspector'});
+    fireEvent.pointerDown(handle, {clientX: 900, clientY: 400, pointerId: 11});
+    now.mockReturnValue(1000);
+    fireEvent.pointerUp(window, {clientX: 713, clientY: 400, pointerId: 11});
+    expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull();
+
+    now.mockReturnValue(0);
+    fireEvent.pointerDown(handle, {clientX: 900, clientY: 400, pointerId: 12});
+    now.mockReturnValue(1000);
+    fireEvent.pointerUp(window, {clientX: 712, clientY: 400, pointerId: 12});
+    expect(await screen.findByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+    fireEvent.keyDown(handle, {key: 'Home'});
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+
+    now.mockReturnValue(0);
+    fireEvent.pointerDown(handle, {clientX: 900, clientY: 400, pointerId: 13});
+    now.mockReturnValue(90);
+    fireEvent.pointerUp(window, {clientX: 850, clientY: 400, pointerId: 13});
+    expect(await screen.findByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+    now.mockRestore();
+  });
+
+  it('opens a docked drawer through placement-relative keyboard and pointer input', async () => {
+    render(
+      <Overlays>
+        <Drawer
+          closeLabel="Close run inspector"
+          description="Inspect the current solver output."
+          dragHandleLabel="Extend run inspector"
+          placement="end"
+          title="Run inspector"
+          trigger={<Button>Inspect run</Button>}
+        >
+          <p>Solver output</p>
+        </Drawer>
+      </Overlays>,
+    );
+
+    const handle = screen.getByRole('button', {name: 'Extend run inspector'});
+    fireEvent.keyDown(handle, {key: 'End'});
+    expect(await screen.findByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+    fireEvent.keyDown(handle, {key: 'Home'});
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+
+    fireEvent.pointerDown(handle, {clientX: 900, clientY: 400, pointerId: 7});
+    fireEvent.pointerMove(window, {clientX: 620, clientY: 400, pointerId: 7});
+    fireEvent.pointerUp(window, {clientX: 620, clientY: 400, pointerId: 7});
+    expect(await screen.findByRole('dialog', {name: 'Run inspector'})).toBeTruthy();
+
+    const extendedHandle = screen.getByRole('button', {name: 'Extend run inspector'});
+    const panel = document.querySelector('[data-wcl-drawer-panel]');
+    fireEvent.pointerDown(extendedHandle, {clientX: 620, clientY: 400, pointerId: 8});
+    fireEvent.pointerMove(window, {clientX: 740, clientY: 400, pointerId: 8});
+    expect(panel?.hasAttribute('data-dragging')).toBe(true);
+    expect(panel?.getAttribute('style')).not.toContain('--wcl-drawer-translate-x: 0px');
+    fireEvent.pointerUp(window, {clientX: 900, clientY: 400, pointerId: 8});
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: 'Run inspector'})).toBeNull());
+  });
+
   it('rejects triggers that do not render exactly one library action', async () => {
     const nativeTrigger = render(
       <Overlays>

@@ -103,18 +103,23 @@ describe('component showcase', () => {
     expect(getByRole('region', {name: 'Showcase notifications'})).toBeTruthy();
   });
 
-  it('demonstrates drawers from both logical viewport edges', async () => {
+  it('demonstrates all Drawer placements with no dock, grip, and preview modes', async () => {
     const {container} = render(<Showcase />);
     const specimen = container.querySelector('[data-showcase-component="Drawer"]');
     if (!(specimen instanceof HTMLElement)) throw new Error('The Drawer specimen is missing.');
 
-    const examples = specimen.querySelectorAll('[data-showcase-example-label]');
-    const triggers = within(specimen).getAllByRole('button');
-    expect(examples).toHaveLength(2);
-    expect(triggers).toHaveLength(2);
+    const placementControl = within(specimen).getByRole('radiogroup', {
+      name: 'Drawer placement',
+    });
+    const trigger = within(specimen).getByRole('button', {name: 'Inspect active run'});
 
-    for (const [index, placement] of ['start', 'end'].entries()) {
-      fireEvent.click(triggers[index]!);
+    for (const placement of ['start', 'end', 'top', 'bottom'] as const) {
+      fireEvent.click(
+        within(placementControl).getByRole('radio', {
+          name: placement[0]!.toUpperCase() + placement.slice(1),
+        }),
+      );
+      fireEvent.click(trigger);
       const drawer = await screen.findByRole('dialog');
       expect(drawer.closest('[data-wcl-overlay]')?.getAttribute('data-placement')).toBe(placement);
 
@@ -123,5 +128,30 @@ describe('component showcase', () => {
       fireEvent.click(close);
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     }
+
+    const dockControl = within(specimen).getByRole('radiogroup', {name: 'Dock behavior'});
+    const noDock = within(dockControl).getByRole('radio', {name: 'None'});
+    expect((noDock as HTMLInputElement).checked).toBe(true);
+    expect(document.querySelector('[data-wcl-drawer-dock]')).toBeNull();
+    fireEvent.click(within(dockControl).getByRole('radio', {name: 'Grip only'}));
+    expect(document.querySelector('[data-wcl-drawer-preview]')).toBeNull();
+    expect(screen.getByRole('button', {name: 'Move result inspector'})).toBeTruthy();
+    fireEvent.click(within(dockControl).getByRole('radio', {name: 'Preview strip'}));
+    expect(document.querySelector('[data-wcl-drawer-preview]')).toBeTruthy();
+    const handleSwitch = within(specimen).getByRole('switch', {name: 'Show drag handle'});
+    for (const placement of ['start', 'end', 'top', 'bottom'] as const) {
+      fireEvent.click(
+        within(placementControl).getByRole('radio', {
+          name: placement[0]!.toUpperCase() + placement.slice(1),
+        }),
+      );
+      expect(document.querySelector('[data-wcl-drawer-dock]')?.getAttribute('data-placement')).toBe(
+        placement,
+      );
+      expect(document.querySelector('[data-wcl-drawer-preview]')).toBeTruthy();
+    }
+    fireEvent.click(handleSwitch);
+    expect(screen.queryByRole('button', {name: 'Move result inspector'})).toBeNull();
+    expect(document.querySelector('[data-wcl-drawer-preview]')).toBeTruthy();
   });
 });
