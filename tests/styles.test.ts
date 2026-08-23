@@ -327,7 +327,7 @@ describe('static appearance styles', () => {
     expect(styles).toMatch(
       /\[data-wcl-tooltip\]\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='neutral'\]\s*\{[^}]*stroke:\s*var\(--wcl-border-strong\)/,
     );
-    expect(menuItem).toContain('grid-template-columns: 3px minmax(0, 1fr) auto');
+    expect(menuItem).toContain('grid-template-columns: minmax(0, 1fr) auto');
     expect(styles).toMatch(
       /\[data-wcl-menu-item\]\[data-focused\][\s\S]*var\(--wcl-accent-focus-on-raised\)/,
     );
@@ -343,6 +343,19 @@ describe('static appearance styles', () => {
     expect(forcedColors).toMatch(
       /:is\(\[data-wcl-popover\], \[data-wcl-tooltip\], \[data-wcl-menu-popover\]\)[\s\S]*border-color:\s*CanvasText/,
     );
+  });
+
+  it('uses whole-row menu highlights without a leading state rail', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const menuSource = await readFile('src/overlays/menu.tsx', 'utf8');
+    const hoveredItem = styles.match(/\[data-wcl-menu-item\]\[data-hovered\]\s*\{([^}]*)\}/)?.[1];
+    const focusedItem = styles.match(/\[data-wcl-menu-item\]\[data-focused\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(hoveredItem).toContain('background: var(--wcl-accent-soft-on-raised)');
+    expect(focusedItem).toContain('background: var(--wcl-accent-soft-on-raised)');
+    expect(focusedItem).toContain('box-shadow: inset 0 0 0 2px');
+    expect(menuSource).not.toContain('data-wcl-menu-item-rail');
+    expect(styles).not.toContain('[data-wcl-menu-item-rail]');
   });
 
   it('maps identity and surface roles to system colors in forced-color mode', async () => {

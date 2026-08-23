@@ -40,7 +40,6 @@ function SubmenuChevron(): ReactElement {
 function MenuActionContent({item}: {readonly item: MenuActionItem}): ReactElement {
   return (
     <>
-      <span aria-hidden="true" data-wcl-menu-item-rail="" />
       <span data-wcl-menu-item-copy="">
         <span data-wcl-menu-item-label="">{item.label}</span>
         {item.description ? (
@@ -57,7 +56,6 @@ function MenuActionContent({item}: {readonly item: MenuActionItem}): ReactElemen
 function SubmenuContent({item}: {readonly item: MenuSubmenuItem}): ReactElement {
   return (
     <>
-      <span aria-hidden="true" data-wcl-menu-item-rail="" />
       <span data-wcl-menu-item-copy="">
         <span data-wcl-menu-item-label="">{item.label}</span>
       </span>

@@ -3460,7 +3460,7 @@
   [data-wcl-menu-item] {
     position: relative;
     display: grid;
-    grid-template-columns: 3px minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--wcl-space);
     align-items: center;
     min-block-size: 2.5rem;
@@ -3496,23 +3496,6 @@
     background: var(--wcl-danger-surface);
     box-shadow: inset 0 0 0 2px var(--wcl-danger);
     color: var(--wcl-danger);
-  }
-
-  [data-wcl-menu-item-rail] {
-    align-self: stretch;
-    inline-size: 3px;
-    min-block-size: 1.25rem;
-    border-radius: 99px;
-    background: transparent;
-  }
-
-  [data-wcl-menu-item]:is([data-focused], [data-hovered]) [data-wcl-menu-item-rail] {
-    background: var(--wcl-accent-rail-on-raised);
-  }
-
-  [data-wcl-menu-item][data-tone='danger']:is([data-focused], [data-hovered])
-    [data-wcl-menu-item-rail] {
-    background: var(--wcl-danger);
   }
 
   [data-wcl-menu-item-copy] {
@@ -4761,10 +4744,6 @@
       background: Canvas;
       box-shadow: inset 0 0 0 2px Highlight;
       color: CanvasText;
-    }
-
-    [data-wcl-menu-item]:is([data-focused], [data-hovered]) [data-wcl-menu-item-rail] {
-      background: Highlight;
     }
 
     [data-wcl-context-menu-target]:focus-visible {

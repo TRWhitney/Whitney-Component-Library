@@ -57,7 +57,7 @@ Popover holds short interactive content beside the control that opened it.
 
 ## Accent, forced colors, and reduced motion
 
-- The application accent marks the top threshold, anchor bridge, and focus rail that connect the anchored surface to its trigger. Danger menu actions keep their semantic red treatment.
+- The application accent marks the top threshold and anchor bridge that connect the anchored surface to its trigger. Focused items and controls retain a visible component-specific treatment.
 - Forced colors preserve the surface boundary, arrow, focused item or control, and trigger focus with system colors.
 - Reduced motion removes the short anchored-surface settling transition without changing placement, focus, or dismissal.
 

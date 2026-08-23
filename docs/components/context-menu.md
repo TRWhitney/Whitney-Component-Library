@@ -52,12 +52,12 @@ ContextMenu presents secondary commands for one named object at its invocation p
 
 ## Appearance and responsive behavior
 
-- ContextMenu uses the same compact command surface and focus rail as Menu, anchored to the invocation point.
+- ContextMenu uses the same compact command surface and whole-row item highlights as Menu, anchored to the invocation point.
 - The surface flips when its requested side lacks room, stays inside the visual viewport, and scrolls its own content when available height is limited.
 
 ## Accent, forced colors, and reduced motion
 
-- The application accent marks the top threshold, anchor bridge, and focus rail that connect the anchored surface to its trigger. Danger menu actions keep their semantic red treatment.
+- The application accent marks the top threshold and anchor bridge that connect the anchored surface to its trigger. Focused items and controls retain a visible component-specific treatment.
 - Forced colors preserve the surface boundary, arrow, focused item or control, and trigger focus with system colors.
 - Reduced motion removes the short anchored-surface settling transition without changing placement, focus, or dismissal.
 

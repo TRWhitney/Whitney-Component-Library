@@ -321,7 +321,7 @@ export const drawerContract = {
 
 const commonAnchoredGuidance = {
   accentBehavior: [
-    'The application accent marks the top threshold, anchor bridge, and focus rail that connect the anchored surface to its trigger. Danger menu actions keep their semantic red treatment.',
+    'The application accent marks the top threshold and anchor bridge that connect the anchored surface to its trigger. Focused items and controls retain a visible component-specific treatment.',
   ],
   forcedColorBehavior: [
     'Forced colors preserve the surface boundary, arrow, focused item or control, and trigger focus with system colors.',
@@ -521,7 +521,7 @@ export const menuContract = {
     'Menu owns menu and menuitem semantics, focus movement, disabled state, groups, separators, submenu relationships, and focus restoration.',
   ],
   appearance: [
-    'Menu is a compact raised instrument with one focus rail per command, subdued group labels, and a joined anchor arrow.',
+    'Menu is a compact raised instrument with whole-row hover and focus highlights, subdued group labels, and a joined anchor arrow.',
   ],
   appropriateUses: [
     'a Button or IconButton opens a bounded list of immediate application commands',
@@ -616,7 +616,7 @@ export const contextMenuContract = {
     'ContextMenu gives its target an accessible name and keyboard focus, owns menu semantics and navigation, and restores focus after dismissal or selection.',
   ],
   appearance: [
-    'ContextMenu uses the same compact command surface and focus rail as Menu, anchored to the invocation point.',
+    'ContextMenu uses the same compact command surface and whole-row item highlights as Menu, anchored to the invocation point.',
   ],
   appropriateUses: ['an object or bounded region has secondary commands at its invocation point'],
   composition: [

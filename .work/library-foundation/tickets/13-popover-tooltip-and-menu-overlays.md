@@ -44,3 +44,5 @@ activation, focus, dismissal, and anchored-placement contracts.
 - Chromium inspection additionally covers nested Menu placement, light and dark appearance,
   locally scoped RTL behavior, reduced motion, and forced colors. Whitney accepted the corrected
   rendered pointers after direct visual review.
+- A later navigation-family review removed the leading state rail from Menu and ContextMenu rows.
+  Hover and focus now use the whole-row highlight, while keyboard focus keeps its visible outline.

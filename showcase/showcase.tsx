@@ -1353,7 +1353,7 @@ function OverlaySpecimens() {
       </Specimen>
 
       <Specimen
-        description="Open a library-owned command list from an explicit action. Arrow keys, typeahead, groups, disabled commands, separators, and nested menus stay consistent."
+        description="Open a library-owned command list from an explicit action. Whole-row highlights identify hovered and focused commands without adding a separate entry rail."
         name="Menu"
       >
         <Menu
@@ -1393,7 +1393,7 @@ function OverlaySpecimens() {
       </Specimen>
 
       <Specimen
-        description="Attach secondary commands to one named object. Right-click, touch long press, or focus and press Shift+F10 to open the same command model as Menu."
+        description="Attach secondary commands to one named object. Right-click, touch long press, or focus and press Shift+F10 to open the same command model and whole-row highlights as Menu."
         name="ContextMenu"
       >
         <ContextMenu

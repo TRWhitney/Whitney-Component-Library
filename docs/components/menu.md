@@ -53,12 +53,12 @@ Menu presents a library-owned list of immediate commands from an explicit trigge
 
 ## Appearance and responsive behavior
 
-- Menu is a compact raised instrument with one focus rail per command, subdued group labels, and a joined anchor arrow.
+- Menu is a compact raised instrument with whole-row hover and focus highlights, subdued group labels, and a joined anchor arrow.
 - The surface flips when its requested side lacks room, stays inside the visual viewport, and scrolls its own content when available height is limited.
 
 ## Accent, forced colors, and reduced motion
 
-- The application accent marks the top threshold, anchor bridge, and focus rail that connect the anchored surface to its trigger. Danger menu actions keep their semantic red treatment.
+- The application accent marks the top threshold and anchor bridge that connect the anchored surface to its trigger. Focused items and controls retain a visible component-specific treatment.
 - Forced colors preserve the surface boundary, arrow, focused item or control, and trigger focus with system colors.
 - Reduced motion removes the short anchored-surface settling transition without changing placement, focus, or dismissal.
 
