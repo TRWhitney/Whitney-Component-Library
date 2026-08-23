@@ -16,6 +16,7 @@ import {
   Checkbox,
   CheckboxGroup,
   ComboBox,
+  ContextMenu,
   DateField,
   DatePicker,
   DateRangePicker,
@@ -33,9 +34,11 @@ import {
   InlineGroup,
   Link,
   Meter,
+  Menu,
   NotificationProvider,
   NumberField,
   ProgressBar,
+  Popover,
   RangeSlider,
   ResponsiveGrid,
   RadioGroup,
@@ -56,6 +59,7 @@ import {
   TimeField,
   ToggleButton,
   Toolbar,
+  Tooltip,
   type AccentColor,
   type Appearance,
   type DrawerPlacement,
@@ -1319,6 +1323,101 @@ function OverlaySpecimens() {
         name="Drawer"
       >
         <DrawerShowcase />
+      </Specimen>
+
+      <Specimen
+        description="Keep short interactive content beside the control that opened it. Focus enters the anchored surface and returns after outside press, Escape, or its close control."
+        name="Popover"
+      >
+        <Popover
+          actions={({close}) => <Button onPress={close}>Done</Button>}
+          closeLabel="Close run summary"
+          description="Review the active run without leaving the current task."
+          title="Run summary"
+          trigger={<Button>Inspect run summary</Button>}
+        >
+          <Stack gap="tight">
+            <StatusIndicator label="Stable" tone="success" />
+            <p>RUN 0284 converged after 18 boundary passes.</p>
+          </Stack>
+        </Popover>
+      </Specimen>
+
+      <Specimen
+        description="Add a short description to an already named control. Hover or focus reveals it; required instructions and interactive content belong elsewhere."
+        name="Tooltip"
+      >
+        <Tooltip content="Copies the immutable identifier used in run history.">
+          <Button>Copy run ID</Button>
+        </Tooltip>
+      </Specimen>
+
+      <Specimen
+        description="Open a library-owned command list from an explicit action. Arrow keys, typeahead, groups, disabled commands, separators, and nested menus stay consistent."
+        name="Menu"
+      >
+        <Menu
+          items={[
+            {
+              description: 'Create a new run from the current inputs.',
+              id: 'duplicate-run',
+              label: 'Duplicate run',
+              onAction: () => undefined,
+              shortcut: 'Ctrl+D',
+              type: 'action',
+            },
+            {id: 'run-actions-divider', type: 'separator'},
+            {
+              id: 'more-run-actions',
+              items: [
+                {
+                  id: 'archive-run',
+                  label: 'Archive run',
+                  onAction: () => undefined,
+                  type: 'action',
+                },
+                {
+                  id: 'delete-run',
+                  label: 'Delete run',
+                  onAction: () => undefined,
+                  tone: 'danger',
+                  type: 'action',
+                },
+              ],
+              label: 'More actions',
+              type: 'submenu',
+            },
+          ]}
+          trigger={<Button>Open run actions</Button>}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Attach secondary commands to one named object. Right-click, touch long press, or focus and press Shift+F10 to open the same command model as Menu."
+        name="ContextMenu"
+      >
+        <ContextMenu
+          items={[
+            {
+              id: 'inspect-boundary',
+              label: 'Inspect boundary',
+              onAction: () => undefined,
+              type: 'action',
+            },
+            {
+              id: 'duplicate-boundary',
+              label: 'Duplicate boundary',
+              onAction: () => undefined,
+              type: 'action',
+            },
+          ]}
+          targetLabel="Boundary condition BC-12"
+        >
+          <div className="showcase-context-target">
+            <strong>BC-12</strong>
+            <span>Insulated north wall</span>
+          </div>
+        </ContextMenu>
       </Specimen>
     </>
   );

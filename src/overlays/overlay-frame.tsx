@@ -37,6 +37,8 @@ interface OverlayFrameBaseProps {
   readonly trigger: ReactElement;
 }
 
+export type OverlayTriggerKind = OverlayFrameProps['kind'] | 'menu' | 'popover' | 'tooltip';
+
 type OverlayFrameProps = OverlayFrameBaseProps &
   (
     | {
@@ -61,9 +63,13 @@ type OverlayFrameProps = OverlayFrameBaseProps &
       }
   );
 
-function overlayName(kind: OverlayFrameProps['kind']): string {
+function overlayName(kind: OverlayTriggerKind): string {
   if (kind === 'alert-dialog') return 'AlertDialog';
-  return kind === 'dialog' ? 'Dialog' : 'Drawer';
+  if (kind === 'dialog') return 'Dialog';
+  if (kind === 'drawer') return 'Drawer';
+  if (kind === 'menu') return 'Menu';
+  if (kind === 'popover') return 'Popover';
+  return 'Tooltip';
 }
 
 export function OverlayTriggerBoundary({
@@ -72,7 +78,7 @@ export function OverlayTriggerBoundary({
   onDirectionChange,
 }: {
   readonly children: ReactElement;
-  readonly kind: OverlayFrameProps['kind'];
+  readonly kind: OverlayTriggerKind;
   readonly onDirectionChange: (direction: OverlayDirection) => void;
 }): ReactElement {
   const registrations = useRef(new Map<HTMLElement, ActionPartKind>());
@@ -80,15 +86,18 @@ export function OverlayTriggerBoundary({
   const validationQueued = useRef(false);
   const [validationError, setValidationError] = useState<TypeError | null>(null);
   const validateRegistrations = useCallback(() => {
-    const triggerActions = [...registrations.current].filter(([, partKind]) =>
-      OVERLAY_TRIGGER_ACTIONS.includes(partKind as (typeof OVERLAY_TRIGGER_ACTIONS)[number]),
+    const allowedActions = new Set<ActionPartKind>(
+      kind === 'tooltip' ? ['button'] : OVERLAY_TRIGGER_ACTIONS,
     );
-    if (triggerActions.length !== 1) {
+    const triggerActions = [...registrations.current].filter(
+      ([, partKind]) => partKind !== 'support',
+    );
+    if (triggerActions.length !== 1 || !allowedActions.has(triggerActions[0]![1])) {
       setValidationError(
         (current) =>
           current ??
           new TypeError(
-            `${overlayName(kind)} trigger must render exactly one Button or IconButton.`,
+            `${overlayName(kind)} trigger must render exactly one ${kind === 'tooltip' ? 'Button' : 'Button or IconButton'}.`,
           ),
       );
       return;

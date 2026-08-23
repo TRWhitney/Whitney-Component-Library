@@ -45,6 +45,7 @@ describe('canonical component contracts', () => {
       'Checkbox',
       'CheckboxGroup',
       'ComboBox',
+      'ContextMenu',
       'DateField',
       'DatePicker',
       'DateRangePicker',
@@ -62,9 +63,11 @@ describe('canonical component contracts', () => {
       'InlineGroup',
       'Link',
       'Meter',
+      'Menu',
       'NotificationProvider',
       'NumberField',
       'ProgressBar',
+      'Popover',
       'RadioGroup',
       'RangeSlider',
       'ResponsiveGrid',
@@ -85,12 +88,15 @@ describe('canonical component contracts', () => {
       'TimeField',
       'ToggleButton',
       'Toolbar',
+      'Tooltip',
     ];
 
     expect(validateComponentContracts(componentContracts, exportNames)).toHaveLength(
       exportNames.length,
     );
-    expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(exportNames);
+    expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(
+      [...exportNames].sort(),
+    );
   });
 
   it('distinguishes ordinary dialogs, consequential confirmations, and drawers', () => {
@@ -122,6 +128,24 @@ describe('canonical component contracts', () => {
       /compact.*full.*viewport|full.*screen/i,
     );
     expect(contractFor('Drawer')?.inappropriateUses.join(' ')).toMatch(/persistent.*navigation/i);
+  });
+
+  it('distinguishes descriptions, anchored content, command menus, and context actions', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Tooltip')?.contentRules.join(' ')).toMatch(
+      /supplemental.*description|description.*supplemental/i,
+    );
+    expect(contractFor('Tooltip')?.inappropriateUses.join(' ')).toMatch(
+      /accessible name|required.*interactive/i,
+    );
+    expect(contractFor('Popover')?.appropriateUses.join(' ')).toMatch(/interactive.*anchored/i);
+    expect(contractFor('Menu')?.keyboardBehavior.join(' ')).toMatch(/arrow.*typeahead.*submenu/i);
+    expect(contractFor('Menu')?.composition.join(' ')).toMatch(/library-owned.*items/i);
+    expect(contractFor('ContextMenu')?.controlBehavior.join(' ')).toMatch(
+      /right.*click.*long press.*Shift.*F10/i,
+    );
   });
 
   it('keeps status, metadata, alerts, progress, meters, and generic busy state distinct', () => {

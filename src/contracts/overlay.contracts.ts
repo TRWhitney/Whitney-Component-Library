@@ -318,3 +318,380 @@ export const drawerContract = {
   ],
   summary: 'Open or extend a supplemental workflow from any viewport edge.',
 } satisfies ComponentContract;
+
+const commonAnchoredGuidance = {
+  accentBehavior: [
+    'The application accent marks the top threshold, anchor bridge, and focus rail that connect the anchored surface to its trigger. Danger menu actions keep their semantic red treatment.',
+  ],
+  forcedColorBehavior: [
+    'Forced colors preserve the surface boundary, arrow, focused item or control, and trigger focus with system colors.',
+  ],
+  reducedMotionBehavior: [
+    'Reduced motion removes the short anchored-surface settling transition without changing placement, focus, or dismissal.',
+  ],
+  responsiveBehavior: [
+    'The surface flips when its requested side lacks room, stays inside the visual viewport, and scrolls its own content when available height is limited.',
+  ],
+  stylesheet: './styles.css',
+} satisfies Pick<
+  ComponentContract,
+  | 'accentBehavior'
+  | 'forcedColorBehavior'
+  | 'reducedMotionBehavior'
+  | 'responsiveBehavior'
+  | 'stylesheet'
+>;
+
+export const popoverContract = {
+  ...commonAnchoredGuidance,
+  accessibility: [
+    'Opening moves focus to the visible close control, keeps interactive content inside one labeled dialog, and restores focus to the trigger after dismissal.',
+  ],
+  appearance: [
+    'Popover is a compact raised surface with an accent threshold and a joined arrow that identifies its current anchor.',
+  ],
+  appropriateUses: [
+    'supplemental interactive content needs an anchored surface near the control or object that opened it',
+  ],
+  composition: [
+    'Render inside AppearanceProvider and pass exactly one library Button or IconButton trigger.',
+    'Supply a visible title and description, a closeLabel, body content, and optional actions that receive a close function.',
+  ],
+  contentRules: [
+    'Keep the task short enough to remain useful beside its trigger. Name the content directly and explain its local purpose in the description.',
+  ],
+  controlBehavior: [
+    'Popover supports controlled isOpen with onOpenChange or uncontrolled defaultOpen. Escape, outside press, the close control, and an action calling close dismiss it.',
+  ],
+  counterExamples: [
+    {
+      code: inProvider(
+        'DeleteRunPopoverCounterexample',
+        '<Popover\n  closeLabel="Close deletion"\n  description="This permanently removes RUN 0284."\n  title="Delete run?"\n  trigger={<Button>Delete run</Button>}\n>\n  <Button>Confirm deletion</Button>\n</Popover>',
+      ),
+      description:
+        'Consequential confirmation needs AlertDialog so cancellation receives initial focus and outside presses cannot dismiss the decision.',
+      title: 'Do not confirm destructive work in Popover',
+    },
+  ],
+  directionality: [
+    'Logical placement, alignment, copy, actions, and the anchor arrow follow the trigger writing direction.',
+  ],
+  events: [
+    'onOpenChange reports each open-state transition. Body actions own their domain events and call close only when the local task should end.',
+  ],
+  examples: [
+    {
+      code: inProvider(
+        'RunSummaryPopover',
+        '<Popover\n  closeLabel="Close run summary"\n  description="Review the active run without leaving the current task."\n  title="Run summary"\n  trigger={<Button>Inspect run</Button>}\n>\n  <p>RUN 0284 converged after 18 passes.</p>\n</Popover>',
+      ),
+      description: 'Keep short interactive or inspectable content attached to its source.',
+      title: 'Anchored run summary',
+    },
+  ],
+  exportName: 'Popover',
+  formBehavior: [
+    'Popover is not a form. Consumer-owned fields may appear in the body when their submit and validation behavior remain explicit.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'supplemental non-interactive description, a command list, consequential confirmation, deep work, or content that must remain visible',
+  ],
+  keyboardBehavior: [
+    'Enter or Space opens from its Button trigger, Tab moves through interactive content, and Escape closes and restores focus.',
+  ],
+  kind: 'component',
+  labeling: [
+    'title and description are required visible strings. closeLabel names the icon-only close control.',
+  ],
+  localization: [
+    'Localize the trigger, title, description, close label, body, and actions. Copy wraps without detaching the surface from its anchor.',
+  ],
+  name: 'Popover',
+  parts: [
+    'Popover includes one trigger, joined anchor arrow, labeled dialog surface, title, description, close control, body, and optional actions.',
+  ],
+  preferredAlternatives: [
+    'Use Tooltip for description, Menu for commands, AlertDialog for consequential confirmation, or Dialog for a larger bounded task.',
+  ],
+  preferredCompositions: [
+    'Compose Popover with short field or inspection content and library Button actions near the object they affect.',
+  ],
+  purpose: 'Popover holds short interactive content beside the control that opened it.',
+  relatedExports: ['AlertDialog', 'AppearanceProvider', 'Button', 'Dialog', 'Menu', 'Tooltip'],
+  states: [
+    'Closed and open may be controlled or uncontrolled. placement and alignment request a logical anchor while collision handling may flip the rendered side.',
+  ],
+  summary: 'Place short interactive content beside its trigger with owned focus and dismissal.',
+  validation: [
+    'TypeScript limits placement and alignment choices. Runtime validation requires exactly one rendered library Button or IconButton trigger.',
+  ],
+} satisfies ComponentContract;
+
+export const tooltipContract = {
+  ...commonAnchoredGuidance,
+  accentBehavior: [
+    'Tooltip keeps its surface, boundary, and anchor bridge neutral. The application accent remains on the wrapped Button focus treatment rather than entering descriptive content.',
+  ],
+  accessibility: [
+    'Tooltip adds a supplemental accessible description to its already named trigger and never receives focus or contains interactive content.',
+  ],
+  appearance: [
+    'Tooltip is a compact high-contrast label with a joined anchor arrow and no interactive chrome.',
+  ],
+  appropriateUses: [
+    'a named control benefits from a short supplemental non-interactive description',
+  ],
+  composition: [
+    'Render inside AppearanceProvider and wrap exactly one library Button that already has its own accessible name. IconButton owns its label tooltip and must not receive a second tooltip.',
+    'Pass plain string content. Interactive descendants are unrepresentable through the public type.',
+  ],
+  contentRules: [
+    'Write one supplemental description that clarifies effect, state, or consequence. Keep the control name on the trigger itself.',
+  ],
+  controlBehavior: [
+    'Tooltip appears after a short hover or keyboard-focus delay, remains while the trigger is hovered or focused, and closes after pointer or focus departure or Escape.',
+  ],
+  counterExamples: [
+    {
+      code: inProvider(
+        'UnnamedTooltipCounterexample',
+        '<Tooltip content="Delete run">\n  <Button><span aria-hidden="true">×</span></Button>\n</Tooltip>',
+      ),
+      description:
+        'Tooltip content does not replace the trigger name. Use IconButton with label when an icon-only command needs a name.',
+      title: 'Do not use Tooltip as the accessible name',
+    },
+  ],
+  directionality: [
+    'Logical placement, text alignment, and the anchor arrow follow the trigger writing direction.',
+  ],
+  events: [
+    'Tooltip exposes no application event. The wrapped control continues to own its action.',
+  ],
+  examples: [
+    {
+      code: inProvider(
+        'CopyRunTooltip',
+        '<Tooltip content="Copies the immutable run identifier.">\n  <Button>Copy run ID</Button>\n</Tooltip>',
+      ),
+      description: 'Add supporting detail without changing the visible or accessible control name.',
+      title: 'Supplemental command description',
+    },
+  ],
+  exportName: 'Tooltip',
+  formBehavior: [
+    'Tooltip does not submit or validate data and does not change the wrapped control form behavior.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'an accessible name, required interactive content, errors, durable instructions, touch-only discovery, or information needed to complete the task',
+  ],
+  keyboardBehavior: [
+    'Keyboard focus on the trigger reveals the description after the same bounded delay; Escape dismisses it without moving focus.',
+  ],
+  kind: 'component',
+  labeling: [
+    'The trigger keeps its own accessible name. content becomes a description through the tooltip relationship.',
+  ],
+  localization: ['Localize content as a complete short phrase and allow it to wrap.'],
+  name: 'Tooltip',
+  parts: ['Tooltip includes one named trigger, a non-focusable description, and its joined arrow.'],
+  preferredAlternatives: [
+    'Use visible support text for required instructions, Popover for interactive content, or Menu for commands.',
+  ],
+  preferredCompositions: [
+    'Use Tooltip sparingly on named compact actions whose effect benefits from one extra sentence.',
+  ],
+  purpose: 'Tooltip adds a short supplemental description to an already named control.',
+  relatedExports: ['AppearanceProvider', 'Button', 'IconButton', 'Menu', 'Popover'],
+  states: [
+    'Hidden and visible follow trigger hover and focus. placement and alignment request the anchor while collision handling may flip it.',
+  ],
+  summary: 'Add a non-interactive description to an already named control.',
+  validation: [
+    'TypeScript limits content to a string and placement to library-owned choices. Runtime validation requires exactly one rendered library Button trigger.',
+  ],
+} satisfies ComponentContract;
+
+export const menuContract = {
+  ...commonAnchoredGuidance,
+  accessibility: [
+    'Menu owns menu and menuitem semantics, focus movement, disabled state, groups, separators, submenu relationships, and focus restoration.',
+  ],
+  appearance: [
+    'Menu is a compact raised instrument with one focus rail per command, subdued group labels, and a joined anchor arrow.',
+  ],
+  appropriateUses: [
+    'a Button or IconButton opens a bounded list of immediate application commands',
+  ],
+  composition: [
+    'Render inside AppearanceProvider so the surface, threshold, items, and focus treatment share the active theme and application accent.',
+    'Pass library-owned items with stable ids, labels, callbacks, and optional descriptions, shortcuts, disabled state, danger tone, groups, separators, or submenus.',
+    'Pass exactly one library Button or IconButton trigger. Consumers do not compose private menu parts or attach handlers to rendered rows.',
+  ],
+  contentRules: [
+    'Use direct verb phrases for actions, group only commands that share a clear purpose, and show a shortcut only when the application implements it outside the open menu.',
+  ],
+  controlBehavior: [
+    'Menu opens from press, dismisses after an enabled action, outside press, or Escape, and supports controlled isOpen with onOpenChange or uncontrolled defaultOpen.',
+  ],
+  counterExamples: [
+    {
+      code: inProvider(
+        'NavigationMenuCounterexample',
+        '<Menu\n  items={[{id: "settings", label: "Settings", onAction: () => {}, type: "action"}]}\n  trigger={<Button>Application sections</Button>}\n/>',
+      ),
+      description:
+        'Persistent destinations need a navigation component. Menu represents immediate commands rather than application structure.',
+      title: 'Do not replace persistent navigation',
+    },
+  ],
+  directionality: [
+    'Logical placement, item copy, shortcuts, submenu arrows, and submenu opening keys follow the trigger writing direction.',
+  ],
+  events: [
+    'An enabled action calls its onAction once and closes the complete menu path. onOpenChange reports root open-state transitions.',
+  ],
+  examples: [
+    {
+      code: inProvider(
+        'RunActionsMenu',
+        '<Menu\n  items={[\n    {id: "duplicate", label: "Duplicate run", onAction: () => {}, type: "action"},\n    {id: "divider", type: "separator"},\n    {id: "delete", label: "Delete run", onAction: () => {}, tone: "danger", type: "action"},\n  ]}\n  trigger={<Button>Run actions</Button>}\n/>',
+      ),
+      description: 'Offer a short command list anchored to the action that reveals it.',
+      title: 'Run command menu',
+    },
+  ],
+  exportName: 'Menu',
+  formBehavior: [
+    'Menu actions do not submit forms implicitly. An onAction callback may perform explicit application or form work.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'selection among values, persistent navigation, arbitrary interactive content, status, or actions attached to a pointer location rather than a menu button',
+  ],
+  keyboardBehavior: [
+    'Arrow keys move roving focus, printable characters provide typeahead, Home and End reach boundaries, Enter or Space runs an action, logical ArrowRight opens a submenu, logical ArrowLeft returns, and Escape dismisses.',
+  ],
+  kind: 'component',
+  labeling: [
+    'The trigger accessible name labels the menu. Every command and submenu has a concise label; descriptions and shortcuts remain supplementary.',
+  ],
+  localization: [
+    'Localize trigger, group, command, description, and shortcut display strings. Labels wrap and typeahead uses the active locale.',
+  ],
+  name: 'Menu',
+  parts: [
+    'Menu owns its trigger relationship, anchored surface, arrow, command rows, groups, separators, descriptions, shortcuts, disabled states, and nested submenu surfaces.',
+  ],
+  preferredAlternatives: [
+    'Use Select for value selection, ContextMenu for object actions at pointer location, Popover for arbitrary interactive content, or navigation components for destinations.',
+  ],
+  preferredCompositions: [
+    'Use Menu from a library Button or IconButton near the object or toolbar whose commands it contains.',
+  ],
+  purpose: 'Menu presents a library-owned list of immediate commands from an explicit trigger.',
+  relatedExports: [
+    'AppearanceProvider',
+    'Button',
+    'ContextMenu',
+    'IconButton',
+    'Popover',
+    'Select',
+  ],
+  states: [
+    'The root and each submenu may be closed or open. Items may be enabled or disabled, neutral or danger, described, grouped, separated, or nested.',
+  ],
+  summary: 'Open an owned command list from an explicit Button or IconButton trigger.',
+  validation: [
+    'TypeScript requires discriminated library-owned item records and bounded placement, alignment, state, and tone choices. Runtime validation requires one rendered Button or IconButton trigger.',
+  ],
+} satisfies ComponentContract;
+
+export const contextMenuContract = {
+  ...commonAnchoredGuidance,
+  accessibility: [
+    'ContextMenu gives its target an accessible name and keyboard focus, owns menu semantics and navigation, and restores focus after dismissal or selection.',
+  ],
+  appearance: [
+    'ContextMenu uses the same compact command surface and focus rail as Menu, anchored to the invocation point.',
+  ],
+  appropriateUses: ['an object or bounded region has secondary commands at its invocation point'],
+  composition: [
+    'Render inside AppearanceProvider so the target focus, command surface, threshold, and items share the active theme and application accent.',
+    'Pass target content, a targetLabel, and the same library-owned item model used by Menu. ContextMenu owns the focusable target region and rendered command parts.',
+  ],
+  contentRules: [
+    'Include only actions that apply to the named target and keep every important action available through a visible or otherwise discoverable path.',
+  ],
+  controlBehavior: [
+    'Right-click, platform context-menu gestures, touch long press, and Shift+F10 open the menu at the invocation point. An enabled action, outside press, or Escape dismisses it.',
+  ],
+  counterExamples: [
+    {
+      code: inProvider(
+        'OnlyDeleteContextMenuCounterexample',
+        '<ContextMenu\n  items={[{id: "delete", label: "Delete run", onAction: () => {}, tone: "danger", type: "action"}]}\n  targetLabel="RUN 0284"\n>\n  <span>RUN 0284</span>\n</ContextMenu>',
+      ),
+      description:
+        'A context menu cannot be the only path to an important or consequential action. Keep a visible discoverable path and confirm deletion with AlertDialog.',
+      title: 'Do not hide the only action path',
+    },
+  ],
+  directionality: [
+    'Item copy, shortcuts, submenu arrows, and keyboard opening follow the target writing direction while the surface remains within the viewport.',
+  ],
+  events: [
+    'An enabled command calls onAction once and closes the complete menu path. onOpenChange reports open-state transitions when state is controlled.',
+  ],
+  examples: [
+    {
+      code: inProvider(
+        'BoundaryContextMenu',
+        '<ContextMenu\n  items={[{id: "inspect", label: "Inspect boundary", onAction: () => {}, type: "action"}]}\n  targetLabel="Boundary condition BC-12"\n>\n  <span>BC-12 · insulated</span>\n</ContextMenu>',
+      ),
+      description: 'Attach secondary commands to one named object and preserve keyboard access.',
+      title: 'Boundary object actions',
+    },
+  ],
+  exportName: 'ContextMenu',
+  formBehavior: [
+    'Context-menu actions do not submit forms implicitly. An onAction callback may perform explicit application or form work.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'the only path to an important action, primary navigation, value selection, arbitrary interactive content, or an unlabeled region',
+  ],
+  keyboardBehavior: [
+    'Shift+F10 opens from the focused target. Arrow keys, typeahead, Home, End, Enter, Space, submenu keys, and Escape match Menu behavior.',
+  ],
+  kind: 'component',
+  labeling: [
+    'targetLabel names the focusable target and therefore labels its context menu. Item labels name every command and submenu.',
+  ],
+  localization: [
+    'Localize the target label and all item copy. Typeahead uses the active locale and logical submenu keys follow direction.',
+  ],
+  name: 'ContextMenu',
+  parts: [
+    'ContextMenu owns a focusable target region, invocation-point anchor, command surface, items, groups, separators, and submenus.',
+  ],
+  preferredAlternatives: [
+    'Use Menu for a visible command trigger, Popover for interactive content, or AlertDialog to confirm a consequential action.',
+  ],
+  preferredCompositions: [
+    'Pair ContextMenu with a visible Menu or ordinary Button path when actions must remain readily discoverable.',
+  ],
+  purpose: 'ContextMenu presents secondary commands for one named object at its invocation point.',
+  relatedExports: ['AlertDialog', 'AppearanceProvider', 'Button', 'Menu', 'Popover'],
+  states: [
+    'Closed and open may be controlled or uncontrolled. Invocation may come from pointer, touch, or keyboard, and item states match Menu.',
+  ],
+  summary:
+    'Open secondary object commands by context gesture with keyboard and touch alternatives.',
+  validation: [
+    'TypeScript requires a target label and discriminated library-owned items. The owned focusable target keeps context activation and restoration coherent.',
+  ],
+} satisfies ComponentContract;

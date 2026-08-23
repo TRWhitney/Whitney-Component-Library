@@ -280,6 +280,71 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('keeps anchored surfaces attached, bounded, legible, and visible in alternate modes', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const anchorArrow = await readFile('src/overlays/anchored-overlay.tsx', 'utf8');
+    const anchoredConsumers = await Promise.all(
+      ['context-menu.tsx', 'menu.tsx', 'popover.tsx', 'tooltip.tsx'].map((file) =>
+        readFile(`src/overlays/${file}`, 'utf8'),
+      ),
+    );
+    const anchoredSurface = styles.match(
+      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const menuItem = styles.match(/\[data-wcl-menu-item\]\s*\{([^}]*)\}/)?.[1];
+    const reducedMotion = styles.match(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)([\s\S]*)/,
+    )?.[1];
+    const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/)?.[1];
+
+    expect(anchoredSurface).toContain('max-inline-size: calc(100vw');
+    expect(anchoredSurface).toContain('max-block-size: var(--available-height)');
+    expect(anchoredSurface).toContain('background: var(--wcl-surface-raised)');
+    expect(anchoredSurface).toContain(
+      'border-block-start: 3px solid var(--wcl-accent-rail-on-raised)',
+    );
+    expect(anchorArrow).toContain('viewBox="0 0 14 7"');
+    expect(anchorArrow).toContain('arrowBoundaryOffset: 12');
+    expect(anchorArrow).toContain('data-wcl-anchor-arrow-rail-mask');
+    expect(anchorArrow).toContain('d="M1 3.5h12v5H1Z"');
+    expect(anchorArrow).toContain('data-variant="accent-rail"');
+    expect(anchorArrow).toContain('d="M0 5.5h1.5L7 0l5.5 5.5H14"');
+    expect(anchorArrow).toContain('data-variant="accent"');
+    expect(anchorArrow).toContain('data-variant="neutral"');
+    expect(anchorArrow).toContain('d="m0.5 6.5 6.5-6.5 6.5 6.5"');
+    for (const consumer of anchoredConsumers) {
+      expect(consumer).toContain('{...anchoredOverlayPositionProps}');
+    }
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s+\[data-wcl-anchor-arrow\]\[data-placement='bottom'\]\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='accent-rail'\]/,
+    );
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s+\[data-wcl-anchor-arrow\]\[data-placement='bottom'\]\s+\[data-wcl-anchor-arrow-rail-mask\]\s*\{[^}]*display:\s*block/,
+    );
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-popover\], \[data-wcl-menu-popover\]\)\s+\[data-wcl-anchor-arrow\]:not\(\[data-placement='bottom'\]\)\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='accent'\]/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-tooltip\]\s+\[data-wcl-anchor-arrow-edge\]\[data-variant='neutral'\]\s*\{[^}]*stroke:\s*var\(--wcl-border-strong\)/,
+    );
+    expect(menuItem).toContain('grid-template-columns: 3px minmax(0, 1fr) auto');
+    expect(styles).toMatch(
+      /\[data-wcl-menu-item\]\[data-focused\][\s\S]*var\(--wcl-accent-focus-on-raised\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-menu-item\]\[data-tone='danger'\][\s\S]*var\(--wcl-danger\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-context-menu-target\]:focus-visible[\s\S]*var\(--wcl-accent-focus\)/,
+    );
+    expect(reducedMotion).toMatch(
+      /:is\(\[data-wcl-popover\], \[data-wcl-tooltip\], \[data-wcl-menu-popover\]\)[\s\S]*transition:\s*none/,
+    );
+    expect(forcedColors).toMatch(
+      /:is\(\[data-wcl-popover\], \[data-wcl-tooltip\], \[data-wcl-menu-popover\]\)[\s\S]*border-color:\s*CanvasText/,
+    );
+  });
+
   it('maps identity and surface roles to system colors in forced-color mode', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const forcedColors = styles.match(/@media\s*\(forced-colors:\s*active\)([\s\S]*)/);

@@ -3296,6 +3296,297 @@
     animation-play-state: paused;
   }
 
+  :is([data-wcl-popover], [data-wcl-menu-popover]) {
+    --wcl-anchored-surface: var(--wcl-surface-raised);
+
+    box-sizing: border-box;
+    max-inline-size: calc(100vw - calc(var(--wcl-space) * 2));
+    max-block-size: var(--available-height);
+    overflow: visible;
+    border: 1px solid var(--wcl-border-strong);
+    border-block-start: 3px solid var(--wcl-accent-rail-on-raised);
+    border-radius: var(--wcl-control-radius);
+    outline: 0;
+    background: var(--wcl-surface-raised);
+    box-shadow: var(--wcl-shadow);
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+    transition:
+      opacity var(--wcl-motion-duration) var(--wcl-motion-easing),
+      translate var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])[data-entering],
+  :is([data-wcl-popover], [data-wcl-menu-popover])[data-exiting] {
+    opacity: 0;
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])[data-placement='bottom']:is(
+      [data-entering],
+      [data-exiting]
+    ) {
+    translate: 0 -4px;
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])[data-placement='top']:is(
+      [data-entering],
+      [data-exiting]
+    ) {
+    translate: 0 4px;
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])[data-placement='left']:is(
+      [data-entering],
+      [data-exiting]
+    ) {
+    translate: 4px 0;
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])[data-placement='right']:is(
+      [data-entering],
+      [data-exiting]
+    ) {
+    translate: -4px 0;
+  }
+
+  [data-wcl-popover] {
+    inline-size: min(24rem, calc(100vw - calc(var(--wcl-space) * 2)));
+  }
+
+  [data-wcl-popover-dialog] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    max-block-size: var(--available-height);
+    overflow: hidden;
+    border-radius: inherit;
+    outline: 0;
+  }
+
+  [data-wcl-tooltip] {
+    --wcl-anchored-surface: var(--wcl-text);
+
+    box-sizing: border-box;
+    max-inline-size: min(20rem, calc(100vw - calc(var(--wcl-space) * 2)));
+    padding: calc(var(--wcl-space) * 0.75) var(--wcl-space);
+    border: 1px solid var(--wcl-border-strong);
+    border-radius: calc(var(--wcl-control-radius) * 0.75);
+    background: var(--wcl-text);
+    box-shadow: var(--wcl-shadow);
+    color: var(--wcl-surface);
+    font-family: var(--wcl-font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    transition:
+      opacity var(--wcl-motion-duration) var(--wcl-motion-easing),
+      translate var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  [data-wcl-tooltip]:is([data-entering], [data-exiting]) {
+    opacity: 0;
+    translate: 0 2px;
+  }
+
+  [data-wcl-anchor-arrow] {
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: 0.875rem;
+    block-size: 0.4375rem;
+    color: var(--wcl-anchored-surface);
+    pointer-events: none;
+  }
+
+  :is([data-wcl-anchor-arrow-fill], [data-wcl-anchor-arrow-rail-mask]) {
+    fill: var(--wcl-anchored-surface);
+  }
+
+  [data-wcl-anchor-arrow-rail-mask],
+  [data-wcl-anchor-arrow-edge] {
+    display: none;
+  }
+
+  [data-wcl-anchor-arrow-edge] {
+    fill: none;
+    stroke-linecap: butt;
+    stroke-linejoin: round;
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])
+    [data-wcl-anchor-arrow][data-placement='bottom']
+    [data-wcl-anchor-arrow-rail-mask] {
+    display: block;
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])
+    [data-wcl-anchor-arrow][data-placement='bottom']
+    [data-wcl-anchor-arrow-edge][data-variant='accent-rail'] {
+    display: block;
+    stroke: var(--wcl-accent-rail-on-raised);
+    stroke-width: 3;
+  }
+
+  :is([data-wcl-popover], [data-wcl-menu-popover])
+    [data-wcl-anchor-arrow]:not([data-placement='bottom'])
+    [data-wcl-anchor-arrow-edge][data-variant='accent'] {
+    display: block;
+    stroke: var(--wcl-accent-rail-on-raised);
+    stroke-width: 1;
+  }
+
+  [data-wcl-tooltip] [data-wcl-anchor-arrow-edge][data-variant='neutral'] {
+    display: block;
+    stroke: var(--wcl-border-strong);
+    stroke-width: 1;
+  }
+
+  [data-wcl-menu-popover] {
+    inline-size: max-content;
+    min-inline-size: min(14rem, calc(100vw - calc(var(--wcl-space) * 2)));
+  }
+
+  [data-wcl-menu] {
+    box-sizing: border-box;
+    min-inline-size: 0;
+    max-block-size: calc(var(--available-height) - 2px);
+    padding: calc(var(--wcl-space) * 0.5);
+    overflow: auto;
+    border-radius: inherit;
+    outline: 0;
+    overscroll-behavior: contain;
+  }
+
+  [data-wcl-menu-item] {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3px minmax(0, 1fr) auto;
+    gap: var(--wcl-space);
+    align-items: center;
+    min-block-size: 2.5rem;
+    padding: calc(var(--wcl-space) * 0.75) var(--wcl-space);
+    border-radius: calc(var(--wcl-control-radius) * 0.55);
+    outline: 0;
+    color: var(--wcl-text);
+    cursor: pointer;
+  }
+
+  [data-wcl-menu-item][data-hovered] {
+    background: var(--wcl-accent-soft-on-raised);
+    color: var(--wcl-accent-hover-contrast-on-raised);
+  }
+
+  [data-wcl-menu-item][data-focused] {
+    background: var(--wcl-accent-soft-on-raised);
+    box-shadow: inset 0 0 0 2px var(--wcl-accent-focus-on-raised);
+    color: var(--wcl-accent-hover-contrast-on-raised);
+  }
+
+  [data-wcl-menu-item][data-disabled] {
+    color: var(--wcl-text-muted);
+    cursor: not-allowed;
+    opacity: 0.52;
+  }
+
+  [data-wcl-menu-item][data-tone='danger']:not([data-disabled]) {
+    color: var(--wcl-danger);
+  }
+
+  [data-wcl-menu-item][data-tone='danger']:is([data-focused], [data-hovered]) {
+    background: var(--wcl-danger-surface);
+    box-shadow: inset 0 0 0 2px var(--wcl-danger);
+    color: var(--wcl-danger);
+  }
+
+  [data-wcl-menu-item-rail] {
+    align-self: stretch;
+    inline-size: 3px;
+    min-block-size: 1.25rem;
+    border-radius: 99px;
+    background: transparent;
+  }
+
+  [data-wcl-menu-item]:is([data-focused], [data-hovered]) [data-wcl-menu-item-rail] {
+    background: var(--wcl-accent-rail-on-raised);
+  }
+
+  [data-wcl-menu-item][data-tone='danger']:is([data-focused], [data-hovered])
+    [data-wcl-menu-item-rail] {
+    background: var(--wcl-danger);
+  }
+
+  [data-wcl-menu-item-copy] {
+    display: grid;
+    gap: calc(var(--wcl-space) * 0.25);
+    min-inline-size: 0;
+  }
+
+  [data-wcl-menu-item-label] {
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  [data-wcl-menu-item-description] {
+    color: var(--wcl-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  [data-wcl-menu-item]:is([data-focused], [data-hovered]) [data-wcl-menu-item-description] {
+    color: currentcolor;
+  }
+
+  [data-wcl-menu-shortcut] {
+    color: var(--wcl-text-muted);
+    font-family: var(--wcl-font-body);
+    font-size: 0.6875rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  [data-wcl-menu-chevron] {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    fill: none;
+    stroke: currentcolor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.75;
+  }
+
+  [data-wcl-menu-chevron]:dir(rtl) {
+    rotate: 180deg;
+  }
+
+  [data-wcl-menu-group-label] {
+    padding: calc(var(--wcl-space) * 0.75) var(--wcl-space) calc(var(--wcl-space) * 0.25);
+    color: var(--wcl-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 720;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  [data-wcl-menu-separator] {
+    block-size: 1px;
+    margin: calc(var(--wcl-space) * 0.5) var(--wcl-space);
+    background: var(--wcl-border);
+  }
+
+  [data-wcl-context-menu-target] {
+    border-radius: var(--wcl-control-radius);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  [data-wcl-context-menu-target]:focus-visible {
+    outline-color: var(--wcl-accent-focus);
+  }
+
   [data-wcl-overlay] {
     --wcl-overlay-rail: var(--wcl-accent-rail);
 
@@ -3438,6 +3729,30 @@
     stroke-width: 1.5;
   }
 
+  [data-wcl-anchor-arrow] svg {
+    display: block;
+    inline-size: 0.875rem;
+    block-size: 0.4375rem;
+    overflow: visible;
+  }
+
+  [data-wcl-anchor-arrow]:is([data-placement='left'], [data-placement='right']) {
+    inline-size: 0.4375rem;
+    block-size: 0.875rem;
+  }
+
+  [data-wcl-anchor-arrow][data-placement='top'] svg {
+    rotate: 180deg;
+  }
+
+  [data-wcl-anchor-arrow][data-placement='left'] svg {
+    rotate: -90deg;
+  }
+
+  [data-wcl-anchor-arrow][data-placement='right'] svg {
+    rotate: 90deg;
+  }
+
   [data-wcl-overlay-body] {
     min-block-size: 0;
     padding: calc(var(--wcl-space) * 2);
@@ -3446,6 +3761,14 @@
     font-size: 0.875rem;
     line-height: 1.55;
     overscroll-behavior: contain;
+  }
+
+  [data-wcl-popover] [data-wcl-overlay-header] {
+    max-block-size: min(14rem, calc(var(--available-height) / 2));
+  }
+
+  [data-wcl-popover] [data-wcl-overlay-body] {
+    max-block-size: calc(var(--available-height) - 8rem);
   }
 
   [data-wcl-overlay-actions] {
@@ -4195,6 +4518,17 @@
       animation: none !important;
     }
 
+    :is([data-wcl-popover], [data-wcl-tooltip], [data-wcl-menu-popover]) {
+      transition: none;
+    }
+
+    :is([data-wcl-popover], [data-wcl-tooltip], [data-wcl-menu-popover]):is(
+      [data-entering],
+      [data-exiting]
+    ) {
+      translate: none;
+    }
+
     [data-wcl-provider],
     [data-wcl-drawer-dock],
     [data-wcl-drawer-panel],
@@ -4405,6 +4739,36 @@
       box-shadow: none;
       color: CanvasText;
       forced-color-adjust: auto;
+    }
+
+    :is([data-wcl-popover], [data-wcl-tooltip], [data-wcl-menu-popover]) {
+      border-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+      color: CanvasText;
+      forced-color-adjust: auto;
+    }
+
+    [data-wcl-anchor-arrow-edge] {
+      stroke: CanvasText;
+    }
+
+    :is([data-wcl-anchor-arrow-fill], [data-wcl-anchor-arrow-rail-mask]) {
+      fill: Canvas;
+    }
+
+    [data-wcl-menu-item]:is([data-focused], [data-hovered]) {
+      background: Canvas;
+      box-shadow: inset 0 0 0 2px Highlight;
+      color: CanvasText;
+    }
+
+    [data-wcl-menu-item]:is([data-focused], [data-hovered]) [data-wcl-menu-item-rail] {
+      background: Highlight;
+    }
+
+    [data-wcl-context-menu-target]:focus-visible {
+      outline-color: Highlight;
     }
 
     [data-wcl-drawer-preview] {

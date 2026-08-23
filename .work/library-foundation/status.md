@@ -9,10 +9,10 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 12, including the intervening Ticket 03A accent correction, are complete.
-Ticket 13 is ready. The maintained human showcase covers every contracted public component. Manual
-screen-reader operation is intentionally consolidated in the Ticket 30 pre-`1.0` release gate
-rather than repeated for every component ticket.
+Tickets 01 through 13, including the intervening Ticket 03A accent correction, are complete. The
+maintained human showcase covers every contracted public component. Manual screen-reader operation
+is intentionally consolidated in the Ticket 30 pre-`1.0` release gate rather than repeated for
+every component ticket.
 
 The library remains pre-adoption. Four completed `0.x` integration slices, a broad conventional
 catalog, the accepted Markdown editing surface, the accessible chart family including radar
@@ -219,7 +219,7 @@ reduced-motion, SSR, hydration, public-package, and typed behavior are covered.
 ## Frontier
 
 See the [decision map](map.md). The next implementation unit is
-[Ticket 13 — Popover, Tooltip, and Menu Overlays](tickets/13-popover-tooltip-and-menu-overlays.md).
+[Ticket 14 — Navigation and Disclosure Family](tickets/14-navigation-and-disclosure-family.md).
 
 ## Accepted sources
 
@@ -246,7 +246,25 @@ See the [decision map](map.md). The next implementation unit is
 
 ## Current verification
 
-- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 315
+- Ticket 13 direct Chromium interaction covers Popover focus entry and restoration, Menu typeahead
+  and action dismissal, ContextMenu keyboard activation, rejection of ambiguous triggers,
+  warning-free positioning at distinct pointer invocation points, focus restoration after
+  right-click and trusted touch long-press, and accessibility structures.
+  Chromium, Firefox, and WebKit rendered inspection covers
+  viewport-constrained Popover, Menu, and ContextMenu attachment. The compact `14 × 7` pointer
+  joins the non-tooltip accent rail at its centerline, stays outside rounded corners, and masks the
+  underlying border across whole and fractional device-pixel positions; Tooltip retains its neutral
+  edge. Chromium additionally covers nested Menu placement, light and dark appearance, locally
+  scoped RTL behavior, reduced motion, and forced colors. Whitney accepted the corrected pointer
+  after direct visual review.
+- Ticket 13 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
+  types, 345 focused and regression tests, generated guidance, and public declarations under
+  TypeScript 5.9, 6, and 7. `npm run showcase:build`, `npm run verify:package`,
+  `npm audit --audit-level=high`, `git diff --check`, and the explicit source/test/tooling no-`Any`
+  scan pass; packed React 18.3.1 and React 19.2.8 consumers pass SSR, hydration, types, and browser
+  builds.
+
+- `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source types, 345
   focused and regression tests, generated guidance, exact contract coverage, and public examples
   under TypeScript 5.9, 6, and 7.
 - `npm run verify:package` passes in packed React 18.3.1 and React 19.2.8 consumers, including SSR,
@@ -307,7 +325,7 @@ See the [decision map](map.md). The next implementation unit is
 
 ## Continuation
 
-Resume Ticket 13 from novel-work implementation with
-`python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`
-and begin the popover, tooltip, and menu overlay slice. Current branch: `master`. Ticket 12 is
-delivered by the commit containing this record; no Ticket 13 implementation has started.
+Continue to Ticket 14 from novel-work delivery with
+`python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py move novel-work delivery implementation`
+and begin the navigation and disclosure slice. Current branch: `master`. Ticket 13 is delivered by
+the commit containing this record.

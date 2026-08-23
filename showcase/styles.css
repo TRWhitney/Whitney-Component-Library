@@ -522,3 +522,18 @@
     }
   }
 }
+
+.showcase-context-target {
+  display: grid;
+  gap: 0.25rem;
+  min-inline-size: min(100%, 18rem);
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-control-radius);
+  background: var(--wcl-surface-subtle);
+}
+
+.showcase-context-target span {
+  color: var(--wcl-text-muted);
+  font-size: 0.8125rem;
+}

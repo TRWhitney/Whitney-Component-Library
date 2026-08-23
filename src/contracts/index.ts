@@ -53,7 +53,15 @@ export {
   spinnerContract,
   statusIndicatorContract,
 } from './feedback.contracts.js';
-export {alertDialogContract, dialogContract, drawerContract} from './overlay.contracts.js';
+export {
+  alertDialogContract,
+  contextMenuContract,
+  dialogContract,
+  drawerContract,
+  menuContract,
+  popoverContract,
+  tooltipContract,
+} from './overlay.contracts.js';
 export {
   renderAgentIndex,
   renderContractDocumentation,
@@ -120,7 +128,15 @@ import {
   spinnerContract,
   statusIndicatorContract,
 } from './feedback.contracts.js';
-import {alertDialogContract, dialogContract, drawerContract} from './overlay.contracts.js';
+import {
+  alertDialogContract,
+  contextMenuContract,
+  dialogContract,
+  drawerContract,
+  menuContract,
+  popoverContract,
+  tooltipContract,
+} from './overlay.contracts.js';
 
 export const componentContracts = [
   alertBannerContract,
@@ -132,6 +148,7 @@ export const componentContracts = [
   checkboxContract,
   checkboxGroupContract,
   comboBoxContract,
+  contextMenuContract,
   dateFieldContract,
   datePickerContract,
   dateRangePickerContract,
@@ -149,9 +166,11 @@ export const componentContracts = [
   inlineAlertContract,
   linkContract,
   meterContract,
+  menuContract,
   notificationProviderContract,
   numberFieldContract,
   progressBarContract,
+  popoverContract,
   rangeSliderContract,
   responsiveGridContract,
   radioGroupContract,
@@ -172,4 +191,5 @@ export const componentContracts = [
   timeFieldContract,
   toggleButtonContract,
   toolbarContract,
+  tooltipContract,
 ] as const;

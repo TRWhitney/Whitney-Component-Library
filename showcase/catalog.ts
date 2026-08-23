@@ -44,7 +44,10 @@ export const showcaseGroups = [
   },
   {label: 'Ranges', components: ['Slider', 'RangeSlider']},
   {label: 'Files', components: ['FileTrigger', 'DropZone']},
-  {label: 'Overlays', components: ['Dialog', 'AlertDialog', 'Drawer']},
+  {
+    label: 'Overlays',
+    components: ['Dialog', 'AlertDialog', 'Drawer', 'Popover', 'Tooltip', 'Menu', 'ContextMenu'],
+  },
   {
     label: 'Feedback',
     components: [
