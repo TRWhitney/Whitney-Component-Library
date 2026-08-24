@@ -441,3 +441,402 @@ export const cardCollectionContract = {
     'Static cards do not accept disabled state. Disabled selectable cards do not accept nested actions.',
   ],
 } as const satisfies ComponentContract;
+
+export const tableContract = {
+  accentBehavior: [
+    'Selected rows use the established leading accent rail. Focus uses the active accent focus color without tinting ordinary data.',
+  ],
+  accessibility: [
+    'Table owns a labeled grid with column headers, row headers, rows, cells, sort state, and optional row selection.',
+    'Embedded actions remain named controls inside an actions column and do not activate or select their row.',
+  ],
+  appearance: sharedCollectionAppearance,
+  appropriateUses: [
+    'people need to scan and compare keyed records across typed columns, optionally sort them, or select rows',
+  ],
+  composition: [
+    'Render Table inside AppearanceProvider.',
+    'Define columns once and provide every row cell through a record keyed by the same column ids.',
+    'Place Button, IconButton, Link, or another explicit control in a column whose kind is actions.',
+  ],
+  contentRules: [
+    'Mark at least one data column as a row header. Keep headers concise and use end alignment for numeric values.',
+    'Sorting is application-owned. Reorder rows after onSortChange and pass the active descriptor back to Table.',
+  ],
+  controlBehavior: [
+    'selectionMode explicitly chooses none, single, or multiple row selection through typed controlled or uncontrolled props.',
+    'Sortable columns require onSortChange. Table reports a typed descriptor and never mutates or sorts consumer rows.',
+    'Stable row ids preserve focus through insertion and reordering. Removing the focused row moves focus through the grid behavior.',
+  ],
+  counterExamples: [
+    {
+      code: `<AppearanceProvider accent="#2878ff" appearance="dark">
+  <Table
+    ariaLabel="Editable budget"
+    columns={[{id: 'amount', label: 'Amount', isRowHeader: true}]}
+    emptyState={{kind: 'no-data', title: 'No rows', description: 'Add a row first.'}}
+    rows={[{id: 'row-1', textValue: 'Row 1', cells: {amount: <input />}}]}
+    selectionMode="none"
+  />
+</AppearanceProvider>;`,
+      description:
+        'Table compares records. Use fields and an explicit edit flow instead of turning every cell into a spreadsheet editor.',
+      title: 'Do not imply spreadsheet editing',
+    },
+  ],
+  directionality: [
+    'Column order, start and end alignment, selection rails, and horizontal overflow follow inherited writing direction.',
+  ],
+  events: [
+    'onSortChange reports a column id and ascending or descending direction. Selection callbacks report row ids in current row order.',
+    'Controls inside action cells own their own events and do not trigger row selection.',
+  ],
+  examples: [
+    {
+      code: `<AppearanceProvider accent="#2878ff" appearance="dark">
+  <Table
+    ariaLabel="Run results"
+    columns={[
+      {id: 'run', label: 'Run', isRowHeader: true, allowsSorting: true},
+      {id: 'status', label: 'Status'},
+    ]}
+    emptyState={{kind: 'no-results', title: 'No matches', description: 'Change the query.'}}
+    onSortChange={(descriptor) => console.log(descriptor)}
+    rows={[{
+      id: 'run-284',
+      textValue: 'RUN 0284',
+      cells: {run: 'RUN 0284', status: 'Converged'},
+    }]}
+    selectionMode="none"
+  />
+</AppearanceProvider>;`,
+      description: 'A sortable row-header column identifies each comparable run.',
+      title: 'Sortable run results',
+    },
+  ],
+  exportName: 'Table',
+  forcedColorBehavior: [
+    'Headers, cells, boundaries, focus, selection, disabled rows, and overflow use system colors.',
+  ],
+  formBehavior: [
+    'Table does not serialize row selection. Controls placed in cells retain their own form behavior.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'spreadsheet editing, layout grids, hierarchical records, prose, menus, or collections without meaningful columns',
+  ],
+  keyboardBehavior: [
+    'Arrow keys move through rows and cells, Home and End reach row boundaries, typeahead finds row headers, Enter sorts headers, and Space or Enter changes selection.',
+    'Focusable controls in cells retain their own keyboard operation without becoming row activation.',
+  ],
+  kind: 'component',
+  labeling: [
+    'ariaLabel names the grid. isRowHeader marks the columns that name each row. Column and row text values support announcements and typeahead.',
+  ],
+  localization: [
+    'Consumers localize the table name, headers, cell content, action labels, empty copy, and status copy.',
+  ],
+  name: 'Table',
+  parts: [
+    'The component owns the overflow container, grid, headers, rows, cells, sorting affordance, selection treatment, and collection feedback.',
+  ],
+  preferredAlternatives: [
+    'Use DescriptionList for one subject, List for a readable sequence, ListBox for compact selection, or Tree for hierarchy.',
+  ],
+  preferredCompositions: [
+    'Place CollectionFilterBar before Table when the application coordinates query, filtering, and sortable results.',
+  ],
+  purpose:
+    'Table compares keyed records across typed columns with optional application-owned sorting and row selection.',
+  reducedMotionBehavior: [
+    'The selection rail and sort indicator settle without transition. Table adds no continuous motion.',
+  ],
+  relatedExports: [
+    'AppearanceProvider',
+    'Button',
+    'CollectionFilterBar',
+    'DescriptionList',
+    'EmptyState',
+    'IconButton',
+    'Link',
+    'List',
+    'Spinner',
+    'Tree',
+  ],
+  responsiveBehavior: [
+    'The table keeps its column relationships and scrolls horizontally when the available inline size is too small. Cells wrap ordinary content.',
+  ],
+  states: [
+    ...sharedCollectionStates,
+    'Rows support focused, selected, selection-disabled, hovered, and pressed states. Headers expose sortable and active sort-direction states.',
+  ],
+  stylesheet: './styles.css',
+  summary: 'Compare typed keyed rows with sorting, selection, and explicit cell actions.',
+  validation: [
+    'Column and row ids must be nonempty and unique. Every row provides exactly one cell for every declared column.',
+    'At least one column is a row header. Action columns cannot sort or name rows. An active sort descriptor names a sortable column.',
+    'Virtualization is not part of the public API.',
+  ],
+} as const satisfies ComponentContract;
+
+export const treeContract = {
+  accentBehavior: [
+    'Selected items use the established leading accent rail. Focus and expansion controls use the active accent roles.',
+  ],
+  accessibility: [
+    'Tree owns a labeled tree grid with hierarchical levels, positions, expansion state, disabled items, and optional selection.',
+    'Every expandable item includes a named chevron control. Nested actions remain separate named controls.',
+  ],
+  appearance: sharedCollectionAppearance,
+  appropriateUses: [
+    'nested keyed information needs disclosure, keyboard hierarchy navigation, and optional selection',
+  ],
+  composition: [
+    'Render Tree inside AppearanceProvider.',
+    'Provide recursive items with stable ids, plain labels for typeahead, optional descriptions, children, and visible nested actions.',
+  ],
+  contentRules: [
+    'Use hierarchy only when parent and child relationships change meaning. Keep labels concise and do not imitate indentation with spaces.',
+  ],
+  controlBehavior: [
+    'Expansion and selection are separate controlled or uncontrolled typed states.',
+    'Stable ids preserve focused items through insertion and reordering. Removing the focused item moves focus to a nearby remaining item.',
+  ],
+  counterExamples: [
+    {
+      code: `<AppearanceProvider accent="#2878ff" appearance="dark">
+  <Tree
+    ariaLabel="Commands"
+    collapseLabel="Collapse"
+    emptyState={{kind: 'no-data', title: 'No commands', description: 'No commands are available.'}}
+    expandLabel="Expand"
+    items={[{id: 'delete', label: 'Delete run'}]}
+    selectionMode="none"
+  />
+</AppearanceProvider>;`,
+      description: 'A flat command collection belongs in Menu or Toolbar, not a tree.',
+      title: 'Do not use hierarchy for commands',
+    },
+  ],
+  directionality: [
+    'Indentation, chevrons, expansion keys, nested actions, and selection rails follow inherited writing direction.',
+  ],
+  events: [
+    'onExpandedChange and onSelectionChange report ids in depth-first item order. Nested controls own their own events.',
+  ],
+  examples: [
+    {
+      code: `<AppearanceProvider accent="#2878ff" appearance="dark">
+  <Tree
+    ariaLabel="Study hierarchy"
+    collapseLabel="Collapse"
+    defaultExpandedIds={['study']}
+    emptyState={{kind: 'no-data', title: 'No studies', description: 'Create a study first.'}}
+    expandLabel="Expand"
+    items={[{
+      id: 'study',
+      label: 'Thermal study',
+      children: [{id: 'run-284', label: 'RUN 0284'}],
+    }]}
+    selectionMode="single"
+  />
+</AppearanceProvider>;`,
+      description: 'Expansion reveals runs while selection remains an independent state.',
+      title: 'Study and run hierarchy',
+    },
+  ],
+  exportName: 'Tree',
+  forcedColorBehavior: [
+    'Hierarchy, chevrons, focus, selection, disabled state, boundaries, and text use system colors.',
+  ],
+  formBehavior: [
+    'Tree does not serialize expansion or selection. Nested form controls retain their own behavior.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'flat commands, breadcrumb navigation, tabular comparison, arbitrary indentation, or relationship diagrams',
+  ],
+  keyboardBehavior: [
+    'Up and Down move between visible items. Logical Right and Left expand, collapse, or move between parent and child. Home, End, typeahead, and selection keys follow tree-grid behavior.',
+  ],
+  kind: 'component',
+  labeling: [
+    'ariaLabel names the tree grid. Item labels name rows and support typeahead. expandLabel and collapseLabel localize chevron commands.',
+  ],
+  localization: [
+    'Consumers localize the tree name, item labels and descriptions, expansion labels, action labels, empty copy, and status copy.',
+  ],
+  name: 'Tree',
+  parts: [
+    'The component owns the tree grid, recursive collection, levels, chevrons, item copy, action slot, focus recovery, selection, and feedback.',
+  ],
+  preferredAlternatives: [
+    'Use List for flat content, ListBox for flat selection, Table for columns, or SideNavigation for persistent destinations.',
+  ],
+  preferredCompositions: [
+    'Place Tree in Section or Surface and keep commands in each item actions slot.',
+  ],
+  purpose:
+    'Tree navigates keyed hierarchical information with explicit expansion and optional selection.',
+  reducedMotionBehavior: [
+    'Chevrons and the selection rail settle without transition. Tree adds no continuous motion.',
+  ],
+  relatedExports: [
+    'AppearanceProvider',
+    'Button',
+    'EmptyState',
+    'IconButton',
+    'List',
+    'ListBox',
+    'Menu',
+    'Section',
+    'SideNavigation',
+    'Spinner',
+    'Surface',
+    'Table',
+  ],
+  responsiveBehavior: [
+    'Long labels wrap within their hierarchy level. Compact layouts preserve indentation without causing document overflow.',
+  ],
+  states: [
+    ...sharedCollectionStates,
+    'Items support collapsed, expanded, focused, selected, disabled, hovered, and pressed states. Focus recovery follows dynamic updates.',
+  ],
+  stylesheet: './styles.css',
+  summary: 'Navigate and optionally select stable keyed hierarchy with explicit expansion.',
+  validation: [
+    'Every item id must be a nonempty stable string and unique across the full hierarchy.',
+    'Disabled items cannot contain active nested actions. Virtualization and asynchronous per-level loading are not public APIs.',
+  ],
+} as const satisfies ComponentContract;
+
+export const collectionFilterBarContract = {
+  accentBehavior: [
+    'Search and filter controls use the application accent for focus. Applied summaries keep neutral text and accent structure.',
+  ],
+  accessibility: [
+    'CollectionFilterBar owns one named search region containing a named search field, labeled filter selects, and a labeled list of applied query summaries.',
+    'Each applied summary has a named removal control. Clear all remains a separate named command.',
+  ],
+  appearance: sharedCollectionAppearance,
+  appropriateUses: [
+    'one text query and a bounded set of categorical filters coordinate a visible consumer-owned collection',
+  ],
+  composition: [
+    'Render CollectionFilterBar inside AppearanceProvider immediately before the collection it controls.',
+    'Define filters and options with stable ids. Keep data fetching, filtering, result counts, and sorting in the application.',
+  ],
+  contentRules: [
+    'Use short filter labels and option labels. Summary callbacks produce concise localized descriptions of the active query.',
+  ],
+  controlBehavior: [
+    'Controlled or uncontrolled query state contains text and an item-ordered list of filter id and option value pairs.',
+    'Changing, removing, or clearing criteria reports a complete next query. The component never filters data or resets collection state.',
+  ],
+  counterExamples: [
+    {
+      code: `<AppearanceProvider accent="#2878ff" appearance="dark">
+  <CollectionFilterBar
+    appliedFiltersLabel="Applied query"
+    ariaLabel="Filter runs"
+    clearAllLabel="Clear query"
+    filters={[]}
+    getFilterSummary={(filter, option) => filter + ': ' + option}
+    getRemoveLabel={(summary) => 'Remove ' + summary}
+    getSearchSummary={(text) => 'Search: ' + text}
+    searchClearLabel="Clear search"
+    searchLabel="Search runs"
+  />
+</AppearanceProvider>;`,
+      description:
+        'Do not hide network requests inside the filter controls. The application receives query changes and owns results.',
+      title: 'Do not make filters fetch data',
+    },
+  ],
+  directionality: [
+    'Control order, applied-summary flow, remove controls, and text follow inherited writing direction.',
+  ],
+  events: [
+    'onQueryChange reports the complete text and filter selection state after every search, select, remove, or clear command.',
+  ],
+  examples: [
+    {
+      code: `<AppearanceProvider accent="#2878ff" appearance="dark">
+  <CollectionFilterBar
+    appliedFiltersLabel="Applied query"
+    ariaLabel="Filter runs"
+    clearAllLabel="Clear query"
+    filters={[{
+      id: 'status',
+      label: 'Status',
+      emptyMessage: 'No statuses',
+      placeholder: 'Any status',
+      options: [{value: 'running', label: 'Running'}],
+    }]}
+    getFilterSummary={(filter, option) => filter + ': ' + option}
+    getRemoveLabel={(summary) => 'Remove ' + summary}
+    getSearchSummary={(text) => 'Search: ' + text}
+    searchClearLabel="Clear search"
+    searchLabel="Search runs"
+  />
+</AppearanceProvider>;`,
+      description: 'The query remains explicit while the application decides how results change.',
+      title: 'Run query controls',
+    },
+  ],
+  exportName: 'CollectionFilterBar',
+  forcedColorBehavior: [
+    'Controls, summaries, focus, remove commands, and boundaries use system colors.',
+  ],
+  formBehavior: [
+    'CollectionFilterBar does not submit or fetch data. The application may serialize the reported query separately.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'unbounded query builders, full-text editing, hidden data fetching, sorting, pagination, or collection rendering',
+  ],
+  keyboardBehavior: [
+    'Search and Select retain their field keyboard behavior. Tab reaches each field and applied-query command in reading order.',
+  ],
+  kind: 'component',
+  labeling: [
+    'ariaLabel names the search region. Every field, applied list, remove command, and clear command requires localized naming copy.',
+  ],
+  localization: [
+    'Consumers localize all field, option, summary, removal, clear, placeholder, and empty-option copy through required strings and callbacks.',
+  ],
+  name: 'CollectionFilterBar',
+  parts: [
+    'The component owns the named search region, search field, filter selects, explicit query state, applied summary list, and removal commands.',
+  ],
+  preferredAlternatives: [
+    'Use SearchField alone for text entry, Select for one unrelated choice, or a domain-specific query builder for unbounded conditions.',
+  ],
+  preferredCompositions: [
+    'Coordinate CollectionFilterBar with Table, Tree, ListBox, or CardCollection while the parent owns filtering and async data.',
+  ],
+  purpose:
+    'CollectionFilterBar reports explicit text and categorical query state with removable applied summaries.',
+  reducedMotionBehavior: ['The filter bar adds no motion beyond its composed controls.'],
+  relatedExports: [
+    'AppearanceProvider',
+    'CardCollection',
+    'ListBox',
+    'SearchField',
+    'Select',
+    'Table',
+    'Tree',
+  ],
+  responsiveBehavior: [
+    'Controls use equal responsive columns on wide layouts and stack at compact widths. Applied summaries wrap without document overflow.',
+  ],
+  states: [
+    'The query may be empty or applied and controlled or uncontrolled. Search and filter fields preserve their disabled-option, focus, open, and value states.',
+  ],
+  stylesheet: './styles.css',
+  summary:
+    'Coordinate explicit collection search and categorical filter state without fetching data.',
+  validation: [
+    'Filter and option ids must be nonempty and unique within their domains. A query may select each known filter at most once and must use a known option value.',
+  ],
+} as const satisfies ComponentContract;

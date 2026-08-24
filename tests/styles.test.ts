@@ -778,6 +778,51 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('outlines advanced collection rows and keeps filter controls compact', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const tableCellBoundary = styles.match(/\[data-wcl-table-cell\]::after \{([^}]*)\}/)?.[1];
+    const tableHover = styles.match(
+      /\[data-wcl-table-row\]:is\(\[data-hovered\], \[data-pressed\]\)\s+\[data-wcl-table-cell\]::after \{([^}]*)\}/,
+    )?.[1];
+    const tableHoverStart = styles.match(
+      /\[data-wcl-table-row\]:is\(\[data-hovered\], \[data-pressed\]\)\s+\[data-wcl-table-cell\]:first-child::after \{([^}]*)\}/,
+    )?.[1];
+    const tableHoverEnd = styles.match(
+      /\[data-wcl-table-row\]:is\(\[data-hovered\], \[data-pressed\]\)\s+\[data-wcl-table-cell\]:last-child::after \{([^}]*)\}/,
+    )?.[1];
+    const tableFocus = styles.match(
+      /\[data-wcl-table-row\]\[data-focus-visible\]\s+\[data-wcl-table-cell\]::after \{([^}]*)\}/,
+    )?.[1];
+    const treeHover = styles.match(
+      /\[data-wcl-tree-item\]:is\(\[data-hovered\], \[data-pressed\]\) \{([^}]*)\}/,
+    )?.[1];
+    const listBoxHover = styles.match(
+      /\[data-wcl-collection-option\]:is\(\[data-hovered\], \[data-pressed\]\) \{([^}]*)\}/,
+    )?.[1];
+    const filterControls = styles.match(/\[data-wcl-collection-filter-controls\] \{([^}]*)\}/)?.[1];
+
+    expect(tableCellBoundary).toContain('border-block: 1px solid transparent');
+    expect(tableCellBoundary).toContain("content: ''");
+    expect(tableHover).toContain('border-block-color: var(--wcl-accent-focus)');
+    expect(tableHoverStart).toContain('border-inline-start: 1px solid var(--wcl-accent-focus)');
+    expect(tableHoverEnd).toContain('border-inline-end: 1px solid var(--wcl-accent-focus)');
+    expect(tableHover).not.toContain('background:');
+    expect(tableHover).not.toContain('box-shadow:');
+    expect(tableFocus).toContain('border-block-width: 2px');
+    expect(treeHover).toContain('outline-color: var(--wcl-accent-focus)');
+    expect(treeHover).not.toContain('background:');
+    expect(listBoxHover).toContain('outline-color: var(--wcl-accent-focus)');
+    expect(listBoxHover).not.toContain('background:');
+    expect(styles).toMatch(
+      /\[data-wcl-card-option\]:is\(\[data-hovered\], \[data-pressed\]\) \[data-wcl-card\] \{[^}]*border-color:\s*var\(--wcl-accent-muted\)/,
+    );
+    expect(styles).not.toMatch(
+      /\[data-wcl-card-option\][^{]*\[data-selected\][^{]*\[data-wcl-card\] \{[^}]*border-color/,
+    );
+    expect(filterControls).toContain('--wcl-field-grid-rows: auto auto');
+    expect(filterControls).toContain('--wcl-field-support-display: none');
+  });
+
   it('does not decorate showcase specimens with an unexplained calibration tick', async () => {
     const styles = await readFile('showcase/styles.css', 'utf8');
     const stageRules = [...styles.matchAll(/\.showcase-specimen-stage\s*\{([^}]*)\}/g)];
@@ -840,10 +885,13 @@ describe('static appearance styles', () => {
       /\[data-wcl-text-area\]\s+\[data-wcl-field-control\]\s*\{([^}]*)\}/,
     )?.[1];
 
-    expect(field).toContain('grid-template-rows: auto auto minmax(2.25rem, auto)');
+    expect(field).toContain(
+      'grid-template-rows: var(--wcl-field-grid-rows, auto auto minmax(2.25rem, auto))',
+    );
     expect(control).toContain('min-block-size: 2.75rem');
     expect(control).toContain('block-size: 2.75rem');
     expect(support).toContain('min-block-size: 2.25rem');
+    expect(support).toContain('display: var(--wcl-field-support-display, grid)');
     expect(textArea).toContain('block-size: auto');
     expect(textArea).not.toContain('min-block-size: 7.5rem');
     expect(styles).not.toMatch(
@@ -1207,6 +1255,23 @@ describe('static appearance styles', () => {
 
     expect(trigger).toContain('box-sizing: border-box');
     expect(trigger).toContain('min-block-size: 2.75rem');
+  });
+
+  it('outlines disclosure and accordion rows without filling their hover surface', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const trigger = styles.match(/\[data-wcl-disclosure-trigger\]\s*\{([^}]*)\}/)?.[1];
+    const hover = styles.match(
+      /\[data-wcl-disclosure-trigger\]:is\(\[data-hovered\], \[data-pressed\]\)\s*\{([^}]*)\}/,
+    )?.[1];
+    const focus = styles.match(
+      /\[data-wcl-disclosure-trigger\]\[data-focus-visible\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(trigger).toContain('outline: 1px solid transparent');
+    expect(hover).toContain('outline-color: var(--wcl-accent-focus)');
+    expect(hover).not.toContain('background:');
+    expect(hover).not.toMatch(/(?:^|[\s;])color:/);
+    expect(focus).toContain('outline-width: 2px');
   });
 
   it('isolates disclosure row rhythm from consumer heading margins', async () => {

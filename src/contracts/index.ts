@@ -35,9 +35,12 @@ export {
 export {comboBoxContract, selectContract} from './selection.contracts.js';
 export {
   cardCollectionContract,
+  collectionFilterBarContract,
   descriptionListContract,
   listBoxContract,
   listContract,
+  tableContract,
+  treeContract,
 } from './collection.contracts.js';
 export {rangeSliderContract, sliderContract} from './range.contracts.js';
 export {
@@ -124,9 +127,12 @@ import {
 import {comboBoxContract, selectContract} from './selection.contracts.js';
 import {
   cardCollectionContract,
+  collectionFilterBarContract,
   descriptionListContract,
   listBoxContract,
   listContract,
+  tableContract,
+  treeContract,
 } from './collection.contracts.js';
 import {rangeSliderContract, sliderContract} from './range.contracts.js';
 import {
@@ -179,6 +185,7 @@ export const componentContracts = [
   checkboxContract,
   checkboxGroupContract,
   comboBoxContract,
+  collectionFilterBarContract,
   contextMenuContract,
   dateFieldContract,
   datePickerContract,
@@ -224,10 +231,12 @@ export const componentContracts = [
   surfaceContract,
   switchContract,
   tabsContract,
+  tableContract,
   textAreaContract,
   textFieldContract,
   timeFieldContract,
   toggleButtonContract,
   toolbarContract,
   tooltipContract,
+  treeContract,
 ] as const;

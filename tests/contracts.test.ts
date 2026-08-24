@@ -48,6 +48,7 @@ describe('canonical component contracts', () => {
       'Checkbox',
       'CheckboxGroup',
       'ComboBox',
+      'CollectionFilterBar',
       'ContextMenu',
       'DateField',
       'DatePicker',
@@ -93,12 +94,14 @@ describe('canonical component contracts', () => {
       'Surface',
       'Switch',
       'Tabs',
+      'Table',
       'TextArea',
       'TextField',
       'TimeField',
       'ToggleButton',
       'Toolbar',
       'Tooltip',
+      'Tree',
     ];
 
     expect(validateComponentContracts(componentContracts, exportNames)).toHaveLength(
@@ -124,6 +127,22 @@ describe('canonical component contracts', () => {
     );
     expect(contractFor('CardCollection')?.accessibility.join(' ')).toMatch(
       /native list.*articles.*grid list/i,
+    );
+  });
+
+  it('keeps tables, trees, and collection query controls distinct', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('Table')?.controlBehavior.join(' ')).toMatch(
+      /sort.*reports|reports.*sort|never.*sort/i,
+    );
+    expect(contractFor('Table')?.inappropriateUses.join(' ')).toMatch(/spreadsheet/i);
+    expect(contractFor('Tree')?.controlBehavior.join(' ')).toMatch(
+      /expansion.*selection.*separate/i,
+    );
+    expect(contractFor('CollectionFilterBar')?.controlBehavior.join(' ')).toMatch(
+      /query.*never filters|never filters.*query|never.*filter/i,
     );
   });
 

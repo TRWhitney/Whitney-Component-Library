@@ -163,6 +163,34 @@ describe('component showcase', () => {
     expect(getByRole('region', {name: 'Showcase notifications'})).toBeTruthy();
   });
 
+  it('sorts the table showcase by each semantic data column', () => {
+    const {container} = render(<Showcase />);
+    const filters = container.querySelector('[data-showcase-component="CollectionFilterBar"]');
+    const specimen = container.querySelector('[data-showcase-component="Table"]');
+    if (!(filters instanceof HTMLElement) || !(specimen instanceof HTMLElement)) {
+      throw new Error('The collection showcase is incomplete.');
+    }
+
+    fireEvent.click(within(filters).getByRole('button', {name: 'Clear query'}));
+
+    const table = within(specimen).getByRole('grid', {name: 'Filtered run results'});
+    const status = within(table).getByRole('columnheader', {name: /Status/});
+    const profile = within(table).getByRole('columnheader', {name: /Profile/});
+    fireEvent.click(status);
+    expect(status.getAttribute('aria-sort')).toBe('ascending');
+    expect(
+      within(within(table).getAllByRole('row')[1] as HTMLElement).getAllByRole('gridcell')[0]
+        ?.textContent,
+    ).toBe('Converged');
+
+    fireEvent.click(profile);
+    expect(profile.getAttribute('aria-sort')).toBe('ascending');
+    expect(
+      within(within(table).getAllByRole('row')[1] as HTMLElement).getAllByRole('gridcell')[1]
+        ?.textContent,
+    ).toBe('Balanced');
+  });
+
   it('toggles a three-card scroll viewport for the same notification controls', () => {
     const {getByRole} = render(<Showcase />);
     const capToggle = getByRole('button', {name: 'Cap stack at three'});

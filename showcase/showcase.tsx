@@ -20,6 +20,7 @@ import {
   Checkbox,
   CheckboxGroup,
   ComboBox,
+  CollectionFilterBar,
   ContextMenu,
   DateField,
   DatePicker,
@@ -65,22 +66,48 @@ import {
   Surface,
   Switch,
   Tabs,
+  Table,
   TextArea,
   TextField,
   TimeField,
   ToggleButton,
   Toolbar,
   Tooltip,
+  Tree,
   type AccentColor,
   type Appearance,
   type BreadcrumbItems,
+  type CollectionQueryFor,
   type DrawerPlacement,
   type FieldControlProps,
   type FileAcquisitionResult,
+  type TableSortDescriptor,
 } from '../src/index.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
 
 const defaultAccent: AccentColor = '#2878ff';
+const runCollectionFilters = [
+  {
+    emptyMessage: 'No statuses',
+    id: 'status',
+    label: 'Status',
+    options: [
+      {label: 'Converged', value: 'converged'},
+      {label: 'Solving', value: 'solving'},
+    ],
+    placeholder: 'Any status',
+  },
+  {
+    emptyMessage: 'No profiles',
+    id: 'profile',
+    label: 'Profile',
+    options: [
+      {label: 'Balanced', value: 'balanced'},
+      {label: 'Fast', value: 'fast'},
+    ],
+    placeholder: 'Any profile',
+  },
+] as const;
 const workspaceBreadcrumb = {href: '#workspace', id: 'workspace', label: 'Workspace'} as const;
 const studiesBreadcrumb = {
   href: '#thermal-studies',
@@ -654,11 +681,45 @@ function NavigationSpecimens() {
 }
 
 function CollectionSpecimens() {
+  const [query, setQuery] = useState<CollectionQueryFor<typeof runCollectionFilters>>({
+    filters: [{filterId: 'status', value: 'converged'}],
+    text: '',
+  });
+  const [sortDescriptor, setSortDescriptor] = useState<
+    TableSortDescriptor<'actions' | 'profile' | 'run' | 'status'>
+  >({column: 'run', direction: 'ascending'});
   const emptyState = {
     description: 'Create a run to populate this collection.',
     kind: 'no-data' as const,
     title: 'No runs yet',
   };
+  const runRecords = [
+    {id: 'run-284', profile: 'Balanced', run: 'RUN 0284', status: 'Converged'},
+    {id: 'run-283', profile: 'Fast', run: 'RUN 0283', status: 'Converged'},
+    {id: 'run-282', profile: 'Balanced', run: 'RUN 0282', status: 'Solving'},
+    {id: 'run-281', profile: 'Fast', run: 'RUN 0281', status: 'Converged'},
+    {id: 'run-280', profile: 'Balanced', run: 'RUN 0280', status: 'Converged'},
+    {id: 'run-279', profile: 'Fast', run: 'RUN 0279', status: 'Solving'},
+    {id: 'run-278', profile: 'Balanced', run: 'RUN 0278', status: 'Converged'},
+    {id: 'run-277', profile: 'Fast', run: 'RUN 0277', status: 'Converged'},
+  ] as const;
+  const selectedFilters = new Map(query.filters.map((filter) => [filter.filterId, filter.value]));
+  const visibleRuns = [
+    ...runRecords.filter((run) => {
+      const textMatches = run.run.toLocaleLowerCase().includes(query.text.toLocaleLowerCase());
+      const status = selectedFilters.get('status');
+      const profile = selectedFilters.get('profile');
+      return (
+        textMatches &&
+        (status === undefined || run.status.toLocaleLowerCase() === status) &&
+        (profile === undefined || run.profile.toLocaleLowerCase() === profile)
+      );
+    }),
+  ].sort((first, second) => {
+    if (sortDescriptor.column === 'actions') return 0;
+    const direction = sortDescriptor.direction === 'ascending' ? 1 : -1;
+    return first[sortDescriptor.column].localeCompare(second[sortDescriptor.column]) * direction;
+  });
 
   return (
     <>
@@ -758,6 +819,95 @@ function CollectionSpecimens() {
             />
           </Example>
         </Stack>
+      </Specimen>
+
+      <Specimen
+        description="Report a complete text and categorical query while the parent keeps filtering and data fetching. Applied criteria remain visible and removable."
+        name="CollectionFilterBar"
+      >
+        <CollectionFilterBar
+          appliedFiltersLabel="Applied query"
+          ariaLabel="Filter run results"
+          clearAllLabel="Clear query"
+          filters={runCollectionFilters}
+          getFilterSummary={(filter, option) => `${filter}: ${option}`}
+          getRemoveLabel={(summary) => `Remove ${summary}`}
+          getSearchSummary={(text) => `Search: ${text}`}
+          onQueryChange={setQuery}
+          query={query}
+          searchClearLabel="Clear run search"
+          searchLabel="Search runs"
+          searchPlaceholder="RUN number"
+        />
+      </Specimen>
+
+      <Specimen
+        description="Compare typed columns and sort application-owned rows. Selection stays separate from visible controls in the actions column."
+        name="Table"
+      >
+        <Table
+          ariaLabel="Filtered run results"
+          columns={[
+            {allowsSorting: true, id: 'run', isRowHeader: true, label: 'Run'},
+            {allowsSorting: true, id: 'status', label: 'Status'},
+            {allowsSorting: true, id: 'profile', label: 'Profile'},
+            {id: 'actions', kind: 'actions', label: 'Actions'},
+          ]}
+          defaultSelectedIds={['run-284']}
+          emptyState={{
+            description: 'Clear or change the current query.',
+            kind: 'no-results',
+            title: 'No matching runs',
+          }}
+          onSortChange={setSortDescriptor}
+          rows={visibleRuns.map((run) => ({
+            cells: {
+              actions: <Button size="compact">Inspect {run.run}</Button>,
+              profile: run.profile,
+              run: run.run,
+              status: run.status,
+            },
+            id: run.id,
+            textValue: run.run,
+          }))}
+          selectionMode="multiple"
+          sortDescriptor={sortDescriptor}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Navigate a stable keyed hierarchy with expansion and selection as separate states. Commands remain explicit nested controls."
+        name="Tree"
+      >
+        <Tree
+          ariaLabel="Study run hierarchy"
+          collapseLabel="Collapse"
+          defaultExpandedIds={['thermal-study']}
+          defaultSelectedId="run-284"
+          emptyState={emptyState}
+          expandLabel="Expand"
+          items={[
+            {
+              children: [
+                {
+                  actions: <Button size="compact">Inspect run</Button>,
+                  description: 'Converged',
+                  id: 'run-284',
+                  label: 'RUN 0284',
+                },
+                {description: 'Solving', id: 'run-282', label: 'RUN 0282'},
+              ],
+              id: 'thermal-study',
+              label: 'Thermal study',
+            },
+            {
+              children: [{id: 'run-191', label: 'RUN 0191'}],
+              id: 'airflow-study',
+              label: 'Airflow study',
+            },
+          ]}
+          selectionMode="single"
+        />
       </Specimen>
     </>
   );
@@ -1938,7 +2088,7 @@ export function Showcase() {
             <section aria-labelledby="collections-heading" className="showcase-family">
               <header className="showcase-family-header">
                 <span>Data and collections</span>
-                <h2 id="collections-heading">Read, compare, and select keyed items</h2>
+                <h2 id="collections-heading">Query, compare, and navigate keyed data</h2>
               </header>
               <CollectionSpecimens />
             </section>

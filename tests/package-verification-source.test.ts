@@ -122,6 +122,20 @@ describe('packed consumer verification source', () => {
     expect(source).toContain('Packed basic collections did not preserve their distinct semantics.');
   });
 
+  it('exercises every advanced collection export through the packed API', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of ['CollectionFilterBar', 'Table', 'Tree']) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-collection-filter-bar');
+    expect(source).toContain('data-wcl-table-grid');
+    expect(source).toContain('data-wcl-tree-grid');
+    expect(source).toContain(
+      'Packed advanced collections did not preserve query, table, and tree semantics.',
+    );
+  });
+
   it('exercises single and paired range entry through the packed API', () => {
     const source = createConsumerVerificationSource('@fixture/component-library');
 

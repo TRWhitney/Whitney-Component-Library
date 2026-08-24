@@ -14,6 +14,7 @@ import {
   Checkbox,
   CheckboxGroup,
   ComboBox,
+  CollectionFilterBar,
   DateField,
   DatePicker,
   DateRangePicker,
@@ -50,11 +51,13 @@ import {
   StatusIndicator,
   Surface,
   Switch,
+  Table,
   TextArea,
   TextField,
   TimeField,
   ToggleButton,
   Toolbar,
+  Tree,
 } from '${packageName}';
 
 const manifest = (await import('${packageName}/manifest.json', {with: {type: 'json'}})).default;
@@ -256,6 +259,69 @@ const view = React.createElement(
           emptyState: {description: 'Create a run first.', kind: 'no-data', title: 'No runs'},
           headingLevel: 3,
           items: [{description: 'Complete', id: 'run-284', title: 'RUN 0284'}],
+          selectionMode: 'none',
+        }),
+        React.createElement(CollectionFilterBar, {
+          appliedFiltersLabel: 'Applied run filters',
+          ariaLabel: 'Filter packed runs',
+          clearAllLabel: 'Clear all filters',
+          defaultQuery: {
+            filters: [{filterId: 'status', value: 'complete'}],
+            text: 'thermal',
+          },
+          filters: [
+            {
+              emptyMessage: 'No statuses',
+              id: 'status',
+              label: 'Status',
+              options: [
+                {label: 'Complete', value: 'complete'},
+                {label: 'Review', value: 'review'},
+              ],
+              placeholder: 'Any status',
+            },
+          ],
+          getFilterSummary: (filterLabel, optionLabel) => filterLabel + ': ' + optionLabel,
+          getRemoveLabel: (summary) => 'Remove ' + summary,
+          getSearchSummary: (text) => 'Search: ' + text,
+          searchClearLabel: 'Clear run search',
+          searchLabel: 'Search packed runs',
+        }),
+        React.createElement(Table, {
+          ariaLabel: 'Packed run comparison',
+          columns: [
+            {allowsSorting: true, id: 'run', isRowHeader: true, label: 'Run'},
+            {id: 'status', label: 'Status'},
+            {id: 'actions', kind: 'actions', label: 'Actions'},
+          ],
+          emptyState: {description: 'Create a run first.', kind: 'no-data', title: 'No runs'},
+          onSortChange: () => undefined,
+          rows: [
+            {
+              cells: {
+                actions: React.createElement('button', {type: 'button'}, 'Open packed run'),
+                run: 'RUN 0284',
+                status: 'Complete',
+              },
+              id: 'run-284',
+              textValue: 'RUN 0284 Complete',
+            },
+          ],
+          selectionMode: 'none',
+        }),
+        React.createElement(Tree, {
+          ariaLabel: 'Packed study tree',
+          collapseLabel: 'Collapse study',
+          defaultExpandedIds: ['thermal'],
+          emptyState: {description: 'Create a study first.', kind: 'no-data', title: 'No studies'},
+          expandLabel: 'Expand study',
+          items: [
+            {
+              children: [{id: 'thermal-run', label: 'RUN 0284'}],
+              id: 'thermal',
+              label: 'Thermal study',
+            },
+          ],
           selectionMode: 'none',
         }),
         React.createElement(DateField, {
@@ -622,6 +688,16 @@ if (
   document.querySelector('[data-wcl-card-list] article')?.getAttribute('aria-label') !== 'RUN 0284'
 ) {
   throw new Error('Packed basic collections did not preserve their distinct semantics.');
+}
+if (
+  document.querySelector('[data-wcl-collection-filter-bar]')?.getAttribute('role') !== 'search' ||
+  document.querySelectorAll('[data-wcl-applied-filter]').length !== 2 ||
+  document.querySelector('[data-wcl-table-grid]')?.getAttribute('role') !== 'grid' ||
+  document.querySelectorAll('[data-wcl-table-row]').length !== 1 ||
+  document.querySelector('[data-wcl-tree-grid]')?.getAttribute('role') !== 'treegrid' ||
+  document.querySelectorAll('[data-wcl-tree-item]').length !== 2
+) {
+  throw new Error('Packed advanced collections did not preserve query, table, and tree semantics.');
 }
 if (document.querySelector('[data-wcl-combo-box] input')?.getAttribute('role') !== 'combobox') {
   throw new Error('Packed combo box did not preserve editable autocomplete semantics.');

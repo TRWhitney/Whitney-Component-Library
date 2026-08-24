@@ -9,7 +9,8 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 15, including the intervening Ticket 03A accent correction, are complete. Menu
+Tickets 01 through 16, including the intervening Ticket 03A accent correction, are complete. Ticket
+17 is next. Menu
 and ContextMenu now use whole-row item highlights without a leading entry rail. The maintained human
 showcase covers every contracted public component. Manual screen-reader operation is intentionally
 consolidated in the Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
@@ -231,7 +232,7 @@ without owning the application router or generic sidebar layout.
 
 ## Frontier
 
-See the [decision map](map.md). Ticket 15 is delivered; Ticket 16 is the next accepted unit.
+See the [decision map](map.md). Ticket 17 is the next unit.
 
 ## Accepted sources
 
@@ -257,6 +258,24 @@ See the [decision map](map.md). Ticket 15 is delivered; Ticket 16 is the next ac
 - Repository-owned evaluation of agent output or a prescribed consumer evaluation workflow.
 
 ## Current verification
+
+- Ticket 16 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
+  types, 23 test files with 393 tests, generated guidance, package build, and public declarations
+  under TypeScript 5.9, 6, and 7. `npm run showcase:build`, `npm run verify:package`, and
+  `git diff --check` pass. Packed React 18.3.1 and 19.2.8 consumers pass SSR, hydration,
+  declarations, advanced-collection semantic assertions, and browser builds.
+- Ticket 16 direct browser evidence covers sorting, selection versus embedded actions, recursive
+  expansion, query filtering and clearing, compact responsive overflow, 200 percent zoom, RTL,
+  forced colors, and reduced motion. Chromium directly confirms a painted table-row hover boundary,
+  logical RTL edges, forced-color edges, and application-owned sorting by Run, Status, and Profile.
+  Chromium, Firefox, and WebKit expose the expected search, grid, and treegrid structures without
+  document overflow or page errors. Inspected Table, Tree, CollectionFilterBar, ListBox,
+  selectable-card, Disclosure, and Accordion states confirm the accepted compact spacing and
+  accent-outline hover language; temporary screenshots were discarded.
+- Independent intent and engineering correction reviews pass with no blocking findings, unresolved
+  judgments, nonblocking follow-ups, or missing evidence. They confirm the cell-painted table-row
+  boundary and the three sortable data columns satisfy the corrected Ticket 16 behavior without
+  changing row layout, selection, RTL edges, forced-color visibility, or action-column semantics.
 
 - Ticket 15 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
   types, 22 test files with 375 tests, generated guidance, package build, and public declarations
@@ -384,7 +403,7 @@ See the [decision map](map.md). Ticket 15 is delivered; Ticket 16 is the next ac
 
 ## Continuation
 
-Continue to Ticket 16 from novel-work delivery with
-`python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py move novel-work delivery implementation`
-and begin the table, tree, and filter slice. Current branch: `master`. Ticket 15 is delivered by the
-commit containing this record.
+Ticket 16 is complete on `master`. Start Ticket 17 from its accepted application-structure sources
+when Whitney asks for the next ticket. The Ticket 16 outcome owns its implementation, tests,
+contracts, generated guidance, showcase, package verifier, shared collection-row styling, and work
+record.
