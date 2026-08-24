@@ -10,17 +10,17 @@
 
 ## Question
 
-Which public component and higher-level construct use cases must the initial pre-release slice
-support so it demonstrates the library's system coherently without constraining the stable catalog?
+Which public component use cases must the initial pre-release slice support so it demonstrates the
+library's system coherently without constraining the stable catalog or prescribing an application?
 
 ## Answer
 
-Use a **breadth-aware vertical slice**. The initial pre-release slice must support one complete,
-domain-independent workflow for configuring an operation, validating and reviewing it, executing
-it, and monitoring its semantic status and progress. It includes the theme and accent boundary,
-actions, the input and selection controls required by the workflow, semantic status and progress,
-dialog-based review, field and section composition, and a higher-level workflow construct that
-owns the relationships among those parts.
+Use a **breadth-aware vertical slice**. One non-exported consumer fixture configures an operation,
+validates and reviews it, executes it, and monitors its semantic status and progress using only
+public package components. The required public capabilities are the theme and accent boundary,
+actions, relevant input and selection controls, semantic status and progress, dialog-based review,
+field and section composition, and a staged-process tracker. The fixture owns the workflow and
+layout relationships among those parts.
 
 Before its public foundations are frozen, map the wider action, input, selection, overlay,
 collection, navigation, feedback, layout, and composition territory and validate cross-cutting
@@ -36,10 +36,10 @@ including accepted specialized components, have exercised the foundation.
 
 ## Evidence
 
-- The release must expose components, styles, behaviors, agent-facing guidance, and at least one
-  higher-level construct to exercise all four project goals as one system.
-- A primitives-only catalog would not demonstrate synthesis or give agents a preferred path for a
-  recurring advanced use case.
+- The release must expose components, styles, behaviors, and agent-facing guidance while proving
+  that they compose through the packed public package.
+- A staged-process tracker demonstrates useful synthesis without turning a complete workflow into
+  a component.
 - A broad parity catalog would multiply unsettled component semantics and delay evidence that the
   library's distinctive contracts and visual direction work together.
 - The accepted prototype provides evidence for tool and simulator workflows involving
@@ -47,4 +47,5 @@ including accepted specialized components, have exercised the foundation.
   but its application-specific content is not itself a proposed component API.
 - [Component Library Context](../../../CONTEXT.md)
 - [Architecture decision: Build a Breadth-Aware Vertical Slice](../../../docs/adr/0005-build-a-breadth-aware-vertical-slice.md)
+- [Architecture decision: Own Reusable Concepts, Not Applications](../../../docs/adr/0012-own-reusable-concepts-not-applications.md)
 - [Interactive visual direction prototype](../prototypes/visual-directions.html)

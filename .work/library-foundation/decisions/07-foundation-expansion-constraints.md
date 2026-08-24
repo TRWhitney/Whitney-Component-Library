@@ -25,8 +25,8 @@ implement every listed component in the first release:
   transient notifications.
 - **Layout and composition:** stacks, inline groups, fields, sections, panels, toolbars, and
   responsive compound regions.
-- **Higher-level constructs:** recurring tool and simulator workflows that coordinate primitives,
-  status, actions, and responsive relationships.
+- **Reusable composites:** recurring semantic or behavioral relationships that justify a bounded
+  component without prescribing a consumer workflow or application layout.
 
 Before the foundation stabilizes, model representative hard cases across those families:
 
@@ -44,8 +44,9 @@ Before the foundation stabilizes, model representative hard cases across those f
   keyboard movement, and future scale constraints.
 - Progress and transient notification test live semantic state, timing, interruption, and reduced
   motion.
-- The accepted workflow composition tests slots, coordinated state, Route, responsive reflow, and
-  guidance toward a higher-level construct.
+- The accepted operational fixture tests public-package interoperability, coordinated consumer
+  state, and responsive composition. Its staged process remains the only new composite identified
+  by that application example.
 
 These models must exercise shared conventions for labeling, descriptions, validation,
 disabled/read-only/required/pending states, controlled and uncontrolled state, form submission,
@@ -64,3 +65,4 @@ They are evidence against architectural lock-in, not hidden first-release produc
 - [Behavior and Accessibility Foundation](03-behavior-foundation.md)
 - [Agent-Facing Contract](04-agent-contract.md)
 - [Visual Direction and Permitted Variation](05-visual-direction.md)
+- [Reusable Composite Boundary](16-reusable-composite-boundary.md)

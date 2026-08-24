@@ -12,7 +12,7 @@ PageHeader coordinates page identity, semantic status, ancestry, description, an
 
 ## Prefer instead
 
-- Use Section for local headed content, Surface for an unheaded panel, or a workflow construct for staged identity and progress.
+- Use Section for local headed content, Surface for an unheaded panel, or ProcessTracker for staged status alongside separate progress.
 
 ## Composition and parts
 

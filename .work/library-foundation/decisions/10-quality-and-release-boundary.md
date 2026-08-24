@@ -19,12 +19,12 @@ stable?
 
 ## Answer
 
-Use successive `0.x` milestones for the operational workflow, data analysis, Markdown authoring,
-and application workbench slices. Publish prereleases, if published externally, under a non-default
-tag such as `next`; the library is not intended for application adoption and `latest` remains
-unused until stable release. Breaking changes may occur between `0.x` minors, but each milestone
-must pass its applicable quality checks and update affected contracts, generated guidance, and all
-four integration slices.
+Use successive `0.x` milestones for the catalog and its operational, data-analysis, Markdown, and
+application-workbench integration fixtures. Publish prereleases, if published externally, under a
+non-default tag such as `next`; the library is not intended for application adoption and `latest`
+remains unused until stable release. Breaking changes may occur between `0.x` minors, but each
+milestone must pass its applicable quality checks and update affected contracts, generated
+guidance, and fixtures.
 
 Component and slice tickets verify their assistive-technology surface through automated semantic,
 relationship, state, keyboard, and browser accessibility-tree checks. Manual screen-reader
@@ -55,7 +55,8 @@ unless the ticket explicitly makes that matrix part of its acceptance criteria.
 Stable `1.0` requires explicit acceptance after all of the following remain true:
 
 - The accepted broad conventional catalog, Markdown editor, and chart family are production-ready.
-- All four integration slices use only public package APIs and no external component substitutes.
+- All four non-exported integration fixtures use only public package APIs and no external
+  component substitutes. Their application arrangements are not release contracts.
 - Every export has a complete canonical component contract; human guidance, manifest, and agent
   index regenerate without drift.
 - Examples and public declarations pass TypeScript 5.9, 6, and 7 without exposing private React
@@ -89,4 +90,5 @@ not a release gate.
 - [Distribution and Compatibility Contract](09-distribution-and-compatibility.md) establishes the
   compiler, browser, React, package, SSR, and hydration matrix that release evidence must cover.
 - [Prerelease Integration Slice Set](14-prerelease-slice-set.md)
+- [Reusable Composite Boundary](16-reusable-composite-boundary.md)
 - [Architecture decision: Stabilize After Broad Prerelease Validation](../../../docs/adr/0009-stabilize-after-broad-prerelease-validation.md)

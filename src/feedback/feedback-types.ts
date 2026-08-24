@@ -4,6 +4,25 @@ export type AnnouncementMode = 'off' | 'polite' | 'assertive';
 export type StatusTone = 'neutral' | 'success' | 'warning' | 'danger';
 export type BadgeTone = StatusTone | 'accent';
 
+export type ProcessStageStatus = 'complete' | 'active' | 'pending' | 'warning' | 'failed';
+
+export interface ProcessStage {
+  readonly description?: string;
+  readonly id: string;
+  readonly label: string;
+  readonly status: ProcessStageStatus;
+}
+
+export type ProcessStages = readonly [ProcessStage, ...ProcessStage[]];
+export type ProcessStatusLabels = Readonly<Record<ProcessStageStatus, string>>;
+
+export interface ProcessTrackerProps {
+  readonly announcement?: AnnouncementMode;
+  readonly ariaLabel: string;
+  readonly stages: ProcessStages;
+  readonly statusLabels: ProcessStatusLabels;
+}
+
 export interface StatusIndicatorProps {
   readonly announcement?: AnnouncementMode;
   readonly label: string;

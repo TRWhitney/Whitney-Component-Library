@@ -48,6 +48,7 @@ import {
   NumberField,
   Pagination,
   PageHeader,
+  ProcessTracker,
   ProgressBar,
   Popover,
   RangeSlider,
@@ -1591,6 +1592,63 @@ function FeedbackSpecimens() {
             <StatusIndicator label="Not started" tone="neutral" />
           </Example>
         </InlineGroup>
+      </Specimen>
+
+      <Specimen
+        description="Report the ordered status of a staged process without turning its stages into navigation or prescribing the surrounding workflow. Use ProgressBar when one stage also has measurable progress."
+        name="ProcessTracker"
+      >
+        <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
+          <Example label="Active ProcessTracker">
+            <ProcessTracker
+              ariaLabel="Thermal solve stages"
+              stages={[
+                {
+                  description: '12 surfaces, no open edges',
+                  id: 'geometry',
+                  label: 'Geometry validated',
+                  status: 'complete',
+                },
+                {
+                  description: '4 of 6 conditions resolved',
+                  id: 'boundary',
+                  label: 'Boundary pass',
+                  status: 'active',
+                },
+                {id: 'solve', label: 'Solve pending', status: 'pending'},
+              ]}
+              statusLabels={{
+                active: 'Active',
+                complete: 'Complete',
+                failed: 'Failed',
+                pending: 'Pending',
+                warning: 'Needs review',
+              }}
+            />
+          </Example>
+          <Example label="Interrupted ProcessTracker">
+            <ProcessTracker
+              ariaLabel="Import stages"
+              stages={[
+                {id: 'read', label: 'Source read', status: 'complete'},
+                {
+                  description: 'Two records need review',
+                  id: 'validate',
+                  label: 'Validation',
+                  status: 'warning',
+                },
+                {id: 'write', label: 'Write stopped', status: 'failed'},
+              ]}
+              statusLabels={{
+                active: 'Active',
+                complete: 'Complete',
+                failed: 'Failed',
+                pending: 'Pending',
+                warning: 'Needs review',
+              }}
+            />
+          </Example>
+        </ResponsiveGrid>
       </Specimen>
 
       <Specimen

@@ -14,10 +14,10 @@ stable?
 
 ## Answer
 
-Require four materially distinct prerelease integration slices:
+Require four materially distinct non-exported consumer fixtures:
 
-1. **Operational workflow:** configure, validate, review, execute, and monitor through entry,
-   choice, validation, dialogs, actions, progress, status, and responsive workflow composition.
+1. **Operation lifecycle:** configure, validate, review, execute, and monitor through entry,
+   choice, validation, dialogs, actions, progress, status, and consumer-owned composition.
 2. **Data analysis workspace:** search, filter, sort, select, compare, chart, inspect details, and
    handle loading, empty, partial, and error states through collections, tables, charts, tooltips,
    coordinated selection, dense layout, and data-state behavior.
@@ -29,10 +29,11 @@ Require four materially distinct prerelease integration slices:
    consumer-owned application layout, collapsible navigation pane, page header, disclosure,
    overlays, split views, and transient feedback.
 
-The slices do not restrict the catalog. Other accepted conventional components retain their own
-contracts, examples, and behavior tests even when they are not central to a slice. Stable release
-requires all four slices to consume only the package's public surface without private imports or
-external component substitutes.
+The fixtures do not restrict the catalog and do not define public workspace, workflow, workbench,
+layout, or state-coordination contracts. Other accepted components retain their own contracts,
+examples, and behavior tests even when they are not central to a fixture. Stable release requires
+all four fixtures to consume only the package's public surface without private imports or external
+component substitutes.
 
 ## Evidence
 
@@ -42,3 +43,4 @@ external component substitutes.
 - [Initial Prerelease Export Catalog](08-initial-export-catalog.md)
 - [Markdown Editor Scope](12-markdown-editor-scope.md)
 - [Charting Scope](13-charting-scope.md)
+- [Reusable Composite Boundary](16-reusable-composite-boundary.md)

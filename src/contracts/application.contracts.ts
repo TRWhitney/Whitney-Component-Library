@@ -108,7 +108,7 @@ export const pageHeaderContract = {
     'PageHeader exposes optional breadcrumb and context rows, one identity-to-status Route, one heading and description group, and one action group.',
   ],
   preferredAlternatives: [
-    'Use Section for local headed content, Surface for an unheaded panel, or a workflow construct for staged identity and progress.',
+    'Use Section for local headed content, Surface for an unheaded panel, or ProcessTracker for staged status alongside separate progress.',
   ],
   preferredCompositions: [
     'Compose PageHeader in an application-owned page region with Breadcrumbs, optional status content, ButtonGroup, or Toolbar.',
@@ -120,6 +120,7 @@ export const pageHeaderContract = {
     'Breadcrumbs',
     'Button',
     'ButtonGroup',
+    'ProcessTracker',
     'Section',
     'StatusIndicator',
     'Toolbar',

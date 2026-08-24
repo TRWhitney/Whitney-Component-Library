@@ -4,18 +4,20 @@
 
 Establish and implement the first coherent release of a reusable component, style, and behavior
 library whose APIs and guidance constrain agent-authored applications toward consistent,
-appropriate results while preserving deliberate extension through higher-level constructs and a
+appropriate results while preserving deliberate extension through reusable composites and a
 propagated application accent.
 
 ## Current state
 
-Tickets 01 through 17, including the intervening Ticket 03A accent correction, are complete. The
-Ticket 17 correction removes ApplicationShell, keeps CollapsibleNavigationPane's existing appearance
-without a placement requirement, gives PageHeader arbitrary status content with an independent
-semantic tone, and lets SplitView collapse either pane unambiguously. Manual screen-reader operation
-remains consolidated in the Ticket 30 pre-`1.0` release gate.
+Tickets 01 through 18, including the intervening Ticket 03A accent correction, are complete.
+The future-ticket audit is complete. Ticket 18 delivers ProcessTracker and a non-exported
+operational integration fixture that proves one coherent stateful flow. The data-analysis,
+Markdown-authoring, and application-workbench
+tickets retain only non-exported integration proof. The speculative forward-expansion probe ticket
+is removed, and the release gates no longer require public application constructs. Manual
+screen-reader operation remains consolidated in the pre-`1.0` release gate.
 
-The library remains pre-adoption. Four completed `0.x` integration slices, a broad conventional
+The library remains pre-adoption. Four completed `0.x` integration fixtures, a broad conventional
 catalog, the accepted Markdown editing surface, the accessible chart family including radar
 charts, and the final compatibility and quality gates are required before `1.0`.
 
@@ -36,7 +38,8 @@ charts, and the final compatibility and quality gates are required before `1.0`.
   same-hue structure support hover, focus, rails, and boundaries where the exact accent is not
   sufficiently visible. Ordinary content remains neutral and success, warning, and danger remain
   semantically independent.
-- Vertical slices prove integration without limiting catalog breadth. Stable scope includes
+- Consumer fixtures prove integration without limiting catalog breadth or prescribing application
+  arrangements. Stable scope includes
   conventional controls, application structure, feedback, overlays, collections, an Obsidian-like
   Markdown-valued editing surface, and standard accessible charts.
 
@@ -241,9 +244,21 @@ SplitView owns two named peer panes, bounded controlled or uncontrolled percenta
 keyboard and pointer resizing, collapse of either pane, focus recovery, and container-owned compact
 stacking. Distinct pane controls identify the target without relying on a directional chevron.
 
+### Ticket 18 — process tracker and operational proof
+
+ProcessTracker reports one ordered staged-process relationship without owning workflow, navigation,
+actions, or surrounding layout. It keeps complete, active, pending, warning, and failed markers
+distinct by shape and localized status text. The active marker combines a fixed filled center with
+the accepted outward pulse, while a restrained accent rail preserves the relationship between
+evenly spaced stages.
+
+The packed operational fixture composes existing public fields, choices, validation, Dialog,
+actions, PageHeader, ProcessTracker, status, and progress. The fixture owns its arrangement and
+cross-component state, so no application workflow component enters the public catalog.
+
 ## Frontier
 
-See the [decision map](map.md). The Ticket 17 correction is the current unit; Ticket 18 follows it.
+See the [decision map](map.md). [Ticket 19](tickets/19-cartesian-chart-foundation.md) is next.
 
 ## Accepted sources
 
@@ -258,6 +273,8 @@ See the [decision map](map.md). The Ticket 17 correction is the current unit; Ti
 - [Architecture decision: Own an Accessible Chart Family](../../docs/adr/0008-own-an-accessible-chart-family.md)
 - [Architecture decision: Stabilize After Broad Prerelease Validation](../../docs/adr/0009-stabilize-after-broad-prerelease-validation.md)
 - [Architecture decision: Preserve Consumer Composition Boundaries](../../docs/adr/0010-preserve-consumer-composition-boundaries.md)
+- [Architecture decision: Own Reusable Concepts, Not Applications](../../docs/adr/0012-own-reusable-concepts-not-applications.md)
+- [Reusable Composite Boundary](decisions/16-reusable-composite-boundary.md)
 - [Component Library Context](../../CONTEXT.md)
 - [Research: Accessible React Behavior Foundations](research/behavior-foundations.md)
 
@@ -270,6 +287,24 @@ See the [decision map](map.md). The Ticket 17 correction is the current unit; Ti
 
 ## Current verification
 
+- Ticket 18 passes `npm run check` with 25 test files and 417 tests, generated guidance, and public
+  declarations under TypeScript 5.9, 6, and 7. `npm run showcase:build`,
+  `npm run verify:package`, and `git diff --check` pass. Packed React 18.3.1 and 19.2.8 consumers
+  execute invalid configuration, corrected validation, Dialog review, execution, and coherent
+  monitoring transitions using public exports only, then pass SSR, hydration, types, semantic
+  assertions, and browser builds.
+- Direct Chromium inspection covers ProcessTracker in light, dark, compact, reduced-motion,
+  forced-color, and long-label RTL conditions. Two pulse frames retain the filled active center as
+  the outer ring expands and fades. The interrupted example has equal 52-pixel marker spacing, the
+  rail uses the prototype's 33% accent blend, compact and RTL layouts have no overflow, and the two
+  named ordered lists add no focus targets. Inspected screenshots were discarded.
+- Chromium, Firefox, and WebKit accessibility snapshots expose ProcessTracker as one named list
+  with three noninteractive stages. A live Chromium transition under accent `#d14f00` moves the
+  active marker while preserving the 122.55-pixel tracker height and following content position.
+  Before and after screenshots confirm the filled exact-accent center, rail, and
+  stable geometry; screenshots and the temporary harness were discarded.
+- Independent correction review passes both intent and engineering axes with no objective defect,
+  unresolved judgment, or missing evidence inside the correction boundary.
 - Ticket 17 correction passes `npm run check` with 24 test files and 411 tests, generated guidance,
   and public declarations under TypeScript 5.9, 6, and 7. `npm run showcase:build`,
   `npm run verify:package`, and `git diff --check` pass. Packed React 18.3.1 and 19.2.8 consumers pass
@@ -429,7 +464,8 @@ See the [decision map](map.md). The Ticket 17 correction is the current unit; Ti
 
 ## Continuation
 
-Ticket 17 is complete on `master`. Start Ticket 18 from its accepted operational-workflow sources
-when Whitney asks for the next ticket. The Ticket 17 outcome owns its implementation, tests,
-contracts, generated guidance, showcase, package verifier, application-structure styling, and work
-record.
+- Branch: `master`
+- Ticket 18 was delivered in the latest commit, `[Feature] Add bounded process tracking`.
+- The working tree is clean after delivery.
+- Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
+- Next action: begin [Ticket 19](tickets/19-cartesian-chart-foundation.md).

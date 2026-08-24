@@ -1,7 +1,8 @@
-# 27 Markdown Authoring Prerelease
+# 27 Markdown Authoring Integration Proof
 
-**What to build:** The Markdown authoring workspace construct and prerelease slice for composing,
-previewing, navigating wiki links, inserting assets, invoking commands, and coordinating metadata.
+**What to build:** A non-exported packed-package fixture that composes the public Markdown editor,
+fields, file handling, commands, overlays, feedback, and application structure under
+consumer-owned layout and persistence state.
 
 **Blocked by:** [Markdown Commands, Links, Assets, and Extensions](26-markdown-commands-links-assets-and-extensions.md),
 [Application Structure](17-application-structure.md), [Popover, Tooltip, and Menu Overlays](13-popover-tooltip-and-menu-overlays.md),
@@ -9,8 +10,8 @@ previewing, navigating wiki links, inserting assets, invoking commands, and coor
 
 **Status:** blocked
 
-- [ ] The workspace coordinates editor, metadata fields, toolbar/commands, link navigation, asset
-      state, and preview through bounded public composition.
+- [ ] The fixture coordinates editor, metadata fields, toolbar/commands, link navigation, asset
+      state, and preview through public component APIs.
 - [ ] It demonstrates unsaved, saving, saved, invalid, read-only, locked, asset-pending, and error
       states without owning persistence or collaborative transport.
 - [ ] Source, Live Preview, and read-only flows remain keyboard operable and expose coherent
@@ -18,7 +19,8 @@ previewing, navigating wiki links, inserting assets, invoking commands, and coor
 - [ ] Compact and wide layouts preserve authoring focus, supporting metadata, and commands.
 - [ ] A clean packed-package fixture implements the complete slice with no private import or
       external substitute component.
-- [ ] Contracts guide agents to the authoring construct without implying a notes vault.
+- [ ] No Markdown-workspace export, contract, required layout, persistence model, or notes-vault
+      abstraction is introduced.
 - [ ] Representative document workloads, browsers, theme, SSR, hydration, types, accessibility,
       and generated guidance pass.
 

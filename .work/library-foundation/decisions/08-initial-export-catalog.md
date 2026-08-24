@@ -7,7 +7,7 @@
 
 ## Question
 
-Which exact public component and construct capabilities belong in the initial pre-release slice, and
+Which exact public component capabilities belong in the initial pre-release slice, and
 which representative stress cases remain design-only evidence for forward expansion?
 
 ## Answer
@@ -21,13 +21,11 @@ The initial pre-release slice includes these public capabilities:
 - Semantic status, inline alert, and determinate or indeterminate progress feedback.
 - Dialog overlay behavior.
 - Field-group and section composition.
-- A bounded higher-level construct for configure, validate or review, execute, and monitor
-  workflows, including identity-to-status Route, stages, actions, and responsive configuration and
-  status regions.
+- A staged-process tracker for ordered complete, active, pending, warning, and failed stages.
 
-Exact export names remain reversible specification work. The slice boundary is binding: the
-supported workflow must not require an external substitute for these roles, but this is not the
-stable catalog or an intended-use release.
+The non-exported operational fixture must not require an external substitute for these roles, but
+its workflow, layout, and state coordination remain consumer-owned and establish no public
+component contract. This is not the stable catalog or an intended-use release.
 
 Link and toggle-button distinctions, date and time entry, asynchronous combobox collections, tabs
 and navigation, popovers, tables or grids, transient notifications, and large or virtualized
@@ -44,3 +42,4 @@ production scope as the stable catalog expands.
   families and hard cases that must influence shared contracts without becoming accidental release
   commitments.
 - [Interactive visual direction prototype](../prototypes/visual-directions.html)
+- [Reusable Composite Boundary](16-reusable-composite-boundary.md)

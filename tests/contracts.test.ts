@@ -77,6 +77,7 @@ describe('canonical component contracts', () => {
       'NumberField',
       'Pagination',
       'PageHeader',
+      'ProcessTracker',
       'ProgressBar',
       'Popover',
       'RadioGroup',
@@ -188,6 +189,12 @@ describe('canonical component contracts', () => {
     expect(contractFor('SplitView')?.responsiveBehavior.join(' ')).toMatch(
       /stack.*DOM order.*disable.*resiz/i,
     );
+    expect(contractFor('PageHeader')?.preferredAlternatives.join(' ')).toMatch(
+      /ProcessTracker.*staged.*progress/i,
+    );
+    expect(contractFor('PageHeader')?.preferredAlternatives.join(' ')).not.toMatch(
+      /workflow construct/i,
+    );
   });
 
   it('distinguishes ordinary dialogs, consequential confirmations, and drawers', () => {
@@ -239,12 +246,21 @@ describe('canonical component contracts', () => {
     );
   });
 
-  it('keeps status, metadata, alerts, progress, meters, and generic busy state distinct', () => {
+  it('keeps status, staged process, metadata, alerts, progress, meters, and generic busy state distinct', () => {
     const contractFor = (exportName: string) =>
       componentContracts.find((contract) => contract.exportName === exportName);
 
     expect(contractFor('StatusIndicator')?.accentBehavior.join(' ')).toMatch(
       /accent.*not.*status|never.*accent/i,
+    );
+    expect(contractFor('ProcessTracker')?.controlBehavior.join(' ')).toMatch(
+      /status-only.*does not start.*navigate/i,
+    );
+    expect(contractFor('ProcessTracker')?.preferredCompositions.join(' ')).toMatch(
+      /application-owned actions/i,
+    );
+    expect(contractFor('ProcessTracker')?.inappropriateUses.join(' ')).toMatch(
+      /interactive step navigation/i,
     );
     expect(contractFor('Badge')?.appropriateUses.join(' ')).toMatch(
       /metadata|category|identifier/i,

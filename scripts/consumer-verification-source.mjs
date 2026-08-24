@@ -36,6 +36,7 @@ import {
   NotificationProvider,
   NumberField,
   PageHeader,
+  ProcessTracker,
   ProgressBar,
   RadioGroup,
   RangeSlider,
@@ -84,6 +85,191 @@ const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 console.error = (...messages) => consoleMessages.push(messages);
 console.warn = (...messages) => consoleMessages.push(messages);
+
+const packedProcessStatusLabels = {
+  active: 'Active',
+  complete: 'Complete',
+  failed: 'Failed',
+  pending: 'Pending',
+  warning: 'Needs review',
+};
+
+function PackedOperationalProof() {
+  const configurationForm = React.useRef(null);
+  const [operationName, setOperationName] = React.useState('');
+  const [operationState, setOperationState] = React.useState('configure');
+  const isInvalid = operationState === 'invalid';
+  const isValidated = operationState === 'validated';
+  const isReviewed = operationState === 'reviewed';
+  const isMonitoring = operationState === 'monitoring';
+  const stages = isMonitoring
+    ? [
+        {id: 'configure', label: 'Configuration valid', status: 'complete'},
+        {id: 'review', label: 'Review accepted', status: 'complete'},
+        {id: 'execute', label: 'Solve running', status: 'active'},
+      ]
+    : isReviewed || isValidated
+      ? [
+          {id: 'configure', label: 'Configuration valid', status: 'complete'},
+          {
+            id: 'review',
+            label: isReviewed ? 'Review accepted' : 'Review configuration',
+            status: isReviewed ? 'complete' : 'active',
+          },
+          {id: 'execute', label: 'Solve pending', status: 'pending'},
+        ]
+      : [
+          {
+            id: 'configure',
+            label: isInvalid ? 'Configuration needs input' : 'Configure operation',
+            status: isInvalid ? 'warning' : 'active',
+          },
+          {id: 'review', label: 'Review pending', status: 'pending'},
+          {id: 'execute', label: 'Solve pending', status: 'pending'},
+        ];
+  const status = isMonitoring
+    ? {label: 'Running', tone: 'warning'}
+    : isReviewed
+      ? {label: 'Reviewed', tone: 'success'}
+      : isValidated
+        ? {label: 'Ready for review', tone: 'neutral'}
+      : isInvalid
+        ? {label: 'Needs input', tone: 'danger'}
+        : {label: 'Configuration', tone: 'neutral'};
+
+  const validateConfiguration = () => {
+    const nameControl = configurationForm.current?.elements.namedItem('operation-name');
+    const nextOperationName = nameControl?.value.trim() ?? '';
+    if (!nextOperationName) {
+      setOperationState('invalid');
+      return;
+    }
+    setOperationName(nextOperationName);
+    setOperationState('validated');
+  };
+
+  return React.createElement(
+    'section',
+    {'data-packed-operation-state': operationState},
+    React.createElement(
+      Stack,
+      {gap: 'regular'},
+      React.createElement(PageHeader, {
+        actions: React.createElement(
+          Button,
+          {
+            isDisabled: !isReviewed,
+            onPress: () => setOperationState('monitoring'),
+            variant: 'primary',
+          },
+          'Run operation',
+        ),
+        description: 'Consumer-owned configuration, review, execution, and monitoring proof.',
+        identity: 'RUN 0284',
+        status: status.label,
+        statusTone: status.tone,
+        title: operationName || 'Untitled thermal solve',
+      }),
+      React.createElement(
+        'form',
+        {id: 'packed-operation-form', ref: configurationForm},
+        React.createElement(
+          FormSection,
+          {title: 'Operation configuration'},
+          React.createElement(
+            FieldGroup,
+            {legend: 'Required inputs'},
+            React.createElement(TextField, {
+              defaultValue: '',
+              errorMessage: 'Enter an operation name before review.',
+              isInvalid,
+              isRequired: true,
+              label: 'Operation name',
+              name: 'operation-name',
+            }),
+            React.createElement(RadioGroup, {
+              defaultValue: 'balanced',
+              label: 'Solve mode',
+              name: 'operation-mode',
+              options: [
+                {label: 'Conservative', value: 'conservative'},
+                {label: 'Balanced', value: 'balanced'},
+              ],
+            }),
+          ),
+        ),
+      ),
+      React.createElement(
+        ButtonGroup,
+        {label: 'Operation review actions'},
+        React.createElement(
+          Button,
+          {onPress: validateConfiguration, variant: 'secondary'},
+          'Validate configuration',
+        ),
+        React.createElement(
+          Dialog,
+          {
+            actions: ({close}) => React.createElement(
+              Button,
+              {
+                onPress: () => {
+                  setOperationState('reviewed');
+                  close();
+                },
+                variant: 'primary',
+              },
+              'Accept review',
+            ),
+            closeLabel: 'Close operation review',
+            description: 'Confirm the configured operation before execution.',
+            title: 'Review operation',
+            trigger: React.createElement(
+              Button,
+              {isDisabled: !isValidated},
+              'Review configuration',
+            ),
+          },
+          React.createElement(
+            DescriptionList,
+            {
+              ariaLabel: 'Operation review details',
+              emptyState: {description: 'Configure the operation first.', kind: 'no-data', title: 'No configuration'},
+              items: [{description: operationName, id: 'name', term: 'Operation'}],
+            },
+          ),
+        ),
+      ),
+      isInvalid
+        ? React.createElement(
+            InlineAlert,
+            {title: 'Configuration incomplete', tone: 'danger'},
+            'Add the required operation name before review.',
+          )
+        : null,
+      React.createElement(ProcessTracker, {
+        announcement: 'polite',
+        ariaLabel: 'Operation stages',
+        stages,
+        statusLabels: packedProcessStatusLabels,
+      }),
+      React.createElement(StatusIndicator, {
+        announcement: 'polite',
+        label: status.label,
+        tone: status.tone,
+      }),
+      React.createElement(ProgressBar, {
+        completionLabel: 'Complete when all 25 boundary passes are solved.',
+        isActive: isMonitoring,
+        label: isMonitoring ? 'Solving boundary passes' : 'Solve progress',
+        maxValue: 25,
+        minValue: 0,
+        value: isMonitoring ? 18 : 0,
+        valueLabel: isMonitoring ? '18 of 25 passes' : 'Not started',
+      }),
+    ),
+  );
+}
 
 const view = React.createElement(
   AppearanceProvider,
@@ -326,12 +512,7 @@ const view = React.createElement(
           ],
           selectionMode: 'none',
         }),
-        React.createElement(PageHeader, {
-          identity: 'RUN 0284',
-          status: 'Converged',
-          statusTone: 'success',
-          title: 'North chamber',
-        }),
+        React.createElement(PackedOperationalProof),
         React.createElement(SplitView, {
           ariaLabel: 'Packed run workspace',
           collapsePrimaryLabel: 'Hide packed configuration',
@@ -406,11 +587,6 @@ const view = React.createElement(
           step: 5,
           thumbLabels: ['Window start', 'Window end'],
         }),
-        React.createElement(StatusIndicator, {
-          announcement: 'polite',
-          label: 'Solving',
-          tone: 'warning',
-        }),
         React.createElement(Badge, {tone: 'accent'}, 'RUN 0284'),
         React.createElement(
           InlineAlert,
@@ -422,15 +598,6 @@ const view = React.createElement(
           {title: 'Solver connected', tone: 'success'},
           'Runs can start.',
         ),
-        React.createElement(ProgressBar, {
-          completionLabel: 'Complete when all 25 boundary passes are solved.',
-          isActive: true,
-          label: 'Solving boundary passes',
-          maxValue: 25,
-          minValue: 0,
-          value: 18,
-          valueLabel: '18 of 25 passes',
-        }),
         React.createElement(ProgressBar, {
           completionLabel: 'Complete after convergence.',
           isActive: true,
@@ -602,15 +769,87 @@ hydrateRoot(document.getElementById('root'), view, {
   onRecoverableError(error) { recoverableErrors.push(error); },
 });
 await new Promise((resolve) => setTimeout(resolve, 25));
+const findPackedButton = (label) =>
+  [...document.querySelectorAll('[data-wcl-button]')].find(
+    (button) => button.textContent === label,
+  );
+const packedOperation = document.querySelector('[data-packed-operation-state]');
+const packedRunOperation = findPackedButton('Run operation');
+if (
+  packedOperation?.getAttribute('data-packed-operation-state') !== 'configure' ||
+  !packedRunOperation?.hasAttribute('disabled')
+) {
+  throw new Error('Packed operational proof did not begin with execution blocked.');
+}
+findPackedButton('Validate configuration')?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+if (
+  packedOperation.getAttribute('data-packed-operation-state') !== 'invalid' ||
+  !packedOperation.querySelector('[data-wcl-inline-alert][data-tone="danger"]') ||
+  !packedRunOperation.hasAttribute('disabled') ||
+  document.querySelector('[data-kind="dialog"] [role="dialog"]')
+) {
+  throw new Error('Packed operational proof accepted an invalid configuration.');
+}
+const packedOperationName = packedOperation.querySelector('input[name="operation-name"]');
+const setPackedInputValue = Object.getOwnPropertyDescriptor(
+  dom.window.HTMLInputElement.prototype,
+  'value',
+)?.set;
+setPackedInputValue?.call(packedOperationName, 'North chamber');
+packedOperationName?.dispatchEvent(new dom.window.Event('input', {bubbles: true}));
+await new Promise((resolve) => setTimeout(resolve, 25));
+if (
+  packedOperationName?.value !== 'North chamber' ||
+  packedOperation.getAttribute('data-packed-operation-state') !== 'invalid'
+) {
+  throw new Error('Packed operational proof did not accept corrected field input.');
+}
+findPackedButton('Validate configuration')?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+if (
+  packedOperation.getAttribute('data-packed-operation-state') !== 'validated' ||
+  !packedOperation.querySelector('[data-wcl-page-header]')?.textContent?.includes('North chamber')
+) {
+  throw new Error('Packed operational proof did not validate corrected configuration.');
+}
+findPackedButton('Review configuration')?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+const packedOperationDialog = document.querySelector(
+  '[data-kind="dialog"] [role="dialog"]',
+);
+if (!packedOperationDialog?.textContent?.includes('Review operation')) {
+  throw new Error('Packed operational proof did not open its review dialog.');
+}
+if (!packedOperationDialog.textContent.includes('North chamber')) {
+  throw new Error('Packed operational proof did not carry configuration into review.');
+}
+findPackedButton('Accept review')?.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+if (
+  packedOperation.getAttribute('data-packed-operation-state') !== 'reviewed' ||
+  packedRunOperation.hasAttribute('disabled')
+) {
+  throw new Error('Packed operational proof did not preserve accepted review state.');
+}
+packedRunOperation.click();
+await new Promise((resolve) => setTimeout(resolve, 25));
+if (
+  packedOperation.getAttribute('data-packed-operation-state') !== 'monitoring' ||
+  !packedOperation.querySelector('[data-wcl-page-header-status]')?.textContent?.includes('Running') ||
+  !packedOperation.querySelector('[data-wcl-status-indicator]')?.textContent?.includes('Running') ||
+  packedOperation.querySelector('[data-wcl-progress-bar]')?.getAttribute('aria-valuenow') !== '18' ||
+  !packedOperation
+    .querySelector('[data-wcl-process-stage][aria-current="step"]')
+    ?.textContent?.includes('Solve running')
+) {
+  throw new Error('Packed operational proof did not enter monitoring coherently.');
+}
 document
   .getElementById('packed-notification-trigger')
   ?.dispatchEvent(new dom.window.MouseEvent('click', {bubbles: true}));
 await new Promise((resolve) => setTimeout(resolve, 25));
 let packedOverlaySemantics = true;
-const findPackedButton = (label) =>
-  [...document.querySelectorAll('[data-wcl-button]')].find(
-    (button) => button.textContent === label,
-  );
 const packedDialogTrigger = findPackedButton('Open packed dialog');
 packedDialogTrigger?.click();
 await new Promise((resolve) => setTimeout(resolve, 25));
@@ -674,6 +913,13 @@ if (document.querySelector('[aria-label="Run history"]')?.getAttribute('tabindex
 if (!document.querySelector('[data-wcl-toolbar]')) {
   throw new Error('Packed toolbar did not render its public marker.');
 }
+if (
+  document.querySelector('[data-wcl-process-stage][aria-current="step"]')?.textContent?.includes(
+    'Solve running',
+  ) !== true
+) {
+  throw new Error('Packed ProcessTracker did not preserve the active staged relationship.');
+}
 if (document.querySelector('[data-wcl-toggle-button]')?.getAttribute('aria-pressed') !== 'true') {
   throw new Error('Packed toggle button did not preserve selected semantics.');
 }
@@ -703,7 +949,7 @@ if (!document.querySelector('[data-wcl-selection-field]')) {
 }
 if (
   document.querySelector('[data-wcl-list] > ol')?.getAttribute('aria-label') !== 'Run sequence' ||
-  document.querySelectorAll('[data-wcl-description-list] dt').length !== 1 ||
+  document.querySelectorAll('[data-wcl-description-list] dl[aria-label="Run details"] dt').length !== 1 ||
   document.querySelector('[data-wcl-list-box] [role="option"]')?.getAttribute('aria-selected') !== 'true' ||
   document.querySelector('[data-wcl-card-list] article')?.getAttribute('aria-label') !== 'RUN 0284'
 ) {

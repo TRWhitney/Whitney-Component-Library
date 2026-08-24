@@ -17,6 +17,6 @@ distribution is not a first-release requirement.
 ## Evidence
 
 - The repository is empty and imposes no existing framework or runtime constraint.
-- The stated goals require components, styles, behaviors, higher-level constructs, and reliable
+- The stated goals require components, styles, behaviors, reusable composites, and reliable
   agent consumption; the chosen model must expose all five coherently.
 - [Architecture decision: Target React and TypeScript](../../../docs/adr/0001-target-react-and-typescript.md)

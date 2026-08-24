@@ -100,6 +100,14 @@ describe('static appearance styles', () => {
     )?.[1];
     const spinnerGlyph = styles.match(/\[data-wcl-spinner-glyph\]\s*\{([^}]*)\}/)?.[1];
     const spinnerSegments = styles.match(/\[data-wcl-spinner-segments\]\s*\{([^}]*)\}/)?.[1];
+    const processActivity = styles.match(
+      /\[data-wcl-process-stage\]\[data-status='active'\]\s+\[data-wcl-process-stage-marker\]::after\s*\{([^}]*)\}/,
+    )?.[1];
+    const processRail = styles.match(
+      /\[data-wcl-process-stage\]:not\(:last-child\)::after\s*\{([^}]*)\}/,
+    )?.[1];
+    const processStage = styles.match(/\[data-wcl-process-stage\]\s*\{([^}]*)\}/)?.[1];
+    const processCore = styles.match(/\[data-wcl-process-stage-core\]\s*\{([^}]*)\}/)?.[1];
     const reducedMotion = styles.match(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)([\s\S]*)/,
     )?.[1];
@@ -110,6 +118,18 @@ describe('static appearance styles', () => {
     expect(spinnerSegmentActivity).toContain('var(--wcl-spinner-segment-index) * 132ms');
     expect(spinnerGlyph).toContain('inline-size: 1.375rem');
     expect(spinnerSegments).toContain('stroke-width: 3.5');
+    expect(processActivity).toContain('animation: wcl-process-stage-active 1.5s ease-out infinite');
+    expect(processActivity).toContain('inset: -0.4375rem');
+    expect(processStage).toContain('min-block-size: 3.25rem');
+    expect(processRail).toContain('inset-block: 1.125rem 0');
+    expect(processRail).toContain(
+      'background: color-mix(in srgb, var(--wcl-accent-rail) 33%, transparent)',
+    );
+    expect(processCore).toContain('fill: currentcolor');
+    expect(processCore).not.toContain('animation');
+    expect(styles).toMatch(
+      /@keyframes wcl-process-stage-active\s*\{[\s\S]*?from\s*\{[\s\S]*?opacity:\s*0\.65;[\s\S]*?transform:\s*scale\(0\.65\);[\s\S]*?to\s*\{[\s\S]*?opacity:\s*0;[\s\S]*?transform:\s*scale\(1\.25\);/,
+    );
     expect(styles).toMatch(
       /\[data-wcl-spinner-segment\]:nth-child\(6\)\s*\{[^}]*--wcl-spinner-segment-index:\s*5/,
     );
@@ -120,6 +140,18 @@ describe('static appearance styles', () => {
       /\[data-wcl-spinner-glyph\],[\s\S]*\[data-wcl-spinner-segment\][\s\S]*animation:\s*none !important/,
     );
     expect(reducedMotion).toMatch(/\[data-wcl-spinner-segment\]\s*\{[^}]*opacity:\s*1/);
+    expect(reducedMotion).toMatch(
+      /\[data-wcl-process-stage-marker\]::after\s*\{[^}]*animation:\s*none !important/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-process-stage\]:not\(:last-child\)::after\s*\{[^}]*background:\s*CanvasText/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-process-stage\]\[data-status='warning'\][\s\S]*?color:\s*var\(--wcl-warning\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-process-stage\]\[data-status='failed'\][\s\S]*?color:\s*var\(--wcl-danger\)/,
+    );
   });
 
   it('contains long progress values inside narrow label rows', async () => {

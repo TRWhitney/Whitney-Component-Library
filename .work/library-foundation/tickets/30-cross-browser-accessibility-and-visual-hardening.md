@@ -1,18 +1,22 @@
 # 30 Cross-Browser, Accessibility, and Visual Hardening
 
 **What to build:** Release-wide evidence and fixes for the accepted browser, interaction,
-assistive-technology, appearance, responsive, and motion matrix after the catalog and slices exist.
+assistive-technology, appearance, responsive, and motion matrix after the catalog and integration
+fixtures exist.
 
-**Blocked by:** [Forward-Expansion Contract Probes](29-forward-expansion-contract-probes.md)
+**Blocked by:** [Operational Integration Proof](18-process-tracker-and-operational-proof.md),
+[Data Analysis Integration Proof](23-data-analysis-prerelease.md),
+[Markdown Authoring Integration Proof](27-markdown-authoring-prerelease.md),
+[Application Workbench Integration Proof](28-application-workbench-prerelease.md)
 
 **Status:** blocked
 
 - [ ] Chromium, Firefox, and WebKit pass representative behavior across every public family under
       the fixed Baseline 2023 contract.
 - [ ] Manual focused screen-reader exercises cover compound fields, select/combobox, overlays,
-      collections, navigation, charts, Markdown editing, and all four higher-level constructs
+      collections, navigation, charts, Markdown editing, and all four integration fixtures
       before stable-candidate acceptance.
-- [ ] Keyboard-only and touch flows complete every supported slice without an inaccessible
+- [ ] Keyboard-only and touch flows complete every integration fixture without an inaccessible
       substitute path.
 - [ ] Light, dark, multiple accents, compact/wide, zoom, forced-color, reduced-motion, loading,
       empty, partial, error, pending, disabled, and read-only states pass documented checks.

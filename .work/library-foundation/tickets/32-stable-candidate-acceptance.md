@@ -1,7 +1,8 @@
 # 32 Stable Candidate Acceptance
 
-**What to build:** A complete, reviewable stable-candidate evidence set proving the accepted catalog,
-contracts, four slices, and quality gates are ready for Whitney's explicit compatibility decision.
+**What to build:** A complete, reviewable stable-candidate evidence set proving the accepted
+catalog, contracts, four integration fixtures, and quality gates are ready for Whitney's explicit
+compatibility decision.
 
 **Blocked by:** [Package, Compatibility, and Performance Gates](31-package-compatibility-and-performance-gates.md)
 
@@ -10,7 +11,7 @@ contracts, four slices, and quality gates are ready for Whitney's explicit compa
 - [ ] Every preceding ticket is complete with linked, reproducible completion evidence.
 - [ ] Every accepted public export exists, is documented by one canonical contract, and appears in
       generated human guidance, manifest, and agent index without drift.
-- [ ] All four integration slices consume only the packed public API and no external substitute
+- [ ] All four integration fixtures consume only the packed public API and no external substitute
       component.
 - [ ] No unresolved public API, visual, behavior, accessibility, composition, package,
       compatibility, or performance decision remains.

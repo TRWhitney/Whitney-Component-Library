@@ -175,6 +175,7 @@ describe('packed consumer verification source', () => {
       'InlineAlert',
       'Meter',
       'NotificationProvider',
+      'ProcessTracker',
       'ProgressBar',
       'Skeleton',
       'Spinner',
@@ -183,6 +184,7 @@ describe('packed consumer verification source', () => {
       expect(source).toContain(exportName);
     }
     expect(source).toContain('data-wcl-status-indicator');
+    expect(source).toContain('data-wcl-process-stage');
     expect(source).toContain('data-wcl-alert-banner');
     expect(source).toContain('data-wcl-skeleton');
     expect(source).toContain('data-wcl-empty-state');
@@ -190,6 +192,19 @@ describe('packed consumer verification source', () => {
     expect(source).toContain("getAttribute('aria-valuenow') !== '18'");
     expect(source).toContain("getAttribute('aria-valuetext') !== '76 kilowatts'");
     expect(source).toContain('Packed feedback family did not preserve semantic relationships.');
+  });
+
+  it('proves one consumer-owned operation from invalid configuration through monitoring', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    expect(source).toContain('function PackedOperationalProof()');
+    expect(source).toContain("'data-packed-operation-state': operationState");
+    expect(source).toContain("setOperationState('invalid')");
+    expect(source).toContain("setOperationState('reviewed')");
+    expect(source).toContain("setOperationState('monitoring')");
+    expect(source).toContain('Packed operational proof accepted an invalid configuration.');
+    expect(source).toContain('Packed operational proof did not open its review dialog.');
+    expect(source).toContain('Packed operational proof did not enter monitoring coherently.');
   });
 
   it('exercises every overlay through packed SSR and hydration', () => {

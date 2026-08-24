@@ -11,7 +11,8 @@ specialized-system performance evidence for the stable candidate.
       paths and installs cleanly in client-rendered and SSR fixtures.
 - [ ] Public examples and declarations pass TypeScript 5.9, 6, and 7 without private dependency
       type leakage.
-- [ ] React 18.3 and 19 render and hydrate every public family and four slices without mismatches.
+- [ ] React 18.3 and 19 render and hydrate every public family and all four integration fixtures
+      without mismatches.
 - [ ] Browser code and edge-rendering fixtures contain no Node API dependency.
 - [ ] Production bundles importing ordinary components exclude Markdown editor and chart renderer
       JavaScript; specialized CSS is split if shared inclusion exceeds the recorded materiality budget.

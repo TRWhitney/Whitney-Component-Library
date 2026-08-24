@@ -13,10 +13,11 @@ component offering independently validated through several slices?
 
 ## Answer
 
-The initial workflow is only a pre-release slice. Stable release requires a substantially wider
-catalog of conventional components; vertical slices validate integration but do not define which
-components may be offered. The stable catalog also includes specialized capabilities, explicitly
-an Obsidian-like Markdown editing field and a standard chart family containing a radar chart.
+The initial operational fixture is only pre-release integration evidence. Stable release requires
+a substantially wider catalog of conventional components; fixtures validate integration but do
+not define which components may be offered or prescribe application arrangements. The stable
+catalog also includes specialized capabilities, explicitly an Obsidian-like Markdown editing field
+and a standard chart family containing a radar chart.
 
 The precise editor and chart contracts are separate decisions because superficial wrappers would
 not satisfy the accepted scope. Compatibility does not stabilize and the library is not intended
@@ -31,3 +32,4 @@ for use until several slices and the wider catalog are complete.
 - Whitney explicitly included Obsidian-like Markdown editing and standard chart types including a
   radar chart in the pre-stable scope.
 - [Architecture decision: Build a Breadth-Aware Vertical Slice](../../../docs/adr/0005-build-a-breadth-aware-vertical-slice.md)
+- [Architecture decision: Own Reusable Concepts, Not Applications](../../../docs/adr/0012-own-reusable-concepts-not-applications.md)

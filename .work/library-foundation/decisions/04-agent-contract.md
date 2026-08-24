@@ -29,8 +29,8 @@ Accepted boundary:
   focused examples or counterexamples.
 - Human documentation, a machine-readable component manifest, and a compact agent index are
   derived from those canonical contracts.
-- Higher-level constructs are supported exports, and their contracts direct agents toward them
-  when their use cases match.
+- Reusable composites are supported exports when they own one recurring semantic or behavioral
+  relationship. Contracts do not direct agents toward library-owned application arrangements.
 - Repository verification is deterministic: contract completeness and references, generated
   artifact drift, example compilation, public types, and component behavior. Agent-output
   adherence evaluation is neither owned here nor prescribed as a consumer workflow.
@@ -43,5 +43,6 @@ Accepted boundary:
 - Semantic appropriateness and JSX child identity cannot always be represented by TypeScript,
   while finite variants, state ownership, and many explicit part or slot relationships can be.
 - [Architecture decision: Preserve Consumer Composition Boundaries](../../../docs/adr/0010-preserve-consumer-composition-boundaries.md)
+- [Architecture decision: Own Reusable Concepts, Not Applications](../../../docs/adr/0012-own-reusable-concepts-not-applications.md)
 - [Component Library Context](../../../CONTEXT.md)
 - [Architecture decision: Publish Canonical Component Contracts](../../../docs/adr/0004-publish-canonical-component-contracts.md)

@@ -3,6 +3,7 @@ export {Badge} from './badge.js';
 export {EmptyState} from './empty-state.js';
 export {Meter} from './meter.js';
 export {NotificationProvider} from './notification-provider.js';
+export {ProcessTracker} from './process-tracker.js';
 export {ProgressBar} from './progress-bar.js';
 export {Skeleton} from './skeleton.js';
 export {Spinner} from './spinner.js';
@@ -24,6 +25,11 @@ export type {
   NotificationTone,
   NotificationUrgency,
   NotificationVisibleLimit,
+  ProcessStage,
+  ProcessStages,
+  ProcessStageStatus,
+  ProcessStatusLabels,
+  ProcessTrackerProps,
   ProgressBarProps,
   SkeletonLineCount,
   SkeletonProps,

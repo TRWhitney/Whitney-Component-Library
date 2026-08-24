@@ -3,28 +3,29 @@
 ## Problem Statement
 
 Applications assembled by people and agents need a reusable React component, style, and behavior
-system that reduces accidental variation, clearly advertises appropriate use, provides supported
-higher-level compositions, and carries an application accent without turning every semantic state
-into that accent. Existing primitive libraries solve accessible behavior but leave too much public
-composition and styling discretion for this product's goals.
+system that reduces accidental variation, clearly advertises appropriate use, provides reusable
+composites for recurring concepts, and carries an application accent without turning every
+semantic state into that accent. Existing primitive libraries solve accessible behavior but leave
+too much public composition and styling discretion for this product's goals.
 
 The library must eventually support a broad ordinary interface vocabulary plus specialized
-Markdown editing and charting. Its first workflow slice is architectural evidence, not a stable or
-adoptable release. The product becomes intended for use only after the broad catalog and four
-materially different integration slices validate the same public system.
+Markdown editing and charting. Its first operational fixture is architectural evidence, not a
+stable or adoptable release. The product becomes intended for use only after the broad catalog and
+four materially different integration fixtures validate the same public system.
 
 ## Solution
 
 ### Product and release model
 
 Build one React and TypeScript library in successive `0.x` milestones. The milestones culminate in
-four integration slices: operational workflow, data analysis, Markdown authoring, and application
-workbench. Components may be implemented before the slice that demonstrates them; slices validate
-integration and do not limit catalog breadth.
+four non-exported integration fixtures: operation lifecycle, data analysis, Markdown authoring,
+and application workbench. Components may be implemented before the fixture that demonstrates
+them; fixtures validate integration, establish no application contract, and do not limit catalog
+breadth.
 
 Prereleases are explicitly non-adoptable and use a non-default package tag if externally
-published. Stable `1.0` requires the complete catalog, all four slices, the accepted quality matrix,
-and explicit review. Semantic compatibility begins at `1.0`.
+published. Stable `1.0` requires the complete catalog, all four fixtures, the accepted quality
+matrix, and explicit review. Semantic compatibility begins at `1.0`.
 
 ### Public catalog
 
@@ -41,16 +42,14 @@ implementation concern; public contracts must preserve the distinctions below.
 - **Navigation and disclosure:** tabs, breadcrumbs, menu, pagination, disclosure, accordion, and a
   collapsible navigation pane that does not assume a particular page position.
 - **Overlays:** dialog, alert dialog, popover, tooltip, drawer, and context menu.
-- **Feedback and status:** status indicator, badge, inline alert, alert banner, progress bar, meter,
-  spinner, skeleton, empty state, and toast or notification.
+- **Feedback and status:** status indicator, badge, inline alert, alert banner, progress bar,
+  staged-process tracker, meter, spinner, skeleton, empty state, and toast or notification.
 - **Data and collections:** list, description list, list box, card, table, tree, reusable search and
   filter controls, and consistent collection loading, empty, partial, and error treatments.
 - **Layout and application structure:** stack, inline group, responsive grid, divider, surface or
   panel, section, split view, scroll region, and workspace or page header. Applications own their
   overall header, navigation, workspace, utility, and footer arrangement.
 - **Specialized systems:** the accepted Markdown editing surface and standard chart family.
-- **Higher-level constructs:** supported operational workflow, data-analysis workspace, Markdown
-  authoring workspace, and application workbench compositions.
 
 ### Public API and component contracts
 
@@ -75,7 +74,7 @@ Every public export also has one canonical structured component contract. A cont
 - accessibility obligations, keyboard behavior, labeling, localization, and directionality;
 - responsive, appearance, accent, forced-color, and reduced-motion behavior;
 - focused examples and counterexamples;
-- related primitives and preferred higher-level constructs.
+- related components and preferred composites.
 
 Human documentation, `./manifest.json`, and `./agent-index.md` derive from these contracts.
 Verification rejects incomplete contracts, invalid references, generation drift, uncompilable
@@ -171,6 +170,31 @@ status content is present, its separate semantic tone is required as success, wa
 neutral. Route begins with an open accent circle, runs through the flexible space, and ends with a
 solid circle in that semantic tone.
 
+### Reusable composite boundary
+
+The library may compose components when the result owns one recurring concept with its own
+semantics or behavior. PageHeader coordinates one page-heading relationship. The staged-process
+tracker presents one ordered process relationship. Neither dictates the surrounding application.
+
+Applications own workflows, workspace arrangements, activity sequences, and cross-component state
+coordination. The library does not export operational-workflow, data-analysis-workspace,
+Markdown-workspace, workbench, or application-shell components.
+
+ProcessTracker is a status-only ordered list for a staged process. Its public stages form a
+non-empty immutable tuple. Each stage has a unique stable string id, a non-empty label, an optional
+description, and one status: `complete`, `active`, `pending`, `warning`, or `failed`. At most one
+stage may be active. The consumer owns stage ordering and every status transition; ProcessTracker
+does not start work, navigate between steps, retry failures, infer sequence validity, or coordinate
+other components.
+
+ProcessTracker renders a compact vertical rail with one non-color marker per stage and exposes the
+ordered relationship, position, label, description, and status to assistive technology. It adds no
+focus target. Optional `off`, `polite`, or `assertive` announcement follows the shared feedback
+convention and defaults to `off`. Active motion belongs only to the active marker and disappears
+under reduced motion without removing its current meaning. Warning and failed stages use semantic
+status color independent from the application accent. Use ProgressBar beside the tracker when the
+active stage also has measurable numeric progress.
+
 ### Markdown editing surface
 
 The editor's canonical value is Markdown text. It provides in-place Live Preview that reveals
@@ -210,9 +234,9 @@ annotations, and coordinated views while keeping the renderer private.
 Geographic maps, network graphs, Sankey diagrams, treemaps, candlesticks, 3D charts, and dashboard
 layout are outside the initial chart family.
 
-### Integration slices
+### Integration fixtures
 
-1. **Operational workflow:** configure, validate, review, execute, and monitor with responsive
+1. **Operation lifecycle:** configure, validate, review, execute, and monitor with consumer-owned
    configuration and status regions, stages, actions, Route, status, and progress.
 2. **Data analysis workspace:** search, filter, sort, select, compare, chart, inspect detail, and
    handle loading, empty, partial, and error data states.
@@ -221,8 +245,9 @@ layout are outside the initial chart family.
 4. **Application workbench:** navigate among tools, manage tabs and panels, invoke menus and
    commands, display notifications, and preserve responsive workspace structure.
 
-Every slice consumes only the public package and may not substitute an external component for a
-catalog role the library claims to support.
+Every fixture consumes only the public package and may not substitute an external component for a
+catalog role the library claims to support. Fixtures are not exported, carry no canonical
+component contract, and establish no required layout, state model, or visual treatment.
 
 ### Package and compatibility contract
 
@@ -246,8 +271,8 @@ than directly executable React Server Components.
    does not immediately require components from a second design system.
 2. As an agent authoring an application, I want narrow APIs and explicit appropriate-use guidance
    so that I choose supported components and compositions consistently.
-3. As a tool developer, I want higher-level workflow and workspace constructs so that I do not
-   recreate complex relationships from primitives for each application.
+3. As a tool developer, I want reusable composites for recurring semantic and behavioral
+   relationships while retaining control over my application's workflow and layout.
 4. As an application designer, I want one accent and light or dark appearance to propagate through
    the library while semantic colors retain their independent meanings.
 5. As a keyboard, touch, pointer, or assistive-technology user, I want complete and predictable
@@ -273,6 +298,8 @@ than directly executable React Server Components.
 - [Agent-facing contract](decisions/04-agent-contract.md) and [ADR
   0004](../../docs/adr/0004-publish-canonical-component-contracts.md), together with [ADR
   0010](../../docs/adr/0010-preserve-consumer-composition-boundaries.md)
+- [Reusable composite boundary](decisions/16-reusable-composite-boundary.md) and [ADR
+  0012](../../docs/adr/0012-own-reusable-concepts-not-applications.md)
 - [Visual direction and permitted variation](decisions/05-visual-direction.md) and the accepted
   [interactive prototype](prototypes/visual-directions.html)
 - [Initial public scope](decisions/06-initial-public-scope.md), [foundation expansion
@@ -306,7 +333,8 @@ than directly executable React Server Components.
 - Exercise supported interactions in Chromium, Firefox, and WebKit against the Baseline 2023
   target. Each implementation ticket verifies semantics, relationships, states, keyboard behavior,
   and the browser accessibility tree automatically. Consolidate manual screen-reader exercises for
-  complex widgets and complete workflows in release-wide accessibility hardening before `1.0`.
+  complex widgets and the integration fixtures in release-wide accessibility hardening before
+  `1.0`.
 - Verify light, dark, accent changes, compact and wide reflow, forced colors, loading, empty,
   partial, error, disabled, read-only, pending, and reduced-motion states where applicable.
 - Select representative combinations according to the changed behavior and risk rather than

@@ -82,6 +82,7 @@ export const showcaseGroups = [
       'Badge',
       'InlineAlert',
       'AlertBanner',
+      'ProcessTracker',
       'ProgressBar',
       'Meter',
       'Spinner',

@@ -188,6 +188,7 @@ import {
   Link,
   Meter,
   NumberField,
+  ProcessTracker,
   ProgressBar,
   RadioGroup,
   RangeSlider,
@@ -322,6 +323,21 @@ export const provider = (
         />
         <StatusIndicator announcement="polite" label="Solving" tone="warning" />
         <Badge tone="accent">RUN 0284</Badge>
+        <ProcessTracker
+          ariaLabel="Thermal solve stages"
+          stages={[
+            {id: 'geometry', label: 'Geometry validated', status: 'complete'},
+            {id: 'boundary', label: 'Boundary pass', status: 'active'},
+            {id: 'solve', label: 'Solve pending', status: 'pending'},
+          ]}
+          statusLabels={{
+            active: 'Active',
+            complete: 'Complete',
+            failed: 'Failed',
+            pending: 'Pending',
+            warning: 'Needs review',
+          }}
+        />
         <InlineAlert title="Boundary review" tone="warning">
           Check the north wall coefficient.
         </InlineAlert>
@@ -414,6 +430,7 @@ import {
   Link,
   Meter,
   NumberField,
+  ProcessTracker,
   ProgressBar,
   RangeSlider,
   ResponsiveGrid,
@@ -464,6 +481,11 @@ createRoot(document.getElementById('root')).render(
         React.createElement(RangeSlider, {defaultValue: [20, 80], label: 'Review window', locale: 'en-US', minValue: 0, maxValue: 100, step: 5, thumbLabels: ['Window start', 'Window end']}),
         React.createElement(StatusIndicator, {label: 'Solving', tone: 'warning'}),
         React.createElement(Badge, {tone: 'accent'}, 'RUN 0284'),
+        React.createElement(ProcessTracker, {ariaLabel: 'Thermal solve stages', stages: [
+          {id: 'geometry', label: 'Geometry validated', status: 'complete'},
+          {id: 'boundary', label: 'Boundary pass', status: 'active'},
+          {id: 'solve', label: 'Solve pending', status: 'pending'}], statusLabels: {
+          active: 'Active', complete: 'Complete', failed: 'Failed', pending: 'Pending', warning: 'Needs review'}}),
         React.createElement(InlineAlert, {title: 'Boundary review', tone: 'warning'}, 'Check one coefficient.'),
         React.createElement(AlertBanner, {title: 'Solver connected', tone: 'success'}, 'Runs can start.'),
         React.createElement(ProgressBar, {completionLabel: 'Complete after all passes.', isActive: true, label: 'Boundary solve', value: 18, valueLabel: '18 passes'}),
