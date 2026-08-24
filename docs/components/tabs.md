@@ -12,13 +12,13 @@ Tabs selects one peer content panel without changing application location.
 
 ## Prefer instead
 
-- Use SideNavigation or Link for destinations, SegmentedControl for a submitted choice, and Disclosure for optional detail.
+- Use CollapsibleNavigationPane or Link for destinations, SegmentedControl for a submitted choice, and Disclosure for optional detail.
 
 ## Composition and parts
 
 - Render inside AppearanceProvider so the route, focus, surface, and text roles use the active theme and accent.
 - Pass a non-empty library-owned item list containing stable ids, short labels, and matching panel content.
-- Use controlled selectedId when application state or a URL parameter determines the active panel; keep route navigation in links or SideNavigation.
+- Use controlled selectedId when application state or a URL parameter determines the active panel; keep route navigation in links or CollapsibleNavigationPane.
 - Tabs owns one tab list, its tab controls, and their matching tab panels.
 
 ## Preferred higher-level compositions
@@ -92,7 +92,7 @@ export function RunDetailTabs() {
 
 ### Do not use tabs as route links
 
-Destinations with their own URLs belong in SideNavigation or ordinary links, not panel-selection tabs.
+Destinations with their own URLs belong in CollapsibleNavigationPane or ordinary links, not panel-selection tabs.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';

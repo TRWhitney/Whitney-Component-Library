@@ -18,12 +18,23 @@ export const showcaseGroups = [
     ],
   },
   {
+    label: 'Application structure',
+    components: ['PageHeader', 'SplitView'],
+  },
+  {
     label: 'Actions',
     components: ['Button', 'IconButton', 'Link', 'ToggleButton', 'ButtonGroup', 'Toolbar'],
   },
   {
     label: 'Navigation and disclosure',
-    components: ['Tabs', 'Breadcrumbs', 'Pagination', 'Disclosure', 'Accordion', 'SideNavigation'],
+    components: [
+      'Tabs',
+      'Breadcrumbs',
+      'Pagination',
+      'Disclosure',
+      'Accordion',
+      'CollapsibleNavigationPane',
+    ],
   },
   {
     label: 'Fields',

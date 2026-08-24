@@ -1,13 +1,13 @@
 import {
   Accordion,
   Breadcrumbs,
+  CollapsibleNavigationPane,
   Disclosure,
   Pagination,
-  SideNavigation,
   Tabs,
   type AccordionItems,
   type BreadcrumbItems,
-  type SideNavigationGroups,
+  type CollapsibleNavigationPaneGroups,
   type TabItems,
 } from '../src/index.js';
 
@@ -32,7 +32,7 @@ const groups = [
     items: [{href: '/runs', id: 'runs', label: 'Runs'}],
     label: 'Workspace',
   },
-] as const satisfies SideNavigationGroups;
+] as const satisfies CollapsibleNavigationPaneGroups;
 
 export const navigationAndDisclosure = (
   <>
@@ -63,7 +63,7 @@ export const navigationAndDisclosure = (
       expansionMode="multiple"
       items={accordion}
     />
-    <SideNavigation
+    <CollapsibleNavigationPane
       ariaLabel="Workspace"
       collapseLabel="Collapse"
       currentId="runs"
@@ -100,9 +100,9 @@ export const controlledAccordionWithoutCallback = (
   />
 );
 
-export const controlledSideNavigationWithoutCallback = (
+export const controlledCollapsibleNavigationPaneWithoutCallback = (
   // @ts-expect-error Controlled collapsed state requires onCollapsedChange.
-  <SideNavigation
+  <CollapsibleNavigationPane
     ariaLabel="Workspace"
     collapseLabel="Collapse"
     currentId="runs"

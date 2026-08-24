@@ -1,7 +1,7 @@
 export {Breadcrumbs} from './breadcrumbs.js';
 export {Disclosure, Accordion} from './disclosure.js';
 export {Pagination} from './pagination.js';
-export {SideNavigation} from './side-navigation.js';
+export {CollapsibleNavigationPane} from './collapsible-navigation-pane.js';
 export {Tabs} from './tabs.js';
 export type {
   AccordionExpansionMode,
@@ -18,11 +18,11 @@ export type {
   DisclosureProps,
   NavigationOrientation,
   PaginationProps,
-  SideNavigationCollapseProps,
-  SideNavigationGroup,
-  SideNavigationGroups,
-  SideNavigationItem,
-  SideNavigationProps,
+  CollapsibleNavigationPaneCollapseProps,
+  CollapsibleNavigationPaneGroup,
+  CollapsibleNavigationPaneGroups,
+  CollapsibleNavigationPaneItem,
+  CollapsibleNavigationPaneProps,
   TabActivationMode,
   TabItem,
   TabItems,

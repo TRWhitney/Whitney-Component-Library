@@ -48,6 +48,7 @@ describe('canonical component contracts', () => {
       'Checkbox',
       'CheckboxGroup',
       'ComboBox',
+      'CollapsibleNavigationPane',
       'CollectionFilterBar',
       'ContextMenu',
       'DateField',
@@ -75,6 +76,7 @@ describe('canonical component contracts', () => {
       'NotificationProvider',
       'NumberField',
       'Pagination',
+      'PageHeader',
       'ProgressBar',
       'Popover',
       'RadioGroup',
@@ -85,10 +87,10 @@ describe('canonical component contracts', () => {
       'Section',
       'SegmentedControl',
       'Select',
-      'SideNavigation',
       'Skeleton',
       'Slider',
       'Spinner',
+      'SplitView',
       'Stack',
       'StatusIndicator',
       'Surface',
@@ -161,10 +163,31 @@ describe('canonical component contracts', () => {
     expect(contractFor('Accordion')?.controlBehavior.join(' ')).toMatch(
       /single.*multiple.*controlled.*uncontrolled/i,
     );
-    expect(contractFor('SideNavigation')?.inappropriateUses.join(' ')).toMatch(
+    expect(contractFor('CollapsibleNavigationPane')?.inappropriateUses.join(' ')).toMatch(
       /commands.*router|routing/i,
     );
-    expect(contractFor('SideNavigation')?.name).toBe('SideNavigation');
+    expect(contractFor('CollapsibleNavigationPane')?.name).toBe('CollapsibleNavigationPane');
+    expect(contractFor('CollapsibleNavigationPane')?.composition.join(' ')).not.toMatch(
+      /sidebar|application shell/i,
+    );
+  });
+
+  it('distinguishes application regions, page identity, and resizable panes', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('PageHeader')?.controlBehavior.join(' ')).toMatch(
+      /Route.*identity.*status/i,
+    );
+    expect(contractFor('PageHeader')?.appropriateUses.join(' ')).not.toMatch(/stable/i);
+    expect(contractFor('PageHeader')?.examples[0]?.code).not.toMatch(/Stable/);
+    expect(contractFor('SplitView')?.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*Home.*End/i);
+    expect(contractFor('SplitView')?.controlBehavior.join(' ')).toMatch(
+      /either pane.*never both|never both.*either pane/i,
+    );
+    expect(contractFor('SplitView')?.responsiveBehavior.join(' ')).toMatch(
+      /stack.*DOM order.*disable.*resiz/i,
+    );
   });
 
   it('distinguishes ordinary dialogs, consequential confirmations, and drawers', () => {

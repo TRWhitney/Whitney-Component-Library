@@ -60,7 +60,7 @@ export const tabsContract = {
   composition: [
     'Render inside AppearanceProvider so the route, focus, surface, and text roles use the active theme and accent.',
     'Pass a non-empty library-owned item list containing stable ids, short labels, and matching panel content.',
-    'Use controlled selectedId when application state or a URL parameter determines the active panel; keep route navigation in links or SideNavigation.',
+    'Use controlled selectedId when application state or a URL parameter determines the active panel; keep route navigation in links or CollapsibleNavigationPane.',
   ],
   contentRules: [
     'Use short parallel labels and keep each panel focused on one peer section. Do not place href destinations in tab items.',
@@ -75,7 +75,7 @@ export const tabsContract = {
         '<Tabs\n  ariaLabel="Workspace destinations"\n  items={[{id: "runs", label: "Runs", panel: <p>Route content</p>}]}\n/>',
       ),
       description:
-        'Destinations with their own URLs belong in SideNavigation or ordinary links, not panel-selection tabs.',
+        'Destinations with their own URLs belong in CollapsibleNavigationPane or ordinary links, not panel-selection tabs.',
       title: 'Do not use tabs as route links',
     },
   ],
@@ -103,7 +103,7 @@ export const tabsContract = {
   name: 'Tabs',
   parts: ['Tabs owns one tab list, its tab controls, and their matching tab panels.'],
   preferredAlternatives: [
-    'Use SideNavigation or Link for destinations, SegmentedControl for a submitted choice, and Disclosure for optional detail.',
+    'Use CollapsibleNavigationPane or Link for destinations, SegmentedControl for a submitted choice, and Disclosure for optional detail.',
   ],
   preferredCompositions: [
     'Compose Tabs inside a Section or application workspace where its panels remain part of one task.',
@@ -114,7 +114,7 @@ export const tabsContract = {
     'Disclosure',
     'Link',
     'SegmentedControl',
-    'SideNavigation',
+    'CollapsibleNavigationPane',
   ],
   responsiveBehavior: [
     'Horizontal tabs remain reachable through a compact scroll track. Vertical tabs return to a horizontal track when the viewport is narrow.',
@@ -178,13 +178,13 @@ export const breadcrumbsContract = {
     'Breadcrumbs owns the navigation landmark, ordered path, separators, and optional anchored overflow overlay.',
   ],
   preferredAlternatives: [
-    'Use Tabs for peer panels, SideNavigation for persistent destinations, and Pagination for numbered result pages.',
+    'Use Tabs for peer panels, CollapsibleNavigationPane for persistent destinations, and Pagination for numbered result pages.',
   ],
   preferredCompositions: [
     'Place Breadcrumbs near the page or workspace heading whose location it names.',
   ],
   purpose: 'Breadcrumbs exposes the current page within a navigable hierarchy.',
-  relatedExports: ['AppearanceProvider', 'Link', 'Pagination', 'SideNavigation', 'Tabs'],
+  relatedExports: ['AppearanceProvider', 'Link', 'Pagination', 'CollapsibleNavigationPane', 'Tabs'],
   responsiveBehavior: [
     'Long labels truncate visually and middle destinations may collapse into the ellipsis overlay, which keeps every destination reachable without displacing page content.',
   ],
@@ -389,10 +389,10 @@ export const accordionContract = {
   summary: 'Coordinate single or multiple expansion across related labeled sections.',
 } satisfies ComponentContract;
 
-export const sideNavigationContract = {
+export const collapsibleNavigationPaneContract = {
   ...commonNavigationGuidance,
   appearance: [
-    'SideNavigation uses one restrained surface, quiet nested guide rails, and an accent route marker for the current destination.',
+    'CollapsibleNavigationPane uses one restrained surface, quiet nested guide rails, and an accent route marker for the current destination.',
   ],
   appropriateUses: [
     'persistent navigation among grouped and hierarchical application destinations',
@@ -406,17 +406,17 @@ export const sideNavigationContract = {
     'Use short destination nouns, group labels only when they clarify hierarchy, and no command actions.',
   ],
   controlBehavior: [
-    'SideNavigation supports controlled or uncontrolled collapse, preserves native link navigation, and reports destination ids through onNavigate.',
+    'CollapsibleNavigationPane supports controlled or uncontrolled collapse, preserves native link navigation, and reports destination ids through onNavigate.',
   ],
   counterExamples: [
     {
       code: inProvider(
-        'RunActionsSideNavigationCounterexample',
-        '<SideNavigation ariaLabel="Run actions" collapseLabel="Collapse" expandLabel="Expand" currentId="delete" groups={[{id: "actions", items: [{id: "delete", label: "Delete", href: "#delete"}]}]} />',
+        'RunActionsCollapsibleNavigationPaneCounterexample',
+        '<CollapsibleNavigationPane ariaLabel="Run actions" collapseLabel="Collapse" expandLabel="Expand" currentId="delete" groups={[{id: "actions", items: [{id: "delete", label: "Delete", href: "#delete"}]}]} />',
       ),
       description:
         'Commands belong in Menu, Toolbar, or Button actions rather than destination navigation.',
-      title: 'Do not place commands in side navigation',
+      title: 'Do not place commands in collapsible navigation pane',
     },
   ],
   events: [
@@ -426,13 +426,13 @@ export const sideNavigationContract = {
     {
       code: inProvider(
         'WorkspaceNavigation',
-        '<SideNavigation\n  ariaLabel="Workspace"\n  collapseLabel="Collapse navigation"\n  currentId="active-runs"\n  expandLabel="Expand navigation"\n  groups={[{\n    id: "workspace",\n    label: "Workspace",\n    items: [{id: "overview", label: "Overview", href: "/overview"}, {id: "active-runs", label: "Active runs", href: "/runs"}],\n  }]}\n/>',
+        '<CollapsibleNavigationPane\n  ariaLabel="Workspace"\n  collapseLabel="Collapse navigation"\n  currentId="active-runs"\n  expandLabel="Expand navigation"\n  groups={[{\n    id: "workspace",\n    label: "Workspace",\n    items: [{id: "overview", label: "Overview", href: "/overview"}, {id: "active-runs", label: "Active runs", href: "/runs"}],\n  }]}\n/>',
       ),
       description: 'Expose grouped application destinations and the current route.',
       title: 'Application destinations',
     },
   ],
-  exportName: 'SideNavigation',
+  exportName: 'CollapsibleNavigationPane',
   importPath: '.',
   inappropriateUses: [
     'commands, transient choices, contextual actions, panel selection, or routing implementation',
@@ -444,17 +444,18 @@ export const sideNavigationContract = {
   labeling: [
     'ariaLabel names the navigation landmark; collapseLabel and expandLabel name the state-changing control.',
   ],
-  name: 'SideNavigation',
+  name: 'CollapsibleNavigationPane',
   parts: [
-    'SideNavigation owns its landmark, collapse control, labeled groups, nested lists, links, and current marker.',
+    'CollapsibleNavigationPane owns its landmark, collapse control, labeled groups, nested lists, links, and current marker.',
   ],
   preferredAlternatives: [
     'Use Menu for commands, Tabs for peer panels, Breadcrumbs for ancestry, or Link for isolated destinations.',
   ],
   preferredCompositions: [
-    'Compose SideNavigation as the persistent navigation region of an application shell.',
+    'Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. It does not require sidebar placement.',
   ],
-  purpose: 'SideNavigation exposes grouped application destinations without owning a router.',
+  purpose:
+    'CollapsibleNavigationPane exposes grouped application destinations without owning a router.',
   relatedExports: ['AppearanceProvider', 'Breadcrumbs', 'Link', 'Menu', 'Tabs'],
   responsiveBehavior: [
     'The controlled or uncontrolled collapsed state reduces the compact layout to one reachable expansion control.',

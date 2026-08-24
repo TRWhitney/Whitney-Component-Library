@@ -7,6 +7,17 @@ export {
 } from './appearance/appearance-provider.js';
 export type {AccentColor} from './appearance/accent.js';
 export {
+  PageHeader,
+  SplitView,
+  type PageHeaderHeadingLevel,
+  type PageHeaderProps,
+  type PageHeaderStatusTone,
+  type SplitViewCollapsedPane,
+  type SplitViewCollapseProps,
+  type SplitViewProps,
+  type SplitViewSizeProps,
+} from './application/index.js';
+export {
   CardCollection,
   CollectionFilterBar,
   DescriptionList,
@@ -64,7 +75,7 @@ export {
   Breadcrumbs,
   Disclosure,
   Pagination,
-  SideNavigation,
+  CollapsibleNavigationPane,
   Tabs,
   type AccordionExpansionMode,
   type AccordionExpansionProps,
@@ -80,11 +91,11 @@ export {
   type DisclosureProps,
   type NavigationOrientation,
   type PaginationProps,
-  type SideNavigationCollapseProps,
-  type SideNavigationGroup,
-  type SideNavigationGroups,
-  type SideNavigationItem,
-  type SideNavigationProps,
+  type CollapsibleNavigationPaneCollapseProps,
+  type CollapsibleNavigationPaneGroup,
+  type CollapsibleNavigationPaneGroups,
+  type CollapsibleNavigationPaneItem,
+  type CollapsibleNavigationPaneProps,
   type TabActivationMode,
   type TabItem,
   type TabItems,

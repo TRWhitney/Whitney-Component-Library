@@ -10,7 +10,7 @@ import {
   Breadcrumbs,
   Disclosure,
   Pagination,
-  SideNavigation,
+  CollapsibleNavigationPane,
   Tabs,
 } from '../src/index.js';
 
@@ -256,12 +256,12 @@ describe('navigation and disclosure family', () => {
     ).toThrow(/single expansion.*at most one/i);
   });
 
-  it('keeps hierarchical side-navigation links reachable through compact collapse', () => {
+  it('keeps hierarchical navigation-pane links reachable through compact collapse', () => {
     const onCollapsedChange = vi.fn();
     const onNavigate = vi.fn();
     render(
       <NavigationFixture>
-        <SideNavigation
+        <CollapsibleNavigationPane
           ariaLabel="Workspace"
           collapseLabel="Collapse workspace navigation"
           defaultCollapsed
@@ -332,7 +332,7 @@ describe('navigation and disclosure family', () => {
           ariaLabel="Run configuration"
           items={[{content: 'Geometry settings', id: 'geometry', title: 'Geometry'}]}
         />
-        <SideNavigation
+        <CollapsibleNavigationPane
           ariaLabel="Workspace"
           collapseLabel="Collapse workspace navigation"
           currentId="runs"

@@ -9,11 +9,11 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 16, including the intervening Ticket 03A accent correction, are complete. Ticket
-17 is next. Menu
-and ContextMenu now use whole-row item highlights without a leading entry rail. The maintained human
-showcase covers every contracted public component. Manual screen-reader operation is intentionally
-consolidated in the Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
+Tickets 01 through 17, including the intervening Ticket 03A accent correction, are complete. The
+Ticket 17 correction removes ApplicationShell, keeps CollapsibleNavigationPane's existing appearance
+without a placement requirement, gives PageHeader arbitrary status content with an independent
+semantic tone, and lets SplitView collapse either pane unambiguously. Manual screen-reader operation
+remains consolidated in the Ticket 30 pre-`1.0` release gate.
 
 The library remains pre-adoption. Four completed `0.x` integration slices, a broad conventional
 catalog, the accepted Markdown editing surface, the accessible chart family including radar
@@ -219,20 +219,31 @@ reduced-motion, SSR, hydration, public-package, and typed behavior are covered.
 
 ### Ticket 14 — navigation and disclosure
 
-Tabs, Breadcrumbs, Pagination, Disclosure, Accordion, and SideNavigation preserve panel selection,
-hierarchical location, numbered result movement, optional expansion, coordinated expansion, and
-persistent application destinations as separate public concepts. Controlled and uncontrolled
-state stays explicit, while native links preserve consumer routing.
+Tabs, Breadcrumbs, Pagination, Disclosure, Accordion, and CollapsibleNavigationPane preserve panel
+selection, hierarchical location, numbered result movement, optional expansion, coordinated
+expansion, and persistent application destinations as separate public concepts. Controlled and
+uncontrolled state stays explicit, while native links preserve consumer routing.
 
 Breadcrumbs keeps root and current locations visible and moves collapsed ancestors into an anchored
 ellipsis overlay without displacing page content. Pagination uses the same full-width selection rail
 as ToggleButton. Disclosure and Accordion keep collapsed rows compact without losing find-in-page
-behavior. SideNavigation owns grouped destination links, current location, and its collapse control
-without owning the application router or generic sidebar layout.
+behavior. CollapsibleNavigationPane owns grouped destination links, current location, and its
+collapse control without owning the application router or requiring a particular page position.
+
+### Ticket 17 — application structure
+
+Applications own their overall layout. PageHeader keeps breadcrumbs, an optional page identifier,
+optional consumer-named status content, title, description, and page actions distinct while Route
+uses only the flexible space between identifier and status. It prescribes neither a particular
+status label nor a pill.
+
+SplitView owns two named peer panes, bounded controlled or uncontrolled percentage sizing, logical
+keyboard and pointer resizing, collapse of either pane, focus recovery, and container-owned compact
+stacking. Distinct pane controls identify the target without relying on a directional chevron.
 
 ## Frontier
 
-See the [decision map](map.md). Ticket 17 is the next unit.
+See the [decision map](map.md). The Ticket 17 correction is the current unit; Ticket 18 follows it.
 
 ## Accepted sources
 
@@ -258,6 +269,23 @@ See the [decision map](map.md). Ticket 17 is the next unit.
 - Repository-owned evaluation of agent output or a prescribed consumer evaluation workflow.
 
 ## Current verification
+
+- Ticket 17 correction passes `npm run check` with 24 test files and 411 tests, generated guidance,
+  and public declarations under TypeScript 5.9, 6, and 7. `npm run showcase:build`,
+  `npm run verify:package`, and `git diff --check` pass. Packed React 18.3.1 and 19.2.8 consumers pass
+  SSR, hydration, types, and browser builds.
+- Chromium, Firefox, and WebKit direct showcase operation confirms the revised PageHeader Route,
+  arbitrary status content, RTL direction, collapse of either SplitView pane, and the settled quiet
+  secondary hover highlight with a white icon and no hover outline. Chromium light, dark, compact,
+  forced-color, reduced-motion, narrow reflow, and CollapsibleNavigationPane checks pass.
+- Renewed Chromium, Firefox, and WebKit correction checks confirm offset-preserving pointer resize,
+  separator focus recovery after controlled collapse and compact reflow, pressed-button parity, and
+  overflow-free PageHeader and stacked SplitView reflow at 200 percent device scale. A second renewed
+  focus check confirms that focus which has already left the separator stays outside SplitView
+  through a later controlled collapse in all three engines.
+- Independent intent and engineering correction reviews pass with no blocking findings. The final
+  bounded review confirms the stale separator-focus correction resolves the admitted focus-stealing
+  defect without affecting active focus recovery.
 
 - Ticket 16 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
   types, 23 test files with 393 tests, generated guidance, package build, and public declarations
@@ -313,15 +341,13 @@ See the [decision map](map.md). Ticket 17 is the next unit.
   control. The showcase removes descendants after following an ancestor and exposes the next route
   from each ancestor page so the hierarchy can be traversed in both directions. It also covers
   Pagination's full-width selection rail, Disclosure and Accordion expansion and disabled states,
-  and SideNavigation collapse and current destination behavior. A touch-enabled compact viewport
-  directly exercises Tabs, Breadcrumbs, Pagination, Disclosure, Accordion, and SideNavigation. The
-  browser accessibility tree exposes the expected named tablist, navigation landmarks, links, and
-  collapse control. Wide and compact RTL layouts have no component or document overflow; reduced
-  motion, forced colors, light, and dark appearances render correctly. Collapsed Disclosure rows
-  retain the intended 44-pixel minimum independent of consumer box sizing while preserving
-  find-in-page behavior. Whitney accepted SideNavigation's role as the persistent destination list
-  inside an application sidebar, including its owned collapse control. Inspected screenshots were
-  discarded after validation.
+  and the collapsible navigation pane's current destination and collapse behavior. A touch-enabled
+  compact viewport directly exercises all six components. The browser accessibility tree exposes
+  the expected named tablist, navigation landmarks, links, and collapse control. Wide and compact
+  RTL layouts have no component or document overflow; reduced motion, forced colors, light, and dark
+  appearances render correctly. Collapsed Disclosure rows retain the intended 44-pixel minimum
+  independent of consumer box sizing while preserving find-in-page behavior. Inspected screenshots
+  were discarded after validation.
 - Ticket 13 direct Chromium interaction covers Popover focus entry and restoration, Menu typeahead
   and action dismissal, ContextMenu keyboard activation, rejection of ambiguous triggers,
   warning-free positioning at distinct pointer invocation points, focus restoration after
@@ -403,7 +429,7 @@ See the [decision map](map.md). Ticket 17 is the next unit.
 
 ## Continuation
 
-Ticket 16 is complete on `master`. Start Ticket 17 from its accepted application-structure sources
-when Whitney asks for the next ticket. The Ticket 16 outcome owns its implementation, tests,
-contracts, generated guidance, showcase, package verifier, shared collection-row styling, and work
+Ticket 17 is complete on `master`. Start Ticket 18 from its accepted operational-workflow sources
+when Whitney asks for the next ticket. The Ticket 17 outcome owns its implementation, tests,
+contracts, generated guidance, showcase, package verifier, application-structure styling, and work
 record.

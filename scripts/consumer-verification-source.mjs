@@ -35,6 +35,7 @@ import {
   Meter,
   NotificationProvider,
   NumberField,
+  PageHeader,
   ProgressBar,
   RadioGroup,
   RangeSlider,
@@ -47,6 +48,7 @@ import {
   Slider,
   Skeleton,
   Spinner,
+  SplitView,
   Stack,
   StatusIndicator,
   Surface,
@@ -323,6 +325,24 @@ const view = React.createElement(
             },
           ],
           selectionMode: 'none',
+        }),
+        React.createElement(PageHeader, {
+          identity: 'RUN 0284',
+          status: 'Converged',
+          statusTone: 'success',
+          title: 'North chamber',
+        }),
+        React.createElement(SplitView, {
+          ariaLabel: 'Packed run workspace',
+          collapsePrimaryLabel: 'Hide packed configuration',
+          collapseSecondaryLabel: 'Hide packed inspector',
+          primary: 'Packed configuration',
+          primaryLabel: 'Packed configuration pane',
+          resizeLabel: 'Resize packed inspector',
+          restorePrimaryLabel: 'Show packed configuration',
+          restoreSecondaryLabel: 'Show packed inspector',
+          secondary: 'Packed inspector',
+          secondaryLabel: 'Packed inspector pane',
         }),
         React.createElement(DateField, {
           calendar: 'gregory',
@@ -698,6 +718,14 @@ if (
   document.querySelectorAll('[data-wcl-tree-item]').length !== 2
 ) {
   throw new Error('Packed advanced collections did not preserve query, table, and tree semantics.');
+}
+if (
+  !document.querySelector('[data-wcl-page-header-route]') ||
+  !document.querySelector('[data-wcl-page-header-route-endpoint]') ||
+  document.querySelectorAll('[data-wcl-split-view-pane-control]').length !== 2 ||
+  document.querySelector('[data-wcl-split-view-separator]')?.getAttribute('aria-valuenow') !== '60'
+) {
+  throw new Error('Packed application structure did not preserve Route and split semantics.');
 }
 if (document.querySelector('[data-wcl-combo-box] input')?.getAttribute('role') !== 'combobox') {
   throw new Error('Packed combo box did not preserve editable autocomplete semantics.');

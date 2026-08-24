@@ -118,8 +118,9 @@ the test now verifies that clicking Run cannot scroll or clip the content.
 - Preserved Focus Field's single visible glow behind the active composite region and recorded that
   glow must not become a general-purpose surface treatment.
 - Assigned the running `Solving` state to semantic warning yellow instead of the configurable
-  application accent. `Stable` remains semantic green. Both status pairs meet 4.5:1 contrast in
-  light and dark appearances.
+  application accent. `Converged` demonstrates a semantic success status without prescribing its
+  copy or requiring a status pill. Both status examples meet 4.5:1 contrast in light and dark
+  appearances.
 
 ## Revision 5: Preferred Ingredients
 
@@ -266,8 +267,9 @@ base. Orbit is rejected because its moving perimeter communicates the same runni
 Boundary Pass pulse. State Field is set aside. The next comparison changes only the top bar that
 contains the run identifier and semantic status pill:
 
-- **Route:** a continuous track begins at the run marker and terminates beneath the status pill. It
-  connects two meaningful endpoints without crossing their labels or adding motion.
+- **Route:** a continuous track begins at an open accent origin and terminates at a solid semantic
+  endpoint before the status content. It connects two meaningful endpoints without crossing their
+  labels or adding motion. Status content may be a pill, text, or a richer consumer-owned element.
 - **Dock:** a substantial recessed rounded bay gives status a dedicated structural home while the
   run identifier remains flat.
 - **Beacon:** the status pill overlaps the header seam and receives one localized semantic halo,
@@ -275,16 +277,17 @@ contains the run identifier and semantic status pill:
 
 Every header uses the same canvas, surfaces, typography, accent and semantic tokens, profile
 interaction, state-change pulse, status panel, and responsive layout. The alternatives vary only
-connection, containment, or emphasis in the header. Compact mode preserves the identifier and pill
-without overflow or collapsing their distinction.
+connection, containment, or emphasis in the header. Compact mode preserves the identifier and
+status content without overflow or collapsing their distinction.
 
 The first Route implementation used solid box-shadow masks to keep a pseudo-element track from
 crossing the endpoint content. Those masks appeared as unwanted halos around both endpoints. Route
-now renders a real flexible track between the run identifier and status pill, so it fills only the
-available space and requires no masking. Wide and compact checks assert that the track remains
-visible and both endpoint shadows remain absent. The corrected direction is accepted because it
-gives otherwise empty header space a meaningful role while preserving the distinction between run
-identity and semantic status.
+now renders a real flexible track between the run identifier and status content, so it fills only
+the available space and requires no masking. Its open accent origin and solid semantic endpoint
+match the library masthead Route. Wide and compact checks assert that the track remains visible and
+both endpoint shadows remain absent. The corrected direction is accepted because it gives otherwise
+empty header space a meaningful role while preserving the distinction between run identity and
+semantic status.
 
 ## Revision 11: Exploration Settled
 

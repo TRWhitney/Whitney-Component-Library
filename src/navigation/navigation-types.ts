@@ -113,8 +113,8 @@ export type AccordionProps<Id extends string = string> = AccordionExpansionProps
   readonly items: AccordionItems<Id>;
 };
 
-export interface SideNavigationItem<Id extends string = string> {
-  readonly children?: readonly SideNavigationItem<Id>[];
+export interface CollapsibleNavigationPaneItem<Id extends string = string> {
+  readonly children?: readonly CollapsibleNavigationPaneItem<Id>[];
   readonly href: string;
   readonly id: Id;
   readonly isDisabled?: boolean;
@@ -122,18 +122,21 @@ export interface SideNavigationItem<Id extends string = string> {
   readonly newWindow?: boolean;
 }
 
-export interface SideNavigationGroup<Id extends string = string> {
+export interface CollapsibleNavigationPaneGroup<Id extends string = string> {
   readonly id: string;
-  readonly items: readonly [SideNavigationItem<Id>, ...SideNavigationItem<Id>[]];
+  readonly items: readonly [
+    CollapsibleNavigationPaneItem<Id>,
+    ...CollapsibleNavigationPaneItem<Id>[],
+  ];
   readonly label?: string;
 }
 
-export type SideNavigationGroups<Id extends string = string> = readonly [
-  SideNavigationGroup<Id>,
-  ...SideNavigationGroup<Id>[],
+export type CollapsibleNavigationPaneGroups<Id extends string = string> = readonly [
+  CollapsibleNavigationPaneGroup<Id>,
+  ...CollapsibleNavigationPaneGroup<Id>[],
 ];
 
-export type SideNavigationCollapseProps =
+export type CollapsibleNavigationPaneCollapseProps =
   | {
       readonly defaultCollapsed?: boolean;
       readonly isCollapsed?: never;
@@ -145,11 +148,12 @@ export type SideNavigationCollapseProps =
       readonly onCollapsedChange: (isCollapsed: boolean) => void;
     };
 
-export type SideNavigationProps<Id extends string = string> = SideNavigationCollapseProps & {
-  readonly ariaLabel: string;
-  readonly collapseLabel: string;
-  readonly currentId: NoInfer<Id>;
-  readonly expandLabel: string;
-  readonly groups: SideNavigationGroups<Id>;
-  readonly onNavigate?: (id: Id) => void;
-};
+export type CollapsibleNavigationPaneProps<Id extends string = string> =
+  CollapsibleNavigationPaneCollapseProps & {
+    readonly ariaLabel: string;
+    readonly collapseLabel: string;
+    readonly currentId: NoInfer<Id>;
+    readonly expandLabel: string;
+    readonly groups: CollapsibleNavigationPaneGroups<Id>;
+    readonly onNavigate?: (id: Id) => void;
+  };

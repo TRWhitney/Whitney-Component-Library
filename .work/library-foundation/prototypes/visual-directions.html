@@ -1296,18 +1296,37 @@
 
       /* Route: the run identity and its status become meaningful endpoints of one track. */
       html[data-header='route'] .header-track {
+        position: relative;
         display: block;
         flex: 1;
         min-width: 18px;
         height: 2px;
         margin-inline: 14px;
-        background: linear-gradient(
-          90deg,
-          var(--accent-muted),
-          var(--border) 58%,
-          color-mix(in srgb, var(--header-status) 72%, var(--border))
-        );
+        background: linear-gradient(90deg, var(--accent), var(--header-status));
         pointer-events: none;
+      }
+
+      html[data-header='route'] .header-track::before,
+      html[data-header='route'] .header-track::after {
+        position: absolute;
+        inset-block-start: 50%;
+        inline-size: 7px;
+        block-size: 7px;
+        border: 2px solid var(--accent);
+        border-radius: 50%;
+        content: '';
+        translate: 0 -50%;
+      }
+
+      html[data-header='route'] .header-track::before {
+        inset-inline-start: -3px;
+        background: var(--surface);
+      }
+
+      html[data-header='route'] .header-track::after {
+        inset-inline-end: -3px;
+        border-color: var(--header-status);
+        background: var(--header-status);
       }
 
       .principles {
@@ -1641,7 +1660,7 @@
             <header class="app-header">
               <span class="run-code"><span class="run-dot"></span>SIM / THERMAL / 0284</span>
               <span class="header-track" aria-hidden="true"></span>
-              <span class="status-pill" id="run-status" data-tone="success">Stable</span>
+              <span class="status-pill" id="run-status" data-tone="success">Converged</span>
             </header>
 
             <div class="workflow">
@@ -1827,7 +1846,7 @@
               ? 'Unavailable'
               : value === 'error'
                 ? 'Needs input'
-                : 'Stable';
+                : 'Converged';
             status.dataset.tone = disabled ? 'muted' : value === 'error' ? 'danger' : 'success';
             shell.dataset.running = 'false';
             document.querySelector('#run').textContent = 'Run profile';
@@ -1872,7 +1891,7 @@
         shell.dataset.running = String(!running);
         event.currentTarget.textContent = running ? 'Run profile' : 'Running…';
         const status = document.querySelector('#run-status');
-        status.textContent = running ? 'Stable' : 'Solving';
+        status.textContent = running ? 'Converged' : 'Solving';
         status.dataset.tone = running ? 'success' : 'warning';
       });
     </script>

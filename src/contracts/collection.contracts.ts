@@ -671,7 +671,7 @@ export const treeContract = {
     'The component owns the tree grid, recursive collection, levels, chevrons, item copy, action slot, focus recovery, selection, and feedback.',
   ],
   preferredAlternatives: [
-    'Use List for flat content, ListBox for flat selection, Table for columns, or SideNavigation for persistent destinations.',
+    'Use List for flat content, ListBox for flat selection, Table for columns, or CollapsibleNavigationPane for persistent destinations.',
   ],
   preferredCompositions: [
     'Place Tree in Section or Surface and keep commands in each item actions slot.',
@@ -690,7 +690,7 @@ export const treeContract = {
     'ListBox',
     'Menu',
     'Section',
-    'SideNavigation',
+    'CollapsibleNavigationPane',
     'Spinner',
     'Surface',
     'Table',

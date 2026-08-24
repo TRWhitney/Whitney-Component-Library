@@ -38,15 +38,16 @@ implementation concern; public contracts must preserve the distinctions below.
   field, search field, checkbox and checkbox group, radio group, switch, select, combobox,
   segmented control, slider and range slider, date field, time field, date picker, date-range
   picker, file trigger, and drop zone.
-- **Navigation and disclosure:** tabs, breadcrumbs, menu, pagination, disclosure, accordion, and
-  side navigation.
+- **Navigation and disclosure:** tabs, breadcrumbs, menu, pagination, disclosure, accordion, and a
+  collapsible navigation pane that does not assume a particular page position.
 - **Overlays:** dialog, alert dialog, popover, tooltip, drawer, and context menu.
 - **Feedback and status:** status indicator, badge, inline alert, alert banner, progress bar, meter,
   spinner, skeleton, empty state, and toast or notification.
 - **Data and collections:** list, description list, list box, card, table, tree, reusable search and
   filter controls, and consistent collection loading, empty, partial, and error treatments.
 - **Layout and application structure:** stack, inline group, responsive grid, divider, surface or
-  panel, section, split view, scroll region, application shell, and workspace or page header.
+  panel, section, split view, scroll region, and workspace or page header. Applications own their
+  overall header, navigation, workspace, utility, and footer arrangement.
 - **Specialized systems:** the accepted Markdown editing surface and standard chart family.
 - **Higher-level constructs:** supported operational workflow, data-analysis workspace, Markdown
   authoring workspace, and application workbench compositions.
@@ -148,6 +149,27 @@ localization, right-to-left direction, server rendering, and hydration behavior.
 own focus containment or movement, restoration, dismissal, and responsive placement according to
 their specific contracts. Collection components own selection and keyboard navigation semantics
 rather than delegating them to consumers.
+
+### Application structure
+
+Applications own their overall header, navigation, workspace, utility, and footer arrangement. The
+library does not prescribe an application shell. PageHeader coordinates page identity and actions
+inside whatever layout the application chooses.
+
+CollapsibleNavigationPane owns grouped destinations and its collapse state without requiring
+sidebar placement. Its accepted appearance remains unchanged by the name and placement correction.
+
+SplitView owns two named panes and a resize rail. Either pane may collapse, but never both at once.
+Distinct pane-target controls use pane diagrams rather than directional chevrons, and their labels
+name the collapse or restore action for the affected pane. Compact stacking preserves the same pane
+order and state model. Pane-target controls use the same hover and pressed highlight treatment as
+quiet secondary buttons. Only keyboard focus draws their focus outline.
+
+PageHeader accepts an optional page identifier and optional status content. Neither is required,
+and the library does not prescribe a specific status label or require the status to be a pill. When
+status content is present, its separate semantic tone is required as success, warning, danger, or
+neutral. Route begins with an open accent circle, runs through the flexible space, and ends with a
+solid circle in that semantic tone.
 
 ### Markdown editing surface
 

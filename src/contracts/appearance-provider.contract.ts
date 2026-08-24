@@ -95,7 +95,7 @@ export const appearanceProviderContract = {
     'Use supported component variants instead of replacing internal design tokens.',
   ],
   preferredCompositions: [
-    'Place the provider around the application shell. Nest one only for a region with a different appearance or identity.',
+    'Place the provider around the application root. Nest one only for a region with a different appearance or identity.',
   ],
   purpose:
     'AppearanceProvider scopes the library visual system to light or dark appearance and one application accent.',

@@ -331,7 +331,7 @@ export const alertBannerContract = {
     'Use InlineAlert for local scope, StatusIndicator for terse state, or NotificationProvider for transient background completion.',
   ],
   preferredCompositions: [
-    'Compose at the beginning of an application shell, workspace, or page content region before the affected controls.',
+    'Compose at the beginning of a workspace or page content region before the affected controls.',
   ],
   purpose: 'AlertBanner explains a condition that affects a page or workspace.',
   relatedExports: [
@@ -840,7 +840,7 @@ export const notificationProviderContract = {
     'Use InlineAlert for durable local feedback, AlertBanner for a broad condition, StatusIndicator for a concise state, or a dialog when the reader must decide or recover.',
   ],
   preferredCompositions: [
-    'Place one provider around an application shell or workbench and issue notifications from completed background commands without duplicating durable status history.',
+    'Place one provider around the application root or workbench and issue notifications from completed background commands without duplicating durable status history.',
   ],
   purpose: 'NotificationProvider queues and presents brief dismissible application notifications.',
   reducedMotionBehavior: [

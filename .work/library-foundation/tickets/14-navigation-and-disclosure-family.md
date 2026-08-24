@@ -1,7 +1,7 @@
 # 14 Navigation and Disclosure Family
 
-**What to build:** Tabs, breadcrumbs, pagination, disclosure, accordion, and side-navigation
-exports with explicit navigation, selection, expansion, and current-location semantics.
+**What to build:** Tabs, breadcrumbs, pagination, disclosure, accordion, and a collapsible
+navigation pane with explicit navigation, selection, expansion, and current-location semantics.
 
 **Blocked by:** [Action Family](03-action-family.md),
 [Popover, Tooltip, and Menu Overlays](13-popover-tooltip-and-menu-overlays.md),
@@ -15,12 +15,14 @@ exports with explicit navigation, selection, expansion, and current-location sem
       behavior without losing reachability.
 - [x] Disclosure and accordion own expansion state, heading relationships, and single or multiple
       expansion rules.
-- [x] Side navigation owns hierarchy, current destination, groups, compact collapse, and keyboard
-      reachability without becoming an application router.
+- [x] Collapsible navigation pane owns hierarchy, current destination, groups, compact collapse,
+      and keyboard reachability without becoming an application router or requiring sidebar
+      placement.
 - [x] Controlled and uncontrolled state and URL integration seams are explicit.
 - [x] Focus, touch, keyboard, browser accessibility-tree, directionality, responsive, theme, SSR,
       hydration, and type checks pass.
-- [x] Contracts direct agents among tabs, side navigation, menu, disclosure, and ordinary links.
+- [x] Contracts direct agents among tabs, collapsible navigation panes, menus, disclosure, and
+      ordinary links.
 
 ## Accepted sources
 
@@ -41,8 +43,8 @@ in an anchored ellipsis overlay without displacing page content, retain ordered-
 and follow runtime direction changes. The showcase removes descendants after an ancestor
 destination is followed and provides the next route from each ancestor page.
 Whitney accepted the completed Breadcrumbs behavior and appearance.
-Whitney also accepted SideNavigation as the persistent destination list inside an application
-sidebar, including its library-owned collapse and expand control.
+Whitney accepted CollapsibleNavigationPane as a self-contained grouped destination list with a
+library-owned collapse control and no required placement within an application layout.
 
 All accepted interface decisions now have current repository and rendered-browser evidence.
 
@@ -52,7 +54,7 @@ All accepted interface decisions now have current repository and rendered-browse
 - Body labels use the established compact body role. Location metadata and page numbers use the
   utility role.
 - Tabs and breadcrumbs form horizontal routes. Disclosure and accordion form quiet vertical
-  sequences. Side navigation uses one continuous route rail rather than separate cards.
+  sequences. Collapsible navigation pane uses one continuous route rail rather than separate cards.
 - Motion is limited to selected-route and expansion transitions, and settles immediately under
   reduced motion.
 - The same accent route marker identifies selected content, current location, and expanded

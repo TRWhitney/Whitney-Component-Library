@@ -127,15 +127,17 @@ describe('component showcase', () => {
     fireEvent.click(within(accordion as HTMLElement).getByRole('button', {name: 'Solver'}));
     expect(within(accordion as HTMLElement).getByRole('region', {name: 'Solver'})).toBeTruthy();
 
-    const sideNavigation = container.querySelector('[data-showcase-component="SideNavigation"]');
+    const collapsibleNavigationPane = container.querySelector(
+      '[data-showcase-component="CollapsibleNavigationPane"]',
+    );
     fireEvent.click(
-      within(sideNavigation as HTMLElement).getByRole('button', {
+      within(collapsibleNavigationPane as HTMLElement).getByRole('button', {
         name: 'Collapse workspace navigation',
       }),
     );
-    expect(within(sideNavigation as HTMLElement).queryByRole('link')).toBeNull();
+    expect(within(collapsibleNavigationPane as HTMLElement).queryByRole('link')).toBeNull();
     expect(
-      within(sideNavigation as HTMLElement).getByRole('button', {
+      within(collapsibleNavigationPane as HTMLElement).getByRole('button', {
         name: 'Expand workspace navigation',
       }),
     ).toBeTruthy();

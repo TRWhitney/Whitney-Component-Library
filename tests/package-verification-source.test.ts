@@ -136,6 +136,21 @@ describe('packed consumer verification source', () => {
     );
   });
 
+  it('exercises every application-structure export through packed SSR and hydration', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of ['PageHeader', 'SplitView']) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-page-header-route');
+    expect(source).toContain('data-wcl-page-header-route-endpoint');
+    expect(source).toContain('data-wcl-split-view-separator');
+    expect(source).toContain('data-wcl-split-view-pane-control');
+    expect(source).toContain(
+      'Packed application structure did not preserve Route and split semantics.',
+    );
+  });
+
   it('exercises single and paired range entry through the packed API', () => {
     const source = createConsumerVerificationSource('@fixture/component-library');
 

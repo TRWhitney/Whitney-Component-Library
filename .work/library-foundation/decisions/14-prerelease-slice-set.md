@@ -26,7 +26,8 @@ Require four materially distinct prerelease integration slices:
    toolbars, file handling, links, overlays, undo and redo, and compound form state.
 4. **Application workbench:** navigate among tools, manage tabs and panels, invoke menus and
    commands, display notifications, and preserve responsive workspace structure through the
-   application shell, navigation, disclosure, overlays, split views, and transient feedback.
+   consumer-owned application layout, collapsible navigation pane, page header, disclosure,
+   overlays, split views, and transient feedback.
 
 The slices do not restrict the catalog. Other accepted conventional components retain their own
 contracts, examples, and behavior tests even when they are not central to a slice. Stable release

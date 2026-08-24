@@ -102,9 +102,9 @@
     <g transform="translate(28 136)">
       <rect width="496" height="520" rx="14" fill="#f2f0ea"/>
       <text x="22" y="37" class="small" fill="#74756d">Run 0284</text>
-      <rect x="398" y="19" width="76" height="28" rx="14" fill="#d6ebe6"/>
-      <circle cx="414" cy="33" r="4" fill="#006e5f"/>
-      <text x="425" y="37" class="small" fill="#00584c">Stable</text>
+      <rect x="382" y="19" width="92" height="28" rx="14" fill="#d6ebe6"/>
+      <circle cx="398" cy="33" r="4" fill="#006e5f"/>
+      <text x="409" y="37" class="small" fill="#00584c">Converged</text>
 
       <text x="22" y="91" class="label" fill="#74756d">THERMAL ENVELOPE</text>
       <text x="22" y="126" class="title" fill="#272823">North chamber</text>

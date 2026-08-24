@@ -12,7 +12,7 @@ Tree navigates keyed hierarchical information with explicit expansion and option
 
 ## Prefer instead
 
-- Use List for flat content, ListBox for flat selection, Table for columns, or SideNavigation for persistent destinations.
+- Use List for flat content, ListBox for flat selection, Table for columns, or CollapsibleNavigationPane for persistent destinations.
 
 ## Composition and parts
 

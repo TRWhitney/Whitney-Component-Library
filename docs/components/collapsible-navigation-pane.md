@@ -1,6 +1,6 @@
-# SideNavigation
+# CollapsibleNavigationPane
 
-SideNavigation exposes grouped application destinations without owning a router.
+CollapsibleNavigationPane exposes grouped application destinations without owning a router.
 
 ## Use for
 
@@ -19,11 +19,11 @@ SideNavigation exposes grouped application destinations without owning a router.
 - Render inside AppearanceProvider so the surface, route, focus, and text roles use the active theme and accent.
 - Pass labeled groups containing stable destination ids, labels, href values, and optional nested destinations.
 - Set currentId from the active route. Control isCollapsed from an application breakpoint when compact layout should begin collapsed.
-- SideNavigation owns its landmark, collapse control, labeled groups, nested lists, links, and current marker.
+- CollapsibleNavigationPane owns its landmark, collapse control, labeled groups, nested lists, links, and current marker.
 
 ## Preferred higher-level compositions
 
-- Compose SideNavigation as the persistent navigation region of an application shell.
+- Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. It does not require sidebar placement.
 
 ## Content
 
@@ -35,7 +35,7 @@ SideNavigation exposes grouped application destinations without owning a router.
 
 ## Control, events, validation, and forms
 
-- SideNavigation supports controlled or uncontrolled collapse, preserves native link navigation, and reports destination ids through onNavigate.
+- CollapsibleNavigationPane supports controlled or uncontrolled collapse, preserves native link navigation, and reports destination ids through onNavigate.
 - onNavigate reports the activated destination id without replacing href routing. onCollapsedChange reports compact-state requests.
 - TypeScript constrains controlled and uncontrolled state, finite modes, and library-owned item models. Consumers keep identifiers unique and destination URLs valid.
 - This component does not submit a form value. Keep navigation and disclosure state separate from form data.
@@ -53,7 +53,7 @@ SideNavigation exposes grouped application destinations without owning a router.
 
 ## Appearance and responsive behavior
 
-- SideNavigation uses one restrained surface, quiet nested guide rails, and an accent route marker for the current destination.
+- CollapsibleNavigationPane uses one restrained surface, quiet nested guide rails, and an accent route marker for the current destination.
 - The controlled or uncontrolled collapsed state reduces the compact layout to one reachable expansion control.
 
 ## Accent, forced colors, and reduced motion
@@ -70,12 +70,12 @@ Expose grouped application destinations and the current route.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
-import {AppearanceProvider, SideNavigation} from '@trwhitney/component-library';
+import {AppearanceProvider, CollapsibleNavigationPane} from '@trwhitney/component-library';
 
 export function WorkspaceNavigation() {
   return (
     <AppearanceProvider appearance="dark" accent="#2878ff">
-      <SideNavigation
+      <CollapsibleNavigationPane
         ariaLabel="Workspace"
         collapseLabel="Collapse navigation"
         currentId="active-runs"
@@ -93,18 +93,18 @@ export function WorkspaceNavigation() {
 
 ## Counterexamples
 
-### Do not place commands in side navigation
+### Do not place commands in collapsible navigation pane
 
 Commands belong in Menu, Toolbar, or Button actions rather than destination navigation.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
-import {AppearanceProvider, SideNavigation} from '@trwhitney/component-library';
+import {AppearanceProvider, CollapsibleNavigationPane} from '@trwhitney/component-library';
 
-export function RunActionsSideNavigationCounterexample() {
+export function RunActionsCollapsibleNavigationPaneCounterexample() {
   return (
     <AppearanceProvider appearance="dark" accent="#2878ff">
-      <SideNavigation ariaLabel="Run actions" collapseLabel="Collapse" expandLabel="Expand" currentId="delete" groups={[{id: "actions", items: [{id: "delete", label: "Delete", href: "#delete"}]}]} />
+      <CollapsibleNavigationPane ariaLabel="Run actions" collapseLabel="Collapse" expandLabel="Expand" currentId="delete" groups={[{id: "actions", items: [{id: "delete", label: "Delete", href: "#delete"}]}]} />
     </AppearanceProvider>
   );
 }

@@ -1,4 +1,5 @@
 export {appearanceProviderContract} from './appearance-provider.contract.js';
+export {pageHeaderContract, splitViewContract} from './application.contracts.js';
 export {
   buttonContract,
   buttonGroupContract,
@@ -76,7 +77,7 @@ export {
   breadcrumbsContract,
   disclosureContract,
   paginationContract,
-  sideNavigationContract,
+  collapsibleNavigationPaneContract,
   tabsContract,
 } from './navigation.contracts.js';
 export {
@@ -91,6 +92,7 @@ export {
 } from './component-contract.js';
 
 import {appearanceProviderContract} from './appearance-provider.contract.js';
+import {pageHeaderContract, splitViewContract} from './application.contracts.js';
 import {
   buttonContract,
   buttonGroupContract,
@@ -168,7 +170,7 @@ import {
   breadcrumbsContract,
   disclosureContract,
   paginationContract,
-  sideNavigationContract,
+  collapsibleNavigationPaneContract,
   tabsContract,
 } from './navigation.contracts.js';
 
@@ -213,6 +215,7 @@ export const componentContracts = [
   numberFieldContract,
   progressBarContract,
   paginationContract,
+  pageHeaderContract,
   popoverContract,
   rangeSliderContract,
   responsiveGridContract,
@@ -221,10 +224,11 @@ export const componentContracts = [
   searchFieldContract,
   sectionContract,
   selectContract,
-  sideNavigationContract,
+  collapsibleNavigationPaneContract,
   sliderContract,
   skeletonContract,
   spinnerContract,
+  splitViewContract,
   segmentedControlContract,
   stackContract,
   statusIndicatorContract,

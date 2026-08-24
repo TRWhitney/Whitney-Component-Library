@@ -21,7 +21,7 @@ NotificationProvider queues and presents brief dismissible application notificat
 
 ## Preferred higher-level compositions
 
-- Place one provider around an application shell or workbench and issue notifications from completed background commands without duplicating durable status history.
+- Place one provider around the application root or workbench and issue notifications from completed background commands without duplicating durable status history.
 
 ## Content
 

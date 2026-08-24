@@ -12,7 +12,7 @@ Breadcrumbs exposes the current page within a navigable hierarchy.
 
 ## Prefer instead
 
-- Use Tabs for peer panels, SideNavigation for persistent destinations, and Pagination for numbered result pages.
+- Use Tabs for peer panels, CollapsibleNavigationPane for persistent destinations, and Pagination for numbered result pages.
 
 ## Composition and parts
 

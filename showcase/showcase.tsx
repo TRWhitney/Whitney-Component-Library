@@ -47,6 +47,7 @@ import {
   NotificationProvider,
   NumberField,
   Pagination,
+  PageHeader,
   ProgressBar,
   Popover,
   RangeSlider,
@@ -56,10 +57,11 @@ import {
   SearchField,
   Section,
   Select,
-  SideNavigation,
+  CollapsibleNavigationPane,
   Slider,
   Skeleton,
   Spinner,
+  SplitView,
   Stack,
   StatusIndicator,
   SegmentedControl,
@@ -423,6 +425,95 @@ function LayoutSpecimens() {
   );
 }
 
+function ApplicationStructureSpecimens() {
+  return (
+    <>
+      <Specimen
+        description="Keep page ancestry, an optional page identifier, optional status content, title, description, and page-level actions distinct. Route occupies only the flexible space between identifier and status when both are present."
+        name="PageHeader"
+      >
+        <PageHeader
+          actions={
+            <ButtonGroup label="Run actions">
+              <Button size="compact" variant="secondary">
+                Review
+              </Button>
+              <Button size="compact">Run profile</Button>
+            </ButtonGroup>
+          }
+          breadcrumbs={
+            <Breadcrumbs
+              ariaLabel="Run location"
+              items={[
+                {href: '#page-header-workspace', id: 'workspace', label: 'Workspace'},
+                {href: '#page-header-runs', id: 'runs', label: 'Runs'},
+                {href: '#page-header-current', id: 'current', label: 'RUN 0284'},
+              ]}
+            />
+          }
+          description="Evaluate the 18-minute ramp profile."
+          headingLevel={3}
+          identity="SIM / THERMAL / 0284"
+          status={
+            <span data-showcase-page-status="">
+              <span>Run state</span>
+              <strong>Converged</strong>
+            </span>
+          }
+          statusTone="success"
+          title="North chamber"
+        />
+      </Specimen>
+
+      <Specimen
+        description="Resize two named workspace panes within application-owned bounds. Either pane can collapse through its own pane-target control, and compact containers stack both panes without changing their reading order."
+        name="SplitView"
+      >
+        <SplitView
+          ariaLabel="Run workspace"
+          collapsePrimaryLabel="Hide run configuration"
+          collapseSecondaryLabel="Hide run inspector"
+          defaultPrimarySize={58}
+          primary={
+            <Section headingLevel={3} title="Run configuration">
+              <Stack gap="regular">
+                <Select
+                  defaultValue="adaptive"
+                  emptyMessage="No solvers"
+                  label="Solver"
+                  options={[
+                    {label: 'Adaptive mesh', value: 'adaptive'},
+                    {label: 'Finite volume', value: 'volume'},
+                  ]}
+                />
+                <NumberField
+                  defaultValue={18}
+                  label="Boundary passes"
+                  locale="en-US"
+                  minValue={1}
+                />
+              </Stack>
+            </Section>
+          }
+          primaryLabel="Run configuration"
+          resizeLabel="Resize run inspector"
+          restorePrimaryLabel="Show run configuration"
+          restoreSecondaryLabel="Show run inspector"
+          secondary={
+            <Section headingLevel={3} title="Run inspector">
+              <Stack gap="regular">
+                <StatusIndicator label="Converged" tone="success" />
+                <p>RUN 0284 converged after 18 boundary passes.</p>
+              </Stack>
+            </Section>
+          }
+          secondaryLabel="Run inspector"
+        />
+      </Specimen>
+    </>
+  );
+}
+
 function ActionSpecimens() {
   const [isPinned, setPinned] = useState(true);
 
@@ -649,9 +740,9 @@ function NavigationSpecimens() {
 
       <Specimen
         description="Navigate grouped application destinations without coupling the library to a router. The current link, hierarchy, URL, and compact collapse state remain explicit."
-        name="SideNavigation"
+        name="CollapsibleNavigationPane"
       >
-        <SideNavigation
+        <CollapsibleNavigationPane
           ariaLabel="Workspace navigation"
           collapseLabel="Collapse workspace navigation"
           currentId="active-runs"
@@ -2043,6 +2134,16 @@ export function Showcase() {
                 <h2 id="layout-heading">Arrange and contain related content</h2>
               </header>
               <LayoutSpecimens />
+            </section>
+
+            <section aria-labelledby="application-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Application structure</span>
+                <h2 id="application-heading">
+                  Assign regions and preserve workspace relationships
+                </h2>
+              </header>
+              <ApplicationStructureSpecimens />
             </section>
 
             <section aria-labelledby="actions-heading" className="showcase-family">

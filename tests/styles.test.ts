@@ -12,6 +12,60 @@ describe('static appearance styles', () => {
     expect(reducedMotion).not.toBeNull();
   });
 
+  it('gives PageHeader its endpoint Route and SplitView a responsive two-way rail', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const route = styles.match(/\[data-wcl-page-header-route\]\s*\{([^}]*)\}/)?.[1];
+    const separatorRail = styles.match(
+      /\[data-wcl-split-view-separator\]::before\s*\{([^}]*)\}/,
+    )?.[1];
+    const splitCompact = styles.match(
+      /@container\s+wcl-split-view\s*\(max-width:\s*40rem\)([\s\S]*?)\n\s*\[data-wcl-field\]/,
+    )?.[1];
+
+    expect(route).toContain('flex: 1');
+    expect(route).toContain('min-inline-size: 1.125rem');
+    expect(route).not.toContain('box-shadow');
+    expect(styles).toMatch(
+      /\[data-wcl-page-header-route-origin\][\s\S]*?border:\s*2px solid var\(--wcl-accent-rail\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-page-header-route-endpoint\]\s*\{[^}]*background:\s*var\(--wcl-page-header-route-status\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-page-header-route-track\]\s*\{[^}]*linear-gradient\([\s\S]*?var\(--wcl-accent-rail\)[\s\S]*?var\(--wcl-page-header-route-status\)/,
+    );
+    expect(separatorRail).toContain('inset-block: 0');
+    expect(separatorRail).toContain('background: var(--wcl-border-strong)');
+    expect(styles).toMatch(
+      /\[data-wcl-split-view-separator\]:is\(:hover, :focus-visible\)::before\s*\{[^}]*background:\s*var\(--wcl-accent-focus\)/,
+    );
+    expect(splitCompact).toContain('grid-template-columns: minmax(0, 1fr)');
+    expect(splitCompact).toContain('[data-wcl-split-view-separator]');
+    expect(splitCompact).toContain('display: none');
+    expect(splitCompact).not.toMatch(
+      /\[data-wcl-split-view-secondary\]\s*\{[^}]*border-block-start/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-page-header-context\]\[data-tone='success'\]\s*\{[^}]*--wcl-page-header-route-status:\s*var\(--wcl-success\)/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-page-header-route-track\]\s*\{[^}]*background:\s*Highlight[^}]*forced-color-adjust:\s*none/,
+    );
+    expect(styles).toContain("[data-wcl-split-view][data-collapsed-pane='primary']");
+    expect(styles).toContain("[data-wcl-split-view][data-collapsed-pane='secondary']");
+    expect(styles).toContain('[data-wcl-split-view-pane-control]');
+    expect(styles).toContain('[data-wcl-split-view-pane-icon]');
+    expect(styles).toMatch(
+      /\[data-wcl-split-view-pane-control\]\[data-hovered\]\s*\{[^}]*border-color:\s*var\(--wcl-accent-muted-on-raised\)[^}]*background:\s*var\(--wcl-accent-soft-on-raised\)[^}]*color:\s*var\(--wcl-accent-hover-contrast-on-raised\)[^}]*box-shadow:\s*inset 0 0 0 1px var\(--wcl-accent-muted-on-raised\)/,
+    );
+    expect(styles).not.toMatch(
+      /\[data-wcl-split-view-pane-control\]\[data-hovered\]\s*\{[^}]*outline/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-split-view-separator\]::before\s*\{[^}]*background:\s*CanvasText/,
+    );
+  });
+
   it('keeps semantic feedback colors independent from application accent', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const statusRules = styles.match(

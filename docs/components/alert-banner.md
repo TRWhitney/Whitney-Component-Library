@@ -21,7 +21,7 @@ AlertBanner explains a condition that affects a page or workspace.
 
 ## Preferred higher-level compositions
 
-- Compose at the beginning of an application shell, workspace, or page content region before the affected controls.
+- Compose at the beginning of a workspace or page content region before the affected controls.
 
 ## Content
 
