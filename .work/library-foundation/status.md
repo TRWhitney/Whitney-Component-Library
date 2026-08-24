@@ -9,7 +9,7 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 14, including the intervening Ticket 03A accent correction, are complete. Menu
+Tickets 01 through 15, including the intervening Ticket 03A accent correction, are complete. Menu
 and ContextMenu now use whole-row item highlights without a leading entry rail. The maintained human
 showcase covers every contracted public component. Manual screen-reader operation is intentionally
 consolidated in the Ticket 30 pre-`1.0` release gate rather than repeated for every component ticket.
@@ -231,8 +231,7 @@ without owning the application router or generic sidebar layout.
 
 ## Frontier
 
-See the [decision map](map.md). The active implementation unit is
-[Ticket 15 — Basic Data and Collection Family](tickets/15-basic-data-and-collection-family.md).
+See the [decision map](map.md). Ticket 15 is delivered; Ticket 16 is the next accepted unit.
 
 ## Accepted sources
 
@@ -258,6 +257,30 @@ See the [decision map](map.md). The active implementation unit is
 - Repository-owned evaluation of agent output or a prescribed consumer evaluation workflow.
 
 ## Current verification
+
+- Ticket 15 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
+  types, 22 test files with 375 tests, generated guidance, package build, and public declarations
+  under TypeScript 5.9, 6, and 7. `npm run verify:package` passes SSR, hydration, declarations,
+  semantic assertions, and browser builds for packed React 18.3.1 and 19.2.8 consumers.
+  `npm run showcase:build`, `npm audit --audit-level=high`, and `git diff --check` pass.
+- Ticket 15 focused public behavior and type coverage passes for native lists, description pairs,
+  keyed list-box insertion, removal, reordering, focus and selection, invalid stable ids, shared
+  collection feedback, static-card action boundaries, selectable-card discriminants, and spatial
+  grid keyboard navigation. Direct Chromium operation covers wide and compact card layout,
+  left-to-right and initial right-to-left spatial keys, French-context typeahead, touch selection,
+  light appearance, arbitrary accent propagation, forced colors, reduced motion, and zero document
+  overflow. Firefox and WebKit cover card-grid layout and spatial navigation, typeahead, keyboard
+  selection, and zero document overflow. The wide, compact, and forced-color card specimens passed
+  rendered inspection; temporary screenshots were discarded.
+- The bounded correction reviewers accepted the spatial-grid correction and found one remaining
+  structural-typing path for predeclared static-card arrays. A focused public type regression first
+  failed because the invalid array compiled, then passed after static items declared
+  `isDisabled?: never`. The final `npm run check` passes all 375 tests, formatting, lint, generated
+  guidance, strict types, and TypeScript 5.9, 6, and 7 declarations. Packed React 18.3.1 and 19.2.8
+  consumers again pass SSR, hydration, declarations, semantic assertions, and browser builds.
+- Independent intent and engineering correction reviews pass with no blocking findings, judgment
+  calls, or missing evidence. They confirm the spatial-grid correction and the static-card
+  structural type exclusion close both admitted delivery blockers.
 
 - Ticket 14 `npm run check` passes formatting, zero-warning ESLint and Stylelint, strict source
   types, 364 focused and regression tests, generated guidance, and public declarations under
@@ -361,7 +384,7 @@ See the [decision map](map.md). The active implementation unit is
 
 ## Continuation
 
-Continue to Ticket 15 from novel-work delivery with
+Continue to Ticket 16 from novel-work delivery with
 `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py move novel-work delivery implementation`
-and begin the basic data and collection slice. Current branch: `master`. Ticket 14 is delivered by
-the commits containing this record.
+and begin the table, tree, and filter slice. Current branch: `master`. Ticket 15 is delivered by the
+commit containing this record.

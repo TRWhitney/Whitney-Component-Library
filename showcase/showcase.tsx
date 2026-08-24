@@ -16,6 +16,7 @@ import {
   Button,
   ButtonGroup,
   Breadcrumbs,
+  CardCollection,
   Checkbox,
   CheckboxGroup,
   ComboBox,
@@ -24,6 +25,7 @@ import {
   DatePicker,
   DateRangePicker,
   Dialog,
+  DescriptionList,
   Divider,
   Disclosure,
   DropZone,
@@ -37,6 +39,8 @@ import {
   InlineAlert,
   InlineGroup,
   Link,
+  List,
+  ListBox,
   Meter,
   Menu,
   NotificationProvider,
@@ -644,6 +648,116 @@ function NavigationSpecimens() {
             },
           ]}
         />
+      </Specimen>
+    </>
+  );
+}
+
+function CollectionSpecimens() {
+  const emptyState = {
+    description: 'Create a run to populate this collection.',
+    kind: 'no-data' as const,
+    title: 'No runs yet',
+  };
+
+  return (
+    <>
+      <Specimen
+        description="Present a readable sequence without adding widget behavior. Numbered markers communicate order, while stable item ids preserve updates."
+        name="List"
+      >
+        <List
+          ariaLabel="Run sequence"
+          emptyState={emptyState}
+          items={[
+            {id: 'prepare', primary: 'Prepare mesh', secondary: 'Complete'},
+            {id: 'solve', primary: 'Solve model', secondary: 'Running'},
+            {id: 'publish', primary: 'Publish result', secondary: 'Waiting'},
+          ]}
+          marker="number"
+        />
+      </Specimen>
+
+      <Specimen
+        description="Pair terms with values for compact structured facts. This is a description list, not a two-column data table."
+        name="DescriptionList"
+      >
+        <DescriptionList
+          ariaLabel="Run details"
+          emptyState={emptyState}
+          items={[
+            {description: 'RUN 0284', id: 'run', term: 'Run'},
+            {description: 'Balanced', id: 'profile', term: 'Profile'},
+            {description: '18 of 25', id: 'passes', term: 'Boundary passes'},
+          ]}
+        />
+      </Specimen>
+
+      <Specimen
+        description="Choose one or more items with separate focus and selection. Arrow keys and typeahead move focus; activation changes selection."
+        name="ListBox"
+      >
+        <ListBox
+          ariaLabel="Compared runs"
+          defaultSelectedIds={['run-284']}
+          emptyState={emptyState}
+          items={[
+            {description: 'RUN 0284 · Converged', id: 'run-284', label: 'Alpha run'},
+            {description: 'RUN 0283 · Converged', id: 'run-283', label: 'Beta run'},
+            {
+              description: 'RUN 0282 · Archived',
+              id: 'run-282',
+              isDisabled: true,
+              label: 'Gamma run',
+            },
+          ]}
+          selectionMode="multiple"
+        />
+      </Specimen>
+
+      <Specimen
+        description="Group summary cards without making each card a hidden button. Selection is explicit, and commands remain visible nested actions."
+        name="CardCollection"
+      >
+        <Stack gap="regular">
+          <Example label="Static cards with a nested action">
+            <CardCollection
+              ariaLabel="Recent runs"
+              emptyState={emptyState}
+              headingLevel={3}
+              items={[
+                {
+                  actions: <Button size="compact">Inspect run</Button>,
+                  description: 'Completed two minutes ago',
+                  id: 'alpha',
+                  title: 'Alpha run',
+                },
+                {
+                  content: '12 output files',
+                  description: 'Completed yesterday',
+                  id: 'beta',
+                  title: 'Beta run',
+                },
+              ]}
+              selectionMode="none"
+            />
+          </Example>
+          <Example label="Selectable card grid">
+            <CardCollection
+              ariaLabel="Selectable run cards"
+              defaultSelectedId="north"
+              emptyState={emptyState}
+              headingLevel={3}
+              items={[
+                {description: 'RUN 0284', id: 'north', title: 'North chamber'},
+                {description: 'RUN 0283', id: 'south', title: 'South chamber'},
+                {description: 'RUN 0282', id: 'east', title: 'East chamber'},
+                {description: 'RUN 0281', id: 'west', title: 'West chamber'},
+              ]}
+              selectionMode="single"
+            />
+          </Example>
+        </Stack>
       </Specimen>
     </>
   );
@@ -1819,6 +1933,14 @@ export function Showcase() {
                 <h2 id="selection-heading">Choose from collapsible collections</h2>
               </header>
               <SelectionSpecimens />
+            </section>
+
+            <section aria-labelledby="collections-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Data and collections</span>
+                <h2 id="collections-heading">Read, compare, and select keyed items</h2>
+              </header>
+              <CollectionSpecimens />
             </section>
 
             <section aria-labelledby="ranges-heading" className="showcase-family">

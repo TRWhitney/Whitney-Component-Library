@@ -33,6 +33,12 @@ export {
   switchContract,
 } from './choice.contracts.js';
 export {comboBoxContract, selectContract} from './selection.contracts.js';
+export {
+  cardCollectionContract,
+  descriptionListContract,
+  listBoxContract,
+  listContract,
+} from './collection.contracts.js';
 export {rangeSliderContract, sliderContract} from './range.contracts.js';
 export {
   dateFieldContract,
@@ -116,6 +122,12 @@ import {
   switchContract,
 } from './choice.contracts.js';
 import {comboBoxContract, selectContract} from './selection.contracts.js';
+import {
+  cardCollectionContract,
+  descriptionListContract,
+  listBoxContract,
+  listContract,
+} from './collection.contracts.js';
 import {rangeSliderContract, sliderContract} from './range.contracts.js';
 import {
   dateFieldContract,
@@ -163,6 +175,7 @@ export const componentContracts = [
   breadcrumbsContract,
   buttonContract,
   buttonGroupContract,
+  cardCollectionContract,
   checkboxContract,
   checkboxGroupContract,
   comboBoxContract,
@@ -172,6 +185,7 @@ export const componentContracts = [
   dateRangePickerContract,
   dividerContract,
   dialogContract,
+  descriptionListContract,
   disclosureContract,
   dropZoneContract,
   drawerContract,
@@ -184,6 +198,8 @@ export const componentContracts = [
   inlineGroupContract,
   inlineAlertContract,
   linkContract,
+  listBoxContract,
+  listContract,
   meterContract,
   menuContract,
   notificationProviderContract,

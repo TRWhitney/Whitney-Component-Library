@@ -111,6 +111,17 @@ describe('packed consumer verification source', () => {
     expect(source).toContain("['combo-mode', 'balanced']");
   });
 
+  it('exercises every basic data and collection export through the packed API', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of ['CardCollection', 'DescriptionList', 'List', 'ListBox']) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-description-list');
+    expect(source).toContain('data-wcl-card-list');
+    expect(source).toContain('Packed basic collections did not preserve their distinct semantics.');
+  });
+
   it('exercises single and paired range entry through the packed API', () => {
     const source = createConsumerVerificationSource('@fixture/component-library');
 

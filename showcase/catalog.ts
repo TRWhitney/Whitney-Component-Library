@@ -43,6 +43,10 @@ export const showcaseGroups = [
   },
   {label: 'Selection', components: ['Select', 'ComboBox']},
   {
+    label: 'Data and collections',
+    components: ['List', 'DescriptionList', 'ListBox', 'CardCollection'],
+  },
+  {
     label: 'Date and time',
     components: ['DateField', 'TimeField', 'DatePicker', 'DateRangePicker'],
   },

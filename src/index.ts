@@ -7,6 +7,31 @@ export {
 } from './appearance/appearance-provider.js';
 export type {AccentColor} from './appearance/accent.js';
 export {
+  CardCollection,
+  DescriptionList,
+  List,
+  ListBox,
+  type CardCollectionItem,
+  type CardCollectionItems,
+  type CardCollectionProps,
+  type CardHeadingLevel,
+  type CollectionSelectionProps,
+  type CollectionStatus,
+  type CollectionStatusProps,
+  type DescriptionListItem,
+  type DescriptionListItems,
+  type DescriptionListProps,
+  type ListBoxItem,
+  type ListBoxItems,
+  type ListBoxProps,
+  type ListItem,
+  type ListItems,
+  type ListMarker,
+  type ListProps,
+  type SelectableCardCollectionItem,
+  type SelectableCardCollectionItems,
+} from './collections/index.js';
+export {
   Accordion,
   Breadcrumbs,
   Disclosure,

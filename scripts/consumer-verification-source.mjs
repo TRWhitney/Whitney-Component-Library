@@ -10,12 +10,14 @@ import {
   Badge,
   Button,
   ButtonGroup,
+  CardCollection,
   Checkbox,
   CheckboxGroup,
   ComboBox,
   DateField,
   DatePicker,
   DateRangePicker,
+  DescriptionList,
   Dialog,
   Divider,
   Drawer,
@@ -27,6 +29,8 @@ import {
   InlineAlert,
   InlineGroup,
   Link,
+  List,
+  ListBox,
   Meter,
   NotificationProvider,
   NumberField,
@@ -225,6 +229,34 @@ const view = React.createElement(
             {label: 'Conservative', value: 'conservative'},
             {label: 'Balanced', value: 'balanced'},
           ],
+        }),
+        React.createElement(List, {
+          ariaLabel: 'Run sequence',
+          emptyState: {description: 'Create a run first.', kind: 'no-data', title: 'No runs'},
+          items: [{id: 'prepare', primary: 'Prepare mesh', secondary: 'Complete'}],
+          marker: 'number',
+        }),
+        React.createElement(DescriptionList, {
+          ariaLabel: 'Run details',
+          emptyState: {description: 'Select a run first.', kind: 'no-data', title: 'No details'},
+          items: [{description: 'RUN 0284', id: 'run', term: 'Run'}],
+        }),
+        React.createElement(ListBox, {
+          ariaLabel: 'Compared runs',
+          defaultSelectedId: 'run-284',
+          emptyState: {description: 'Try another query.', kind: 'no-results', title: 'No matches'},
+          items: [
+            {id: 'run-284', label: 'RUN 0284'},
+            {id: 'run-283', label: 'RUN 0283'},
+          ],
+          selectionMode: 'single',
+        }),
+        React.createElement(CardCollection, {
+          ariaLabel: 'Recent runs',
+          emptyState: {description: 'Create a run first.', kind: 'no-data', title: 'No runs'},
+          headingLevel: 3,
+          items: [{description: 'Complete', id: 'run-284', title: 'RUN 0284'}],
+          selectionMode: 'none',
         }),
         React.createElement(DateField, {
           calendar: 'gregory',
@@ -432,6 +464,7 @@ const dom = new JSDOM('<div id="root">' + serverMarkup + '</div>');
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 globalThis.CustomEvent = dom.window.CustomEvent;
+globalThis.CSS = {escape: (value) => value.replace(/[^a-zA-Z0-9_-]/g, '\\$&')};
 globalThis.Element = dom.window.Element;
 globalThis.Event = dom.window.Event;
 globalThis.FocusEvent = dom.window.FocusEvent;
@@ -581,6 +614,14 @@ if (!document.querySelector('[data-wcl-segmented-control] input[value="balanced"
 }
 if (!document.querySelector('[data-wcl-selection-field]')) {
   throw new Error('Packed selection family did not render its private collection composition.');
+}
+if (
+  document.querySelector('[data-wcl-list] > ol')?.getAttribute('aria-label') !== 'Run sequence' ||
+  document.querySelectorAll('[data-wcl-description-list] dt').length !== 1 ||
+  document.querySelector('[data-wcl-list-box] [role="option"]')?.getAttribute('aria-selected') !== 'true' ||
+  document.querySelector('[data-wcl-card-list] article')?.getAttribute('aria-label') !== 'RUN 0284'
+) {
+  throw new Error('Packed basic collections did not preserve their distinct semantics.');
 }
 if (document.querySelector('[data-wcl-combo-box] input')?.getAttribute('role') !== 'combobox') {
   throw new Error('Packed combo box did not preserve editable autocomplete semantics.');

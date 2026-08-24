@@ -43,6 +43,7 @@ describe('canonical component contracts', () => {
       'Badge',
       'Button',
       'ButtonGroup',
+      'CardCollection',
       'Breadcrumbs',
       'Checkbox',
       'CheckboxGroup',
@@ -52,6 +53,7 @@ describe('canonical component contracts', () => {
       'DatePicker',
       'DateRangePicker',
       'Dialog',
+      'DescriptionList',
       'Disclosure',
       'Divider',
       'Drawer',
@@ -65,6 +67,8 @@ describe('canonical component contracts', () => {
       'InlineAlert',
       'InlineGroup',
       'Link',
+      'List',
+      'ListBox',
       'Meter',
       'Menu',
       'NotificationProvider',
@@ -102,6 +106,24 @@ describe('canonical component contracts', () => {
     );
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(
       [...exportNames].sort(),
+    );
+  });
+
+  it('keeps static data, description pairs, option selection, and cards distinct', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName);
+
+    expect(contractFor('List')?.accessibility.join(' ')).toMatch(/native.*ul.*ol.*li/i);
+    expect(contractFor('DescriptionList')?.accessibility.join(' ')).toMatch(/dl.*dt.*dd/i);
+    expect(contractFor('ListBox')?.controlBehavior.join(' ')).toMatch(
+      /none.*single.*multiple.*controlled.*uncontrolled/i,
+    );
+    expect(contractFor('ListBox')?.accessibility.join(' ')).toMatch(/focus.*selection.*separate/i);
+    expect(contractFor('CardCollection')?.contentRules.join(' ')).toMatch(
+      /actions.*selectionMode.*click/i,
+    );
+    expect(contractFor('CardCollection')?.accessibility.join(' ')).toMatch(
+      /native list.*articles.*grid list/i,
     );
   });
 
