@@ -31,11 +31,11 @@
     --wcl-success-surface: #dff4e8;
     --wcl-warning: #805300;
     --wcl-warning-surface: #fff0bd;
-    --wcl-chart-series-2: #8d4fa8;
-    --wcl-chart-series-3: #007f78;
-    --wcl-chart-series-4: #b45d12;
-    --wcl-chart-series-5: #4867a9;
-    --wcl-chart-series-6: #a33f65;
+    --wcl-chart-series-2: var(--wcl-chart-series-2-on-canvas);
+    --wcl-chart-series-3: var(--wcl-chart-series-3-on-canvas);
+    --wcl-chart-series-4: var(--wcl-chart-series-4-on-canvas);
+    --wcl-chart-series-5: var(--wcl-chart-series-5-on-canvas);
+    --wcl-chart-series-6: var(--wcl-chart-series-6-on-canvas);
     --wcl-radius: 12px;
     --wcl-control-radius: 8px;
     --wcl-space: 8px;
@@ -63,11 +63,6 @@
     --wcl-success-surface: #173d2b;
     --wcl-warning: #ffd166;
     --wcl-warning-surface: #403413;
-    --wcl-chart-series-2: #d19be6;
-    --wcl-chart-series-3: #55cfbf;
-    --wcl-chart-series-4: #ffad66;
-    --wcl-chart-series-5: #91adf0;
-    --wcl-chart-series-6: #ee8daf;
     --wcl-shadow: 0 22px 62px rgb(0 0 0 / 35%);
 
     color-scheme: dark;
@@ -209,6 +204,11 @@
     --wcl-accent-muted: var(--wcl-accent-muted-on-base);
     --wcl-accent-rail: var(--wcl-accent-rail-on-base);
     --wcl-accent-soft: var(--wcl-accent-soft-on-base);
+    --wcl-chart-series-2: var(--wcl-chart-series-2-on-base);
+    --wcl-chart-series-3: var(--wcl-chart-series-3-on-base);
+    --wcl-chart-series-4: var(--wcl-chart-series-4-on-base);
+    --wcl-chart-series-5: var(--wcl-chart-series-5-on-base);
+    --wcl-chart-series-6: var(--wcl-chart-series-6-on-base);
 
     background: var(--wcl-surface);
   }
@@ -220,6 +220,11 @@
     --wcl-accent-muted: var(--wcl-accent-muted-on-raised);
     --wcl-accent-rail: var(--wcl-accent-rail-on-raised);
     --wcl-accent-soft: var(--wcl-accent-soft-on-raised);
+    --wcl-chart-series-2: var(--wcl-chart-series-2-on-raised);
+    --wcl-chart-series-3: var(--wcl-chart-series-3-on-raised);
+    --wcl-chart-series-4: var(--wcl-chart-series-4-on-raised);
+    --wcl-chart-series-5: var(--wcl-chart-series-5-on-raised);
+    --wcl-chart-series-6: var(--wcl-chart-series-6-on-raised);
 
     background: var(--wcl-surface-raised);
     box-shadow: var(--wcl-shadow);
@@ -232,6 +237,11 @@
     --wcl-accent-muted: var(--wcl-accent-muted-on-subtle);
     --wcl-accent-rail: var(--wcl-accent-rail-on-subtle);
     --wcl-accent-soft: var(--wcl-accent-soft-on-subtle);
+    --wcl-chart-series-2: var(--wcl-chart-series-2-on-subtle);
+    --wcl-chart-series-3: var(--wcl-chart-series-3-on-subtle);
+    --wcl-chart-series-4: var(--wcl-chart-series-4-on-subtle);
+    --wcl-chart-series-5: var(--wcl-chart-series-5-on-subtle);
+    --wcl-chart-series-6: var(--wcl-chart-series-6-on-subtle);
 
     background: var(--wcl-surface-subtle);
   }
@@ -5960,6 +5970,7 @@
   }
 
   [data-wcl-chart-canvas] {
+    container: wcl-chart-canvas / inline-size;
     inline-size: 100%;
     min-inline-size: min(100%, var(--wcl-chart-minimum-width));
     min-block-size: var(--wcl-chart-minimum-height);
@@ -5992,7 +6003,7 @@
   :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
     fill: var(--wcl-text-muted);
     font-family: var(--wcl-font-utility);
-    font-size: 10px;
+    font-size: 16px;
   }
 
   [data-wcl-chart-axis-label] {
@@ -6041,7 +6052,7 @@
     stroke: var(--wcl-chart-series-color);
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-width: 2;
+    stroke-width: 2.5;
     vector-effect: non-scaling-stroke;
   }
 
@@ -6053,16 +6064,16 @@
   }
 
   [data-wcl-chart-area] {
-    fill: color-mix(in srgb, var(--wcl-chart-series-color) 24%, transparent);
+    fill: color-mix(in oklch, var(--wcl-chart-series-color) 18%, transparent);
     stroke: var(--wcl-chart-series-color);
     stroke-width: 1.25;
     vector-effect: non-scaling-stroke;
   }
 
   [data-wcl-chart-bar] {
-    fill: var(--wcl-chart-series-color);
+    fill: color-mix(in oklch, var(--wcl-chart-series-color) 30%, var(--wcl-surface));
     stroke: var(--wcl-chart-series-color);
-    stroke-width: 1;
+    stroke-width: 1.75;
     vector-effect: non-scaling-stroke;
     rx: 2px;
   }
@@ -6163,19 +6174,49 @@
     padding: 0;
     color: var(--wcl-text-muted);
     font-family: var(--wcl-font-utility);
-    font-size: 0.6875rem;
+    font-size: 0.875rem;
     list-style: none;
   }
 
   [data-wcl-chart-annotation-label] {
     fill: var(--wcl-text);
     font-family: var(--wcl-font-utility);
-    font-size: 9px;
+    font-size: 14px;
     font-weight: 650;
     paint-order: stroke;
     stroke: var(--wcl-surface);
     stroke-width: 3px;
     stroke-linejoin: round;
+  }
+
+  @container wcl-chart-canvas (min-width: 40rem) {
+    :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
+      font-size: 14px;
+    }
+
+    [data-wcl-chart-annotation-label] {
+      font-size: 13px;
+    }
+  }
+
+  @container wcl-chart-canvas (min-width: 50rem) {
+    :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
+      font-size: 12px;
+    }
+
+    [data-wcl-chart-annotation-label] {
+      font-size: 11px;
+    }
+  }
+
+  @container wcl-chart-canvas (min-width: 60rem) {
+    :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
+      font-size: 10px;
+    }
+
+    [data-wcl-chart-annotation-label] {
+      font-size: 9px;
+    }
   }
 
   [data-wcl-chart-legend] > li {

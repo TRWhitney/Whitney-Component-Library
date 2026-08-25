@@ -53,6 +53,16 @@ describe('component showcase', () => {
     expect(getByText('#ff0000')).toBeTruthy();
   });
 
+  it('shows distinct automatic colors for the mixed Cartesian bars and line', () => {
+    const {container} = render(<Showcase />);
+    const specimen = container.querySelector('[data-showcase-component="CartesianChart"]');
+    const colors = [...(specimen?.querySelectorAll('[data-wcl-chart-legend] > li') ?? [])].map(
+      (item) => item.getAttribute('data-color'),
+    );
+
+    expect(colors).toEqual(['accent', 'series-2']);
+  });
+
   it('labels every action example by variant or composition', () => {
     const {container} = render(<Showcase />);
     const expectedLabels = {

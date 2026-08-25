@@ -49,7 +49,7 @@ type ChartFrameStyles = CSSProperties & {
 
 const viewWidth = 640;
 const viewHeight = 360;
-const plot = {bottom: 306, left: 62, right: 620, top: 18} as const;
+const plot = {bottom: 306, left: 140, right: 620, top: 18} as const;
 const plotWidth = plot.right - plot.left;
 const plotHeight = plot.bottom - plot.top;
 const defaultColors: readonly ChartColor[] = [
@@ -218,6 +218,7 @@ function createProjection<Value extends ChartDomainValue>(
 ): Projection<Value> {
   if (scale.type === 'categorical') {
     const domain = [...(scale.domain ?? stableDomain(values))];
+    const ticks = categoricalTicks(domain, tickCount);
     if (useBands) {
       const band: ScaleBand<Value> = scaleBand<Value>().domain(domain).range(range).padding(0.18);
       return {
@@ -226,11 +227,11 @@ function createProjection<Value extends ChartDomainValue>(
           const start = band(value);
           return start === undefined ? undefined : start + band.bandwidth() / 2;
         },
-        ticks: domain,
+        ticks,
       };
     }
     const point: ScalePoint<Value> = scalePoint<Value>().domain(domain).range(range).padding(0.45);
-    return {bandwidth: 0, position: point, ticks: domain};
+    return {bandwidth: 0, position: point, ticks};
   }
 
   if (scale.type === 'time') {
@@ -280,6 +281,17 @@ function createProjection<Value extends ChartDomainValue>(
   };
 }
 
+function categoricalTicks<Value>(domain: readonly Value[], requestedCount: number): Value[] {
+  const count = Math.max(1, Math.floor(requestedCount));
+  if (domain.length <= count) return [...domain];
+  if (count === 1) return domain[0] === undefined ? [] : [domain[0]];
+  const lastIndex = domain.length - 1;
+  return Array.from(
+    {length: count},
+    (_, index) => domain[Math.round((index * lastIndex) / (count - 1))]!,
+  ).filter((value, index, values) => index === 0 || value !== values[index - 1]);
+}
+
 function valueDomain<Datum extends object, Category extends ChartDomainValue>(
   rows: readonly PreparedRow<Datum, Category>[],
   layout: ChartBarLayout | ChartStacking,
@@ -314,6 +326,50 @@ function axisTickLabel<Value extends ChartDomainValue>(
   return axis.formatTick?.(value) ?? formatValue(value, axis.scale);
 }
 
+function truncateTickLabel(label: string, maximumCharacters: number): string {
+  const characters = [...label];
+  if (characters.length <= maximumCharacters) return label;
+  const finalWord = label.slice(label.lastIndexOf(' ') + 1);
+  const finalWordCharacters = [...finalWord];
+  if (finalWord !== label) {
+    if (finalWordCharacters.length <= maximumCharacters - 3) {
+      const prefixLength = maximumCharacters - finalWordCharacters.length - 2;
+      return `${characters.slice(0, prefixLength).join('').trimEnd()}… ${finalWord}`;
+    }
+    const suffixLength = Math.floor(maximumCharacters / 2);
+    const prefixLength = maximumCharacters - suffixLength - 1;
+    return `${characters.slice(0, prefixLength).join('').trimEnd()}…${finalWordCharacters
+      .slice(-suffixLength)
+      .join('')}`;
+  }
+  const suffixLength = Math.max(2, Math.floor(maximumCharacters / 3));
+  const prefixLength = maximumCharacters - suffixLength - 1;
+  return `${characters.slice(0, prefixLength).join('')}…${characters.slice(-suffixLength).join('')}`;
+}
+
+function tickLabelCharacterLimit(
+  horizontal: boolean,
+  centered: boolean,
+  positions: readonly number[],
+  index: number,
+): number {
+  if (!horizontal) return 11;
+  if (positions.length < 2) return 18;
+  const previousGap =
+    index === 0 ? Number.POSITIVE_INFINITY : positions[index]! - positions[index - 1]!;
+  const nextGap =
+    index === positions.length - 1
+      ? Number.POSITIVE_INFINITY
+      : positions[index + 1]! - positions[index]!;
+  const position = positions[index]!;
+  const availableWidth = Math.min(
+    previousGap,
+    nextGap,
+    ...(centered ? [position * 2, (viewWidth - position) * 2] : []),
+  );
+  return Math.max(6, Math.min(18, Math.floor(availableWidth / 10)));
+}
+
 function Axis<Value extends ChartDomainValue>({
   axis,
   placement,
@@ -330,6 +386,12 @@ function Axis<Value extends ChartDomainValue>({
   readonly projection: Projection<Value>;
 }): ReactElement {
   const horizontal = placement === 'x';
+  const centerCategoricalLabels = horizontal && axis.scale.type === 'categorical';
+  const renderedTicks = projection.ticks.flatMap((tick, sourceIndex) => {
+    const position = projection.position(tick);
+    return position === undefined ? [] : [{position, sourceIndex, tick}];
+  });
+  const tickPositions = renderedTicks.map(({position}) => position);
   return (
     <g data-axis={placement} data-scale={axis.scale.type} data-wcl-chart-axis="">
       <line
@@ -339,11 +401,29 @@ function Axis<Value extends ChartDomainValue>({
         y1={horizontal ? plot.bottom : plot.top}
         y2={plot.bottom}
       />
-      {projection.ticks.map((tick, index) => {
-        const position = projection.position(tick);
-        if (position === undefined) return null;
+      {renderedTicks.map(({position, sourceIndex, tick}, index) => {
+        const fullLabel = axisTickLabel(tick, axis);
+        const label =
+          axis.scale.type === 'categorical'
+            ? truncateTickLabel(
+                fullLabel,
+                tickLabelCharacterLimit(horizontal, centerCategoricalLabels, tickPositions, index),
+              )
+            : fullLabel;
+        const textAnchor = centerCategoricalLabels
+          ? 'middle'
+          : horizontal && tickPositions.length > 1
+            ? index === 0
+              ? 'start'
+              : index === tickPositions.length - 1
+                ? 'end'
+                : 'middle'
+            : horizontal
+              ? 'middle'
+              : 'end';
         return (
-          <g data-wcl-chart-tick="" key={`${formatValue(tick, axis.scale)}-${index}`}>
+          <g data-wcl-chart-tick="" key={`${formatValue(tick, axis.scale)}-${sourceIndex}`}>
+            {label === fullLabel ? null : <title>{fullLabel}</title>}
             {axis.showGrid ? (
               <line
                 data-wcl-chart-grid-line=""
@@ -362,11 +442,11 @@ function Axis<Value extends ChartDomainValue>({
             />
             <text
               data-wcl-chart-tick-label=""
-              textAnchor={horizontal ? 'middle' : 'end'}
+              textAnchor={textAnchor}
               x={horizontal ? position : plot.left - 9}
               y={horizontal ? plot.bottom + 18 : position + 4}
             >
-              {axisTickLabel(tick, axis)}
+              {label}
             </text>
           </g>
         );
@@ -417,9 +497,14 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
 }): ReactElement {
   const isHorizontal = categoryPlacement === 'y';
   const barSeries = series.filter((item) => item.kind === 'bar' || item.kind === 'column');
+  const orderedSeries = series
+    .map((item, seriesIndex) => ({item, seriesIndex}))
+    .sort(
+      (first, second) => Number(first.item.kind === 'line') - Number(second.item.kind === 'line'),
+    );
   return (
     <g data-wcl-chart-marks="">
-      {series.map((item, seriesIndex) => {
+      {orderedSeries.map(({item, seriesIndex}) => {
         const color = item.color;
         if (item.kind === 'line') {
           const path = createLine<PreparedRow<Datum, Category>>()
@@ -884,8 +969,8 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   invalidData,
   layout,
   legend,
-  minimumSize = {height: 220, width: 320},
-  overflow = 'clip',
+  minimumSize = {height: 220, width: 480},
+  overflow = 'scroll',
   rootAttribute,
   series,
   status = {kind: 'ready'},
@@ -1059,15 +1144,38 @@ function normalizeSeries<Datum extends object>(
   >,
   kind: SeriesKind | undefined,
 ): InternalSeries<Datum>[] {
-  return series.map((item, index) => ({
-    accessor: item.accessor,
-    color: item.color ?? defaultColors[index] ?? 'accent',
-    curve: 'curve' in item ? (item.curve ?? 'linear') : 'linear',
-    id: item.id,
-    kind: kind ?? ('kind' in item ? item.kind : 'line'),
-    label: item.label,
-    showPoints: 'showPoints' in item ? (item.showPoints ?? false) : false,
-  }));
+  const claimedColors = new Set<ChartColor>();
+  for (const item of series) {
+    if (item.color !== undefined && defaultColors.includes(item.color)) {
+      claimedColors.add(item.color);
+    }
+  }
+  let automaticColorIndex = 0;
+  const nextAutomaticColor = (): ChartColor => {
+    while (
+      automaticColorIndex < defaultColors.length &&
+      claimedColors.has(defaultColors[automaticColorIndex] ?? 'accent')
+    ) {
+      automaticColorIndex += 1;
+    }
+    const color = defaultColors[automaticColorIndex] ?? 'accent';
+    automaticColorIndex += 1;
+    claimedColors.add(color);
+    return color;
+  };
+
+  return series.map((item) => {
+    const color = item.color ?? nextAutomaticColor();
+    return {
+      accessor: item.accessor,
+      color,
+      curve: 'curve' in item ? (item.curve ?? 'linear') : 'linear',
+      id: item.id,
+      kind: kind ?? ('kind' in item ? item.kind : 'line'),
+      label: item.label,
+      showPoints: 'showPoints' in item ? (item.showPoints ?? false) : false,
+    };
+  });
 }
 
 export function LineChart<Datum extends object, XValue extends ChartDomainValue>(

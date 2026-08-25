@@ -2012,7 +2012,6 @@ function ChartSpecimens() {
             series={[
               {
                 accessor: 'capacity',
-                color: 'series-2',
                 id: 'capacity',
                 kind: 'column',
                 label: 'Capacity',

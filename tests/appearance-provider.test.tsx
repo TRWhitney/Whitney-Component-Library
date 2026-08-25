@@ -159,6 +159,71 @@ describe('AppearanceProvider', () => {
     },
   );
 
+  it.each(['light', 'dark'] as const)(
+    'derives five distinct chart hues from a chromatic accent in %s appearance',
+    (appearance) => {
+      const {container} = render(
+        <AppearanceProvider appearance={appearance} accent="#e11919">
+          <span />
+        </AppearanceProvider>,
+      );
+      const provider = container.firstElementChild as HTMLElement;
+      const series = [2, 3, 4, 5, 6].map((index) =>
+        provider.style.getPropertyValue(`--wcl-chart-series-${index}-on-canvas`),
+      );
+
+      expect(new Set(series).size).toBe(5);
+      expect(series.every((color) => /^#[0-9a-f]{6}$/.test(color))).toBe(true);
+      expect(series.every((color) => oklch(color).chroma >= 0.08)).toBe(true);
+      expect(
+        series.every(
+          (color) => contrastRatio(color, appearance === 'light' ? '#e9edef' : '#11171b') >= 3,
+        ),
+      ).toBe(true);
+    },
+  );
+
+  it.each(['light', 'dark'] as const)(
+    'uses the default blue orbit for achromatic accents in %s appearance',
+    (appearance) => {
+      const {container} = render(
+        <>
+          <AppearanceProvider appearance={appearance} accent="#000000">
+            <span />
+          </AppearanceProvider>
+          <AppearanceProvider appearance={appearance} accent="#111111">
+            <span />
+          </AppearanceProvider>
+          <AppearanceProvider appearance={appearance} accent="#eeeeee">
+            <span />
+          </AppearanceProvider>
+          <AppearanceProvider appearance={appearance} accent="#ffffff">
+            <span />
+          </AppearanceProvider>
+          <AppearanceProvider appearance={appearance} accent="#2878ff">
+            <span />
+          </AppearanceProvider>
+        </>,
+      );
+      const [black, nearBlack, nearWhite, white, blue] = [
+        ...container.querySelectorAll<HTMLElement>('[data-wcl-provider]'),
+      ];
+      const palette = (provider: HTMLElement | undefined) =>
+        [2, 3, 4, 5, 6].map((index) =>
+          provider?.style.getPropertyValue(`--wcl-chart-series-${index}-on-canvas`),
+        );
+
+      expect(palette(black)).toEqual(palette(blue));
+      expect(palette(nearBlack)).toEqual(palette(blue));
+      expect(palette(nearWhite)).toEqual(palette(blue));
+      expect(palette(white)).toEqual(palette(blue));
+      expect(black?.style.getPropertyValue('--wcl-accent')).toBe('#000000');
+      expect(nearBlack?.style.getPropertyValue('--wcl-accent')).toBe('#111111');
+      expect(nearWhite?.style.getPropertyValue('--wcl-accent')).toBe('#eeeeee');
+      expect(white?.style.getPropertyValue('--wcl-accent')).toBe('#ffffff');
+    },
+  );
+
   it('updates the scoped appearance without mutating the document root', () => {
     const {getByTestId, rerender} = render(
       <AppearanceProvider appearance="light" accent="#2474ff">

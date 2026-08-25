@@ -72,6 +72,11 @@ describe('Cartesian charts', () => {
     expect(
       container.querySelector('[data-wcl-chart-axis][data-axis="y"]')?.getAttribute('data-scale'),
     ).toBe('linear');
+    expect(
+      [...container.querySelectorAll('[data-axis="y"] [data-wcl-chart-tick-label]')].every(
+        (label) => label.textContent?.endsWith(' energy'),
+      ),
+    ).toBe(true);
     expect(screen.getByRole('list', {name: 'Energy series'})).toBeTruthy();
     expect(container.querySelectorAll('[data-wcl-chart-annotation]')).toHaveLength(3);
     expect(container.querySelector('[data-wcl-chart-annotation-summary]')?.textContent).toContain(
@@ -285,6 +290,247 @@ describe('Cartesian charts', () => {
     expect(container.querySelector('[data-wcl-chart-line]')).toBeTruthy();
   });
 
+  it('renders stroked series above filled marks regardless of series order', () => {
+    const {container} = render(
+      <CartesianChart
+        data={data}
+        dataTableLabel="Demand and capacity data"
+        description="Demand remains visible over filled capacity and reserve marks."
+        emptyState={emptyState}
+        invalidData={invalidData}
+        legend={{label: 'Energy series'}}
+        series={[
+          {accessor: 'demand', id: 'demand', kind: 'line', label: 'Demand'},
+          {accessor: 'capacity', id: 'capacity', kind: 'column', label: 'Capacity'},
+          {accessor: 'demand', id: 'reserve', kind: 'area', label: 'Reserve'},
+        ]}
+        title="Demand over capacity"
+        xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+        yAxis={{label: 'Energy', scale: {type: 'linear'}}}
+      />,
+    );
+    const line = container.querySelector('[data-wcl-chart-line]');
+    const bar = container.querySelector('[data-wcl-chart-bar]');
+    const area = container.querySelector('[data-wcl-chart-area]');
+
+    expect(bar?.compareDocumentPosition(line as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(area?.compareDocumentPosition(line as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it('bounds categorical tick labels without removing data categories', () => {
+    const regions = [
+      'North',
+      'South',
+      'East',
+      'West',
+      'Central',
+      'Northeast',
+      'Southeast',
+      'Northwest',
+      'Southwest',
+      'Remote',
+    ];
+    const denseData = Array.from({length: 10}, (_, index) => ({
+      category: `Long planning interval ${regions[index]}`,
+      value: index + 1,
+    }));
+    const {container} = render(
+      <>
+        <LineChart
+          data={denseData}
+          dataTableLabel="Planning interval data"
+          description="All intervals remain in the data table while the plot labels a useful subset."
+          emptyState={emptyState}
+          invalidData={invalidData}
+          series={[{accessor: 'value', id: 'value', label: 'Value'}]}
+          title="Planning intervals"
+          xAxis={{
+            accessor: 'category',
+            label: 'Interval',
+            scale: {type: 'categorical'},
+            tickCount: 4,
+          }}
+          yAxis={{label: 'Value', scale: {type: 'linear'}}}
+        />
+        <BarChart
+          data={denseData}
+          dataTableLabel="Horizontal planning interval data"
+          description="Long interval names remain bounded beside horizontal bars."
+          emptyState={emptyState}
+          invalidData={invalidData}
+          series={[{accessor: 'value', id: 'value', label: 'Value'}]}
+          title="Horizontal planning intervals"
+          xAxis={{label: 'Value', scale: {type: 'linear'}}}
+          yAxis={{
+            accessor: 'category',
+            label: 'Interval',
+            scale: {type: 'categorical'},
+            tickCount: 4,
+          }}
+        />
+      </>,
+    );
+
+    const horizontalLabels = [
+      ...(container
+        .querySelector('[data-wcl-line-chart]')
+        ?.querySelectorAll('[data-axis="x"] [data-wcl-chart-tick-label]') ?? []),
+    ];
+    const verticalLabels = [
+      ...(container
+        .querySelector('[data-wcl-bar-chart]')
+        ?.querySelectorAll('[data-axis="y"] [data-wcl-chart-tick-label]') ?? []),
+    ];
+    expect(horizontalLabels).toHaveLength(4);
+    expect(verticalLabels).toHaveLength(4);
+    expect(horizontalLabels.every((label) => (label.textContent?.length ?? 0) <= 17)).toBe(true);
+    expect(verticalLabels.every((label) => (label.textContent?.length ?? 0) <= 11)).toBe(true);
+    expect(new Set(verticalLabels.map((label) => label.textContent)).size).toBe(4);
+    expect(verticalLabels.map((label) => label.textContent)).toEqual([
+      expect.stringMatching(/North$/),
+      expect.stringMatching(/West$/),
+      expect.stringMatching(/east$/),
+      expect.stringMatching(/mote$/),
+    ]);
+    expect(horizontalLabels.every((label) => label.getAttribute('text-anchor') === 'middle')).toBe(
+      true,
+    );
+    expect(
+      [...(container.querySelector('[data-wcl-line-chart]')?.querySelectorAll('title') ?? [])].map(
+        (title) => title.textContent,
+      ),
+    ).toEqual([
+      'Long planning interval North',
+      'Long planning interval West',
+      'Long planning interval Southeast',
+      'Long planning interval Remote',
+    ]);
+    expect(
+      within(screen.getByRole('table', {name: 'Planning interval data'})).getAllByRole('row'),
+    ).toHaveLength(11);
+  });
+
+  it('keeps long single-word category endings distinguishable', () => {
+    const {container} = render(
+      <BarChart
+        data={[
+          {category: 'NorthwesternRegionA', value: 4},
+          {category: 'NorthwesternRegionB', value: 6},
+        ]}
+        dataTableLabel="Regional values"
+        description="Regions with a shared long prefix remain distinguishable."
+        emptyState={emptyState}
+        invalidData={invalidData}
+        series={[{accessor: 'value', id: 'value', label: 'Value'}]}
+        title="Regional values"
+        xAxis={{label: 'Value', scale: {type: 'linear'}}}
+        yAxis={{
+          accessor: 'category',
+          label: 'Region',
+          scale: {type: 'categorical'},
+          tickCount: 2,
+        }}
+      />,
+    );
+    const labels = [
+      ...container.querySelectorAll('[data-axis="y"] [data-wcl-chart-tick-label]'),
+    ].map((label) => label.textContent);
+
+    expect(new Set(labels).size).toBe(2);
+    expect(labels).toEqual([expect.stringMatching(/A$/), expect.stringMatching(/B$/)]);
+  });
+
+  it('keeps automatic colors distinct from explicit ordinary palette choices', () => {
+    const {container, rerender} = render(
+      <CartesianChart
+        data={data}
+        dataTableLabel="Demand and capacity data"
+        description="Capacity columns sit behind the demand line."
+        emptyState={emptyState}
+        invalidData={invalidData}
+        legend={{label: 'Energy series'}}
+        series={[
+          {
+            accessor: 'capacity',
+            color: 'series-2',
+            id: 'capacity',
+            kind: 'column',
+            label: 'Capacity',
+          },
+          {accessor: 'demand', id: 'demand', kind: 'line', label: 'Demand'},
+        ]}
+        title="Demand within capacity"
+        xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+        yAxis={{label: 'Energy', scale: {type: 'linear'}}}
+      />,
+    );
+
+    const legendColors = () =>
+      [...container.querySelectorAll('[data-wcl-chart-legend] > li')].map((item) =>
+        item.getAttribute('data-color'),
+      );
+    expect(legendColors()).toEqual(['series-2', 'accent']);
+
+    rerender(
+      <CartesianChart
+        data={data}
+        dataTableLabel="Demand and capacity data"
+        description="Later explicit choices reserve their color from automatic series."
+        emptyState={emptyState}
+        invalidData={invalidData}
+        legend={{label: 'Energy series'}}
+        series={[
+          {accessor: 'capacity', id: 'capacity', kind: 'column', label: 'Capacity'},
+          {
+            accessor: 'demand',
+            color: 'accent',
+            id: 'demand',
+            kind: 'line',
+            label: 'Demand',
+          },
+          {accessor: 'capacity', id: 'reserve', kind: 'area', label: 'Reserve'},
+        ]}
+        title="Reserved explicit color"
+        xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+        yAxis={{label: 'Energy', scale: {type: 'linear'}}}
+      />,
+    );
+
+    expect(legendColors()).toEqual(['series-2', 'accent', 'series-3']);
+
+    rerender(
+      <CartesianChart
+        data={data}
+        dataTableLabel="Demand and capacity data"
+        description="Explicit duplicate colors remain author-controlled."
+        emptyState={emptyState}
+        invalidData={invalidData}
+        legend={{label: 'Energy series'}}
+        series={[
+          {
+            accessor: 'capacity',
+            color: 'series-2',
+            id: 'capacity',
+            kind: 'column',
+            label: 'Capacity',
+          },
+          {
+            accessor: 'demand',
+            color: 'series-2',
+            id: 'demand',
+            kind: 'line',
+            label: 'Demand',
+          },
+        ]}
+        title="Explicit shared color"
+        xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+        yAxis={{label: 'Energy', scale: {type: 'linear'}}}
+      />,
+    );
+
+    expect(legendColors()).toEqual(['series-2', 'series-2']);
+  });
+
   it('uses shared feedback semantics for loading, empty, partial, invalid, and error data', () => {
     const shared = {
       dataTableLabel: 'Demand state data',
@@ -384,6 +630,28 @@ describe('Cartesian charts', () => {
     expect(frame?.getAttribute('style')).toContain('--wcl-chart-minimum-width:360px');
     expect(frame?.getAttribute('style')).toContain('--wcl-chart-minimum-height:220px');
     expect(() => hydrateRoot(rootElement, specimen)).not.toThrow();
+  });
+
+  it('preserves a readable default plot width with local scrolling in compact regions', () => {
+    const {container} = render(
+      <LineChart
+        data={data}
+        dataTableLabel="Default demand plot data"
+        description="Monthly demand."
+        emptyState={emptyState}
+        invalidData={invalidData}
+        series={[{accessor: 'demand', id: 'demand', label: 'Demand'}]}
+        title="Default demand plot"
+        xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+        yAxis={{label: 'Energy', scale: {type: 'linear'}}}
+      />,
+    );
+    const frame = container.querySelector('[data-wcl-chart-frame]');
+
+    expect(frame?.getAttribute('data-overflow')).toBe('scroll');
+    expect((frame as HTMLElement | null)?.style.getPropertyValue('--wcl-chart-minimum-width')).toBe(
+      '480px',
+    );
   });
 
   it('rejects ambiguous series identity and incoherent normalized layout configuration', () => {

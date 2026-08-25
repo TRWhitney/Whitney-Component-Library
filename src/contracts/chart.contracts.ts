@@ -37,13 +37,13 @@ function chartContract({
 }: ChartContractOptions): ComponentContract {
   return {
     accentBehavior: [
-      'Application accent identifies the first ordinary series and accent annotations. Additional categorical colors remain theme-aware; success, warning, and danger are reserved for semantic meaning.',
+      'Application accent identifies the first ordinary series and accent annotations. Later ordinary series orbit that accent with an achromatic fallback, and automatic colors avoid explicit ordinary choices. Success, warning, and danger remain semantic colors.',
     ],
     accessibility: [
       'The required visible title names one figure and the required description explains its point. The SVG is hidden from assistive technology because a generated native data table exposes every valid category and series value before interaction.',
     ],
     appearance: [
-      'A direct instrument plot uses restrained grid and axis rails, utility typography for ticks, and series color only on marks. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.',
+      'A direct instrument plot uses restrained grid and axis rails with readable utility typography. Filled marks use softened series color beneath stronger lines and boundaries. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.',
     ],
     appropriateUses: [use],
     composition: [
@@ -108,7 +108,7 @@ function chartContract({
     ],
     relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
     responsiveBehavior: [
-      'aspectRatio and minimumSize make the plot budget explicit. clip keeps the chart within its assigned region; scroll preserves the requested minimum width in compact regions without silently changing the data.',
+      'Charts preserve a 480px minimum plot with local horizontal scrolling by default. Categorical tickCount bounds label density, and long visible labels shorten within the plot while the generated table retains complete values. aspectRatio and minimumSize make another plot budget explicit; choose clip only when shrinking the complete plot is more important than preserving text size.',
     ],
     states: [
       'Ready, loading, empty, partial, invalid-data, and error states are explicit. Partial data remains plotted with warning copy; invalid rows are omitted and reported; an entirely invalid dataset becomes unavailable.',
@@ -116,7 +116,7 @@ function chartContract({
     stylesheet: './styles.css',
     summary: purpose,
     validation: [
-      'TypeScript bounds record accessors, scales, colors, layouts, annotation values, and the one-to-six series vocabulary. Runtime preparation excludes missing or non-finite rows, preserves valid rows, requires a multi-series legend and representable filled-mark baseline, and gives empty and unavailable states distinct feedback.',
+      'TypeScript bounds record accessors, scales, colors, layouts, annotation values, and the one-to-six series vocabulary. Runtime preparation assigns omitted colors without colliding with explicit ordinary choices, excludes missing or non-finite rows, requires a multi-series legend and representable filled-mark baseline, and gives empty and unavailable states distinct feedback.',
     ],
   };
 }
@@ -178,7 +178,7 @@ export const cartesianChartContract = chartContract({
   alternative:
     'Prefer LineChart, AreaChart, ColumnChart, or BarChart when one named mark family expresses the data without a mixed encoding.',
   counterExample: `<CartesianChart\n  data={[{month: "Jan", cost: 1200, temperature: 18}, {month: "Feb", cost: 900, temperature: 22}]}\n  description="Temperature and cost use unrelated units."\n  ${counterState}\n  legend={{label: "Unrelated series"}}\n  series={[{id: "cost", kind: "column", label: "Cost", accessor: "cost"}, {id: "temperature", kind: "line", label: "Temperature", accessor: "temperature"}]}\n  title="Cost and temperature"\n  xAxis={{accessor: "month", label: "Month", scale: {type: "categorical"}}}\n  yAxis={{label: "Mixed values", scale: {type: "linear"}}}\n/>`,
-  example: `<CartesianChart\n  ${commonProps}\n  legend={{label: "Energy series"}}\n  series={[{id: "capacity", kind: "column", label: "Capacity", accessor: "capacity", color: "series-2"}, {id: "demand", kind: "line", label: "Demand", accessor: "demand", showPoints: true}]}\n  title="Demand within capacity"\n  xAxis={{accessor: "month", label: "Month", scale: {type: "categorical"}}}\n  yAxis={{label: "Energy", unit: "MWh", scale: {type: "linear"}}}\n/>`,
+  example: `<CartesianChart\n  ${commonProps}\n  legend={{label: "Energy series"}}\n  series={[{id: "capacity", kind: "column", label: "Capacity", accessor: "capacity"}, {id: "demand", kind: "line", label: "Demand", accessor: "demand", showPoints: true}]}\n  title="Demand within capacity"\n  xAxis={{accessor: "month", label: "Month", scale: {type: "categorical"}}}\n  yAxis={{label: "Energy", unit: "MWh", scale: {type: "linear"}}}\n/>`,
   misuse:
     'series with incompatible units or domains, decorative mixed marks, or a case already expressed clearly by one named chart type',
   name: 'CartesianChart',

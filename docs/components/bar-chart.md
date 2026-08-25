@@ -35,7 +35,7 @@ Compare discrete categories with grouped, stacked, or normalized horizontal bars
 
 - BarChart is a static data display in this foundation. It does not filter records, coordinate selection, show tooltips, mutate domains, or own application workflow.
 - BarChart emits no events in the Cartesian foundation. Later interaction components add bounded hover and selection behavior without changing this static meaning.
-- TypeScript bounds record accessors, scales, colors, layouts, annotation values, and the one-to-six series vocabulary. Runtime preparation excludes missing or non-finite rows, preserves valid rows, requires a multi-series legend and representable filled-mark baseline, and gives empty and unavailable states distinct feedback.
+- TypeScript bounds record accessors, scales, colors, layouts, annotation values, and the one-to-six series vocabulary. Runtime preparation assigns omitted colors without colliding with explicit ordinary choices, excludes missing or non-finite rows, requires a multi-series legend and representable filled-mark baseline, and gives empty and unavailable states distinct feedback.
 - Charts are not form controls and do not submit, validate, or reset values. Filter and range controls belong beside the chart in consumer-owned composition.
 
 ## Accessibility
@@ -51,12 +51,12 @@ Compare discrete categories with grouped, stacked, or normalized horizontal bars
 
 ## Appearance and responsive behavior
 
-- A direct instrument plot uses restrained grid and axis rails, utility typography for ticks, and series color only on marks. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.
-- aspectRatio and minimumSize make the plot budget explicit. clip keeps the chart within its assigned region; scroll preserves the requested minimum width in compact regions without silently changing the data.
+- A direct instrument plot uses restrained grid and axis rails with readable utility typography. Filled marks use softened series color beneath stronger lines and boundaries. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.
+- Charts preserve a 480px minimum plot with local horizontal scrolling by default. Categorical tickCount bounds label density, and long visible labels shorten within the plot while the generated table retains complete values. aspectRatio and minimumSize make another plot budget explicit; choose clip only when shrinking the complete plot is more important than preserving text size.
 
 ## Accent, forced colors, and reduced motion
 
-- Application accent identifies the first ordinary series and accent annotations. Additional categorical colors remain theme-aware; success, warning, and danger are reserved for semantic meaning.
+- Application accent identifies the first ordinary series and accent annotations. Later ordinary series orbit that accent with an achromatic fallback, and automatic colors avoid explicit ordinary choices. Success, warning, and danger remain semantic colors.
 - Forced colors preserve axis and grid structure, retain series dash and outline patterns in system foreground and highlight colors, and keep the generated data table as the complete non-color representation.
 - The static Cartesian foundation has no idle or data-transition motion. Reduced motion therefore preserves identical plot structure without a substitute animation.
 

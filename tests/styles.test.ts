@@ -30,6 +30,20 @@ describe('static appearance styles', () => {
     );
     expect(styles).toMatch(/\[data-wcl-chart-legend-swatch\]\s*\{[^}]*block-size:\s*0\.5rem/);
     expect(styles).toMatch(
+      /:is\(\[data-wcl-chart-tick-label\], \[data-wcl-chart-axis-label\]\)\s*\{[^}]*font-size:\s*16px/,
+    );
+    expect(styles).toMatch(/\[data-wcl-chart-annotation-label\]\s*\{[^}]*font-size:\s*14px/);
+    expect(styles).toMatch(/\[data-wcl-chart-legend\]\s*\{[^}]*font-size:\s*0\.875rem/);
+    expect(styles).toMatch(
+      /\[data-wcl-chart-bar\]\s*\{[^}]*fill:\s*color-mix\(in oklch, var\(--wcl-chart-series-color\) 30%, var\(--wcl-surface\)\)[^}]*stroke-width:\s*1\.75/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-chart-area\]\s*\{[^}]*fill:\s*color-mix\(in oklch, var\(--wcl-chart-series-color\) 18%, transparent\)/,
+    );
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-chart-line\], \[data-wcl-chart-legend-line\]\)\s*\{[^}]*stroke-width:\s*2\.5/,
+    );
+    expect(styles).toMatch(
       /@media\s*\(forced-colors:\s*active\)[\s\S]*?:is\(\[data-wcl-chart-line\], \[data-wcl-chart-legend-line\]\)\s*\{[^}]*fill:\s*none/,
     );
     expect(styles).not.toMatch(/\[data-wcl-chart\][^{]*\{[^}]*animation:/);

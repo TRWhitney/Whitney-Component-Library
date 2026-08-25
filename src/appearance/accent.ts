@@ -15,6 +15,7 @@ interface Oklch {
 export type AccentSurface = 'base' | 'canvas' | 'raised' | 'subtle';
 
 export interface SurfaceAccentRoles {
+  readonly chartSeries: readonly [string, string, string, string, string];
   readonly fillBoundary: string;
   readonly focus: string;
   readonly hoverContrast: string;
@@ -51,12 +52,17 @@ const WHITE = parseHexUnchecked('#ffffff');
 const STRUCTURAL_CONTRAST = 3;
 const CONTENT_CONTRAST = 4.5;
 const ACHROMATIC_THRESHOLD = 0.015;
+const CHART_NEUTRAL_CHANNEL_SPREAD = 24 / 255;
+const CHART_CHROMA_FLOOR = 0.12;
+const CHART_ORBIT_OFFSETS = [137.5, 275, 52.5, 190, 327.5] as const;
+const CHART_NEUTRAL_FALLBACK = parseHexUnchecked('#2878ff');
 
 export function deriveAccentRoles(accent: AccentColor, appearance: 'light' | 'dark'): AccentRoles {
   const sourceRgb = parseHexColor(accent);
   const source = rgbToOklch(sourceRgb);
   const normalizedAccent = accent.toLowerCase() as AccentColor;
   const surfaces = APPEARANCE_SURFACES[appearance];
+  const chartSource = hasStableChartHue(sourceRgb) ? source : rgbToOklch(CHART_NEUTRAL_FALLBACK);
   const surfaceDirection = appearance === 'light' ? 'darker' : 'lighter';
   const hoverEdgeDirection =
     contrastRatio(sourceRgb, BLACK) >= contrastRatio(sourceRgb, WHITE) ? 'darker' : 'lighter';
@@ -69,10 +75,10 @@ export function deriveAccentRoles(accent: AccentColor, appearance: 'light' | 'da
       oklchToRgb(vividContrast(source, [sourceRgb], STRUCTURAL_CONTRAST, hoverEdgeDirection)),
     ),
     on: {
-      base: deriveSurfaceRoles(source, sourceRgb, surfaces.base, surfaceDirection),
-      canvas: deriveSurfaceRoles(source, sourceRgb, surfaces.canvas, surfaceDirection),
-      raised: deriveSurfaceRoles(source, sourceRgb, surfaces.raised, surfaceDirection),
-      subtle: deriveSurfaceRoles(source, sourceRgb, surfaces.subtle, surfaceDirection),
+      base: deriveSurfaceRoles(source, sourceRgb, chartSource, surfaces.base, surfaceDirection),
+      canvas: deriveSurfaceRoles(source, sourceRgb, chartSource, surfaces.canvas, surfaceDirection),
+      raised: deriveSurfaceRoles(source, sourceRgb, chartSource, surfaces.raised, surfaceDirection),
+      subtle: deriveSurfaceRoles(source, sourceRgb, chartSource, surfaces.subtle, surfaceDirection),
     },
   };
 }
@@ -80,6 +86,7 @@ export function deriveAccentRoles(accent: AccentColor, appearance: 'light' | 'da
 function deriveSurfaceRoles(
   source: Oklch,
   sourceRgb: Rgb,
+  chartSource: Oklch,
   componentSurface: Rgb,
   direction: 'darker' | 'lighter',
 ): SurfaceAccentRoles {
@@ -97,6 +104,7 @@ function deriveSurfaceRoles(
     : undefined;
 
   return {
+    chartSeries: deriveChartSeries(chartSource, componentSurface, direction),
     fillBoundary: boundary ? toHex(oklchToRgb(boundary)) : 'transparent',
     focus: toHex(oklchToRgb(signal)),
     hoverContrast: toHex(bestContentColor(softRgb)),
@@ -107,6 +115,28 @@ function deriveSurfaceRoles(
         : toHex(oklchToRgb(signal)),
     soft: toHex(softRgb),
   };
+}
+
+function deriveChartSeries(
+  source: Oklch,
+  componentSurface: Rgb,
+  direction: 'darker' | 'lighter',
+): readonly [string, string, string, string, string] {
+  const visibleSource = vividContrast(source, [componentSurface], STRUCTURAL_CONTRAST, direction);
+  return CHART_ORBIT_OFFSETS.map((offset) =>
+    toHex(
+      oklchToRgb({
+        ...visibleSource,
+        chroma: Math.max(visibleSource.chroma, CHART_CHROMA_FLOOR),
+        hue: visibleSource.hue + (offset * Math.PI) / 180,
+      }),
+    ),
+  ) as unknown as readonly [string, string, string, string, string];
+}
+
+function hasStableChartHue(color: Rgb): boolean {
+  const channels = [color.red, color.green, color.blue];
+  return Math.max(...channels) - Math.min(...channels) >= CHART_NEUTRAL_CHANNEL_SPREAD;
 }
 
 function parseHexColor(color: AccentColor): Rgb {
