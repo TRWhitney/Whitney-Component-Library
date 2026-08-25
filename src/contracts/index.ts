@@ -1,6 +1,13 @@
 export {appearanceProviderContract} from './appearance-provider.contract.js';
 export {pageHeaderContract, splitViewContract} from './application.contracts.js';
 export {
+  areaChartContract,
+  barChartContract,
+  cartesianChartContract,
+  columnChartContract,
+  lineChartContract,
+} from './chart.contracts.js';
+export {
   buttonContract,
   buttonGroupContract,
   iconButtonContract,
@@ -95,6 +102,13 @@ export {
 import {appearanceProviderContract} from './appearance-provider.contract.js';
 import {pageHeaderContract, splitViewContract} from './application.contracts.js';
 import {
+  areaChartContract,
+  barChartContract,
+  cartesianChartContract,
+  columnChartContract,
+  lineChartContract,
+} from './chart.contracts.js';
+import {
   buttonContract,
   buttonGroupContract,
   iconButtonContract,
@@ -180,16 +194,20 @@ export const componentContracts = [
   accordionContract,
   alertBannerContract,
   alertDialogContract,
+  areaChartContract,
   appearanceProviderContract,
   badgeContract,
+  barChartContract,
   breadcrumbsContract,
   buttonContract,
   buttonGroupContract,
   cardCollectionContract,
+  cartesianChartContract,
   checkboxContract,
   checkboxGroupContract,
   comboBoxContract,
   collectionFilterBarContract,
+  columnChartContract,
   contextMenuContract,
   dateFieldContract,
   datePickerContract,
@@ -209,6 +227,7 @@ export const componentContracts = [
   inlineGroupContract,
   inlineAlertContract,
   linkContract,
+  lineChartContract,
   listBoxContract,
   listContract,
   meterContract,

@@ -30,6 +30,7 @@ import {
   InlineAlert,
   InlineGroup,
   Link,
+  LineChart,
   List,
   ListBox,
   Meter,
@@ -512,6 +513,20 @@ const view = React.createElement(
           ],
           selectionMode: 'none',
         }),
+        React.createElement(LineChart, {
+          data: [
+            {demand: 42, month: 'Jan'},
+            {demand: 51, month: 'Feb'},
+          ],
+          dataTableLabel: 'Packed thermal demand data',
+          description: 'Packed monthly thermal demand.',
+          emptyState: {description: 'Choose a recorded period.', title: 'No demand data'},
+          invalidData: {description: 'Correct invalid demand records.', title: 'Invalid demand data'},
+          series: [{accessor: 'demand', id: 'demand', label: 'Demand', showPoints: true}],
+          title: 'Packed thermal demand',
+          xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
+          yAxis: {label: 'Energy', scale: {type: 'linear'}, unit: 'MWh'},
+        }),
         React.createElement(PackedOperationalProof),
         React.createElement(SplitView, {
           ariaLabel: 'Packed run workspace',
@@ -912,6 +927,12 @@ if (document.querySelector('[aria-label="Run history"]')?.getAttribute('tabindex
 }
 if (!document.querySelector('[data-wcl-toolbar]')) {
   throw new Error('Packed toolbar did not render its public marker.');
+}
+if (
+  !document.querySelector('[data-wcl-line-chart] [data-wcl-chart-line]') ||
+  document.querySelector('[aria-label="Packed thermal demand data"]')?.textContent?.includes('51') !== true
+) {
+  throw new Error('Packed Cartesian chart did not preserve its plotted and tabular meaning.');
 }
 if (
   document.querySelector('[data-wcl-process-stage][aria-current="step"]')?.textContent?.includes(

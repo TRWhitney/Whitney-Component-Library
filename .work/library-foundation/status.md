@@ -256,9 +256,18 @@ The packed operational fixture composes existing public fields, choices, validat
 actions, PageHeader, ProcessTracker, status, and progress. The fixture owns its arrangement and
 cross-component state, so no application workflow component enters the public catalog.
 
+### Ticket 19 — Cartesian chart foundation
+
+LineChart, AreaChart, ColumnChart, BarChart, and CartesianChart provide the shared Cartesian
+foundation without defining a dashboard or analysis workflow. Typed accessors, bounded scale and
+annotation vocabularies, deterministic React-owned SVG, explicit responsive policy, shared feedback
+states, and generated native data tables keep the family reusable and accessible. D3 micro-packages
+remain private geometry dependencies, and an executable tree-shaking proof keeps their code out of
+ordinary component bundles.
+
 ## Frontier
 
-See the [decision map](map.md). [Ticket 19](tickets/19-cartesian-chart-foundation.md) is next.
+See the [decision map](map.md). [Ticket 20](tickets/20-statistical-chart-family.md) is next.
 
 ## Accepted sources
 
@@ -460,12 +469,19 @@ See the [decision map](map.md). [Ticket 19](tickets/19-cartesian-chart-foundatio
   bounded scrolling for long localized AlertDialog copy without clipping its decisions, touch
   activation, reduced motion, and forced colors. Inspected screenshots were discarded after
   validation.
-- Manual screen-reader operation remains deferred to Ticket 30 before stable-candidate acceptance.
+- Ticket 19 focused and full-suite checks cover every Cartesian scale and named mark family,
+  generated tables and annotation summaries, shared feedback states, explicit sizing, runtime
+  validation, deterministic server output, and hydration. The production showcase build succeeds.
+  Packed React 18.3.1 and 19.2.8 consumers render, hydrate, type-check, and browser-build a LineChart;
+  the ordinary-component isolation build emits no chart or D3 modules. Independent engineering and
+  intent re-reviews report no unresolved objective defects.
+- Direct chart inspection across Chromium, Firefox, and WebKit, including forced-color rendering and
+  manual screen-reader operation, remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
 - Branch: `master`
-- Ticket 18 was delivered in the latest commit, `[Feature] Add bounded process tracking`.
+- Ticket 19 is delivered in the latest commit, `[Feature] Add Cartesian chart foundation`.
 - The working tree is clean after delivery.
 - Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-- Next action: begin [Ticket 19](tickets/19-cartesian-chart-foundation.md).
+- Next action: begin [Ticket 20](tickets/20-statistical-chart-family.md).

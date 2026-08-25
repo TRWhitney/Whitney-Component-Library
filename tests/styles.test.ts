@@ -3,6 +3,38 @@ import {readFile} from 'node:fs/promises';
 import {describe, expect, it} from 'vitest';
 
 describe('static appearance styles', () => {
+  it('keeps chart geometry direct, theme-aware, and independent from semantic status color', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+
+    expect(styles).toMatch(/\[data-wcl-chart\]\s*\{[^}]*display:\s*grid/);
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-chart-line\], \[data-wcl-chart-legend-line\]\)\s*\{[^}]*stroke:\s*var\(--wcl-chart-series-color\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-color='accent'\]\s*\{[^}]*--wcl-chart-series-color:\s*var\(--wcl-accent-rail\)/,
+    );
+    expect(styles).toMatch(
+      /\[data-color='warning'\]\s*\{[^}]*--wcl-chart-series-color:\s*var\(--wcl-warning\)/,
+    );
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-chart-table\], \[data-wcl-chart-annotation-summary\]\)\s*\{[^}]*clip-path:\s*inset\(50%\)/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-chart-axis-rail\]/,
+    );
+    expect(styles).toMatch(
+      /\[data-series-index='1'\][\s\S]*?\[data-wcl-chart-line\][\s\S]*?stroke-dasharray:\s*6 3/,
+    );
+    expect(styles).toMatch(
+      /\[data-series-index='5'\][\s\S]*?\[data-wcl-chart-line\][\s\S]*?stroke-dasharray:\s*10 3/,
+    );
+    expect(styles).toMatch(/\[data-wcl-chart-legend-swatch\]\s*\{[^}]*block-size:\s*0\.5rem/);
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*?:is\(\[data-wcl-chart-line\], \[data-wcl-chart-legend-line\]\)\s*\{[^}]*fill:\s*none/,
+    );
+    expect(styles).not.toMatch(/\[data-wcl-chart\][^{]*\{[^}]*animation:/);
+  });
+
   it('settles motion without removing state meaning when reduced motion is requested', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const reducedMotion = styles.match(

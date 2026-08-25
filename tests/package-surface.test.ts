@@ -23,6 +23,9 @@ describe('package surface', () => {
     });
     expect(packageJson.dependencies['react-aria-components']).toBe('1.20.0');
     expect(packageJson.dependencies['@internationalized/date']).toBe('3.12.3');
+    expect(packageJson.dependencies['d3-array']).toBe('3.2.4');
+    expect(packageJson.dependencies['d3-scale']).toBe('4.0.2');
+    expect(packageJson.dependencies['d3-shape']).toBe('3.2.0');
     expect(packageJson.peerDependencies).not.toHaveProperty('react-aria-components');
     expect(packageJson.engines.node).toBe('>=22.12.0');
   });

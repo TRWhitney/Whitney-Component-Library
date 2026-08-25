@@ -11,16 +11,20 @@ import {
   AlertBanner,
   AlertDialog,
   Accordion,
+  AreaChart,
   AppearanceProvider,
   Badge,
+  BarChart,
   Button,
   ButtonGroup,
   Breadcrumbs,
   CardCollection,
+  CartesianChart,
   Checkbox,
   CheckboxGroup,
   ComboBox,
   CollectionFilterBar,
+  ColumnChart,
   ContextMenu,
   DateField,
   DatePicker,
@@ -40,6 +44,7 @@ import {
   InlineAlert,
   InlineGroup,
   Link,
+  LineChart,
   List,
   ListBox,
   Meter,
@@ -89,6 +94,22 @@ import {
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
 
 const defaultAccent: AccentColor = '#2878ff';
+const chartData = [
+  {capacity: 58, demand: 42, month: 'Jan'},
+  {capacity: 64, demand: 51, month: 'Feb'},
+  {capacity: 68, demand: 61, month: 'Mar'},
+  {capacity: 72, demand: 57, month: 'Apr'},
+] as const;
+const chartStateCopy = {
+  emptyState: {
+    description: 'Choose a reporting interval with recorded energy.',
+    title: 'No energy data',
+  },
+  invalidData: {
+    description: 'Correct records with missing or non-finite energy values.',
+    title: 'Some energy data is invalid',
+  },
+} as const;
 const runCollectionFilters = [
   {
     emptyMessage: 'No statuses',
@@ -1892,6 +1913,126 @@ function FeedbackSpecimens() {
   );
 }
 
+function ChartSpecimens() {
+  const verticalAxes = {
+    xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
+    yAxis: {label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'},
+  } as const;
+  const common = {
+    ...chartStateCopy,
+    data: chartData,
+    dataTableLabel: 'Monthly energy data',
+    description: 'Monthly demand remains within available thermal capacity.',
+  } as const;
+
+  return (
+    <>
+      <Specimen
+        description="Show change over an ordered, numeric, logarithmic, or time domain. The generated table carries the complete static meaning without requiring pointer interaction."
+        name="LineChart"
+      >
+        <Example label="Two-series LineChart">
+          <LineChart
+            {...common}
+            {...verticalAxes}
+            annotations={[{axis: 'y', kind: 'line', label: 'Target', value: 60}]}
+            legend={{label: 'Energy series'}}
+            series={[
+              {accessor: 'demand', id: 'demand', label: 'Demand', showPoints: true},
+              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
+            ]}
+            title="Thermal demand"
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Show magnitude or contribution across an ordered domain. Choose overlap, stacked, or normalized deliberately; the chart does not infer that relationship."
+        name="AreaChart"
+      >
+        <Example label="Stacked AreaChart">
+          <AreaChart
+            {...common}
+            {...verticalAxes}
+            legend={{label: 'Energy series'}}
+            series={[
+              {accessor: 'demand', id: 'demand', label: 'Demand'},
+              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
+            ]}
+            stacking="stacked"
+            title="Energy magnitude"
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Compare discrete categories with grouped, stacked, or normalized vertical columns. Use BarChart when category labels need horizontal room."
+        name="ColumnChart"
+      >
+        <Example label="Grouped ColumnChart">
+          <ColumnChart
+            {...common}
+            {...verticalAxes}
+            layout="grouped"
+            legend={{label: 'Energy series'}}
+            series={[
+              {accessor: 'demand', id: 'demand', label: 'Demand'},
+              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
+            ]}
+            title="Monthly comparison"
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Compare discrete categories on a horizontal plot. The orientation is part of the named component rather than a renderer option."
+        name="BarChart"
+      >
+        <Example label="Horizontal BarChart">
+          <BarChart
+            {...common}
+            layout="grouped"
+            series={[{accessor: 'demand', id: 'demand', label: 'Demand'}]}
+            title="Demand by month"
+            xAxis={{label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'}}
+            yAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Prefer a named single-mark chart otherwise."
+        name="CartesianChart"
+      >
+        <Example label="Mixed CartesianChart">
+          <CartesianChart
+            {...common}
+            {...verticalAxes}
+            legend={{label: 'Energy series'}}
+            series={[
+              {
+                accessor: 'capacity',
+                color: 'series-2',
+                id: 'capacity',
+                kind: 'column',
+                label: 'Capacity',
+              },
+              {
+                accessor: 'demand',
+                id: 'demand',
+                kind: 'line',
+                label: 'Demand',
+                showPoints: true,
+              },
+            ]}
+            title="Demand within capacity"
+          />
+        </Example>
+      </Specimen>
+    </>
+  );
+}
+
 function OverlaySpecimens() {
   return (
     <>
@@ -2250,6 +2391,14 @@ export function Showcase() {
                 <h2 id="collections-heading">Query, compare, and navigate keyed data</h2>
               </header>
               <CollectionSpecimens />
+            </section>
+
+            <section aria-labelledby="charts-heading" className="showcase-family">
+              <header className="showcase-family-header">
+                <span>Charts</span>
+                <h2 id="charts-heading">Plot data without prescribing the surrounding workspace</h2>
+              </header>
+              <ChartSpecimens />
             </section>
 
             <section aria-labelledby="ranges-heading" className="showcase-family">

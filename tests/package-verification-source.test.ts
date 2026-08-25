@@ -151,6 +151,17 @@ describe('packed consumer verification source', () => {
     );
   });
 
+  it('exercises packed Cartesian SVG and tabular meaning through the public API', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    expect(source).toContain('LineChart');
+    expect(source).toContain('data-wcl-line-chart');
+    expect(source).toContain('Packed thermal demand data');
+    expect(source).toContain(
+      'Packed Cartesian chart did not preserve its plotted and tabular meaning.',
+    );
+  });
+
   it('exercises single and paired range entry through the packed API', () => {
     const source = createConsumerVerificationSource('@fixture/component-library');
 

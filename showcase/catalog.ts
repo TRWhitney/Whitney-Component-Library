@@ -66,6 +66,10 @@ export const showcaseGroups = [
     ],
   },
   {
+    label: 'Charts',
+    components: ['LineChart', 'AreaChart', 'ColumnChart', 'BarChart', 'CartesianChart'],
+  },
+  {
     label: 'Date and time',
     components: ['DateField', 'TimeField', 'DatePicker', 'DateRangePicker'],
   },

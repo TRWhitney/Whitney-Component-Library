@@ -186,6 +186,7 @@ import {
   InlineAlert,
   InlineGroup,
   Link,
+  LineChart,
   Meter,
   NumberField,
   ProcessTracker,
@@ -215,6 +216,7 @@ import {
 
 const accent: AccentColor = '#2474ff';
 const gap: LayoutGap = 'regular';
+const chartData = [{month: 'Jan', demand: 42}, {month: 'Feb', demand: 51}] as const;
 const choiceOptions = [
   {label: 'Conservative', value: 'conservative'},
   {label: 'Balanced', value: 'balanced'},
@@ -240,6 +242,17 @@ export const provider = (
           </Stack>
         </ResponsiveGrid>
         <Link href="/runs/0284">Open run</Link>
+        <LineChart
+          data={chartData}
+          dataTableLabel="Thermal demand data"
+          description="Monthly thermal demand."
+          emptyState={{title: 'No demand data', description: 'Choose a recorded period.'}}
+          invalidData={{title: 'Invalid demand data', description: 'Correct invalid records.'}}
+          series={[{accessor: 'demand', id: 'demand', label: 'Demand'}]}
+          title="Thermal demand"
+          xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+          yAxis={{label: 'Energy', scale: {type: 'linear'}, unit: 'MWh'}}
+        />
         <FormSection title="Solver setup">
           <FieldGroup legend="Boundary inputs">
             <TextField label="Run name" defaultValue="North chamber" />
@@ -428,6 +441,7 @@ import {
   IconButton,
   InlineAlert,
   Link,
+  LineChart,
   Meter,
   NumberField,
   ProcessTracker,
@@ -461,6 +475,17 @@ createRoot(document.getElementById('root')).render(
           React.createElement('span', null, 'Solver'),
           React.createElement('span', null, 'Adaptive mesh')),
         React.createElement(Link, {href: '/runs/0284'}, 'Open run'),
+        React.createElement(LineChart, {
+          data: [{month: 'Jan', demand: 42}, {month: 'Feb', demand: 51}],
+          dataTableLabel: 'Thermal demand data',
+          description: 'Monthly thermal demand.',
+          emptyState: {title: 'No demand data', description: 'Choose a recorded period.'},
+          invalidData: {title: 'Invalid demand data', description: 'Correct invalid records.'},
+          series: [{accessor: 'demand', id: 'demand', label: 'Demand'}],
+          title: 'Thermal demand',
+          xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
+          yAxis: {label: 'Energy', scale: {type: 'linear'}, unit: 'MWh'},
+        }),
         React.createElement(FieldGroup, {legend: 'Boundary inputs'},
           React.createElement(TextField, {label: 'Run name', defaultValue: 'North chamber'}),
           React.createElement(NumberField, {label: 'Tolerance', locale: 'en-US', defaultValue: 0.0025})),
