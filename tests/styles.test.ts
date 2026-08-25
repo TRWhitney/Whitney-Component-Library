@@ -17,8 +17,16 @@ describe('static appearance styles', () => {
       /\[data-color='warning'\]\s*\{[^}]*--wcl-chart-series-color:\s*var\(--wcl-warning\)/,
     );
     expect(styles).toMatch(
-      /:is\(\[data-wcl-chart-table\], \[data-wcl-chart-annotation-summary\]\)\s*\{[^}]*clip-path:\s*inset\(50%\)/,
+      /:is\(\s*\[data-wcl-chart-table\],\s*\[data-wcl-chart-annotation-summary\],\s*\[data-wcl-chart-reading-announcement\]\s*\)\s*\{[^}]*clip-path:\s*inset\(50%\)/,
     );
+    expect(styles).toMatch(
+      /\[data-wcl-chart-tooltip-layer\]\s*\{[^}]*position:\s*fixed[^}]*pointer-events:\s*none/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-chart-tooltip\]\s*\{[^}]*left:\s*var\(--wcl-chart-tooltip-left\)/,
+    );
+    expect(styles).not.toMatch(/left:\s*clamp\([^;]*100vw - 100%/);
+    expect(styles).toMatch(/\[data-wcl-chart-legend-button\]\s*\{[^}]*cursor:\s*pointer/);
     expect(styles).toMatch(
       /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-chart-axis-rail\]/,
     );
@@ -30,18 +38,20 @@ describe('static appearance styles', () => {
     );
     expect(styles).toMatch(/\[data-wcl-chart-legend-swatch\]\s*\{[^}]*block-size:\s*0\.5rem/);
     expect(styles).toMatch(
-      /:is\(\[data-wcl-chart-tick-label\], \[data-wcl-chart-axis-label\]\)\s*\{[^}]*font-size:\s*16px/,
+      /:is\(\[data-wcl-chart-tick-label\], \[data-wcl-chart-axis-label\]\)\s*\{[^}]*font-size:\s*var\(--wcl-chart-axis-font-size\)/,
     );
-    expect(styles).toMatch(/\[data-wcl-chart-annotation-label\]\s*\{[^}]*font-size:\s*14px/);
+    expect(styles).toMatch(
+      /\[data-wcl-chart-annotation-label\]\s*\{[^}]*font-size:\s*calc\(var\(--wcl-chart-axis-font-size\) \* 0\.875\)/,
+    );
     expect(styles).toMatch(/\[data-wcl-chart-legend\]\s*\{[^}]*font-size:\s*0\.875rem/);
     expect(styles).toMatch(
-      /\[data-wcl-chart-bar\]\s*\{[^}]*fill:\s*color-mix\(in oklch, var\(--wcl-chart-series-color\) 30%, var\(--wcl-surface\)\)[^}]*stroke-width:\s*1\.75/,
+      /\[data-wcl-chart-bar\]\s*\{[^}]*fill:\s*color-mix\(in oklch, var\(--wcl-chart-series-color\) 30%, var\(--wcl-surface\)\)[^}]*stroke-width:\s*calc\(var\(--wcl-chart-line-width\) \* 0\.7\)/,
     );
     expect(styles).toMatch(
       /\[data-wcl-chart-area\]\s*\{[^}]*fill:\s*color-mix\(in oklch, var\(--wcl-chart-series-color\) 18%, transparent\)/,
     );
     expect(styles).toMatch(
-      /:is\(\[data-wcl-chart-line\], \[data-wcl-chart-legend-line\]\)\s*\{[^}]*stroke-width:\s*2\.5/,
+      /\[data-wcl-chart-line\]\s*\{[^}]*stroke-width:\s*var\(--wcl-chart-line-width\)/,
     );
     expect(styles).toMatch(
       /@media\s*\(forced-colors:\s*active\)[\s\S]*?:is\(\[data-wcl-chart-line\], \[data-wcl-chart-legend-line\]\)\s*\{[^}]*fill:\s*none/,
@@ -535,6 +545,26 @@ describe('static appearance styles', () => {
     );
     expect(styles).toMatch(
       /@media\s*\(forced-colors:\s*active\)[\s\S]*@layer wcl\.components[\s\S]*\[data-wcl-surface\][\s\S]*box-shadow:\s*none/,
+    );
+  });
+
+  it('gives overflowing charts the ScrollRegion scrollbar states', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const chartFrame = styles.match(
+      /\[data-wcl-chart-frame\]\[data-overflow='scroll'\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(chartFrame).toContain('scrollbar-color: transparent transparent');
+    expect(chartFrame).toContain('scrollbar-width: thin');
+    expect(chartFrame).toContain('transition: scrollbar-color');
+    expect(styles).toMatch(
+      /\[data-wcl-chart-frame\]\[data-overflow='scroll'\]\[data-scrollbar-active\][\s\S]*scrollbar-color:\s*var\(--wcl-border-strong\) transparent/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-chart-frame\]\[data-overflow='scroll'\]\s*\{[^}]*transition:\s*none/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-chart-frame\]\[data-overflow='scroll'\]\s*\{[^}]*scrollbar-color:\s*CanvasText Canvas/,
     );
   });
 

@@ -11,11 +11,25 @@ import {
   type ScaleTime,
 } from 'd3-scale';
 import {area as createArea, curveLinear, curveStep, line as createLine} from 'd3-shape';
-import {useId, type CSSProperties, type ReactElement, type ReactNode} from 'react';
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FocusEvent,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
+import {createPortal} from 'react-dom';
 
 import {EmptyState} from '../feedback/empty-state.js';
 import {InlineAlert} from '../feedback/alerts.js';
 import {Spinner} from '../feedback/spinner.js';
+import {useScrollbarActivity} from '../scrollbar-activity.js';
 import type {
   AreaChartProps,
   BarChartProps,
@@ -35,6 +49,7 @@ import type {
   ChartStacking,
   ChartStateCopy,
   ChartStatus,
+  ChartTone,
   ChartValueAxis,
   ColumnChartProps,
   LineChartProps,
@@ -43,15 +58,23 @@ import type {
 
 type ChartFrameStyles = CSSProperties & {
   '--wcl-chart-aspect-ratio': number;
+  '--wcl-chart-axis-font-size': string;
+  '--wcl-chart-grid-width': string;
+  '--wcl-chart-line-width': string;
   '--wcl-chart-minimum-height': string;
   '--wcl-chart-minimum-width': string;
+  '--wcl-chart-point-radius': string;
+  '--wcl-chart-point-stroke-width': string;
+};
+
+type ChartTooltipStyles = CSSProperties & {
+  '--wcl-chart-tooltip-left': string;
+  '--wcl-chart-tooltip-y': string;
 };
 
 const viewWidth = 640;
 const viewHeight = 360;
-const plot = {bottom: 306, left: 140, right: 620, top: 18} as const;
-const plotWidth = plot.right - plot.left;
-const plotHeight = plot.bottom - plot.top;
+const compactPlot = {bottom: 306, left: 60, right: 620, top: 18} as const;
 const defaultColors: readonly ChartColor[] = [
   'accent',
   'series-2',
@@ -62,6 +85,32 @@ const defaultColors: readonly ChartColor[] = [
 ];
 
 type SeriesKind = 'area' | 'bar' | 'column' | 'line';
+
+interface PlotBounds {
+  readonly bottom: number;
+  readonly left: number;
+  readonly right: number;
+  readonly top: number;
+}
+
+interface PresentationMetrics {
+  readonly canvasWidth: number;
+  readonly fontSize: number;
+  readonly gridWidth: number;
+  readonly lineWidth: number;
+  readonly pointRadius: number;
+  readonly pointStrokeWidth: number;
+  readonly staggerLabels: boolean;
+  readonly viewScale: number;
+}
+
+function plotWidth(plot: PlotBounds): number {
+  return plot.right - plot.left;
+}
+
+function plotHeight(plot: PlotBounds): number {
+  return plot.bottom - plot.top;
+}
 
 interface InternalSeries<Datum extends object> {
   readonly accessor: ChartAccessor<Datum, number>;
@@ -78,6 +127,18 @@ interface PreparedRow<Datum extends object, Category extends ChartDomainValue> {
   readonly datum: Datum;
   readonly index: number;
   readonly values: readonly number[];
+}
+
+interface ChartReading {
+  readonly index: number;
+  readonly pointer?: {readonly x: number; readonly y: number};
+  readonly seriesId?: string;
+}
+
+interface ReadingReference {
+  readonly label: string;
+  readonly tone: ChartTone;
+  readonly value: number;
 }
 
 interface Projection<Value extends ChartDomainValue> {
@@ -218,7 +279,7 @@ function createProjection<Value extends ChartDomainValue>(
 ): Projection<Value> {
   if (scale.type === 'categorical') {
     const domain = [...(scale.domain ?? stableDomain(values))];
-    const ticks = categoricalTicks(domain, tickCount);
+    const ticks = domain;
     if (useBands) {
       const band: ScaleBand<Value> = scaleBand<Value>().domain(domain).range(range).padding(0.18);
       return {
@@ -281,17 +342,6 @@ function createProjection<Value extends ChartDomainValue>(
   };
 }
 
-function categoricalTicks<Value>(domain: readonly Value[], requestedCount: number): Value[] {
-  const count = Math.max(1, Math.floor(requestedCount));
-  if (domain.length <= count) return [...domain];
-  if (count === 1) return domain[0] === undefined ? [] : [domain[0]];
-  const lastIndex = domain.length - 1;
-  return Array.from(
-    {length: count},
-    (_, index) => domain[Math.round((index * lastIndex) / (count - 1))]!,
-  ).filter((value, index, values) => index === 0 || value !== values[index - 1]);
-}
-
 function valueDomain<Datum extends object, Category extends ChartDomainValue>(
   rows: readonly PreparedRow<Datum, Category>[],
   layout: ChartBarLayout | ChartStacking,
@@ -347,33 +397,121 @@ function truncateTickLabel(label: string, maximumCharacters: number): string {
   return `${characters.slice(0, prefixLength).join('')}…${characters.slice(-suffixLength).join('')}`;
 }
 
+function estimatedUtilityTextWidth(label: string): number {
+  return [...label].reduce((width, character) => {
+    if (character === ' ') return width + 5.25;
+    if (/[1Iil.,:|]/.test(character)) return width + 5;
+    if (/[MW@%]/.test(character)) return width + 12.5;
+    return width + 9.25;
+  }, 0);
+}
+
+function plotForPresentation(presentation: PresentationMetrics): PlotBounds {
+  const axisFontSize = presentation.fontSize / presentation.viewScale;
+  const tickOffset = axisFontSize * (presentation.staggerLabels ? 1.75 : 1.125);
+  const labelGap = axisFontSize * 1.45;
+  return {
+    ...compactPlot,
+    bottom: Math.min(compactPlot.bottom, viewHeight - 7 - tickOffset - labelGap),
+  };
+}
+
+function plotForYAxisLabels(
+  labels: readonly string[],
+  fontScale: number,
+  bounds: PlotBounds,
+): PlotBounds {
+  const widestLabel = Math.max(0, ...labels.map(estimatedUtilityTextWidth)) * fontScale;
+  const left = Math.max(compactPlot.left, Math.min(140, Math.ceil(widestLabel + 39)));
+  return {...bounds, left};
+}
+
+function clamp(minimum: number, value: number, maximum: number): number {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+function inheritedDirection(element: HTMLElement): 'ltr' | 'rtl' {
+  const computedDirection = element.ownerDocument.defaultView?.getComputedStyle(element).direction;
+  if (computedDirection === 'ltr' || computedDirection === 'rtl') return computedDirection;
+  return element.closest<HTMLElement>('[dir]')?.dir.toLowerCase() === 'rtl' ? 'rtl' : 'ltr';
+}
+
+function estimatedLabelWidth(label: string, fontSize: number): number {
+  return [...label].length * fontSize * 0.62;
+}
+
+function presentationMetrics(
+  availableWidth: number,
+  minimumWidth: number,
+  categoryLabels: readonly string[],
+): PresentationMetrics {
+  const fontSize = clamp(14, (availableWidth / viewWidth) * 16, 18);
+  const lineWidth = clamp(2, (availableWidth / viewWidth) * 2.5, 3.25);
+  const pointRadius = clamp(3.25, (availableWidth / viewWidth) * 4, 5);
+  const pointStrokeWidth = clamp(1.75, (availableWidth / viewWidth) * 2, 2.5);
+  const gridWidth = clamp(1, (availableWidth / viewWidth) * 1.15, 1.4);
+  const labelWidths = categoryLabels.map((label) => estimatedLabelWidth(label, fontSize));
+  const maximumLabelWidth = Math.max(...labelWidths, 0);
+  const edgePadding = Math.max(
+    (labelWidths[0] ?? 0) / 2,
+    (labelWidths[labelWidths.length - 1] ?? 0) / 2,
+  );
+  const intervals = Math.max(0, categoryLabels.length - 1);
+  const fixedPlotSpace = 104 + edgePadding * 2;
+  const singleRowWidth = fixedPlotSpace + intervals * (maximumLabelWidth + 12);
+  const staggerLabels = categoryLabels.length > 0 && singleRowWidth > availableWidth;
+  const contentWidth =
+    categoryLabels.length === 0
+      ? 0
+      : fixedPlotSpace +
+        intervals * (staggerLabels ? maximumLabelWidth / 2 + 12 : maximumLabelWidth + 12);
+  const canvasWidth = Math.ceil(Math.max(availableWidth, minimumWidth, contentWidth));
+  return {
+    canvasWidth,
+    fontSize,
+    gridWidth,
+    lineWidth,
+    pointRadius,
+    pointStrokeWidth,
+    staggerLabels,
+    viewScale: canvasWidth / viewWidth,
+  };
+}
+
 function tickLabelCharacterLimit(
   horizontal: boolean,
   centered: boolean,
+  fontSize: number,
   positions: readonly number[],
   index: number,
+  staggered: boolean,
+  viewScale: number,
 ): number {
-  if (!horizontal) return 11;
+  if (!horizontal) return 14;
   if (positions.length < 2) return 18;
+  const stride = staggered ? 2 : 1;
   const previousGap =
-    index === 0 ? Number.POSITIVE_INFINITY : positions[index]! - positions[index - 1]!;
+    index < stride ? Number.POSITIVE_INFINITY : positions[index]! - positions[index - stride]!;
   const nextGap =
-    index === positions.length - 1
+    index + stride >= positions.length
       ? Number.POSITIVE_INFINITY
-      : positions[index + 1]! - positions[index]!;
+      : positions[index + stride]! - positions[index]!;
   const position = positions[index]!;
   const availableWidth = Math.min(
     previousGap,
     nextGap,
     ...(centered ? [position * 2, (viewWidth - position) * 2] : []),
   );
-  return Math.max(6, Math.min(18, Math.floor(availableWidth / 10)));
+  return Math.max(6, Math.min(18, Math.floor((availableWidth * viewScale) / (fontSize * 0.62))));
 }
 
 function Axis<Value extends ChartDomainValue>({
   axis,
   placement,
+  plot,
   projection,
+  presentation,
+  staggerLabels,
 }: {
   readonly axis: {
     readonly formatTick?: (tick: Value) => string;
@@ -383,7 +521,10 @@ function Axis<Value extends ChartDomainValue>({
     readonly unit?: string;
   };
   readonly placement: 'x' | 'y';
+  readonly plot: PlotBounds;
   readonly projection: Projection<Value>;
+  readonly presentation: PresentationMetrics;
+  readonly staggerLabels?: boolean;
 }): ReactElement {
   const horizontal = placement === 'x';
   const centerCategoricalLabels = horizontal && axis.scale.type === 'categorical';
@@ -407,7 +548,15 @@ function Axis<Value extends ChartDomainValue>({
           axis.scale.type === 'categorical'
             ? truncateTickLabel(
                 fullLabel,
-                tickLabelCharacterLimit(horizontal, centerCategoricalLabels, tickPositions, index),
+                tickLabelCharacterLimit(
+                  horizontal,
+                  centerCategoricalLabels,
+                  presentation.fontSize,
+                  tickPositions,
+                  index,
+                  staggerLabels ?? false,
+                  presentation.viewScale,
+                ),
               )
             : fullLabel;
         const textAnchor = centerCategoricalLabels
@@ -441,10 +590,19 @@ function Axis<Value extends ChartDomainValue>({
               y2={horizontal ? plot.bottom + 5 : position}
             />
             <text
+              data-label-row={staggerLabels && horizontal ? (sourceIndex % 2) + 1 : undefined}
               data-wcl-chart-tick-label=""
               textAnchor={textAnchor}
               x={horizontal ? position : plot.left - 9}
-              y={horizontal ? plot.bottom + 18 : position + 4}
+              y={
+                horizontal
+                  ? staggerLabels
+                    ? plot.bottom +
+                      (presentation.fontSize / presentation.viewScale) *
+                        (sourceIndex % 2 === 0 ? 0.875 : 1.75)
+                    : plot.bottom + (presentation.fontSize / presentation.viewScale) * 1.125
+                  : position + 4
+              }
             >
               {label}
             </text>
@@ -454,9 +612,9 @@ function Axis<Value extends ChartDomainValue>({
       <text
         data-wcl-chart-axis-label=""
         textAnchor="middle"
-        transform={horizontal ? undefined : `rotate(-90 14 ${plot.top + plotHeight / 2})`}
-        x={horizontal ? plot.left + plotWidth / 2 : 14}
-        y={horizontal ? viewHeight - 7 : plot.top + plotHeight / 2}
+        transform={horizontal ? undefined : `rotate(-90 14 ${plot.top + plotHeight(plot) / 2})`}
+        x={horizontal ? plot.left + plotWidth(plot) / 2 : 14}
+        y={horizontal ? viewHeight - 7 : plot.top + plotHeight(plot) / 2}
       >
         {axis.label}
         {axis.unit === undefined ? '' : ` (${axis.unit})`}
@@ -480,17 +638,339 @@ function coordinates<Datum extends object, Category extends ChartDomainValue>(
   return {end: start + Math.max(0, value) / divisor, start};
 }
 
-function Marks<Datum extends object, Category extends ChartDomainValue>({
+function displayedValues<Datum extends object, Category extends ChartDomainValue>(
+  row: PreparedRow<Datum, Category>,
+  layout: ChartBarLayout | ChartStacking,
+): readonly number[] {
+  if (layout !== 'normalized') return row.values;
+  const total = row.values.reduce((sum, value) => sum + Math.max(0, value), 0) || 1;
+  return row.values.map((value) => value / total);
+}
+
+function formatReadingValue(value: number, valueAxis: ChartValueAxis): string {
+  const formatted = axisTickLabel(value, valueAxis);
+  const unit = valueAxis.unit?.trim();
+  if (unit === undefined || unit.length === 0 || formatted.trimEnd().endsWith(unit))
+    return formatted;
+  return `${formatted} ${unit}`;
+}
+
+function nearestReadingIndex<Datum extends object, Category extends ChartDomainValue>(
+  rows: readonly PreparedRow<Datum, Category>[],
+  projection: Projection<Category>,
+  coordinate: number,
+): number | null {
+  let nearestIndex: number | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  rows.forEach((row, index) => {
+    const position = projection.position(row.category);
+    if (position === undefined) return;
+    const distance = Math.abs(position - coordinate);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = index;
+    }
+  });
+  return nearestIndex;
+}
+
+function svgViewport(svg: SVGSVGElement): {
+  readonly left: number;
+  readonly scale: number;
+  readonly top: number;
+} {
+  const rectangle = svg.getBoundingClientRect();
+  const scale = Math.min(rectangle.width / viewWidth, rectangle.height / viewHeight);
+  if (!Number.isFinite(scale) || scale <= 0) return {left: 0, scale: 1, top: 0};
+  return {
+    left: rectangle.left + (rectangle.width - viewWidth * scale) / 2,
+    scale,
+    top: rectangle.top + (rectangle.height - viewHeight * scale) / 2,
+  };
+}
+
+function viewBoxPointFromPointer(
+  svg: SVGSVGElement,
+  clientX: number,
+  clientY: number,
+): {readonly x: number; readonly y: number} {
+  const viewport = svgViewport(svg);
+  return {
+    x: (clientX - viewport.left) / viewport.scale,
+    y: (clientY - viewport.top) / viewport.scale,
+  };
+}
+
+function clientPointFromViewBox(
+  svg: SVGSVGElement | null,
+  x: number,
+  y: number,
+): {readonly x: number; readonly y: number} {
+  if (svg === null) return {x, y};
+  const viewport = svgViewport(svg);
+  return {x: viewport.left + x * viewport.scale, y: viewport.top + y * viewport.scale};
+}
+
+function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>({
   categoryPlacement,
   categoryProjection,
+  emphasizedSeriesId,
   layout,
+  plot,
+  reading,
   rows,
   series,
   valueProjection,
 }: {
   readonly categoryPlacement: 'x' | 'y';
   readonly categoryProjection: Projection<Category>;
+  readonly emphasizedSeriesId: string | undefined;
   readonly layout: ChartBarLayout | ChartStacking;
+  readonly plot: PlotBounds;
+  readonly reading: ChartReading;
+  readonly rows: readonly PreparedRow<Datum, Category>[];
+  readonly series: readonly InternalSeries<Datum>[];
+  readonly valueProjection: Projection<number>;
+}): ReactElement | null {
+  const row = rows[reading.index];
+  if (row === undefined) return null;
+  const category = categoryProjection.position(row.category);
+  if (category === undefined) return null;
+  return (
+    <g data-wcl-chart-reading="">
+      <line
+        data-wcl-chart-reading-needle=""
+        x1={categoryPlacement === 'x' ? category : plot.left}
+        x2={categoryPlacement === 'x' ? category : plot.right}
+        y1={categoryPlacement === 'x' ? plot.top : category}
+        y2={categoryPlacement === 'x' ? plot.bottom : category}
+      />
+      {series.map((item, seriesIndex) => {
+        const plottedValue = coordinates(row, seriesIndex, layout).end;
+        const value = valueProjection.position(plottedValue);
+        if (value === undefined) return null;
+        return (
+          <circle
+            cx={categoryPlacement === 'x' ? category : value}
+            cy={categoryPlacement === 'x' ? value : category}
+            data-active={emphasizedSeriesId === item.id ? '' : undefined}
+            data-color={item.color}
+            data-muted={
+              emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
+            }
+            data-series-index={seriesIndex}
+            data-wcl-chart-reading-node=""
+            key={item.id}
+            r="4.5"
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+function ReadingTooltip<Datum extends object, Category extends ChartDomainValue>({
+  categoryAxis,
+  categoryPlacement,
+  categoryProjection,
+  emphasizedSeriesId,
+  layout,
+  plot,
+  portalTarget,
+  references,
+  reading,
+  rows,
+  series,
+  valueAxis,
+  valueProjection,
+  svg,
+}: {
+  readonly categoryAxis: ChartDataAxis<Datum, Category>;
+  readonly categoryPlacement: 'x' | 'y';
+  readonly categoryProjection: Projection<Category>;
+  readonly emphasizedSeriesId: string | undefined;
+  readonly layout: ChartBarLayout | ChartStacking;
+  readonly plot: PlotBounds;
+  readonly portalTarget: Element | null;
+  readonly references: readonly ReadingReference[];
+  readonly reading: ChartReading;
+  readonly rows: readonly PreparedRow<Datum, Category>[];
+  readonly series: readonly InternalSeries<Datum>[];
+  readonly valueAxis: ChartValueAxis;
+  readonly valueProjection: Projection<number>;
+  readonly svg: SVGSVGElement | null;
+}): ReactElement | null {
+  const row = rows[reading.index];
+  const values = row === undefined ? [] : displayedValues(row, layout);
+  const formattedValues = series.map((_, seriesIndex) =>
+    formatReadingValue(values[seriesIndex] ?? 0, valueAxis),
+  );
+  const formattedReferenceValues = references.map((reference) =>
+    formatReadingValue(reference.value, valueAxis),
+  );
+  const viewportWidth = typeof window === 'undefined' ? viewWidth : window.innerWidth;
+  const tooltipContentKey = [
+    row === undefined ? '' : axisTickLabel(row.category, categoryAxis),
+    emphasizedSeriesId ?? '',
+    ...series.flatMap((item, seriesIndex) => [item.label, formattedValues[seriesIndex] ?? '']),
+    ...references.flatMap((reference, referenceIndex) => [
+      reference.label,
+      formattedReferenceValues[referenceIndex] ?? '',
+    ]),
+  ].join('\u0000');
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipSize, setTooltipSize] = useState<{
+    readonly height: number;
+    readonly width: number;
+  }>();
+  useLayoutEffect(() => {
+    const tooltip = tooltipRef.current;
+    if (tooltip === null) return;
+    const bounds = tooltip.getBoundingClientRect();
+    if (bounds.width <= 0 || bounds.height <= 0) return;
+    setTooltipSize((current) =>
+      current?.width === bounds.width && current.height === bounds.height
+        ? current
+        : {height: bounds.height, width: bounds.width},
+    );
+  }, [tooltipContentKey, viewportWidth]);
+  if (row === undefined) return null;
+  const category = categoryProjection.position(row.category);
+  if (category === undefined) return null;
+  const plottedPositions = row.values.flatMap((_, seriesIndex) => {
+    const position = valueProjection.position(coordinates(row, seriesIndex, layout).end);
+    return position === undefined ? [] : [position];
+  });
+  const plotAnchorX =
+    categoryPlacement === 'x'
+      ? category
+      : Math.max(plot.left, ...plottedPositions, plot.left + plotWidth(plot) / 2);
+  const plotAnchorY =
+    categoryPlacement === 'x'
+      ? Math.min(plot.bottom, ...plottedPositions, plot.top + plotHeight(plot) / 2)
+      : category;
+  const categoryAnchor = clientPointFromViewBox(svg, plotAnchorX, plotAnchorY);
+  const anchorX = reading.pointer?.x ?? categoryAnchor.x;
+  const anchorY = reading.pointer?.y ?? categoryAnchor.y;
+  const viewportHeight = typeof window === 'undefined' ? viewHeight : window.innerHeight;
+  const tooltipGap = 12;
+  const viewportPadding = 8;
+  const estimatedTooltipWidth = Math.min(304, Math.max(176, viewportWidth - viewportPadding * 2));
+  const tooltipWidth = tooltipSize?.width ?? estimatedTooltipWidth;
+  const tooltipHeight = tooltipSize?.height ?? 50 + (series.length + references.length) * 25;
+  const availableBefore = anchorX - tooltipGap;
+  const availableAfter = viewportWidth - anchorX - tooltipGap;
+  const horizontalPlacement =
+    availableAfter >= tooltipWidth || availableAfter >= availableBefore ? 'start' : 'end';
+  const preferredLeft =
+    horizontalPlacement === 'start' ? anchorX + tooltipGap : anchorX - tooltipGap - tooltipWidth;
+  const tooltipLeft = clamp(
+    viewportPadding,
+    preferredLeft,
+    Math.max(viewportPadding, viewportWidth - tooltipWidth - viewportPadding),
+  );
+  const style: ChartTooltipStyles = {
+    '--wcl-chart-tooltip-left': `${tooltipLeft}px`,
+    '--wcl-chart-tooltip-y': `${anchorY}px`,
+  };
+  if (portalTarget === null) return null;
+  return createPortal(
+    <div data-wcl-chart-tooltip-layer="">
+      <div
+        data-horizontal-placement={horizontalPlacement}
+        data-vertical-placement={
+          anchorY < tooltipHeight / 2 + 12
+            ? 'start'
+            : anchorY + tooltipHeight / 2 + 12 > viewportHeight
+              ? 'end'
+              : 'center'
+        }
+        data-wcl-chart-tooltip=""
+        ref={tooltipRef}
+        role="tooltip"
+        style={style}
+      >
+        <strong>{axisTickLabel(row.category, categoryAxis)}</strong>
+        <dl>
+          {series.map((item, seriesIndex) => (
+            <div data-active={emphasizedSeriesId === item.id ? '' : undefined} key={item.id}>
+              <dt>
+                <svg
+                  aria-hidden="true"
+                  data-color={item.color}
+                  data-series-index={seriesIndex}
+                  data-wcl-chart-tooltip-swatch=""
+                  focusable="false"
+                  viewBox="0 0 20 8"
+                >
+                  <line data-wcl-chart-legend-line="" x1="0" x2="20" y1="4" y2="4" />
+                </svg>
+                {item.label}
+              </dt>
+              <dd>{formattedValues[seriesIndex]}</dd>
+            </div>
+          ))}
+          {references.map((reference, referenceIndex) => (
+            <div
+              data-wcl-chart-tooltip-reference=""
+              key={`${reference.label}-${reference.value}-${referenceIndex}`}
+            >
+              <dt>
+                <svg
+                  aria-hidden="true"
+                  data-tone={reference.tone}
+                  data-wcl-chart-tooltip-swatch=""
+                  focusable="false"
+                  viewBox="0 0 20 8"
+                >
+                  <line data-wcl-chart-annotation="" x1="0" x2="20" y1="4" y2="4" />
+                </svg>
+                {reference.label}
+              </dt>
+              <dd>{formattedReferenceValues[referenceIndex]}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>,
+    portalTarget,
+  );
+}
+
+function readingReferences(
+  annotations: readonly ChartAnnotation<ChartDomainValue, ChartDomainValue>[],
+  categoryPlacement: 'x' | 'y',
+): readonly ReadingReference[] {
+  return annotations.flatMap((annotation) =>
+    annotation.kind === 'line' &&
+    annotation.axis !== categoryPlacement &&
+    typeof annotation.value === 'number'
+      ? [
+          {
+            label: annotation.label,
+            tone: annotation.tone ?? 'neutral',
+            value: annotation.value,
+          },
+        ]
+      : [],
+  );
+}
+
+function Marks<Datum extends object, Category extends ChartDomainValue>({
+  categoryPlacement,
+  categoryProjection,
+  emphasizedSeriesId,
+  layout,
+  plot,
+  rows,
+  series,
+  valueProjection,
+}: {
+  readonly categoryPlacement: 'x' | 'y';
+  readonly categoryProjection: Projection<Category>;
+  readonly emphasizedSeriesId: string | undefined;
+  readonly layout: ChartBarLayout | ChartStacking;
+  readonly plot: PlotBounds;
   readonly rows: readonly PreparedRow<Datum, Category>[];
   readonly series: readonly InternalSeries<Datum>[];
   readonly valueProjection: Projection<number>;
@@ -512,13 +992,25 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
             .y((row) => valueProjection.position(row.values[seriesIndex] ?? 0) ?? plot.bottom)
             .curve(item.curve === 'step' ? curveStep : curveLinear)(rows);
           return (
-            <g data-color={color} data-series-index={seriesIndex} key={item.id}>
+            <g
+              data-color={color}
+              data-emphasized={emphasizedSeriesId === item.id ? '' : undefined}
+              data-muted={
+                emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
+              }
+              data-series-id={item.id}
+              data-series-index={seriesIndex}
+              data-wcl-chart-series=""
+              key={item.id}
+            >
+              <path d={path ?? undefined} data-series={item.id} data-wcl-chart-line-hit-target="" />
               <path d={path ?? undefined} data-series={item.id} data-wcl-chart-line="" />
               {item.showPoints
-                ? rows.map((row) => (
+                ? rows.map((row, rowIndex) => (
                     <circle
                       cx={categoryProjection.position(row.category)}
                       cy={valueProjection.position(row.values[seriesIndex] ?? 0)}
+                      data-row-index={rowIndex}
                       data-series={item.id}
                       data-wcl-chart-point=""
                       key={`${item.id}-${row.index}`}
@@ -546,15 +1038,21 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
             <path
               d={path ?? undefined}
               data-color={color}
+              data-emphasized={emphasizedSeriesId === item.id ? '' : undefined}
+              data-muted={
+                emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
+              }
               data-series={item.id}
+              data-series-id={item.id}
               data-series-index={seriesIndex}
               data-wcl-chart-area=""
+              data-wcl-chart-series=""
               key={item.id}
             />
           );
         }
 
-        const availableLength = isHorizontal ? plotHeight : plotWidth;
+        const availableLength = isHorizontal ? plotHeight(plot) : plotWidth(plot);
         const groupWidth =
           categoryProjection.bandwidth > 0
             ? categoryProjection.bandwidth
@@ -563,8 +1061,18 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
         const barIndex = barSeries.findIndex((bar) => bar.id === item.id);
         const barWidth = grouped ? groupWidth / Math.max(barSeries.length, 1) : groupWidth;
         return (
-          <g data-color={color} data-series-index={seriesIndex} key={item.id}>
-            {rows.map((row) => {
+          <g
+            data-color={color}
+            data-emphasized={emphasizedSeriesId === item.id ? '' : undefined}
+            data-muted={
+              emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
+            }
+            data-series-id={item.id}
+            data-series-index={seriesIndex}
+            data-wcl-chart-series=""
+            key={item.id}
+          >
+            {rows.map((row, rowIndex) => {
               const category = categoryProjection.position(row.category) ?? 0;
               const {end, start} = coordinates(row, seriesIndex, layout);
               const startPosition = valueProjection.position(start) ?? 0;
@@ -573,6 +1081,7 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
                 category - groupWidth / 2 + (grouped ? Math.max(barIndex, 0) * barWidth : 0);
               return (
                 <rect
+                  data-row-index={rowIndex}
                   data-series={item.id}
                   data-wcl-chart-bar=""
                   height={isHorizontal ? barWidth : Math.abs(startPosition - endPosition)}
@@ -595,12 +1104,14 @@ function Annotations<Category extends ChartDomainValue>({
   categoryPlacement,
   categoryProjection,
   layer,
+  plot,
   valueProjection,
 }: {
   readonly annotations: readonly ChartAnnotation<ChartDomainValue, ChartDomainValue>[];
   readonly categoryPlacement: 'x' | 'y';
   readonly categoryProjection: Projection<Category>;
   readonly layer: 'background' | 'foreground';
+  readonly plot: PlotBounds;
   readonly valueProjection: Projection<number>;
 }): ReactElement {
   const projectCategory = (value: ChartDomainValue): number | undefined =>
@@ -673,8 +1184,8 @@ function Annotations<Category extends ChartDomainValue>({
           <g data-tone={tone} key={key}>
             <rect
               data-wcl-chart-annotation=""
-              height={annotation.axis === 'x' ? plotHeight : Math.abs(to - from)}
-              width={annotation.axis === 'x' ? Math.abs(to - from) : plotWidth}
+              height={annotation.axis === 'x' ? plotHeight(plot) : Math.abs(to - from)}
+              width={annotation.axis === 'x' ? Math.abs(to - from) : plotWidth(plot)}
               x={annotation.axis === 'x' ? Math.min(from, to) : plot.left}
               y={annotation.axis === 'x' ? plot.top : Math.min(from, to)}
             />
@@ -778,25 +1289,59 @@ function AnnotationSummary<Datum extends object, Category extends ChartDomainVal
 }
 
 function Legend<Datum extends object>({
+  emphasizedSeriesId,
   legend,
+  onClear,
+  onPin,
+  onTransientChange,
+  pinnedSeriesId,
   series,
 }: {
+  readonly emphasizedSeriesId: string | undefined;
   readonly legend: ChartLegend;
+  readonly onClear: () => void;
+  readonly onPin: (seriesId: string) => void;
+  readonly onTransientChange: (seriesId: string | null) => void;
+  readonly pinnedSeriesId: string | null;
   readonly series: readonly InternalSeries<Datum>[];
 }): ReactElement {
   return (
     <ul aria-label={legend.label} data-wcl-chart-legend="">
       {series.map((item, index) => (
-        <li data-color={item.color} data-series-index={index} key={item.id}>
-          <svg
-            aria-hidden="true"
-            data-wcl-chart-legend-swatch=""
-            focusable="false"
-            viewBox="0 0 20 8"
+        <li
+          data-color={item.color}
+          data-emphasized={emphasizedSeriesId === item.id ? '' : undefined}
+          data-muted={
+            emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
+          }
+          data-series-index={index}
+          key={item.id}
+        >
+          <button
+            aria-pressed={pinnedSeriesId === item.id}
+            data-wcl-chart-legend-button=""
+            onBlur={() => onTransientChange(null)}
+            onClick={() => onPin(item.id)}
+            onFocus={() => onTransientChange(item.id)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Escape') return;
+              event.preventDefault();
+              onClear();
+            }}
+            onMouseEnter={() => onTransientChange(item.id)}
+            onMouseLeave={() => onTransientChange(null)}
+            type="button"
           >
-            <line data-wcl-chart-legend-line="" x1="0" x2="20" y1="4" y2="4" />
-          </svg>
-          {item.label}
+            <svg
+              aria-hidden="true"
+              data-wcl-chart-legend-swatch=""
+              focusable="false"
+              viewBox="0 0 20 8"
+            >
+              <line data-wcl-chart-legend-line="" x1="0" x2="20" y1="4" y2="4" />
+            </svg>
+            {item.label}
+          </button>
         </li>
       ))}
     </ul>
@@ -969,7 +1514,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   invalidData,
   layout,
   legend,
-  minimumSize = {height: 220, width: 480},
+  minimumSize = {height: 180, width: 320},
   overflow = 'scroll',
   rootAttribute,
   series,
@@ -999,6 +1544,16 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   });
   const titleId = useId();
   const descriptionId = useId();
+  const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
+  const [frameElement, setFrameElement] = useState<HTMLDivElement | null>(null);
+  const [availableWidth, setAvailableWidth] = useState<number | null>(null);
+  const [svgElement, setSvgElement] = useState<SVGSVGElement | null>(null);
+  const [keyboardReading, setKeyboardReading] = useState<ChartReading | null>(null);
+  const [pointerReading, setPointerReading] = useState<ChartReading | null>(null);
+  const [touchReading, setTouchReading] = useState<ChartReading | null>(null);
+  const [transientLegendSeriesId, setTransientLegendSeriesId] = useState<string | null>(null);
+  const [pinnedLegendSeriesId, setPinnedLegendSeriesId] = useState<string | null>(null);
+  const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
   const prepared = prepareRows(data, categoryAxis, series, valueAxis, layout);
   const isLoading = status.kind === 'loading';
   const isError = status.kind === 'error';
@@ -1008,11 +1563,55 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   if (rootAttribute === 'data-wcl-bar-chart' || rootAttribute === 'data-wcl-column-chart') {
     rootProps['data-layout'] = layout;
   }
+  const categoryLabels =
+    categoryPlacement === 'x' && categoryAxis.scale.type === 'categorical'
+      ? (categoryAxis.scale.domain ?? stableDomain(prepared.rows.map((row) => row.category))).map(
+          (category) => truncateTickLabel(axisTickLabel(category, categoryAxis), 18),
+        )
+      : [];
+  const presentation = presentationMetrics(
+    availableWidth ?? minimumSize.width,
+    minimumSize.width,
+    categoryLabels,
+  );
+  const hasLocalOverflow =
+    overflow === 'scroll' && presentation.canvasWidth > (availableWidth ?? minimumSize.width);
   const frameStyle: ChartFrameStyles = {
     '--wcl-chart-aspect-ratio': aspectRatio,
+    '--wcl-chart-axis-font-size': `${presentation.fontSize / presentation.viewScale}px`,
+    '--wcl-chart-grid-width': `${presentation.gridWidth}px`,
+    '--wcl-chart-line-width': `${presentation.lineWidth}px`,
     '--wcl-chart-minimum-height': `${minimumSize.height}px`,
-    '--wcl-chart-minimum-width': `${minimumSize.width}px`,
+    '--wcl-chart-minimum-width': `${presentation.canvasWidth}px`,
+    '--wcl-chart-point-radius': `${presentation.pointRadius / presentation.viewScale}px`,
+    '--wcl-chart-point-stroke-width': `${presentation.pointStrokeWidth}px`,
   };
+
+  useEffect(() => {
+    if (frameElement === null) return;
+    const measure = (): void => {
+      const nextWidth = frameElement.clientWidth;
+      if (nextWidth <= 0) return;
+      setAvailableWidth((current) => (current === nextWidth ? current : nextWidth));
+    };
+    measure();
+    const ResizeObserverConstructor = frameElement.ownerDocument.defaultView?.ResizeObserver;
+    if (ResizeObserverConstructor === undefined) return;
+    const observer = new ResizeObserverConstructor(measure);
+    observer.observe(frameElement);
+    return () => observer.disconnect();
+  }, [frameElement]);
+
+  useEffect(() => {
+    if (touchReading === null) return;
+    const dismissTouchReading = (event: globalThis.PointerEvent): void => {
+      if (event.target instanceof Node && !rootElement?.contains(event.target)) {
+        setTouchReading(null);
+      }
+    };
+    document.addEventListener('pointerdown', dismissTouchReading);
+    return () => document.removeEventListener('pointerdown', dismissTouchReading);
+  }, [rootElement, touchReading]);
 
   let content: ReactNode;
   if (isLoading) {
@@ -1033,60 +1632,271 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     );
   } else {
     const usesBars = series.some((item) => item.kind === 'bar' || item.kind === 'column');
-    const categoryRange: [number, number] =
-      categoryPlacement === 'x' ? [plot.left, plot.right] : [plot.top, plot.bottom];
-    const valueRange: [number, number] =
-      categoryPlacement === 'x' ? [plot.bottom, plot.top] : [plot.left, plot.right];
-    const categoryProjection = createProjection(
-      categoryAxis.scale,
-      prepared.rows.map((row) => row.category),
-      categoryRange,
-      categoryAxis.tickCount ?? 6,
-      usesBars,
-    );
     const rawDomain = valueDomain(prepared.rows, layout, series);
-    const valueProjection = createProjection(
-      valueAxis.scale,
-      rawDomain,
-      valueRange,
-      valueAxis.tickCount ?? 5,
-      false,
+    const categoryValues = prepared.rows.map((row) => row.category);
+    const createPlotProjections = (bounds: PlotBounds) => ({
+      categoryProjection: createProjection(
+        categoryAxis.scale,
+        categoryValues,
+        categoryPlacement === 'x' ? [bounds.left, bounds.right] : [bounds.top, bounds.bottom],
+        categoryAxis.tickCount ?? 6,
+        usesBars,
+      ),
+      valueProjection: createProjection(
+        valueAxis.scale,
+        rawDomain,
+        categoryPlacement === 'x' ? [bounds.bottom, bounds.top] : [bounds.left, bounds.right],
+        valueAxis.tickCount ?? 5,
+        false,
+      ),
+    });
+    const presentationPlot = plotForPresentation(presentation);
+    const preliminaryProjections = createPlotProjections(presentationPlot);
+    const yAxisLabels =
+      categoryPlacement === 'x'
+        ? preliminaryProjections.valueProjection.ticks.map((tick) => axisTickLabel(tick, valueAxis))
+        : preliminaryProjections.categoryProjection.ticks.map((tick) => {
+            const label = axisTickLabel(tick, categoryAxis);
+            return categoryAxis.scale.type === 'categorical' ? truncateTickLabel(label, 14) : label;
+          });
+    const plot = plotForYAxisLabels(
+      yAxisLabels,
+      presentation.fontSize / presentation.viewScale / 16,
+      presentationPlot,
     );
+    const {categoryProjection, valueProjection} = createPlotProjections(plot);
+    const references = readingReferences(annotations, categoryPlacement);
+    const activeReading = pointerReading ?? touchReading ?? keyboardReading;
+    const availableSeriesId = (seriesId: string | null | undefined): string | undefined =>
+      seriesId !== null && seriesId !== undefined && series.some((item) => item.id === seriesId)
+        ? seriesId
+        : undefined;
+    const validPinnedLegendSeriesId = availableSeriesId(pinnedLegendSeriesId) ?? null;
+    const emphasizedSeriesId =
+      availableSeriesId(pinnedLegendSeriesId) ??
+      availableSeriesId(transientLegendSeriesId) ??
+      availableSeriesId(activeReading?.seriesId);
+    const readingRow = activeReading === null ? undefined : prepared.rows[activeReading.index];
+    const readingValues =
+      readingRow === undefined
+        ? []
+        : displayedValues(readingRow, layout).map((value) => formatReadingValue(value, valueAxis));
+    const readingAnnouncement =
+      readingRow === undefined
+        ? ''
+        : [
+            axisTickLabel(readingRow.category, categoryAxis),
+            ...series.map((item, index) => `${item.label}: ${readingValues[index] ?? ''}`),
+            ...references.map(
+              (reference) =>
+                `${reference.label}: ${formatReadingValue(reference.value, valueAxis)}`,
+            ),
+          ].join('. ');
+    const readingFromPointer = (
+      event: PointerEvent<SVGSVGElement>,
+      followPointer: boolean,
+    ): ChartReading | null => {
+      const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+      if (x < plot.left || x > plot.right || y < plot.top || y > plot.bottom) return null;
+      const target = event.target instanceof Element ? event.target : null;
+      const targetRow = Number(target?.closest('[data-row-index]')?.getAttribute('data-row-index'));
+      const coordinate = categoryPlacement === 'x' ? x : y;
+      const index =
+        Number.isInteger(targetRow) && targetRow >= 0 && targetRow < prepared.rows.length
+          ? targetRow
+          : nearestReadingIndex(prepared.rows, categoryProjection, coordinate);
+      if (index === null) return null;
+      const seriesId = target?.closest('[data-series]')?.getAttribute('data-series') ?? undefined;
+      return {
+        index,
+        ...(followPointer ? {pointer: {x: event.clientX, y: event.clientY}} : {}),
+        ...(seriesId === undefined ? {} : {seriesId}),
+      };
+    };
+    const movePointerReading = (event: PointerEvent<SVGSVGElement>): void => {
+      if (event.pointerType === 'touch') return;
+      setPointerReading(readingFromPointer(event, true));
+    };
+    const retainTouchReading = (event: PointerEvent<SVGSVGElement>): void => {
+      if (event.pointerType !== 'touch') return;
+      const reading = readingFromPointer(event, false);
+      if (reading === null) return;
+      setPointerReading(null);
+      setTouchReading(reading);
+    };
+    const revealCategory = (index: number, frame: HTMLElement | null): void => {
+      if (categoryPlacement !== 'x' || frame === null) return;
+      const row = prepared.rows[index];
+      if (row === undefined) return;
+      const position = categoryProjection.position(row.category);
+      if (position === undefined) return;
+      const maximumScroll = Math.max(0, frame.scrollWidth - frame.clientWidth);
+      if (maximumScroll === 0 || typeof frame.scrollTo !== 'function') return;
+      const categoryCenter = (position / viewWidth) * frame.scrollWidth;
+      const physicalLeft = clamp(0, categoryCenter - frame.clientWidth / 2, maximumScroll);
+      frame.scrollTo({
+        left: inheritedDirection(frame) === 'rtl' ? physicalLeft - maximumScroll : physicalLeft,
+      });
+    };
+    const focusChart = (event: FocusEvent<HTMLDivElement>): void => {
+      if (event.currentTarget === event.target && keyboardReading === null) {
+        revealCategory(0, event.currentTarget.parentElement);
+        setKeyboardReading({index: 0});
+      }
+    };
+    const blurChart = (event: FocusEvent<HTMLDivElement>): void => {
+      if (
+        event.relatedTarget instanceof Node &&
+        event.currentTarget.contains(event.relatedTarget)
+      ) {
+        return;
+      }
+      setKeyboardReading(null);
+    };
+    const readWithKeyboard = (event: KeyboardEvent<HTMLDivElement>): void => {
+      const previousIndex = keyboardReading?.index ?? activeReading?.index ?? 0;
+      let nextIndex: number | null = null;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = prepared.rows.length - 1;
+      if (
+        (categoryPlacement === 'x' && event.key === 'ArrowLeft') ||
+        (categoryPlacement === 'y' && event.key === 'ArrowUp')
+      ) {
+        nextIndex = Math.max(0, previousIndex - 1);
+      }
+      if (
+        (categoryPlacement === 'x' && event.key === 'ArrowRight') ||
+        (categoryPlacement === 'y' && event.key === 'ArrowDown')
+      ) {
+        nextIndex = Math.min(prepared.rows.length - 1, previousIndex + 1);
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setKeyboardReading(null);
+        setPointerReading(null);
+        setTouchReading(null);
+        return;
+      }
+      if (nextIndex === null) return;
+      event.preventDefault();
+      revealCategory(nextIndex, event.currentTarget.parentElement);
+      setKeyboardReading({index: nextIndex});
+      setPointerReading(null);
+      setTouchReading(null);
+    };
     content = (
       <>
         {status.kind === 'partial' ? <Feedback copy={status} kind="partial" /> : null}
         {prepared.invalidCount > 0 ? <Feedback copy={invalidData} kind="invalid" /> : null}
-        {legend === undefined ? null : <Legend legend={legend} series={series} />}
-        <div data-overflow={overflow} data-wcl-chart-frame="" style={frameStyle}>
-          <div data-wcl-chart-canvas="">
+        {legend === undefined ? null : (
+          <Legend
+            emphasizedSeriesId={emphasizedSeriesId}
+            legend={legend}
+            onClear={() => {
+              setPinnedLegendSeriesId(null);
+              setTransientLegendSeriesId(null);
+            }}
+            onPin={(seriesId) =>
+              setPinnedLegendSeriesId((current) => (current === seriesId ? null : seriesId))
+            }
+            onTransientChange={setTransientLegendSeriesId}
+            pinnedSeriesId={validPinnedLegendSeriesId}
+            series={series}
+          />
+        )}
+        <div
+          {...scrollbarActivityProps}
+          aria-labelledby={hasLocalOverflow ? titleId : undefined}
+          data-overflow={overflow}
+          data-scrollable={hasLocalOverflow ? '' : undefined}
+          data-wcl-chart-frame=""
+          ref={setFrameElement}
+          role={hasLocalOverflow ? 'region' : undefined}
+          style={frameStyle}
+          tabIndex={hasLocalOverflow ? 0 : undefined}
+        >
+          <div
+            aria-keyshortcuts={
+              categoryPlacement === 'x'
+                ? 'ArrowLeft ArrowRight Home End Escape'
+                : 'ArrowUp ArrowDown Home End Escape'
+            }
+            aria-labelledby={titleId}
+            data-stagger={presentation.staggerLabels ? '' : undefined}
+            data-wcl-chart-canvas=""
+            onBlur={blurChart}
+            onFocus={focusChart}
+            onKeyDown={readWithKeyboard}
+            role="group"
+            tabIndex={0}
+          >
             <svg
               aria-hidden="true"
               data-wcl-chart-svg=""
               focusable="false"
+              onPointerDown={retainTouchReading}
+              onPointerLeave={() => setPointerReading(null)}
+              onPointerMove={movePointerReading}
+              ref={setSvgElement}
               viewBox={`0 0 ${viewWidth} ${viewHeight}`}
             >
               {categoryPlacement === 'x' ? (
                 <>
-                  <Axis axis={categoryAxis} placement="x" projection={categoryProjection} />
-                  <Axis axis={valueAxis} placement="y" projection={valueProjection} />
+                  <Axis
+                    axis={categoryAxis}
+                    placement="x"
+                    plot={plot}
+                    presentation={presentation}
+                    projection={categoryProjection}
+                    staggerLabels={presentation.staggerLabels}
+                  />
+                  <Axis
+                    axis={valueAxis}
+                    placement="y"
+                    plot={plot}
+                    presentation={presentation}
+                    projection={valueProjection}
+                  />
                 </>
               ) : (
                 <>
-                  <Axis axis={valueAxis} placement="x" projection={valueProjection} />
-                  <Axis axis={categoryAxis} placement="y" projection={categoryProjection} />
+                  <Axis
+                    axis={valueAxis}
+                    placement="x"
+                    plot={plot}
+                    presentation={presentation}
+                    projection={valueProjection}
+                  />
+                  <Axis
+                    axis={categoryAxis}
+                    placement="y"
+                    plot={plot}
+                    presentation={presentation}
+                    projection={categoryProjection}
+                  />
                 </>
               )}
+              <rect
+                data-wcl-chart-hit-region=""
+                height={plotHeight(plot)}
+                width={plotWidth(plot)}
+                x={plot.left}
+                y={plot.top}
+              />
               <Annotations
                 annotations={annotations}
                 categoryPlacement={categoryPlacement}
                 categoryProjection={categoryProjection}
                 layer="background"
+                plot={plot}
                 valueProjection={valueProjection}
               />
               <Marks
                 categoryPlacement={categoryPlacement}
                 categoryProjection={categoryProjection}
+                emphasizedSeriesId={emphasizedSeriesId}
                 layout={layout}
+                plot={plot}
                 rows={prepared.rows}
                 series={series}
                 valueProjection={valueProjection}
@@ -1096,10 +1906,45 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 categoryPlacement={categoryPlacement}
                 categoryProjection={categoryProjection}
                 layer="foreground"
+                plot={plot}
                 valueProjection={valueProjection}
               />
+              {activeReading === null ? null : (
+                <ReadingOverlay
+                  categoryPlacement={categoryPlacement}
+                  categoryProjection={categoryProjection}
+                  emphasizedSeriesId={emphasizedSeriesId}
+                  layout={layout}
+                  plot={plot}
+                  reading={activeReading}
+                  rows={prepared.rows}
+                  series={series}
+                  valueProjection={valueProjection}
+                />
+              )}
             </svg>
+            {activeReading === null ? null : (
+              <ReadingTooltip
+                categoryAxis={categoryAxis}
+                categoryPlacement={categoryPlacement}
+                categoryProjection={categoryProjection}
+                emphasizedSeriesId={emphasizedSeriesId}
+                layout={layout}
+                plot={plot}
+                portalTarget={rootElement?.closest('[data-wcl-provider]') ?? document.body}
+                references={references}
+                reading={activeReading}
+                rows={prepared.rows}
+                series={series}
+                valueAxis={valueAxis}
+                valueProjection={valueProjection}
+                svg={svgElement}
+              />
+            )}
           </div>
+        </div>
+        <div aria-atomic="true" aria-live="polite" data-wcl-chart-reading-announcement="">
+          {readingAnnouncement}
         </div>
         <DataTable
           categoryAxis={categoryAxis}
@@ -1124,6 +1969,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
       data-wcl-chart=""
+      ref={setRootElement}
       {...rootProps}
     >
       <figcaption data-wcl-chart-caption="">

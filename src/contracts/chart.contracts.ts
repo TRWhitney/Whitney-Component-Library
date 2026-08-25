@@ -40,7 +40,7 @@ function chartContract({
       'Application accent identifies the first ordinary series and accent annotations. Later ordinary series orbit that accent with an achromatic fallback, and automatic colors avoid explicit ordinary choices. Success, warning, and danger remain semantic colors.',
     ],
     accessibility: [
-      'The required visible title names one figure and the required description explains its point. The SVG is hidden from assistive technology because a generated native data table exposes every valid category and series value before interaction.',
+      'The required visible title names one figure and the required description explains its point. One title-derived keyboard boundary announces the active category, every series value, and comparable numeric reference lines. The SVG remains hidden from assistive technology while a generated native data table exposes every valid value without interaction.',
     ],
     appearance: [
       'A direct instrument plot uses restrained grid and axis rails with readable utility typography. Filled marks use softened series color beneath stronger lines and boundaries. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.',
@@ -53,7 +53,9 @@ function chartContract({
       'Use a specific title, one-sentence description, one to six short series labels, explicit axis labels and units, stable series ids, and only annotations that materially aid interpretation. Neutral or accent lines and bands are references; warning or danger lines and bands identify genuine semantic thresholds.',
     ],
     controlBehavior: [
-      `${name} is a static data display in this foundation. It does not filter records, coordinate selection, show tooltips, mutate domains, or own application workflow.`,
+      `${name} reads the nearest recorded category on pointer, keyboard, or touch input. Its tooltip reports every series and each numeric reference line on the value axis, and never interpolates values between records.`,
+      'Legend hover and focus emphasize one series. Click, Enter, or Space pins that emphasis; repeat the action or press Escape to clear it. Emphasis never hides data, changes a domain, or filters records.',
+      `${name} emits no consumer events and does not coordinate selection, mutate data, or own application workflow.`,
     ],
     counterExamples: [
       {
@@ -66,7 +68,7 @@ function chartContract({
       'Titles, descriptions, legends, and category labels follow inherited writing direction. Numeric axes preserve their mathematical order and horizontal plots retain low-to-high value progression.',
     ],
     events: [
-      `${name} emits no events in the Cartesian foundation. Later interaction components add bounded hover and selection behavior without changing this static meaning.`,
+      `${name} manages bounded reading and legend emphasis internally without emitting consumer callbacks. Pointer, keyboard, touch, and legend interaction do not change its records or domain.`,
     ],
     examples: [
       {
@@ -85,7 +87,7 @@ function chartContract({
     importPath: '.',
     inappropriateUses: [misuse],
     keyboardBehavior: [
-      'The static chart adds no tab stop or keyboard command. Its complete data table is available without requiring focus or pointer interaction.',
+      'Tab reaches one title-named chart boundary. Left and Right read horizontal categories; Up and Down read vertical categories; Home and End reach the endpoints; Escape clears the reading. When local overflow is necessary, its separately labeled native scroll region remains keyboard reachable.',
     ],
     kind: 'component',
     labeling: [
@@ -96,7 +98,7 @@ function chartContract({
     ],
     name,
     parts: [
-      `${name} contains a named figure, visible caption, optional feedback, a required multi-series legend, deterministic SVG plot, axes, marks, optional annotations, and a generated native data table.`,
+      `${name} contains a named figure, visible caption, optional feedback, a required multi-series legend, interactive SVG plot, axes, marks, shared reading tooltip, optional annotations, and a generated native data table.`,
     ],
     preferredAlternatives: [alternative],
     preferredCompositions: [
@@ -104,11 +106,11 @@ function chartContract({
     ],
     purpose,
     reducedMotionBehavior: [
-      'The static Cartesian foundation has no idle or data-transition motion. Reduced motion therefore preserves identical plot structure without a substitute animation.',
+      'Reduced motion removes series-emphasis and scrollbar-fade transitions while preserving the same reading, focus, legend, and native scrolling states. Plot geometry does not animate.',
     ],
     relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
     responsiveBehavior: [
-      'Charts preserve a 480px minimum plot with local horizontal scrolling by default. Categorical tickCount bounds label density, and long visible labels shorten within the plot while the generated table retains complete values. aspectRatio and minimumSize make another plot budget explicit; choose clip only when shrinking the complete plot is more important than preserving text size.',
+      "Charts scale readable type, marks, strokes, and pointer targets together from the available plot space. Every categorical label is rendered: horizontal labels use one row when possible, alternate across two rows when needed, and fall back to a labeled native scroll region with ScrollRegion's scrollbar behavior only at the legibility limit. Long labels may shorten while the generated table retains complete values. aspectRatio and minimumSize set explicit lower bounds; choose clip only when shrinking the complete plot is more important than local scrolling.",
     ],
     states: [
       'Ready, loading, empty, partial, invalid-data, and error states are explicit. Partial data remains plotted with warning copy; invalid rows are omitted and reported; an entirely invalid dataset becomes unavailable.',

@@ -1928,7 +1928,7 @@ function ChartSpecimens() {
   return (
     <>
       <Specimen
-        description="Show change over an ordered, numeric, logarithmic, or time domain. The generated table carries the complete static meaning without requiring pointer interaction."
+        description="Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category, its series values, and the target reference; or focus it and use the arrow keys. Chart type and marks scale with available space, while categorical labels use a second row before local scrolling is needed."
         name="LineChart"
       >
         <Example label="Two-series LineChart">
@@ -1947,7 +1947,7 @@ function ChartSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Show magnitude or contribution across an ordered domain. Choose overlap, stacked, or normalized deliberately; the chart does not infer that relationship."
+        description="Show magnitude or contribution across an ordered domain. Shared readings report component values for stacks and displayed shares for normalized areas."
         name="AreaChart"
       >
         <Example label="Stacked AreaChart">
@@ -1966,7 +1966,7 @@ function ChartSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Compare discrete categories with grouped, stacked, or normalized vertical columns. Use BarChart when category labels need horizontal room."
+        description="Compare discrete categories with grouped, stacked, or normalized vertical columns. A touch reading stays open until another category or an outside press replaces it."
         name="ColumnChart"
       >
         <Example label="Grouped ColumnChart">
@@ -1985,7 +1985,7 @@ function ChartSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Compare discrete categories on a horizontal plot. The orientation is part of the named component rather than a renderer option."
+        description="Compare discrete categories on a horizontal plot. Up and Down move through its vertical category axis when the plot has keyboard focus."
         name="BarChart"
       >
         <Example label="Horizontal BarChart">
@@ -2001,7 +2001,7 @@ function ChartSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Prefer a named single-mark chart otherwise."
+        description="Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Hover or focus a legend item to emphasize a series; press it to pin that emphasis."
         name="CartesianChart"
       >
         <Example label="Mixed CartesianChart">

@@ -5962,19 +5962,56 @@
   [data-wcl-chart-frame] {
     min-inline-size: 0;
     overflow: hidden;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
   }
 
   [data-wcl-chart-frame][data-overflow='scroll'] {
-    overflow-x: auto;
+    overflow: auto hidden;
+    scrollbar-color: transparent transparent;
     scrollbar-width: thin;
+    transition: scrollbar-color var(--wcl-motion-duration) var(--wcl-motion-easing);
+  }
+
+  :is(
+    [data-wcl-chart-frame][data-overflow='scroll'][data-scrollbar-active],
+    [data-wcl-chart-frame][data-overflow='scroll']:focus-within
+  ) {
+    scrollbar-color: var(--wcl-border-strong) transparent;
+  }
+
+  [data-wcl-chart-frame][data-scrollable]:focus-visible {
+    outline-color: var(--wcl-accent-focus);
+  }
+
+  @supports not (scrollbar-color: auto) {
+    [data-wcl-chart-frame][data-overflow='scroll']::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background-color: transparent;
+      transition: background-color var(--wcl-motion-duration) var(--wcl-motion-easing);
+    }
+
+    :is(
+      [data-wcl-chart-frame][data-overflow='scroll'][data-scrollbar-active],
+      [data-wcl-chart-frame][data-overflow='scroll']:focus-within
+    )::-webkit-scrollbar-thumb {
+      background-color: var(--wcl-border-strong);
+    }
   }
 
   [data-wcl-chart-canvas] {
+    position: relative;
     container: wcl-chart-canvas / inline-size;
     inline-size: 100%;
     min-inline-size: min(100%, var(--wcl-chart-minimum-width));
     min-block-size: var(--wcl-chart-minimum-height);
     aspect-ratio: var(--wcl-chart-aspect-ratio);
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+  }
+
+  [data-wcl-chart-canvas]:focus-visible {
+    outline-color: var(--wcl-accent-focus);
   }
 
   [data-wcl-chart-frame][data-overflow='scroll'] [data-wcl-chart-canvas] {
@@ -5988,22 +6025,27 @@
     overflow: visible;
   }
 
+  [data-wcl-chart-hit-region] {
+    fill: transparent;
+    pointer-events: all;
+  }
+
   :is([data-wcl-chart-axis-rail], [data-wcl-chart-tick-mark]) {
     stroke: var(--wcl-border-strong);
-    stroke-width: 1;
+    stroke-width: var(--wcl-chart-grid-width);
     vector-effect: non-scaling-stroke;
   }
 
   [data-wcl-chart-grid-line] {
     stroke: var(--wcl-border);
-    stroke-width: 1;
+    stroke-width: var(--wcl-chart-grid-width);
     vector-effect: non-scaling-stroke;
   }
 
   :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
     fill: var(--wcl-text-muted);
     font-family: var(--wcl-font-utility);
-    font-size: 16px;
+    font-size: var(--wcl-chart-axis-font-size);
   }
 
   [data-wcl-chart-axis-label] {
@@ -6052,30 +6094,171 @@
     stroke: var(--wcl-chart-series-color);
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-width: 2.5;
     vector-effect: non-scaling-stroke;
   }
 
+  [data-wcl-chart-line] {
+    stroke-width: var(--wcl-chart-line-width);
+  }
+
+  [data-wcl-chart-legend-line] {
+    stroke-width: 2.5;
+  }
+
+  [data-wcl-chart-line-hit-target] {
+    fill: none;
+    stroke: transparent;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: calc(var(--wcl-chart-line-width) * 3);
+    vector-effect: non-scaling-stroke;
+    pointer-events: stroke;
+  }
+
   [data-wcl-chart-point] {
+    r: var(--wcl-chart-point-radius);
     fill: var(--wcl-surface);
     stroke: var(--wcl-chart-series-color);
-    stroke-width: 2;
+    stroke-width: var(--wcl-chart-point-stroke-width);
     vector-effect: non-scaling-stroke;
   }
 
   [data-wcl-chart-area] {
     fill: color-mix(in oklch, var(--wcl-chart-series-color) 18%, transparent);
     stroke: var(--wcl-chart-series-color);
-    stroke-width: 1.25;
+    stroke-width: calc(var(--wcl-chart-line-width) * 0.5);
     vector-effect: non-scaling-stroke;
   }
 
   [data-wcl-chart-bar] {
     fill: color-mix(in oklch, var(--wcl-chart-series-color) 30%, var(--wcl-surface));
     stroke: var(--wcl-chart-series-color);
-    stroke-width: 1.75;
+    stroke-width: calc(var(--wcl-chart-line-width) * 0.7);
     vector-effect: non-scaling-stroke;
     rx: 2px;
+  }
+
+  [data-wcl-chart-reading-needle] {
+    stroke: var(--wcl-text-muted);
+    stroke-dasharray: 3 3;
+    stroke-width: 1.25;
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-chart-reading-node] {
+    r: var(--wcl-chart-point-radius);
+    fill: var(--wcl-surface-raised);
+    stroke: var(--wcl-chart-series-color);
+    stroke-width: var(--wcl-chart-line-width);
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-chart-reading-node][data-active] {
+    stroke-width: calc(var(--wcl-chart-line-width) * 1.6);
+  }
+
+  :is([data-wcl-chart-reading], [data-wcl-chart-annotations]) {
+    pointer-events: none;
+  }
+
+  :is([data-wcl-chart-series], [data-wcl-chart-reading-node]) {
+    transition: opacity 120ms ease;
+  }
+
+  :is(
+    [data-wcl-chart-line],
+    [data-wcl-chart-point],
+    [data-wcl-chart-area],
+    [data-wcl-chart-bar],
+    [data-wcl-chart-reading-node]
+  ) {
+    transition: stroke-width 120ms ease;
+  }
+
+  :is([data-wcl-chart-series], [data-wcl-chart-reading-node])[data-muted] {
+    opacity: 0.24;
+  }
+
+  [data-wcl-chart-tooltip-layer] {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  [data-wcl-chart-tooltip] {
+    position: absolute;
+    inset-block-start: var(--wcl-chart-tooltip-y);
+    left: var(--wcl-chart-tooltip-left);
+    box-sizing: border-box;
+    min-inline-size: min(11rem, calc(100vw - calc(var(--wcl-space) * 2)));
+    max-inline-size: min(18rem, calc(100vw - calc(var(--wcl-space) * 2)));
+    padding: calc(var(--wcl-space) * 1.25);
+    border: 1px solid var(--wcl-border-strong);
+    border-radius: calc(var(--wcl-radius) * 0.75);
+    background: var(--wcl-surface-raised);
+    box-shadow: var(--wcl-shadow);
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+    font-size: 0.875rem;
+    line-height: 1.35;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  [data-wcl-chart-tooltip][data-vertical-placement='start'] {
+    transform: translateY(calc(var(--wcl-space) * 0.5));
+  }
+
+  [data-wcl-chart-tooltip][data-vertical-placement='end'] {
+    transform: translateY(calc(-100% - calc(var(--wcl-space) * 0.5)));
+  }
+
+  [data-wcl-chart-tooltip] > strong {
+    display: block;
+    margin-block-end: calc(var(--wcl-space) * 0.75);
+    font-size: 0.9375rem;
+  }
+
+  [data-wcl-chart-tooltip] dl {
+    display: grid;
+    gap: calc(var(--wcl-space) * 0.5);
+    margin: 0;
+  }
+
+  [data-wcl-chart-tooltip] dl > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: calc(var(--wcl-space) * 1.5);
+    align-items: baseline;
+  }
+
+  [data-wcl-chart-tooltip] dl > div[data-active] {
+    font-weight: 700;
+  }
+
+  [data-wcl-chart-tooltip] :is(dt, dd) {
+    margin: 0;
+  }
+
+  [data-wcl-chart-tooltip] dt {
+    display: inline-flex;
+    gap: calc(var(--wcl-space) * 0.625);
+    align-items: center;
+    min-inline-size: 0;
+  }
+
+  [data-wcl-chart-tooltip] dd {
+    font-family: var(--wcl-font-utility);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  [data-wcl-chart-tooltip-swatch] {
+    flex: 0 0 auto;
+    inline-size: 1.25rem;
+    block-size: 0.5rem;
+    overflow: visible;
   }
 
   :is(
@@ -6138,6 +6321,26 @@
     fill-opacity: 0.68;
   }
 
+  [data-wcl-chart-series][data-emphasized] [data-wcl-chart-line] {
+    stroke-width: calc(var(--wcl-chart-line-width) * 1.6);
+  }
+
+  [data-wcl-chart-series][data-emphasized] [data-wcl-chart-line-hit-target] {
+    stroke-width: calc(var(--wcl-chart-line-width) * 4.8);
+  }
+
+  [data-wcl-chart-series][data-emphasized] [data-wcl-chart-point] {
+    stroke-width: calc(var(--wcl-chart-point-stroke-width) * 1.5);
+  }
+
+  [data-wcl-chart-series][data-emphasized][data-wcl-chart-area] {
+    stroke-width: var(--wcl-chart-line-width);
+  }
+
+  [data-wcl-chart-series][data-emphasized] [data-wcl-chart-bar] {
+    stroke-width: calc(var(--wcl-chart-line-width) * 1.1);
+  }
+
   [data-wcl-chart-annotation] {
     fill: color-mix(in srgb, var(--wcl-text-muted) 12%, transparent);
     stroke: var(--wcl-text-muted);
@@ -6181,7 +6384,7 @@
   [data-wcl-chart-annotation-label] {
     fill: var(--wcl-text);
     font-family: var(--wcl-font-utility);
-    font-size: 14px;
+    font-size: calc(var(--wcl-chart-axis-font-size) * 0.875);
     font-weight: 650;
     paint-order: stroke;
     stroke: var(--wcl-surface);
@@ -6189,40 +6392,37 @@
     stroke-linejoin: round;
   }
 
-  @container wcl-chart-canvas (min-width: 40rem) {
-    :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
-      font-size: 14px;
-    }
-
-    [data-wcl-chart-annotation-label] {
-      font-size: 13px;
-    }
-  }
-
-  @container wcl-chart-canvas (min-width: 50rem) {
-    :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
-      font-size: 12px;
-    }
-
-    [data-wcl-chart-annotation-label] {
-      font-size: 11px;
-    }
-  }
-
-  @container wcl-chart-canvas (min-width: 60rem) {
-    :is([data-wcl-chart-tick-label], [data-wcl-chart-axis-label]) {
-      font-size: 10px;
-    }
-
-    [data-wcl-chart-annotation-label] {
-      font-size: 9px;
-    }
-  }
-
   [data-wcl-chart-legend] > li {
+    transition: opacity 120ms ease;
+  }
+
+  [data-wcl-chart-legend] > li[data-muted] {
+    opacity: 0.45;
+  }
+
+  [data-wcl-chart-legend-button] {
     display: inline-flex;
     gap: calc(var(--wcl-space) * 0.5);
     align-items: center;
+    min-block-size: 2rem;
+    margin: 0;
+    padding: calc(var(--wcl-space) * 0.375) calc(var(--wcl-space) * 0.5);
+    border: 0;
+    border-radius: calc(var(--wcl-radius) * 0.5);
+    outline: 2px solid transparent;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  [data-wcl-chart-legend-button]:is(:hover, :focus-visible, [aria-pressed='true']) {
+    background: var(--wcl-accent-soft);
+    color: var(--wcl-text);
+  }
+
+  [data-wcl-chart-legend-button]:focus-visible {
+    outline-color: var(--wcl-accent-focus);
   }
 
   [data-wcl-chart-legend-swatch] {
@@ -6238,7 +6438,11 @@
     border-block: 1px solid var(--wcl-border);
   }
 
-  :is([data-wcl-chart-table], [data-wcl-chart-annotation-summary]) {
+  :is(
+    [data-wcl-chart-table],
+    [data-wcl-chart-annotation-summary],
+    [data-wcl-chart-reading-announcement]
+  ) {
     position: absolute !important;
     inline-size: 1px !important;
     block-size: 1px !important;
@@ -6418,6 +6622,18 @@
       transition: none;
     }
 
+    :is(
+      [data-wcl-chart-series],
+      [data-wcl-chart-reading-node],
+      [data-wcl-chart-line],
+      [data-wcl-chart-point],
+      [data-wcl-chart-area],
+      [data-wcl-chart-bar],
+      [data-wcl-chart-legend] > li
+    ) {
+      transition: none;
+    }
+
     [data-wcl-notification-timer] {
       display: none;
       animation: none !important;
@@ -6517,6 +6733,14 @@
     }
 
     [data-wcl-scroll-region]::-webkit-scrollbar-thumb {
+      transition: none;
+    }
+
+    [data-wcl-chart-frame][data-overflow='scroll'] {
+      transition: none;
+    }
+
+    [data-wcl-chart-frame][data-overflow='scroll']::-webkit-scrollbar-thumb {
       transition: none;
     }
 
@@ -6819,6 +7043,20 @@
     }
 
     [data-wcl-scroll-region]:focus-visible {
+      outline-color: Highlight;
+    }
+
+    [data-wcl-chart-frame][data-overflow='scroll'] {
+      scrollbar-color: CanvasText Canvas;
+      transition: none;
+    }
+
+    [data-wcl-chart-frame][data-overflow='scroll']::-webkit-scrollbar-thumb {
+      background-color: CanvasText;
+      transition: none;
+    }
+
+    [data-wcl-chart-frame][data-scrollable]:focus-visible {
       outline-color: Highlight;
     }
 
@@ -7253,6 +7491,27 @@
     [data-wcl-chart-annotation] {
       fill: Canvas;
       stroke: CanvasText;
+    }
+
+    [data-wcl-chart-reading-needle] {
+      stroke: CanvasText;
+    }
+
+    [data-wcl-chart-reading-node] {
+      fill: Canvas;
+      stroke: Highlight;
+    }
+
+    [data-wcl-chart-tooltip] {
+      border-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+
+    [data-wcl-chart-legend-button]:focus-visible {
+      outline-color: Highlight;
     }
   }
 }
