@@ -1,6 +1,15 @@
 import type {ComponentContract} from './component-contract.js';
 
-type ChartName = 'AreaChart' | 'BarChart' | 'CartesianChart' | 'ColumnChart' | 'LineChart';
+type ChartName =
+  | 'AreaChart'
+  | 'BarChart'
+  | 'BoxPlot'
+  | 'BubbleChart'
+  | 'CartesianChart'
+  | 'ColumnChart'
+  | 'Histogram'
+  | 'LineChart'
+  | 'ScatterChart';
 
 interface ChartContractOptions {
   readonly alternative: string;
@@ -12,7 +21,17 @@ interface ChartContractOptions {
   readonly use: string;
 }
 
-const chartNames = ['AreaChart', 'BarChart', 'CartesianChart', 'ColumnChart', 'LineChart'] as const;
+const chartNames = [
+  'AreaChart',
+  'BarChart',
+  'BoxPlot',
+  'BubbleChart',
+  'CartesianChart',
+  'ColumnChart',
+  'Histogram',
+  'LineChart',
+  'ScatterChart',
+] as const;
 
 function example(name: string, body: string): string {
   return [
@@ -186,4 +205,369 @@ export const cartesianChartContract = chartContract({
   name: 'CartesianChart',
   purpose: 'Combine compatible line, area, and column series in one shared Cartesian frame.',
   use: 'compatible line, area, or column series share one category domain, one numeric scale, and one comparison question',
+});
+
+interface StatisticalChartContractOptions {
+  readonly alternative: string;
+  readonly counterExample: string;
+  readonly example: string;
+  readonly keyboard: string;
+  readonly misuse: string;
+  readonly name: Extract<ChartName, 'BoxPlot' | 'BubbleChart' | 'Histogram' | 'ScatterChart'>;
+  readonly purpose: string;
+  readonly use: string;
+  readonly validation: string;
+}
+
+interface StatisticalChartGuidance {
+  readonly accent: string;
+  readonly appearance: string;
+  readonly composition: string;
+  readonly content: string;
+  readonly control: readonly string[];
+  readonly events: string;
+  readonly forcedColors: string;
+  readonly labeling: string;
+  readonly localization: string;
+  readonly parts: string;
+  readonly reducedMotion: string;
+  readonly responsive: string;
+}
+
+const statisticalChartGuidance: Record<
+  StatisticalChartContractOptions['name'],
+  StatisticalChartGuidance
+> = {
+  ScatterChart: {
+    accent:
+      'Application accent identifies the first ordinary point group. Later groups use the role-aware chart palette, and automatic colors avoid explicit ordinary choices.',
+    appearance:
+      'Each point has a translucent group-color fill and a stronger edge. Shape distinguishes groups when color is unavailable or points overlap. Direct reading dims every other point.',
+    composition:
+      'Render ScatterChart inside AppearanceProvider in consumer-owned layout. Provide one record per point, separate id and label accessors, two quantitative axes, and one to six declared series. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel. Multiple point groups require a visible legend.',
+    content:
+      'Use stable point ids and labels that identify individual observations. Name both measurements and their units directly. Use groups only when they support comparison.',
+    control: [
+      'Legend hover and focus temporarily emphasize one point group. Click, Enter, or Space pins it. A pinned group receives paint and hit-test priority where points overlap. Repeat the action or press Escape to clear the pin.',
+    ],
+    events:
+      'ScatterChart manages point readings and group emphasis internally. Pointer, keyboard, touch, and legend interaction do not mutate consumer data.',
+    forcedColors:
+      'Forced colors preserve axes and point boundaries in system colors. Point shapes and the generated table keep groups and values distinguishable without color.',
+    labeling:
+      'title, description, both axis labels, and dataTableLabel are required. Point labels identify observations. Group labels must stand alone, and the legend label names their collection.',
+    localization:
+      'Localize titles, descriptions, state copy, point and group labels, axis labels, units, and legend text. Use each axis formatTick for locale-specific numeric formatting.',
+    parts:
+      'ScatterChart contains a named figure, visible caption, optional feedback, a group legend when multiple groups exist, interactive SVG plot, quantitative axes, translucent shaped points, shared tooltip, polite announcement, and generated native data table.',
+    reducedMotion:
+      'Reduced motion removes point-emphasis, legend, and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
+    responsive:
+      'The production chart frame scales type, strokes, and plot geometry from measured space. Scatter points keep a bounded readable rendered size as the plot narrows. minimumSize and overflow retain the established local-scroll behavior.',
+  },
+  BubbleChart: {
+    accent:
+      'Application accent identifies the first ordinary bubble group. Later groups use the role-aware chart palette, and automatic colors avoid explicit ordinary choices.',
+    appearance:
+      'Each bubble has a translucent group-color fill and a stronger edge. Shape distinguishes groups, while proportional area expresses magnitude. Direct reading dims every other bubble.',
+    composition:
+      'Render BubbleChart inside AppearanceProvider in consumer-owned layout. Provide the ScatterChart point contract plus one positive finite magnitude accessor, its label, and an optional unit. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel. Multiple bubble groups require a visible legend.',
+    content:
+      'Use stable point ids and labels that identify individual observations. Name both coordinates, the magnitude, and their units directly. Use area only for a positive measure that supports proportional comparison.',
+    control: [
+      'Legend hover and focus temporarily emphasize one bubble group. Click, Enter, or Space pins it. A pinned group receives paint and hit-test priority where bubbles overlap. Repeat the action or press Escape to clear the pin.',
+    ],
+    events:
+      'BubbleChart manages bubble readings and group emphasis internally. Pointer, keyboard, touch, and legend interaction do not mutate consumer data.',
+    forcedColors:
+      'Forced colors preserve axes and bubble boundaries in system colors. Point shapes and the generated table keep groups, coordinates, and source magnitudes distinguishable without color.',
+    labeling:
+      'title, description, both axis labels, magnitude label, and dataTableLabel are required. Point labels identify observations. Group labels must stand alone, and the legend label names their collection.',
+    localization:
+      'Localize titles, descriptions, state copy, point and group labels, axis and magnitude labels, units, and legend text. Use axis formatTick and magnitude formatValue for locale-specific numeric formatting.',
+    parts:
+      'BubbleChart contains a named figure, visible caption, optional feedback, a group legend when multiple groups exist, interactive SVG plot, quantitative axes, translucent proportional bubbles, shared tooltip, polite announcement, and generated native data table.',
+    reducedMotion:
+      'Reduced motion removes bubble-emphasis, legend, and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
+    responsive:
+      'The production chart frame scales type, strokes, and plot geometry from measured space. Bubble area remains proportional to source magnitude while the maximum rendered radius stays bounded across widths. minimumSize and overflow retain the established local-scroll behavior.',
+  },
+  Histogram: {
+    accent:
+      'Application accent colors the histogram bins. Count, proportion, or density remains explicit in the axis, tooltip, and generated table rather than depending on color.',
+    appearance:
+      'Contiguous translucent bins share the numeric baseline and use stronger boundaries to keep adjacent intervals distinct. Direct reading dims every other bin.',
+    composition:
+      'Render Histogram inside AppearanceProvider in consumer-owned layout. Choose raw observations with explicit or automatic thresholds, or pre-binned records with lower, upper, ordinate accessor, and count, proportion, or density meaning. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel.',
+    content:
+      'Name the measured variable, its unit, and the ordinate directly. Choose thresholds that produce meaningful intervals. Do not describe unrelated categories as bins or pass pre-aggregated values as raw observations.',
+    control: [],
+    events:
+      'Histogram manages direct bin readings internally. Pointer, keyboard, and touch interaction do not mutate observations, bins, or domains.',
+    forcedColors:
+      'Forced colors preserve axes and bin boundaries in system colors. Interval and ordinate values remain complete in the generated table.',
+    labeling:
+      'title, description, both axis labels, and dataTableLabel are required. The horizontal label names the measured variable and unit; the vertical label names the count, proportion, or density being plotted.',
+    localization:
+      'Localize titles, descriptions, state copy, axis labels, and units. Use each axis formatTick for locale-specific interval and ordinate formatting.',
+    parts:
+      'Histogram contains a named figure, visible caption, optional feedback, interactive SVG plot, two quantitative axes, contiguous translucent bins, shared tooltip, polite announcement, and generated native data table.',
+    reducedMotion:
+      'Reduced motion removes bin-emphasis and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
+    responsive:
+      'The production chart frame scales type, strokes, and plot geometry from measured space while bin boundaries remain aligned to their numeric intervals. minimumSize and overflow retain the established local-scroll behavior.',
+  },
+  BoxPlot: {
+    accent:
+      'Application accent identifies the first ordinary distribution group. Later groups use the role-aware chart palette, and automatic colors avoid explicit ordinary choices.',
+    appearance:
+      'Each quartile box has a translucent group-color fill and stronger boundary. Whisker tails stop at Q1 and Q3, and their caps paint above the box so short whiskers remain visible. Only the median crosses the box. Outliers remain separate marks and direct reading dims every other mark.',
+    composition:
+      'Render BoxPlot inside AppearanceProvider in consumer-owned layout. Choose raw observations with Tukey or min-max whiskers, or one explicit summary record per declared group with quartiles, median, whiskers, outliers, and whisker method. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel. Multiple distribution groups require a visible legend.',
+    content:
+      'Name each distribution group, numeric measure, unit, quartile method, and whisker method accurately. Use outliers as observations outside the declared whiskers, not as decorative points.',
+    control: [
+      'Legend hover and focus temporarily emphasize one distribution group. Click, Enter, or Space pins it. Repeat the action or press Escape to clear the pin.',
+    ],
+    events:
+      'BoxPlot manages group-summary and outlier readings plus group emphasis internally. Pointer, keyboard, touch, and legend interaction do not mutate consumer data.',
+    forcedColors:
+      'Forced colors preserve quartile, median, whisker, and outlier boundaries in system colors. Geometry and the generated table retain every statistical role without color.',
+    labeling:
+      'title, description, both axis labels, and dataTableLabel are required. Group labels must stand alone, and the legend label names their collection. A group tooltip reports its quartiles, median, and whiskers without the method or outlier list. An outlier tooltip reports only its group and that observation. The generated table retains the complete method and outlier data.',
+    localization:
+      'Localize titles, descriptions, state copy, group labels, axis labels, units, and legend text. Use the quantitative axis formatTick for locale-specific summary and outlier formatting.',
+    parts:
+      'BoxPlot contains a named figure, visible caption, optional feedback, a group legend when multiple groups exist, interactive SVG plot, categorical and quantitative axes, quartile boxes, medians, split whisker tails, separate outlier marks, shared tooltip, polite announcement, and generated native data table.',
+    reducedMotion:
+      'Reduced motion removes mark-emphasis, legend, and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
+    responsive:
+      'The production chart frame scales type, strokes, boxes, whiskers, and outliers from measured space while preserving their statistical relationships. minimumSize and overflow retain the established local-scroll behavior.',
+  },
+};
+
+function statisticalChartContract({
+  alternative,
+  counterExample,
+  example: exampleCode,
+  keyboard,
+  misuse,
+  name,
+  purpose,
+  use,
+  validation,
+}: StatisticalChartContractOptions): ComponentContract {
+  const guidance = statisticalChartGuidance[name];
+  return {
+    accentBehavior: [guidance.accent],
+    accessibility: [
+      'The visible title names one figure and the description explains the chart question. One keyboard boundary owns readings and announcements. The SVG is hidden from assistive technology; a generated native table exposes the valid chart data without interaction.',
+    ],
+    appearance: [guidance.appearance],
+    appropriateUses: [use],
+    composition: [guidance.composition],
+    contentRules: [guidance.content],
+    controlBehavior: [
+      'Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.',
+      ...guidance.control,
+      `${name} emits no consumer events and does not filter records, change domains, or own selection and coordinated chart state.`,
+    ],
+    counterExamples: [
+      {
+        code: example(`Misused${name}`, counterExample),
+        description: misuse,
+        title: `Do not misuse ${name}`,
+      },
+    ],
+    directionality: [
+      'Visible prose and categorical labels follow inherited writing direction. Quantitative axes preserve low-to-high mathematical order.',
+    ],
+    events: [guidance.events],
+    examples: [
+      {
+        code: example(`${name}Example`, exampleCode),
+        description: purpose,
+        title: `${name} with explicit statistical meaning`,
+      },
+    ],
+    exportName: name,
+    forcedColorBehavior: [guidance.forcedColors],
+    formBehavior: [
+      'Charts are not form controls and do not submit, validate, or reset values. Place filters and range controls beside the chart in consumer-owned composition.',
+    ],
+    importPath: '.',
+    inappropriateUses: [misuse],
+    keyboardBehavior: [
+      `Tab reaches one title-named chart boundary. ${keyboard} Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.`,
+    ],
+    kind: 'component',
+    labeling: [guidance.labeling],
+    localization: [guidance.localization],
+    name,
+    parts: [guidance.parts],
+    preferredAlternatives: [alternative],
+    preferredCompositions: [
+      'Compose charts with CollectionFilterBar or separate controls and application-owned layout. Keep cross-chart selection, filtering, zooming, and brushing outside this component.',
+    ],
+    purpose,
+    reducedMotionBehavior: [guidance.reducedMotion],
+    relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
+    responsiveBehavior: [guidance.responsive],
+    states: [
+      'Ready, loading, empty, partial, invalid-data, and error states are explicit. Partial data remains plotted with warning copy. Invalid records are omitted and reported; an entirely invalid dataset becomes unavailable.',
+    ],
+    stylesheet: './styles.css',
+    summary: purpose,
+    validation: [validation],
+  };
+}
+
+const statisticalState =
+  'dataTableLabel="Statistical data"\n  emptyState={{title: "No observations", description: "Choose a populated interval."}}\n  invalidData={{title: "Invalid observations", description: "Correct missing or non-finite values."}}';
+
+export const scatterChartContract = statisticalChartContract({
+  alternative:
+    'Use LineChart for an ordered trend, BubbleChart when one additional numeric measure belongs in mark area, or Histogram for a one-dimensional distribution.',
+  counterExample: `<ScatterChart
+  data={[{id: "a", label: "Alpha", productCode: 1, defects: 4}, {id: "b", label: "Beta", productCode: 2, defects: 7}]}
+  description="Defects for unrelated products."
+  ${statisticalState}
+  idAccessor="id"
+  labelAccessor="label"
+  series={[{id: "products", label: "Products"}]}
+  title="Product defects"
+  xAxis={{accessor: "productCode", label: "Product code", scale: {type: "linear"}}}
+  yAxis={{accessor: "defects", label: "Defects", scale: {type: "linear"}}}
+/>`,
+  example: `<ScatterChart
+  data={[{id: "north-1", label: "North Monday", loop: "north", temperature: 18, demand: 28}, {id: "south-1", label: "South Monday", loop: "south", temperature: 56, demand: 68}]}
+  dataTableLabel="Turbine observations"
+  description="Compare temperature and thermal demand for recorded operating periods."
+  emptyState={{title: "No observations", description: "Choose a populated interval."}}
+  invalidData={{title: "Invalid observations", description: "Correct invalid records."}}
+  idAccessor="id"
+  labelAccessor="label"
+  legend={{label: "Turbine loops"}}
+  series={[{id: "north", label: "North loop"}, {id: "south", label: "South loop", color: "series-2"}]}
+  seriesAccessor="loop"
+  title="Temperature and demand"
+  xAxis={{accessor: "temperature", label: "Temperature", unit: "°F", scale: {type: "linear"}}}
+  yAxis={{accessor: "demand", label: "Thermal demand", unit: "MWh", scale: {type: "linear"}}}
+/>`,
+  keyboard:
+    'Arrow keys move spatially between recorded points with stable point id as the final tie-breaker.',
+  misuse:
+    'categorical codes, part-to-whole data, an ordered trend that needs connection, or coordinates that do not express a meaningful two-variable relationship',
+  name: 'ScatterChart',
+  purpose: 'Compare two quantitative measurements across distinct recorded observations.',
+  use: 'each record is one identifiable observation and its two numeric measurements form the comparison',
+  validation:
+    'TypeScript requires numeric axis accessors and string id, label, and series accessors. Runtime preparation rejects duplicate point ids, unknown series, invalid domains, missing or non-finite coordinates, and out-of-domain values. Multiple series require seriesAccessor and a legend.',
+});
+
+export const bubbleChartContract = statisticalChartContract({
+  alternative:
+    'Use ScatterChart when area adds no necessary measure, Histogram for one-dimensional frequency, or a generated table when precise comparison of three measurements is the primary task.',
+  counterExample: `<BubbleChart
+  data={[{id: "a", label: "Alpha", x: 18, y: 28, rowNumber: 1}, {id: "b", label: "Beta", x: 56, y: 68, rowNumber: 2}]}
+  description="Row number changes mark area."
+  ${statisticalState}
+  idAccessor="id"
+  labelAccessor="label"
+  magnitude={{accessor: "rowNumber", label: "Row number"}}
+  series={[{id: "records", label: "Records"}]}
+  title="Measurements by row"
+  xAxis={{accessor: "x", label: "X", scale: {type: "linear"}}}
+  yAxis={{accessor: "y", label: "Y", scale: {type: "linear"}}}
+/>`,
+  example: `<BubbleChart
+  data={[{id: "north-1", label: "North Monday", temperature: 18, demand: 28, stored: 42}, {id: "north-2", label: "North Tuesday", temperature: 56, demand: 68, stored: 88}]}
+  description="Compare temperature, demand, and stored energy."
+  ${statisticalState}
+  idAccessor="id"
+  labelAccessor="label"
+  magnitude={{accessor: "stored", label: "Stored energy", unit: "MWh"}}
+  series={[{id: "north", label: "North loop"}]}
+  title="Stored energy"
+  xAxis={{accessor: "temperature", label: "Temperature", unit: "°F", scale: {type: "linear"}}}
+  yAxis={{accessor: "demand", label: "Thermal demand", unit: "MWh", scale: {type: "linear"}}}
+/>`,
+  keyboard:
+    'Arrow keys move spatially between recorded bubbles with stable point id as the final tie-breaker.',
+  misuse:
+    'arbitrary ranking, record order, signed values, or another measure whose area would not support honest proportional comparison',
+  name: 'BubbleChart',
+  purpose:
+    'Compare two quantitative coordinates while a third positive measure controls mark area.',
+  use: 'each point has a third positive numeric measure whose proportional area materially aids comparison',
+  validation:
+    'BubbleChart applies the point-chart validation and requires every valid magnitude to be positive and finite. Radius uses a square-root mapping so rendered area remains proportional to the source magnitude.',
+});
+
+export const histogramContract = statisticalChartContract({
+  alternative:
+    'Use ColumnChart for unrelated categories, ScatterChart for paired measurements, or BoxPlot to compare compact distribution summaries across groups.',
+  counterExample: `<Histogram
+  data={[{productCode: 1}, {productCode: 2}, {productCode: 3}]}
+  description="Product codes are unrelated categories."
+  distribution={{kind: "raw", accessor: "productCode"}}
+  ${statisticalState}
+  title="Products"
+  xAxis={{label: "Product code", scale: {type: "linear"}}}
+  yAxis={{label: "Products", scale: {type: "linear"}}}
+/>`,
+  example: `<Histogram
+  data={[{latency: 8}, {latency: 21}, {latency: 44}, {latency: 47}]}
+  description="See which restart-latency ranges occurred most often."
+  distribution={{kind: "raw", accessor: "latency", thresholds: [0, 20, 40, 60]}}
+  ${statisticalState}
+  title="Restart latency"
+  xAxis={{label: "Restart latency", unit: "ms", scale: {domain: [0, 60], type: "linear"}}}
+  yAxis={{label: "Restarts", scale: {type: "linear"}}}
+/>`,
+  keyboard: 'Left and Right traverse bins in domain order.',
+  misuse:
+    'unrelated categories, pre-aggregated values presented as raw observations, overlapping intervals, or unequal-width bins with unscaled counts',
+  name: 'Histogram',
+  purpose: 'Show a numeric distribution through contiguous intervals and an explicit ordinate.',
+  use: 'frequency, proportion, or density across meaningful numeric intervals is the question',
+  validation:
+    'The discriminated distribution contract separates raw and binned inputs. Runtime validation rejects invalid thresholds, overlapping or reversed intervals, negative ordinates, proportions above one, out-of-domain values, and unequal-width count bins. Raw bins use lower-inclusive intervals; the final bin includes its upper bound.',
+});
+
+export const boxPlotContract = statisticalChartContract({
+  alternative:
+    'Use Histogram to inspect one distribution in detail, ScatterChart for paired observations, or a table when the individual records matter more than a summary.',
+  counterExample: `<BoxPlot
+  data={[{group: "north", value: 4}, {group: "south", value: 7}]}
+  description="Each group contains one observation."
+  distribution={{kind: "raw", valueAccessor: "value"}}
+  groupAccessor="group"
+  groups={[{id: "north", label: "North"}, {id: "south", label: "South"}]}
+  legend={{label: "Groups"}}
+  ${statisticalState}
+  title="Single observations"
+  xAxis={{label: "Group"}}
+  yAxis={{label: "Value", scale: {type: "linear"}}}
+/>`,
+  example: `<BoxPlot
+  data={[{group: "north", value: 43}, {group: "north", value: 48}, {group: "north", value: 52}, {group: "north", value: 54}, {group: "north", value: 57}, {group: "north", value: 104}]}
+  description="Compare the center, spread, and outliers of recovery time."
+  distribution={{kind: "raw", valueAccessor: "value", whisker: "tukey"}}
+  groupAccessor="group"
+  groups={[{id: "north", label: "North loop"}]}
+  ${statisticalState}
+  title="Recovery-time distribution"
+  xAxis={{label: "Turbine loop"}}
+  yAxis={{label: "Recovery time", unit: "minutes", scale: {type: "linear"}}}
+/>`,
+  keyboard:
+    'Left and Right traverse group summaries in declared order. Direct pointer or touch input can read each outlier separately.',
+  misuse:
+    'groups with too little data for a useful distribution summary, unknown quartile or whisker methods, or a task that requires reading every observation in the plot',
+  name: 'BoxPlot',
+  purpose: 'Compare distribution center, spread, whiskers, and outliers across declared groups.',
+  use: 'one or more groups need a compact, method-explicit comparison of their numeric distributions',
+  validation:
+    'Raw mode calculates R-7 quartiles and defaults to Tukey 1.5-IQR whiskers; min-max remains explicit. Summary mode requires one ordered finite summary per group and explicit outliers. Runtime preparation rejects unknown or duplicate groups, reversed statistics, invalid values, and values outside an explicit domain.',
 });

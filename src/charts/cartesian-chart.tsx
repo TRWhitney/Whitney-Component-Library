@@ -56,7 +56,7 @@ import type {
   NonEmptyChartSeries,
 } from './chart-types.js';
 
-type ChartFrameStyles = CSSProperties & {
+export type ChartFrameStyles = CSSProperties & {
   '--wcl-chart-aspect-ratio': number;
   '--wcl-chart-axis-font-size': string;
   '--wcl-chart-grid-width': string;
@@ -67,15 +67,15 @@ type ChartFrameStyles = CSSProperties & {
   '--wcl-chart-point-stroke-width': string;
 };
 
-type ChartTooltipStyles = CSSProperties & {
+export type ChartTooltipStyles = CSSProperties & {
   '--wcl-chart-tooltip-left': string;
   '--wcl-chart-tooltip-y': string;
 };
 
-const viewWidth = 640;
-const viewHeight = 360;
+export const viewWidth = 640;
+export const viewHeight = 360;
 const compactPlot = {bottom: 306, left: 60, right: 620, top: 18} as const;
-const defaultColors: readonly ChartColor[] = [
+export const defaultColors: readonly ChartColor[] = [
   'accent',
   'series-2',
   'series-3',
@@ -86,14 +86,14 @@ const defaultColors: readonly ChartColor[] = [
 
 type SeriesKind = 'area' | 'bar' | 'column' | 'line';
 
-interface PlotBounds {
+export interface PlotBounds {
   readonly bottom: number;
   readonly left: number;
   readonly right: number;
   readonly top: number;
 }
 
-interface PresentationMetrics {
+export interface PresentationMetrics {
   readonly canvasWidth: number;
   readonly fontSize: number;
   readonly gridWidth: number;
@@ -104,11 +104,11 @@ interface PresentationMetrics {
   readonly viewScale: number;
 }
 
-function plotWidth(plot: PlotBounds): number {
+export function plotWidth(plot: PlotBounds): number {
   return plot.right - plot.left;
 }
 
-function plotHeight(plot: PlotBounds): number {
+export function plotHeight(plot: PlotBounds): number {
   return plot.bottom - plot.top;
 }
 
@@ -141,7 +141,7 @@ interface ReadingReference {
   readonly value: number;
 }
 
-interface Projection<Value extends ChartDomainValue> {
+export interface Projection<Value extends ChartDomainValue> {
   readonly bandwidth: number;
   readonly position: (value: Value) => number | undefined;
   readonly ticks: readonly Value[];
@@ -174,7 +174,7 @@ interface ChartFrameProps<
   readonly title: string;
 }
 
-function readAccessor<Datum extends object, Value>(
+export function readAccessor<Datum extends object, Value>(
   accessor: ChartAccessor<Datum, Value>,
   datum: Datum,
   index: number,
@@ -270,7 +270,7 @@ function extentOrFallback(
   return [result[0], result[1]];
 }
 
-function createProjection<Value extends ChartDomainValue>(
+export function createProjection<Value extends ChartDomainValue>(
   scale: ChartScale<Value>,
   values: readonly Value[],
   range: readonly [number, number],
@@ -369,7 +369,7 @@ function formatValue(value: ChartDomainValue, scale: ChartScale<ChartDomainValue
   return value;
 }
 
-function axisTickLabel<Value extends ChartDomainValue>(
+export function axisTickLabel<Value extends ChartDomainValue>(
   value: Value,
   axis: {readonly formatTick?: (tick: Value) => string; readonly scale: ChartScale<Value>},
 ): string {
@@ -406,7 +406,7 @@ function estimatedUtilityTextWidth(label: string): number {
   }, 0);
 }
 
-function plotForPresentation(presentation: PresentationMetrics): PlotBounds {
+export function plotForPresentation(presentation: PresentationMetrics): PlotBounds {
   const axisFontSize = presentation.fontSize / presentation.viewScale;
   const tickOffset = axisFontSize * (presentation.staggerLabels ? 1.75 : 1.125);
   const labelGap = axisFontSize * 1.45;
@@ -416,7 +416,7 @@ function plotForPresentation(presentation: PresentationMetrics): PlotBounds {
   };
 }
 
-function plotForYAxisLabels(
+export function plotForYAxisLabels(
   labels: readonly string[],
   fontScale: number,
   bounds: PlotBounds,
@@ -426,11 +426,11 @@ function plotForYAxisLabels(
   return {...bounds, left};
 }
 
-function clamp(minimum: number, value: number, maximum: number): number {
+export function clamp(minimum: number, value: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
-function inheritedDirection(element: HTMLElement): 'ltr' | 'rtl' {
+export function inheritedDirection(element: HTMLElement): 'ltr' | 'rtl' {
   const computedDirection = element.ownerDocument.defaultView?.getComputedStyle(element).direction;
   if (computedDirection === 'ltr' || computedDirection === 'rtl') return computedDirection;
   return element.closest<HTMLElement>('[dir]')?.dir.toLowerCase() === 'rtl' ? 'rtl' : 'ltr';
@@ -440,7 +440,7 @@ function estimatedLabelWidth(label: string, fontSize: number): number {
   return [...label].length * fontSize * 0.62;
 }
 
-function presentationMetrics(
+export function presentationMetrics(
   availableWidth: number,
   minimumWidth: number,
   categoryLabels: readonly string[],
@@ -505,7 +505,7 @@ function tickLabelCharacterLimit(
   return Math.max(6, Math.min(18, Math.floor((availableWidth * viewScale) / (fontSize * 0.62))));
 }
 
-function Axis<Value extends ChartDomainValue>({
+export function Axis<Value extends ChartDomainValue>({
   axis,
   placement,
   plot,
@@ -701,7 +701,7 @@ function viewBoxPointFromPointer(
   };
 }
 
-function clientPointFromViewBox(
+export function clientPointFromViewBox(
   svg: SVGSVGElement | null,
   x: number,
   y: number,
@@ -1348,7 +1348,7 @@ function Legend<Datum extends object>({
   );
 }
 
-function Feedback({
+export function Feedback({
   copy,
   kind,
 }: {
@@ -1362,11 +1362,11 @@ function Feedback({
   );
 }
 
-function assertText(value: string, name: string): void {
+export function assertText(value: string, name: string): void {
   if (value.trim().length === 0) throw new Error(`${name} must not be blank.`);
 }
 
-function validateScale<Value extends ChartDomainValue>(
+export function validateScale<Value extends ChartDomainValue>(
   scale: ChartScale<Value>,
   name: string,
 ): void {

@@ -170,8 +170,10 @@ import {
   AlertBanner,
   AppearanceProvider,
   Badge,
+  BoxPlot,
   Button,
   ButtonGroup,
+  BubbleChart,
   Checkbox,
   CheckboxGroup,
   ComboBox,
@@ -183,6 +185,7 @@ import {
   FieldGroup,
   FormSection,
   IconButton,
+  Histogram,
   InlineAlert,
   InlineGroup,
   Link,
@@ -197,6 +200,7 @@ import {
   ScrollRegion,
   SearchField,
   Section,
+  ScatterChart,
   Select,
   SegmentedControl,
   Slider,
@@ -217,6 +221,10 @@ import {
 const accent: AccentColor = '#2474ff';
 const gap: LayoutGap = 'regular';
 const chartData = [{month: 'Jan', demand: 42}, {month: 'Feb', demand: 51}] as const;
+const statisticalData = [
+  {group: 'north', id: 'north-1', label: 'North Monday', stored: 25, value: 18, x: 18, y: 28},
+  {group: 'north', id: 'north-2', label: 'North Tuesday', stored: 100, value: 44, x: 56, y: 68},
+] as const;
 const choiceOptions = [
   {label: 'Conservative', value: 'conservative'},
   {label: 'Balanced', value: 'balanced'},
@@ -252,6 +260,57 @@ export const provider = (
           title="Thermal demand"
           xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
           yAxis={{label: 'Energy', scale: {type: 'linear'}, unit: 'MWh'}}
+        />
+        <ScatterChart
+          data={statisticalData}
+          dataTableLabel="Packed scatter data"
+          description="Temperature and demand observations."
+          emptyState={{title: 'No observations', description: 'Add observations.'}}
+          idAccessor="id"
+          invalidData={{title: 'Invalid observations', description: 'Correct observations.'}}
+          labelAccessor="label"
+          series={[{id: 'observations', label: 'Observations'}]}
+          title="Temperature and demand"
+          xAxis={{accessor: 'x', label: 'Temperature', scale: {type: 'linear'}}}
+          yAxis={{accessor: 'y', label: 'Demand', scale: {type: 'linear'}}}
+        />
+        <BubbleChart
+          data={statisticalData}
+          dataTableLabel="Packed bubble data"
+          description="Stored energy observations."
+          emptyState={{title: 'No observations', description: 'Add observations.'}}
+          idAccessor="id"
+          invalidData={{title: 'Invalid observations', description: 'Correct observations.'}}
+          labelAccessor="label"
+          magnitude={{accessor: 'stored', label: 'Stored energy', unit: 'MWh'}}
+          series={[{id: 'observations', label: 'Observations'}]}
+          title="Stored energy"
+          xAxis={{accessor: 'x', label: 'Temperature', scale: {type: 'linear'}}}
+          yAxis={{accessor: 'y', label: 'Demand', scale: {type: 'linear'}}}
+        />
+        <Histogram
+          data={statisticalData}
+          dataTableLabel="Packed histogram data"
+          description="Restart latency distribution."
+          distribution={{accessor: 'value', kind: 'raw', thresholds: [0, 20, 40, 60]}}
+          emptyState={{title: 'No observations', description: 'Add observations.'}}
+          invalidData={{title: 'Invalid observations', description: 'Correct observations.'}}
+          title="Restart latency"
+          xAxis={{label: 'Restart latency', scale: {domain: [0, 60], type: 'linear'}}}
+          yAxis={{label: 'Restarts', scale: {type: 'linear'}}}
+        />
+        <BoxPlot
+          data={statisticalData}
+          dataTableLabel="Packed box plot data"
+          description="Recovery distribution."
+          distribution={{kind: 'raw', valueAccessor: 'value'}}
+          emptyState={{title: 'No observations', description: 'Add observations.'}}
+          groupAccessor="group"
+          groups={[{id: 'north', label: 'North loop'}]}
+          invalidData={{title: 'Invalid observations', description: 'Correct observations.'}}
+          title="Recovery distribution"
+          xAxis={{label: 'Loop'}}
+          yAxis={{label: 'Recovery', scale: {type: 'linear'}}}
         />
         <FormSection title="Solver setup">
           <FieldGroup legend="Boundary inputs">
@@ -431,14 +490,17 @@ import {
   AlertBanner,
   AppearanceProvider,
   Badge,
+  BoxPlot,
   Button,
   ButtonGroup,
+  BubbleChart,
   ComboBox,
   DateField,
   DatePicker,
   DateRangePicker,
   FieldGroup,
   IconButton,
+  Histogram,
   InlineAlert,
   Link,
   LineChart,
@@ -450,6 +512,7 @@ import {
   ResponsiveGrid,
   Section,
   Select,
+  ScatterChart,
   Slider,
   Spinner,
   StatusIndicator,
@@ -485,6 +548,57 @@ createRoot(document.getElementById('root')).render(
           title: 'Thermal demand',
           xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
           yAxis: {label: 'Energy', scale: {type: 'linear'}, unit: 'MWh'},
+        }),
+        React.createElement(ScatterChart, {
+          data: [{id: 'north', label: 'North loop', x: 18, y: 28}],
+          dataTableLabel: 'Packed scatter data',
+          description: 'Temperature and demand observations.',
+          emptyState: {title: 'No observations', description: 'Add observations.'},
+          idAccessor: 'id',
+          invalidData: {title: 'Invalid observations', description: 'Correct observations.'},
+          labelAccessor: 'label',
+          series: [{id: 'observations', label: 'Observations'}],
+          title: 'Temperature and demand',
+          xAxis: {accessor: 'x', label: 'Temperature', scale: {type: 'linear'}},
+          yAxis: {accessor: 'y', label: 'Demand', scale: {type: 'linear'}},
+        }),
+        React.createElement(BubbleChart, {
+          data: [{id: 'north', label: 'North loop', stored: 25, x: 18, y: 28}],
+          dataTableLabel: 'Packed bubble data',
+          description: 'Stored energy observations.',
+          emptyState: {title: 'No observations', description: 'Add observations.'},
+          idAccessor: 'id',
+          invalidData: {title: 'Invalid observations', description: 'Correct observations.'},
+          labelAccessor: 'label',
+          magnitude: {accessor: 'stored', label: 'Stored energy'},
+          series: [{id: 'observations', label: 'Observations'}],
+          title: 'Stored energy',
+          xAxis: {accessor: 'x', label: 'Temperature', scale: {type: 'linear'}},
+          yAxis: {accessor: 'y', label: 'Demand', scale: {type: 'linear'}},
+        }),
+        React.createElement(Histogram, {
+          data: [{value: 8}, {value: 21}],
+          dataTableLabel: 'Packed histogram data',
+          description: 'Restart latency distribution.',
+          distribution: {accessor: 'value', kind: 'raw', thresholds: [0, 20, 40]},
+          emptyState: {title: 'No observations', description: 'Add observations.'},
+          invalidData: {title: 'Invalid observations', description: 'Correct observations.'},
+          title: 'Restart latency',
+          xAxis: {label: 'Restart latency', scale: {domain: [0, 40], type: 'linear'}},
+          yAxis: {label: 'Restarts', scale: {type: 'linear'}},
+        }),
+        React.createElement(BoxPlot, {
+          data: [{group: 'north', value: 2}, {group: 'north', value: 4}],
+          dataTableLabel: 'Packed box plot data',
+          description: 'Recovery distribution.',
+          distribution: {kind: 'raw', valueAccessor: 'value'},
+          emptyState: {title: 'No observations', description: 'Add observations.'},
+          groupAccessor: 'group',
+          groups: [{id: 'north', label: 'North loop'}],
+          invalidData: {title: 'Invalid observations', description: 'Correct observations.'},
+          title: 'Recovery distribution',
+          xAxis: {label: 'Loop'},
+          yAxis: {label: 'Recovery', scale: {type: 'linear'}},
         }),
         React.createElement(FieldGroup, {legend: 'Boundary inputs'},
           React.createElement(TextField, {label: 'Run name', defaultValue: 'North chamber'}),

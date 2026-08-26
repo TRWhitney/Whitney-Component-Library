@@ -8,8 +8,10 @@ import {
   AlertDialog,
   AppearanceProvider,
   Badge,
+  BoxPlot,
   Button,
   ButtonGroup,
+  BubbleChart,
   CardCollection,
   Checkbox,
   CheckboxGroup,
@@ -27,6 +29,7 @@ import {
   FieldGroup,
   FormSection,
   IconButton,
+  Histogram,
   InlineAlert,
   InlineGroup,
   Link,
@@ -44,6 +47,7 @@ import {
   ResponsiveGrid,
   ScrollRegion,
   SearchField,
+  ScatterChart,
   Section,
   Select,
   SegmentedControl,
@@ -527,6 +531,67 @@ const view = React.createElement(
           xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
           yAxis: {label: 'Energy', scale: {type: 'linear'}, unit: 'MWh'},
         }),
+        React.createElement(ScatterChart, {
+          data: [
+            {id: 'north', label: 'North loop', x: 18, y: 28},
+            {id: 'south', label: 'South loop', x: 56, y: 68},
+          ],
+          dataTableLabel: 'Packed scatter data',
+          description: 'Packed temperature and demand observations.',
+          emptyState: {description: 'Add observations.', title: 'No observations'},
+          idAccessor: 'id',
+          invalidData: {description: 'Correct observations.', title: 'Invalid observations'},
+          labelAccessor: 'label',
+          series: [{id: 'observations', label: 'Observations'}],
+          title: 'Packed temperature and demand',
+          xAxis: {accessor: 'x', label: 'Temperature', scale: {type: 'linear'}, unit: '°F'},
+          yAxis: {accessor: 'y', label: 'Demand', scale: {type: 'linear'}, unit: 'MWh'},
+        }),
+        React.createElement(BubbleChart, {
+          data: [
+            {id: 'north', label: 'North loop', stored: 25, x: 18, y: 28},
+            {id: 'south', label: 'South loop', stored: 100, x: 56, y: 68},
+          ],
+          dataTableLabel: 'Packed bubble data',
+          description: 'Packed stored-energy observations.',
+          emptyState: {description: 'Add observations.', title: 'No observations'},
+          idAccessor: 'id',
+          invalidData: {description: 'Correct observations.', title: 'Invalid observations'},
+          labelAccessor: 'label',
+          magnitude: {accessor: 'stored', label: 'Stored energy', unit: 'MWh'},
+          series: [{id: 'observations', label: 'Observations'}],
+          title: 'Packed stored energy',
+          xAxis: {accessor: 'x', label: 'Temperature', scale: {type: 'linear'}, unit: '°F'},
+          yAxis: {accessor: 'y', label: 'Demand', scale: {type: 'linear'}, unit: 'MWh'},
+        }),
+        React.createElement(Histogram, {
+          data: [{latency: 8}, {latency: 21}, {latency: 44}],
+          dataTableLabel: 'Packed histogram data',
+          description: 'Packed restart-latency distribution.',
+          distribution: {accessor: 'latency', kind: 'raw', thresholds: [0, 20, 40, 60]},
+          emptyState: {description: 'Add observations.', title: 'No observations'},
+          invalidData: {description: 'Correct observations.', title: 'Invalid observations'},
+          title: 'Packed restart latency',
+          xAxis: {label: 'Restart latency', scale: {domain: [0, 60], type: 'linear'}, unit: 'ms'},
+          yAxis: {label: 'Restarts', scale: {type: 'linear'}},
+        }),
+        React.createElement(BoxPlot, {
+          data: [
+            {group: 'north', value: 2},
+            {group: 'north', value: 4},
+            {group: 'north', value: 5},
+          ],
+          dataTableLabel: 'Packed box plot data',
+          description: 'Packed recovery distribution.',
+          distribution: {kind: 'raw', valueAccessor: 'value'},
+          emptyState: {description: 'Add observations.', title: 'No observations'},
+          groupAccessor: 'group',
+          groups: [{id: 'north', label: 'North loop'}],
+          invalidData: {description: 'Correct observations.', title: 'Invalid observations'},
+          title: 'Packed recovery distribution',
+          xAxis: {label: 'Loop'},
+          yAxis: {label: 'Recovery', scale: {type: 'linear'}, unit: 'minutes'},
+        }),
         React.createElement(PackedOperationalProof),
         React.createElement(SplitView, {
           ariaLabel: 'Packed run workspace',
@@ -933,6 +998,18 @@ if (
   document.querySelector('[aria-label="Packed thermal demand data"]')?.textContent?.includes('51') !== true
 ) {
   throw new Error('Packed Cartesian chart did not preserve its plotted and tabular meaning.');
+}
+if (
+  !document.querySelector('[data-wcl-scatter-chart] [data-wcl-statistical-point]') ||
+  !document.querySelector('[data-wcl-bubble-chart] [data-wcl-statistical-point]') ||
+  !document.querySelector('[data-wcl-histogram] [data-wcl-histogram-bin]') ||
+  !document.querySelector('[data-wcl-box-plot] [data-wcl-box-quartile]') ||
+  document.querySelector('[aria-label="Packed scatter data"]')?.textContent?.includes('South loop') !== true ||
+  document.querySelector('[aria-label="Packed bubble data"]')?.textContent?.includes('100') !== true ||
+  document.querySelector('[aria-label="Packed histogram data"]')?.textContent?.includes('count') !== true ||
+  document.querySelector('[aria-label="Packed box plot data"]')?.textContent?.includes('North loop') !== true
+) {
+  throw new Error('Packed statistical charts did not preserve their plotted and tabular meaning.');
 }
 if (
   document.querySelector('[data-wcl-process-stage][aria-current="step"]')?.textContent?.includes(

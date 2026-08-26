@@ -1,7 +1,13 @@
 export {AreaChart, BarChart, CartesianChart, ColumnChart, LineChart} from './cartesian-chart.js';
+export {BoxPlot, BubbleChart, Histogram, ScatterChart} from './statistical-chart.js';
 export type {
   AreaChartProps,
   BarChartProps,
+  BoxPlotDistribution,
+  BoxPlotProps,
+  BoxWhisker,
+  BubbleChartProps,
+  BubbleMagnitude,
   CartesianChartProps,
   CartesianChartSeries,
   CategoricalChartScale,
@@ -24,10 +30,16 @@ export type {
   ChartTone,
   ChartValueAxis,
   ColumnChartProps,
+  HistogramDistribution,
+  HistogramOrdinate,
+  HistogramProps,
   LinearChartScale,
   LineChartProps,
   LogarithmicChartScale,
   NormalizedChartScale,
   NonEmptyChartSeries,
+  QuantitativeChartDataAxis,
+  ScatterChartProps,
+  StatisticalChartSeries,
   TimeChartScale,
 } from './chart-types.js';

@@ -15,6 +15,8 @@ import {
   AppearanceProvider,
   Badge,
   BarChart,
+  BoxPlot,
+  BubbleChart,
   Button,
   ButtonGroup,
   Breadcrumbs,
@@ -41,6 +43,7 @@ import {
   FileTrigger,
   FormSection,
   IconButton,
+  Histogram,
   InlineAlert,
   InlineGroup,
   Link,
@@ -60,6 +63,7 @@ import {
   ResponsiveGrid,
   RadioGroup,
   ScrollRegion,
+  ScatterChart,
   SearchField,
   Section,
   Select,
@@ -100,6 +104,31 @@ const chartData = [
   {capacity: 68, demand: 61, month: 'Mar'},
   {capacity: 72, demand: 57, month: 'Apr'},
 ] as const;
+const statisticalPointData = [
+  {demand: 28, id: 'north-1', label: 'North Monday', loop: 'north', stored: 42, temperature: 18},
+  {demand: 46, id: 'south-1', label: 'South Monday', loop: 'south', stored: 74, temperature: 31},
+  {demand: 38, id: 'west-1', label: 'West Monday', loop: 'west', stored: 31, temperature: 43},
+  {demand: 68, id: 'north-2', label: 'North Tuesday', loop: 'north', stored: 88, temperature: 56},
+  {demand: 59, id: 'south-2', label: 'South Tuesday', loop: 'south', stored: 52, temperature: 70},
+  {demand: 82, id: 'west-2', label: 'West Tuesday', loop: 'west', stored: 64, temperature: 82},
+  {demand: 68, id: 'south-3', label: 'South Wednesday', loop: 'south', stored: 26, temperature: 56},
+] as const;
+const statisticalSeries = [
+  {id: 'north', label: 'North loop'},
+  {color: 'series-2', id: 'south', label: 'South loop'},
+  {color: 'series-3', id: 'west', label: 'West loop'},
+] as const;
+const restartLatencies = [
+  8, 21, 44, 47, 63, 71, 86, 91, 95, 103, 108, 111, 116, 124, 131, 139, 151, 168, 177, 209,
+].map((latency) => ({latency}));
+const recoveryTimes = [
+  ...[43, 48, 52, 54, 56, 57, 63, 70, 104].map((recovery) => ({loop: 'north', recovery})),
+  ...[34, 39, 43, 47, 51, 54, 56, 58, 60, 63, 75, 96, 108].map((recovery) => ({
+    loop: 'south',
+    recovery,
+  })),
+  ...[55, 59, 63, 66, 71, 75, 79].map((recovery) => ({loop: 'west', recovery})),
+];
 const chartStateCopy = {
   emptyState: {
     description: 'Choose a reporting interval with recorded energy.',
@@ -1924,6 +1953,17 @@ function ChartSpecimens() {
     dataTableLabel: 'Monthly energy data',
     description: 'Monthly demand remains within available thermal capacity.',
   } as const;
+  const statisticalCommon = {
+    dataTableLabel: 'Statistical chart data',
+    emptyState: {
+      description: 'Choose a reporting interval with recorded observations.',
+      title: 'No observations',
+    },
+    invalidData: {
+      description: 'Correct records with missing, non-finite, or out-of-domain values.',
+      title: 'Some observations are invalid',
+    },
+  } as const;
 
   return (
     <>
@@ -2025,6 +2065,121 @@ function ChartSpecimens() {
               },
             ]}
             title="Demand within capacity"
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Hover or focus a legend item to emphasize its group, or press it to pin the group and give it priority where points overlap."
+        name="ScatterChart"
+      >
+        <Example label="Grouped ScatterChart with coincident points">
+          <ScatterChart
+            {...statisticalCommon}
+            data={statisticalPointData}
+            description="Compare temperature and thermal demand for recorded operating periods."
+            idAccessor="id"
+            labelAccessor="label"
+            legend={{label: 'Turbine loops'}}
+            series={statisticalSeries}
+            seriesAccessor="loop"
+            title="Temperature and demand"
+            xAxis={{
+              accessor: 'temperature',
+              label: 'Temperature',
+              scale: {domain: [10, 90], type: 'linear'},
+              unit: '°F',
+            }}
+            yAxis={{
+              accessor: 'demand',
+              label: 'Thermal demand',
+              scale: {domain: [20, 100], type: 'linear'},
+              showGrid: true,
+              unit: 'MWh',
+            }}
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Add one positive measurement through proportional mark area. The tooltip and generated table report the source magnitude rather than the rendered radius."
+        name="BubbleChart"
+      >
+        <Example label="BubbleChart with stored-energy magnitude">
+          <BubbleChart
+            {...statisticalCommon}
+            data={statisticalPointData}
+            description="Compare temperature, demand, and stored energy for recorded operating periods."
+            idAccessor="id"
+            labelAccessor="label"
+            legend={{label: 'Turbine loops'}}
+            magnitude={{accessor: 'stored', label: 'Stored energy', unit: 'MWh'}}
+            series={statisticalSeries}
+            seriesAccessor="loop"
+            title="Thermal demand and stored energy"
+            xAxis={{
+              accessor: 'temperature',
+              label: 'Temperature',
+              scale: {domain: [10, 90], type: 'linear'},
+              unit: '°F',
+            }}
+            yAxis={{
+              accessor: 'demand',
+              label: 'Thermal demand',
+              scale: {domain: [20, 100], type: 'linear'},
+              showGrid: true,
+              unit: 'MWh',
+            }}
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Show a numeric distribution from raw observations or explicit pre-binned intervals. Directly reading one bin dims the others; blank plot space has no inferred reading."
+        name="Histogram"
+      >
+        <Example label="Raw-observation Histogram">
+          <Histogram
+            {...statisticalCommon}
+            data={restartLatencies}
+            description="See which restart-latency ranges occurred most often."
+            distribution={{
+              accessor: 'latency',
+              kind: 'raw',
+              thresholds: [0, 40, 80, 120, 160, 200, 240],
+            }}
+            title="Pump restart latency"
+            xAxis={{
+              label: 'Restart latency',
+              scale: {domain: [0, 240], type: 'linear'},
+              unit: 'ms',
+            }}
+            yAxis={{label: 'Restarts', scale: {domain: [0, 8], type: 'linear'}, showGrid: true}}
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Compare group medians, quartiles, whiskers, and outliers. Keyboard reading moves by group summary; pointer and touch can read each outlier separately."
+        name="BoxPlot"
+      >
+        <Example label="Raw-observation BoxPlot">
+          <BoxPlot
+            {...statisticalCommon}
+            data={recoveryTimes}
+            description="Compare the center, spread, and outliers of recovery time for three turbine loops."
+            distribution={{kind: 'raw', valueAccessor: 'recovery', whisker: 'tukey'}}
+            groupAccessor="loop"
+            groups={statisticalSeries}
+            legend={{label: 'Turbine loops'}}
+            title="Recovery-time distribution"
+            xAxis={{label: 'Turbine loop'}}
+            yAxis={{
+              label: 'Recovery time',
+              scale: {domain: [0, 120], type: 'linear'},
+              showGrid: true,
+              unit: 'minutes',
+            }}
           />
         </Example>
       </Specimen>

@@ -9,7 +9,9 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 18, including the intervening Ticket 03A accent correction, are complete.
+Tickets 01 through 20, including the intervening Ticket 03A accent correction, are complete.
+Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
+contracts, direct reading, pinned overlap priority, and Whitney's selected translucent marks.
 The future-ticket audit is complete. Ticket 18 delivers ProcessTracker and a non-exported
 operational integration fixture that proves one coherent stateful flow. The data-analysis,
 Markdown-authoring, and application-workbench
@@ -265,9 +267,20 @@ states, and generated native data tables keep the family reusable and accessible
 remain private geometry dependencies, and an executable tree-shaking proof keeps their code out of
 ordinary component bundles.
 
+### Ticket 20 — statistical chart family
+
+ScatterChart, BubbleChart, Histogram, and BoxPlot extend the delivered chart frame without carrying
+prototype controls or prototype-only layout into production. Their public contracts distinguish
+record-oriented points, proportional magnitude, raw and pre-binned distributions, and raw or
+summarized quartiles and whiskers. Direct readings clear on blank space and dim every other mark;
+legend pinning gives overlapping groups paint and hit-test priority. Translucent marks, graduated
+axes, compact point bounds, proportional bubble area, split whiskers, separate outliers, generated
+tables, and chart-specific guidance preserve the accepted visual and reading decisions.
+
 ## Frontier
 
-See the [decision map](map.md). [Ticket 20](tickets/20-statistical-chart-family.md) is next.
+See the [decision map](map.md). The current decision frontier is
+[statistical chart visual encoding](decisions/19-statistical-chart-visual-encoding.md).
 
 ## Accepted sources
 
@@ -295,6 +308,17 @@ See the [decision map](map.md). [Ticket 20](tickets/20-statistical-chart-family.
 - Repository-owned evaluation of agent output or a prescribed consumer evaluation workflow.
 
 ## Current verification
+
+- The isolated statistical-chart prototype passes Prettier, ESLint, Stylelint, repository
+  type-checking, its production build, and `git diff --check`.
+- Direct Chromium operation covers 32 statistical-chart combinations across both treatments, all
+  four chart types, wide and compact sizing, and light and dark appearance. Direct-mark-only
+  tooltips, blank-space and exit clearing, element-level reading emphasis, group-level legend
+  pinning, pinned overlap priority, keyboard reading, retained direct touch, Escape clearing,
+  independent box-summary and outlier reading, accepted axis attributes, forced colors, reduced
+  motion, and a 390px viewport pass without console errors or document overflow.
+- Bubble mark area now follows magnitude proportionally. Compact scatter marks render at roughly
+  15–18 pixels across instead of shrinking below 10 pixels with the plot.
 
 - Ticket 18 passes `npm run check` with 25 test files and 417 tests, generated guidance, and public
   declarations under TypeScript 5.9, 6, and 7. `npm run showcase:build`,
@@ -475,13 +499,29 @@ See the [decision map](map.md). [Ticket 20](tickets/20-statistical-chart-family.
   Packed React 18.3.1 and 19.2.8 consumers render, hydrate, type-check, and browser-build a LineChart;
   the ordinary-component isolation build emits no chart or D3 modules. Independent engineering and
   intent re-reviews report no unresolved objective defects.
+- Ticket 20 focused tests cover direct statistical readings, blank clearing, all-other muting,
+  pinned overlap priority, proportional bubble area, raw and pre-binned histograms, raw and summary
+  box plots, split whiskers, separate outliers, keyboard and touch operation, invalid data, runtime
+  validation, SSR, hydration, public types, styles, canonical contracts, and packed-consumer source.
+  The final `npm run check` passes all 469 tests, formatting, zero-warning lint, strict types,
+  generated guidance, TypeScript 5.9/6/7 declarations, and ordinary-component chart isolation.
+  Packed React 18.3.1 and 19.2.8 consumers pass SSR, hydration, types, semantic assertions, and
+  browser builds. The showcase build, high-severity dependency audit, and diff check pass.
+- Ticket 20 direct Chromium operation covers dark and light appearance, arbitrary accent, wide and
+  compact layout, graduated axes, translucent point and distribution marks, direct hover and blank
+  clearing, all-other muting, legend pinning and overlap priority, proportional bubble area,
+  histogram intervals, split box whiskers, separate outliers, forced colors, and reduced motion
+  without console or page errors. Inspected temporary screenshots were discarded.
 - Direct chart inspection across Chromium, Firefox, and WebKit, including forced-color rendering and
   manual screen-reader operation, remains deferred to Ticket 30 before stable-candidate acceptance.
 
 ## Continuation
 
 - Branch: `master`
-- Ticket 19 is delivered in the latest commit, `[Feature] Add Cartesian chart foundation`.
-- The working tree is clean after delivery.
-- Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-- Next action: begin [Ticket 20](tickets/20-statistical-chart-family.md).
+- Ticket 19 is delivered in `5e47062` (`[Feature] Add Cartesian chart foundation`). The current
+  chart baseline includes the later role-aware palette and reading-interaction commits through
+  `d8cce02` (`[Feature] Make charts readable and interactive`).
+- Ticket 20 is implemented and validated as one delivery change; no follow-up correction remains.
+- Start a new `novel-work` effort before taking up the next ticket.
+- Next action: plan Ticket 21's radial, heatmap, and compact chart family against the delivered
+  Cartesian and statistical-chart foundations.

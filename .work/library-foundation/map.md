@@ -48,6 +48,14 @@ application.
   bounded extension contract without an Obsidian notes ecosystem.
 - [Charting scope](decisions/13-charting-scope.md): Ship an accessible, typed standard chart family,
   including radar charts, with narrow named APIs and a bounded advanced composition layer.
+- [Statistical chart input contracts](decisions/17-statistical-chart-input-contracts.md): Use
+  record-oriented points and explicit raw or summarized distribution modes with documented
+  magnitude, bin, quartile, whisker, and outlier meaning.
+- [Statistical chart reading](decisions/18-statistical-chart-reading.md): Keep one chart boundary and
+  read points spatially, bins in domain order, and box plots as complete group summaries.
+- [Statistical chart visual encoding](decisions/19-statistical-chart-visual-encoding.md): Use
+  translucent series-color fills, proportional bubble area, bounded compact point sizing, split
+  box whiskers, direct-mark emphasis, and pinned overlap priority on the delivered chart frame.
 - [Prerelease integration slice set](decisions/14-prerelease-slice-set.md): Require four
   non-exported consumer fixtures before stable release without turning their arrangements into
   public contracts.

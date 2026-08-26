@@ -3,9 +3,13 @@ export {pageHeaderContract, splitViewContract} from './application.contracts.js'
 export {
   areaChartContract,
   barChartContract,
+  boxPlotContract,
+  bubbleChartContract,
   cartesianChartContract,
   columnChartContract,
+  histogramContract,
   lineChartContract,
+  scatterChartContract,
 } from './chart.contracts.js';
 export {
   buttonContract,
@@ -104,9 +108,13 @@ import {pageHeaderContract, splitViewContract} from './application.contracts.js'
 import {
   areaChartContract,
   barChartContract,
+  boxPlotContract,
+  bubbleChartContract,
   cartesianChartContract,
   columnChartContract,
+  histogramContract,
   lineChartContract,
+  scatterChartContract,
 } from './chart.contracts.js';
 import {
   buttonContract,
@@ -198,7 +206,9 @@ export const componentContracts = [
   appearanceProviderContract,
   badgeContract,
   barChartContract,
+  boxPlotContract,
   breadcrumbsContract,
+  bubbleChartContract,
   buttonContract,
   buttonGroupContract,
   cardCollectionContract,
@@ -224,6 +234,7 @@ export const componentContracts = [
   fileTriggerContract,
   formSectionContract,
   iconButtonContract,
+  histogramContract,
   inlineGroupContract,
   inlineAlertContract,
   linkContract,
@@ -243,6 +254,7 @@ export const componentContracts = [
   responsiveGridContract,
   radioGroupContract,
   scrollRegionContract,
+  scatterChartContract,
   searchFieldContract,
   sectionContract,
   selectContract,

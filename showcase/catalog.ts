@@ -67,7 +67,17 @@ export const showcaseGroups = [
   },
   {
     label: 'Charts',
-    components: ['LineChart', 'AreaChart', 'ColumnChart', 'BarChart', 'CartesianChart'],
+    components: [
+      'LineChart',
+      'AreaChart',
+      'ColumnChart',
+      'BarChart',
+      'CartesianChart',
+      'ScatterChart',
+      'BubbleChart',
+      'Histogram',
+      'BoxPlot',
+    ],
   },
   {
     label: 'Date and time',

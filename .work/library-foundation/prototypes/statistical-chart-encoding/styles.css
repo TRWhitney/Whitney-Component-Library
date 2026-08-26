@@ -1,0 +1,488 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #11171b;
+}
+
+[data-wcl-provider] {
+  min-block-size: 100vh;
+  background: var(--wcl-canvas);
+  color: var(--wcl-text);
+  font-family: var(--wcl-font-body);
+}
+
+.prototype {
+  display: grid;
+  gap: 1.5rem;
+  inline-size: min(100%, 78rem);
+  min-block-size: 100vh;
+  margin-inline: auto;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.prototype-header {
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.prototype-header > div,
+.stat-caption {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.prototype-kicker {
+  color: var(--wcl-text-muted);
+  font-family: var(--wcl-font-utility);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.prototype-header h1,
+.prototype-header p {
+  margin: 0;
+}
+
+.prototype-header h1 {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.prototype-header p {
+  max-inline-size: 68ch;
+  color: var(--wcl-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+:is(.prototype-controls, .prototype-stage) {
+  position: relative;
+  min-inline-size: 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-radius);
+  background: var(--wcl-surface);
+}
+
+.encoding-guide {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.55fr) minmax(0, 1.45fr);
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-radius);
+  background: var(--wcl-surface-subtle);
+}
+
+.encoding-guide-heading,
+.encoding-option-copy {
+  display: grid;
+  gap: 0.3rem;
+  align-content: center;
+}
+
+.encoding-guide-heading > strong,
+.encoding-guide-options strong {
+  font-size: 0.875rem;
+}
+
+.encoding-guide-heading > span,
+.encoding-guide-options small {
+  color: var(--wcl-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.encoding-guide-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.encoding-guide-options > div {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  min-inline-size: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-control-radius);
+  background: var(--wcl-surface);
+  opacity: 0.62;
+}
+
+.encoding-guide-options > div[data-selected] {
+  border-color: var(--wcl-accent-rail);
+  box-shadow: inset 0 -3px 0 var(--wcl-accent-rail);
+  opacity: 1;
+}
+
+.encoding-sample {
+  position: relative;
+  display: block;
+  inline-size: 3rem;
+  block-size: 2.5rem;
+  color: var(--wcl-accent-rail);
+}
+
+.encoding-sample i,
+.encoding-sample b {
+  position: absolute;
+  display: block;
+  border: 2px solid currentcolor;
+}
+
+.encoding-sample i {
+  inset-block-start: 0.1rem;
+  inset-inline-start: 0.1rem;
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  border-radius: 50%;
+}
+
+.encoding-sample b {
+  inset-block-end: 0.1rem;
+  inset-inline-end: 0.1rem;
+  inline-size: 1.35rem;
+  block-size: 1.8rem;
+}
+
+.encoding-sample[data-sample='structure'] :is(i, b) {
+  background: color-mix(in oklch, currentcolor 30%, transparent);
+}
+
+.encoding-sample[data-sample='solid'] :is(i, b) {
+  border-color: var(--wcl-surface);
+  background: currentcolor;
+}
+
+.prototype-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(15rem, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.prototype-accent {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  min-block-size: 2.75rem;
+  color: var(--wcl-text-muted);
+  font-family: var(--wcl-font-utility);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.prototype-accent input {
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  padding: 0.15rem;
+  border: 1px solid var(--wcl-border-strong);
+  border-radius: var(--wcl-control-radius);
+  background: var(--wcl-surface-subtle);
+}
+
+.prototype-stage {
+  overflow: auto;
+}
+
+.prototype-chart-region {
+  display: grid;
+  gap: 1rem;
+  inline-size: min(100%, var(--prototype-region-width));
+  min-inline-size: min(100%, 20rem);
+  margin-inline: auto;
+  transition: inline-size 160ms ease;
+}
+
+.stat-caption > strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.stat-caption > span {
+  color: var(--wcl-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.chart-guide {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  padding-block: 0.9rem;
+  border-block: 1px solid var(--wcl-border);
+}
+
+.chart-guide > strong {
+  font-family: var(--wcl-font-utility);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chart-guide-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
+.chart-guide-item {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  min-inline-size: 0;
+}
+
+.chart-guide-item > span {
+  color: var(--wcl-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.guide-glyph {
+  inline-size: 2.75rem;
+  block-size: 2rem;
+  overflow: visible;
+  color: var(--wcl-accent-rail);
+  fill: color-mix(in oklch, currentcolor 24%, var(--wcl-surface));
+  stroke: currentcolor;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.guide-glyph path {
+  fill: none;
+}
+
+.guide-glyph .guide-glyph-strong {
+  stroke-width: 3;
+}
+
+.stat-plot-composition {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.stat-plot-composition [data-wcl-chart-legend] {
+  padding-inline: 0.25rem;
+}
+
+[data-stat-legend-mark] {
+  fill: color-mix(in oklch, var(--wcl-chart-series-color) 30%, transparent);
+  stroke: var(--wcl-chart-series-color);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-encoding='solid'] [data-stat-legend-mark] {
+  fill: var(--wcl-chart-series-color);
+}
+
+.stat-chart {
+  --stat-series-color: var(--wcl-accent-rail);
+  --wcl-chart-axis-font-size: var(--prototype-axis-font-size);
+  --wcl-chart-grid-width: 1.15px;
+  --wcl-chart-line-width: 2.5px;
+
+  position: relative;
+  min-inline-size: 20rem;
+  overflow: hidden;
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-control-radius);
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  background: var(--wcl-surface-subtle);
+}
+
+.stat-chart:focus-visible {
+  outline-color: var(--wcl-accent-focus);
+}
+
+.stat-chart svg {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+[data-color='accent'] {
+  --stat-series-color: var(--wcl-accent-rail);
+}
+
+[data-color='series-2'] {
+  --stat-series-color: var(--wcl-chart-series-2);
+}
+
+[data-color='series-3'] {
+  --stat-series-color: var(--wcl-chart-series-3);
+}
+
+[data-stat-mark] {
+  fill: color-mix(in oklch, var(--stat-series-color) 30%, transparent);
+  stroke: var(--stat-series-color);
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-encoding='solid'] [data-stat-mark] {
+  fill: var(--stat-series-color);
+  stroke: var(--stat-series-color);
+  stroke-width: 3;
+}
+
+[data-stat-bin] {
+  fill: color-mix(in oklch, var(--stat-series-color) 30%, transparent);
+  stroke: var(--stat-series-color);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-encoding='solid'] [data-stat-bin] {
+  fill: var(--stat-series-color);
+  stroke: var(--stat-series-color);
+  stroke-width: 1.5;
+}
+
+[data-stat-whisker],
+[data-stat-whisker-cap] {
+  stroke: var(--stat-series-color);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-stat-quartile] {
+  fill: color-mix(in oklch, var(--stat-series-color) 30%, transparent);
+  stroke: var(--stat-series-color);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-stat-median] {
+  stroke: var(--stat-series-color);
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-stat-outlier] {
+  fill: color-mix(in oklch, var(--stat-series-color) 30%, transparent);
+  stroke: var(--stat-series-color);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-encoding='solid'] [data-stat-quartile] {
+  fill: var(--stat-series-color);
+  stroke-width: 2;
+}
+
+[data-encoding='solid'] [data-stat-median] {
+  stroke: var(--wcl-surface);
+  stroke-width: 3;
+}
+
+[data-encoding='solid'] [data-stat-outlier] {
+  fill: var(--stat-series-color);
+}
+
+[data-stat-element] {
+  transition: opacity 120ms ease;
+}
+
+[data-stat-element][data-muted] {
+  opacity: 0.24;
+}
+
+:is([data-stat-mark], [data-stat-bin], [data-stat-box], [data-stat-outlier]) {
+  cursor: crosshair;
+  transition:
+    opacity 120ms ease,
+    stroke-width 120ms ease;
+}
+
+[data-stat-mark][data-active] {
+  stroke-width: 4.5;
+}
+
+[data-stat-bin][data-active] {
+  stroke-width: 3;
+}
+
+[data-stat-box][data-active]
+  :is([data-stat-whisker], [data-stat-whisker-cap], [data-stat-quartile]) {
+  stroke-width: 3;
+}
+
+[data-stat-outlier][data-active] {
+  stroke-width: 4;
+}
+
+.prototype-region-label {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 0.4rem;
+  inset-inline-end: 0.4rem;
+  display: none;
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.2rem;
+  background: var(--wcl-text);
+  color: var(--wcl-surface);
+  font-family: var(--wcl-font-utility);
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+.prototype[data-identify='true'] [data-region]:is(:hover, :focus-within) > .prototype-region-label {
+  display: block;
+}
+
+@media (width <= 48rem) {
+  .prototype-header {
+    display: grid;
+  }
+
+  .prototype-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .encoding-guide,
+  .encoding-guide-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prototype-controls [data-wcl-segment] {
+    padding-inline: 0.25rem;
+    font-size: 0.75rem;
+    overflow-wrap: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prototype-chart-region,
+  [data-stat-element],
+  :is([data-stat-mark], [data-stat-bin], [data-stat-box], [data-stat-outlier]) {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :is([data-stat-mark], [data-stat-bin], [data-stat-quartile], [data-stat-outlier]) {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+
+  :is([data-stat-whisker], [data-stat-whisker-cap], [data-stat-median]) {
+    stroke: Highlight;
+  }
+}

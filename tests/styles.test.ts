@@ -51,6 +51,13 @@ describe('static appearance styles', () => {
       /\[data-wcl-chart-area\]\s*\{[^}]*fill:\s*color-mix\(in oklch, var\(--wcl-chart-series-color\) 18%, transparent\)/,
     );
     expect(styles).toMatch(
+      /:is\([\s\S]*?\[data-wcl-statistical-point\][\s\S]*?\)\s*\{[^}]*fill:\s*color-mix\(in oklch, var\(--wcl-chart-series-color\) 30%, transparent\)/,
+    );
+    expect(styles).toMatch(/\[data-wcl-statistical-mark\]\[data-muted\]\s*\{[^}]*opacity:\s*0\.24/);
+    expect(styles).toMatch(
+      /:is\(\[data-wcl-box-whisker\], \[data-wcl-box-whisker-cap\]\)\s*\{[^}]*stroke:\s*var\(--wcl-chart-series-color\)/,
+    );
+    expect(styles).toMatch(
       /\[data-wcl-chart-line\]\s*\{[^}]*stroke-width:\s*var\(--wcl-chart-line-width\)/,
     );
     expect(styles).toMatch(

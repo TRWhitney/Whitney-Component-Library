@@ -271,3 +271,103 @@ export interface CartesianChartProps<
   readonly xAxis: ChartDataAxis<Datum, XValue>;
   readonly yAxis: ChartValueAxis<LinearChartScale>;
 }
+
+interface StatisticalChartCommonProps<Datum extends object> {
+  readonly aspectRatio?: number;
+  readonly data: readonly Datum[];
+  readonly dataTableLabel: string;
+  readonly description: string;
+  readonly emptyState: ChartStateCopy;
+  readonly invalidData: ChartStateCopy;
+  readonly minimumSize?: ChartMinimumSize;
+  readonly overflow?: ChartOverflow;
+  readonly status?: ChartStatus;
+  readonly title: string;
+}
+
+export type QuantitativeChartDataAxis<Datum extends object> = Omit<
+  ChartDataAxis<Datum, number>,
+  'scale'
+> & {
+  readonly scale: LinearChartScale | LogarithmicChartScale;
+};
+
+export interface StatisticalChartSeries {
+  readonly color?: ChartColor;
+  readonly id: string;
+  readonly label: string;
+}
+
+interface PointChartProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly idAccessor: ChartAccessor<Datum, string>;
+  readonly labelAccessor: ChartAccessor<Datum, string>;
+  readonly legend?: ChartLegend;
+  readonly series: NonEmptyChartSeries<StatisticalChartSeries>;
+  readonly seriesAccessor?: ChartAccessor<Datum, string>;
+  readonly xAxis: QuantitativeChartDataAxis<Datum>;
+  readonly yAxis: QuantitativeChartDataAxis<Datum>;
+}
+
+export type ScatterChartProps<Datum extends object> = PointChartProps<Datum>;
+
+export interface BubbleMagnitude<Datum extends object> {
+  readonly accessor: ChartAccessor<Datum, number>;
+  readonly formatValue?: (value: number) => string;
+  readonly label: string;
+  readonly unit?: string;
+}
+
+export interface BubbleChartProps<Datum extends object> extends PointChartProps<Datum> {
+  readonly magnitude: BubbleMagnitude<Datum>;
+}
+
+export type HistogramOrdinate = 'count' | 'density' | 'proportion';
+
+export type HistogramDistribution<Datum extends object> =
+  | {
+      readonly accessor: ChartAccessor<Datum, number>;
+      readonly kind: 'raw';
+      readonly thresholds?: number | readonly number[];
+    }
+  | {
+      readonly kind: 'binned';
+      readonly lowerAccessor: ChartAccessor<Datum, number>;
+      readonly ordinate: HistogramOrdinate;
+      readonly ordinateAccessor: ChartAccessor<Datum, number>;
+      readonly upperAccessor: ChartAccessor<Datum, number>;
+    };
+
+export interface HistogramProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly color?: ChartColor;
+  readonly distribution: HistogramDistribution<Datum>;
+  readonly xAxis: ChartValueAxis<LinearChartScale>;
+  readonly yAxis: ChartValueAxis<LinearChartScale>;
+}
+
+export type BoxWhisker = 'min-max' | 'tukey';
+
+export type BoxPlotDistribution<Datum extends object> =
+  | {
+      readonly kind: 'raw';
+      readonly valueAccessor: ChartAccessor<Datum, number>;
+      readonly whisker?: BoxWhisker;
+    }
+  | {
+      readonly kind: 'summary';
+      readonly lowerWhiskerAccessor: ChartAccessor<Datum, number>;
+      readonly medianAccessor: ChartAccessor<Datum, number>;
+      readonly outliersAccessor: ChartAccessor<Datum, readonly number[]>;
+      readonly q1Accessor: ChartAccessor<Datum, number>;
+      readonly q3Accessor: ChartAccessor<Datum, number>;
+      readonly upperWhiskerAccessor: ChartAccessor<Datum, number>;
+      readonly whisker: BoxWhisker;
+    };
+
+export interface BoxPlotProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly distribution: BoxPlotDistribution<Datum>;
+  readonly groupAccessor: ChartAccessor<Datum, string>;
+  readonly groups: NonEmptyChartSeries<StatisticalChartSeries>;
+  readonly legend?: ChartLegend;
+  readonly xAxis: {readonly label: string};
+  readonly yAxis: ChartValueAxis<LinearChartScale>;
+}

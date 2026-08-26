@@ -162,6 +162,21 @@ describe('packed consumer verification source', () => {
     );
   });
 
+  it('exercises every statistical chart through packed SSR and hydration', () => {
+    const source = createConsumerVerificationSource('@fixture/component-library');
+
+    for (const exportName of ['BoxPlot', 'BubbleChart', 'Histogram', 'ScatterChart']) {
+      expect(source).toContain(exportName);
+    }
+    expect(source).toContain('data-wcl-box-plot');
+    expect(source).toContain('data-wcl-bubble-chart');
+    expect(source).toContain('data-wcl-histogram');
+    expect(source).toContain('data-wcl-scatter-chart');
+    expect(source).toContain(
+      'Packed statistical charts did not preserve their plotted and tabular meaning.',
+    );
+  });
+
   it('exercises single and paired range entry through the packed API', () => {
     const source = createConsumerVerificationSource('@fixture/component-library');
 

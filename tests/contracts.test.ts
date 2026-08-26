@@ -43,6 +43,8 @@ describe('canonical component contracts', () => {
       'AppearanceProvider',
       'Badge',
       'BarChart',
+      'BoxPlot',
+      'BubbleChart',
       'Button',
       'ButtonGroup',
       'CardCollection',
@@ -70,6 +72,7 @@ describe('canonical component contracts', () => {
       'FileTrigger',
       'FormSection',
       'IconButton',
+      'Histogram',
       'InlineAlert',
       'InlineGroup',
       'Link',
@@ -89,6 +92,7 @@ describe('canonical component contracts', () => {
       'RangeSlider',
       'ResponsiveGrid',
       'ScrollRegion',
+      'ScatterChart',
       'SearchField',
       'Section',
       'SegmentedControl',
@@ -118,6 +122,27 @@ describe('canonical component contracts', () => {
     expect(componentContracts.map((contract) => contract.exportName).sort()).toEqual(
       [...exportNames].sort(),
     );
+  });
+
+  it('keeps each statistical chart explanation specific to behavior that chart owns', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName)!;
+    const scatter = contractFor('ScatterChart');
+    const bubble = contractFor('BubbleChart');
+    const histogram = contractFor('Histogram');
+    const box = contractFor('BoxPlot');
+
+    expect(scatter.appearance.join(' ')).toMatch(/translucent.*shape/i);
+    expect(scatter.appearance.join(' ')).not.toMatch(/box|whisker|quartile/i);
+    expect(bubble.responsiveBehavior.join(' ')).toMatch(/area.*proportional/i);
+    expect(histogram.composition.join(' ')).not.toMatch(/group|legend/i);
+    expect(histogram.parts.join(' ')).not.toMatch(/group|legend/i);
+    expect(histogram.localization.join(' ')).not.toMatch(/bubble|formatValue/i);
+    expect(histogram.appearance.join(' ')).toMatch(/contiguous.*bin/i);
+    expect(box.appearance.join(' ')).toMatch(/quartile/i);
+    expect(box.appearance.join(' ')).toMatch(/whisker/i);
+    expect(box.appearance.join(' ')).toMatch(/median/i);
+    expect(box.localization.join(' ')).not.toMatch(/bubble|formatValue/i);
   });
 
   it('keeps static data, description pairs, option selection, and cards distinct', () => {

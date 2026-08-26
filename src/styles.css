@@ -6138,6 +6138,59 @@
     rx: 2px;
   }
 
+  :is(
+    [data-wcl-statistical-point],
+    [data-wcl-histogram-bin],
+    [data-wcl-box-quartile],
+    [data-wcl-box-outlier],
+    [data-wcl-statistical-legend-mark],
+    [data-wcl-statistical-tooltip-mark]
+  ) {
+    fill: color-mix(in oklch, var(--wcl-chart-series-color) 30%, transparent);
+    stroke: var(--wcl-chart-series-color);
+    stroke-width: var(--wcl-statistical-mark-stroke-width, 2px);
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-statistical-mark] {
+    cursor: crosshair;
+    transition: opacity 120ms ease;
+  }
+
+  [data-wcl-statistical-mark][data-muted] {
+    opacity: 0.24;
+  }
+
+  [data-wcl-statistical-mark][data-active]
+    :is([data-wcl-statistical-point], [data-wcl-box-quartile]),
+  :is([data-wcl-histogram-bin], [data-wcl-box-outlier])[data-active] {
+    stroke-width: calc(var(--wcl-statistical-mark-stroke-width, 2px) * 1.6);
+  }
+
+  :is([data-wcl-box-whisker], [data-wcl-box-whisker-cap]) {
+    stroke: var(--wcl-chart-series-color);
+    stroke-width: var(--wcl-statistical-mark-stroke-width, 2px);
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-box-median] {
+    stroke: var(--wcl-chart-series-color);
+    stroke-width: calc(var(--wcl-statistical-mark-stroke-width, 2px) * 2);
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-box-summary][data-active] :is([data-wcl-box-whisker], [data-wcl-box-whisker-cap]) {
+    stroke-width: calc(var(--wcl-statistical-mark-stroke-width, 2px) * 1.5);
+  }
+
+  [data-wcl-statistical-legend-swatch] {
+    block-size: 0.75rem;
+  }
+
+  [data-wcl-statistical-tooltip-mark] {
+    stroke-width: 1.5;
+  }
+
   [data-wcl-chart-reading-needle] {
     stroke: var(--wcl-text-muted);
     stroke-dasharray: 3 3;
@@ -6629,6 +6682,7 @@
       [data-wcl-chart-point],
       [data-wcl-chart-area],
       [data-wcl-chart-bar],
+      [data-wcl-statistical-mark],
       [data-wcl-chart-legend] > li
     ) {
       transition: none;
@@ -7466,10 +7520,24 @@
       forced-color-adjust: auto;
     }
 
-    :is([data-wcl-chart-area], [data-wcl-chart-bar], [data-wcl-chart-point]) {
+    :is(
+      [data-wcl-chart-area],
+      [data-wcl-chart-bar],
+      [data-wcl-chart-point],
+      [data-wcl-statistical-point],
+      [data-wcl-histogram-bin],
+      [data-wcl-box-quartile],
+      [data-wcl-box-outlier],
+      [data-wcl-statistical-legend-mark],
+      [data-wcl-statistical-tooltip-mark]
+    ) {
       fill: Canvas;
       stroke: CanvasText;
       forced-color-adjust: auto;
+    }
+
+    :is([data-wcl-box-whisker], [data-wcl-box-whisker-cap], [data-wcl-box-median]) {
+      stroke: CanvasText;
     }
 
     [data-color='accent']
@@ -7486,6 +7554,19 @@
 
     [data-color='accent'] :is([data-wcl-chart-line], [data-wcl-chart-legend-line]) {
       fill: none;
+    }
+
+    [data-color='accent']
+      :is(
+        [data-wcl-statistical-point],
+        [data-wcl-box-quartile],
+        [data-wcl-box-outlier],
+        [data-wcl-statistical-legend-mark],
+        [data-wcl-statistical-tooltip-mark]
+      ),
+    [data-wcl-histogram-bin][data-color='accent'] {
+      fill: Highlight;
+      stroke: Highlight;
     }
 
     [data-wcl-chart-annotation] {
