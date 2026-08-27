@@ -8,6 +8,7 @@ type ChartName =
   | 'CartesianChart'
   | 'ColumnChart'
   | 'DonutChart'
+  | 'Heatmap'
   | 'Histogram'
   | 'LineChart'
   | 'PieChart'
@@ -32,6 +33,7 @@ const chartNames = [
   'CartesianChart',
   'ColumnChart',
   'DonutChart',
+  'Heatmap',
   'Histogram',
   'LineChart',
   'PieChart',
@@ -383,6 +385,106 @@ export const radarChartContract: ComponentContract = {
   summary: 'Compare a few subjects across ordered qualities on one shared radial scale.',
   validation: [
     'TypeScript requires at least three dimensions and limits data to one through six series. Runtime preparation requires unique usable ids and labels. A missing dimension becomes zero. A negative or non-finite dimension value invalidates the entire series.',
+  ],
+};
+
+export const heatmapContract: ComponentContract = {
+  accentBehavior: [
+    'A sequential scale moves from the surface toward the application accent. A two-sided scale uses the second chart color below its midpoint and the accent above it. Missing cells stay neutral and outside both numeric scales.',
+  ],
+  accessibility: [
+    'The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. The visual grid is hidden from assistive technology, and a generated native table preserves every declared row and column intersection.',
+  ],
+  appearance: [
+    'Every numeric cell uses one visible continuous color key. Sequential color represents low-to-high magnitude. Two-sided color meets at the declared midpoint. Missing cells use a neutral dashed crosshatch that cannot be mistaken for zero or a numeric extreme.',
+  ],
+  appropriateUses: [
+    'showing one shared numeric measure across the intersections of two ordered categorical domains',
+  ],
+  composition: [
+    'Render Heatmap inside AppearanceProvider in consumer-owned layout. Supply ordered labeled row and column domains, sparse cell records, coordinate and value accessors, one shared unit and formatter, scale configuration, localized labels, state copy, and a table label.',
+  ],
+  contentRules: [
+    'Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. State what the color means in the description, and choose a two-sided scale only when its midpoint has a real interpretation.',
+  ],
+  controlBehavior: [
+    'Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.',
+    'Heatmap emits no consumer events and does not select, filter, reorder, or mutate records.',
+  ],
+  counterExamples: [
+    {
+      code: example(
+        'MisusedHeatmap',
+        '<Heatmap\n  columnAccessor="date"\n  columns={Array.from({length: 200}, (_, index) => ({id: String(index), label: `Day ${index + 1}`}))}\n  data={[{date: "0", device: "0", value: 1}]}\n  dataTableLabel="All device readings"\n  description="Every raw device reading."\n  emptyState={{title: "No grid", description: "Declare devices and dates."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Device", column: "Date", colorKey: "Reading scale", missing: "No reading", scrollRegion: "Device grid"}}\n  rowAccessor="device"\n  rows={Array.from({length: 1000}, (_, index) => ({id: String(index), label: `Device ${index + 1}`}))}\n  scale={{type: "sequential"}}\n  title="All device history"\n  value={{accessor: "value", label: "Reading"}}\n/>',
+      ),
+      description:
+        'Use a summarized chart, filtered view, or virtualized data table when the complete grid is too large to scan as color.',
+      title: 'Do not turn Heatmap into an unreadable matrix',
+    },
+  ],
+  directionality: [
+    'Caption, labels, tooltip, key, and table follow inherited writing direction. Declared row and column order remains the source order.',
+  ],
+  events: [
+    'Heatmap manages cell readings and local scrolling internally. Pointer, keyboard, and touch interaction do not change consumer data.',
+  ],
+  examples: [
+    {
+      code: example(
+        'HeatmapExample',
+        '<Heatmap\n  columnAccessor="hour"\n  columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}\n  data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}\n  dataTableLabel="Room temperature data"\n  description="Temperature by room and time; patterned cells have no reading."\n  emptyState={{title: "No grid", description: "Declare rooms and times to begin."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}\n  rowAccessor="location"\n  rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}\n  scale={{type: "sequential"}}\n  title="Room temperature"\n  value={{accessor: "value", label: "Temperature", unit: "°C"}}\n/>',
+      ),
+      description:
+        'Show sparse values across a complete declared grid while keeping zero separate from missing.',
+      title: 'Sequential Heatmap with zero and missing cells',
+    },
+  ],
+  exportName: 'Heatmap',
+  forcedColorBehavior: [
+    'Forced colors preserve numeric cells, missing patterns, active boundaries, labels, and the complete table in system colors. The table remains the exact non-color representation.',
+  ],
+  formBehavior: [
+    'Heatmap is not a form control and does not submit, validate, or reset values. Place dataset and scale controls beside it in consumer-owned composition.',
+  ],
+  importPath: '.',
+  inappropriateUses: [
+    'unrelated units, area-proportional comparison, precise scanning of a very large matrix, arbitrary two-sided midpoints, or datasets that need aggregation to answer the question',
+  ],
+  keyboardBehavior: [
+    'Tab reaches one title-named grid boundary. Left and Right move across columns; Up and Down move across rows. Home and End reach row endpoints. Control Home and Control End reach the first and last cell in the complete grid. Navigation stops at boundaries, and Escape clears the reading.',
+  ],
+  kind: 'component',
+  labeling: [
+    'title, description, dataTableLabel, value label, row and column headings, color-key label, localized missing copy, scroll-region label, and state copy are required. Row and column ids stay stable while labels provide readable names.',
+  ],
+  localization: [
+    'Localize all visible and announced copy, domain labels, missing copy, and units. value.formatValue controls locale-specific number formatting.',
+  ],
+  name: 'Heatmap',
+  parts: [
+    'Heatmap contains a named figure, visible caption, optional feedback, ordered visual grid, row and column labels, continuous numeric key, missing-value key, shared tooltip, polite announcement, labeled local scroll region when needed, and generated native data table.',
+  ],
+  preferredAlternatives: [
+    'Use a native Table for exact dense comparison, LineChart for change over a continuous ordered domain, BarChart or ColumnChart for a small set of precise comparisons, or filtered and summarized views when the full matrix is too large.',
+  ],
+  preferredCompositions: [
+    'Compose Heatmap with separate filters and application-owned layout. For comparisons across several heatmaps, give them the same fixed domain and explain that shared range nearby.',
+  ],
+  purpose: 'Show one numeric measure across the complete intersections of two ordered domains.',
+  reducedMotionBehavior: [
+    'Reduced motion removes active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same. Grid geometry does not animate.',
+  ],
+  relatedExports: ['AppearanceProvider', ...chartNames.filter((name) => name !== 'Heatmap')],
+  responsiveBehavior: [
+    'Heatmap keeps labels and cells legible before preserving inline cell text. Values disappear when space becomes tight. If the complete grid still does not fit, a separately labeled local region scrolls in both directions with the transient ScrollRegion scrollbar treatment. Every intersection remains in the generated table.',
+  ],
+  states: [
+    'Ready, loading, empty-domain, partial, invalid-data, and error states are explicit. A declared grid with no records remains an all-missing grid. Non-finite records are omitted and reported; an entirely invalid nonempty dataset becomes unavailable.',
+  ],
+  stylesheet: './styles.css',
+  summary: 'Show one numeric measure across two ordered categorical domains.',
+  validation: [
+    'Runtime preparation requires unique nonblank row and column ids, declared record coordinates, and at most one record per cell. Zero and negative values are valid. Missing pairs remain missing. Non-finite values are invalid. Fixed domains must be ascending and finite, and a two-sided midpoint must be finite and inside its fixed domain.',
   ],
 };
 

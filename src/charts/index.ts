@@ -1,5 +1,6 @@
 export {AreaChart, BarChart, CartesianChart, ColumnChart, LineChart} from './cartesian-chart.js';
 export {DonutChart, PieChart} from './part-to-whole-chart.js';
+export {Heatmap} from './heatmap.js';
 export {RadarChart} from './radar-chart.js';
 export {BoxPlot, BubbleChart, Histogram, ScatterChart} from './statistical-chart.js';
 export type {
@@ -33,6 +34,11 @@ export type {
   ChartValueAxis,
   ColumnChartProps,
   DonutChartProps,
+  HeatmapDomainItem,
+  HeatmapLabels,
+  HeatmapProps,
+  HeatmapScale,
+  HeatmapValue,
   HistogramDistribution,
   HistogramOrdinate,
   HistogramProps,

@@ -257,6 +257,53 @@ export interface RadarChartProps<Datum extends object> {
   readonly value: RadarChartValue;
 }
 
+export interface HeatmapDomainItem {
+  readonly id: string;
+  readonly label: string;
+}
+
+export type HeatmapScale =
+  | {readonly domain?: readonly [number, number]; readonly type: 'sequential'}
+  | {
+      readonly domain?: readonly [number, number];
+      readonly midpoint: number;
+      readonly type: 'two-sided';
+    };
+
+export interface HeatmapValue<Datum extends object> {
+  readonly accessor: ChartAccessor<Datum, number>;
+  readonly formatValue?: (value: number) => string;
+  readonly label: string;
+  readonly unit?: string;
+}
+
+export interface HeatmapLabels {
+  readonly colorKey: string;
+  readonly column: string;
+  readonly missing: string;
+  readonly row: string;
+  readonly scrollRegion: string;
+}
+
+export interface HeatmapProps<Datum extends object> {
+  readonly aspectRatio?: number;
+  readonly columnAccessor: ChartAccessor<Datum, string>;
+  readonly columns: readonly HeatmapDomainItem[];
+  readonly data: readonly Datum[];
+  readonly dataTableLabel: string;
+  readonly description: string;
+  readonly emptyState: ChartStateCopy;
+  readonly invalidData: ChartStateCopy;
+  readonly labels: HeatmapLabels;
+  readonly minimumSize?: ChartMinimumSize;
+  readonly rowAccessor: ChartAccessor<Datum, string>;
+  readonly rows: readonly HeatmapDomainItem[];
+  readonly scale: HeatmapScale;
+  readonly status?: ChartStatus;
+  readonly title: string;
+  readonly value: HeatmapValue<Datum>;
+}
+
 interface ChartCommonProps<Datum extends object> {
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];

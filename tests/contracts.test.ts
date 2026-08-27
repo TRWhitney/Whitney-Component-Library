@@ -74,6 +74,7 @@ describe('canonical component contracts', () => {
       'FormSection',
       'IconButton',
       'Histogram',
+      'Heatmap',
       'InlineAlert',
       'InlineGroup',
       'Link',
@@ -170,6 +171,16 @@ describe('canonical component contracts', () => {
     expect(radar.appearance.join(' ')).toMatch(/shoulder.*visual.*exact/i);
     expect(radar.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*dimension/i);
     expect(radar.inappropriateUses.join(' ')).toMatch(/unrelated units.*precise/i);
+  });
+
+  it('documents Heatmap scales, missing cells, and dense-grid alternatives honestly', () => {
+    const heatmap = componentContracts.find((contract) => contract.exportName === 'Heatmap')!;
+
+    expect(heatmap.appearance.join(' ')).toMatch(/sequential.*two-sided.*midpoint/i);
+    expect(heatmap.validation.join(' ')).toMatch(/zero.*negative.*missing.*non-finite/i);
+    expect(heatmap.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*Up.*Down.*Control Home/i);
+    expect(heatmap.responsiveBehavior.join(' ')).toMatch(/text.*scroll.*table/i);
+    expect(heatmap.preferredAlternatives.join(' ')).toMatch(/Table.*large/i);
   });
 
   it('keeps static data, description pairs, option selection, and cards distinct', () => {

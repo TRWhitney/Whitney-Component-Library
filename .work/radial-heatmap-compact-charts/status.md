@@ -10,8 +10,8 @@ necessary context.
 ## Current state
 
 [PieChart and DonutChart](tickets/01-pie-and-donut.md) were delivered in `9780036`.
-[RadarChart](tickets/02-radar-chart.md) is delivered in the current `[Feature] Add RadarChart`
-commit. The accepted
+[RadarChart](tickets/02-radar-chart.md) is delivered in `d9ddcd5`. [Heatmap](tickets/03-heatmap.md)
+is delivered in the current `[Feature] Add Heatmap` commit. The accepted
 [specification](spec.md) and four vertical implementation slices resolve the chart-specific
 contracts, prototype decisions, public boundaries, verification, and delivery order within parent
 Ticket 21.
@@ -110,13 +110,22 @@ Ticket 21.
   repeated-color dash treatment, transient legend scrollbars, reduced motion, and forced colors.
 - Added canonical contracts, generated PieChart and DonutChart guidance, root and chart exports,
   public type fixtures, SSR and hydration coverage, and production showcase specimens.
+- Implemented Heatmap with ordered public row and column domains, sparse coordinate records,
+  sequential and two-sided shared scales, optional fixed ranges, valid negative and zero values,
+  explicit missing cells, and complete structured output.
+- Added exact pointer and touch readings, full two-dimensional keyboard traversal, cursor-following
+  and cell-anchored tooltips, responsive cell text, and a separately labeled local grid using the
+  transient ScrollRegion scrollbar treatment.
+- Integrated neutral crosshatched missing cells, continuous numeric and missing keys, compact and
+  height-bounded layout, forced-color and reduced-motion behavior, public contracts and types,
+  generated documentation, and sequential and two-sided showcase specimens.
 
 ## Frontier
 
 The [decision map](map.md) is resolved. [PieChart and DonutChart](tickets/01-pie-and-donut.md) are
-delivered. [RadarChart](tickets/02-radar-chart.md) is also delivered. [Heatmap](tickets/03-heatmap.md)
-is next, and [Sparkline](tickets/04-sparkline.md) remains the final accepted implementation slice of
-the same parent ticket.
+delivered. [RadarChart](tickets/02-radar-chart.md) is also delivered.
+[Heatmap](tickets/03-heatmap.md) is delivered. [Sparkline](tickets/04-sparkline.md) remains the final
+accepted implementation slice of the same parent ticket.
 
 ## Accepted sources
 
@@ -223,6 +232,34 @@ the same parent ticket.
   pins and focus emphasis persist. The full 501-test and package validation was renewed afterward.
 - Independent intent and engineering correction reviews pass with no findings after checking every
   admitted scale, sizing, reading-state, and legend-pattern correction.
+- Heatmap focused coverage passes for ordered sparse grids, zero and negative values, missing cells,
+  derived and fixed sequential and two-sided scales, finite numeric extremes, structural and
+  partial invalidity, complete tables, pointer, touch, full keyboard traversal, dense overflow,
+  state reconciliation, SSR, and hydration.
+- `npm run check` passes 522 tests together with formatting, lint, types, generated documentation,
+  the supported TypeScript matrix, builds, and chart isolation for Heatmap. Package verification
+  passes with React 18.3.1 and React 19.2.8, and the production showcase build passes.
+- Current Playwright inspection covers roomy and constrained layouts, exact pointer, touch, and
+  keyboard readings, light and dark appearance, forced colors, reduced motion, missing-only cells,
+  and local overflow. At 280 by 260, the caption and complete key fit while the grid scrolls in a
+  280 by 139 region whose idle scrollbar and outline are transparent.
+- Delivery review identified boundary-changing vertical traversal, ineffective vertical overflow,
+  offscreen keyboard readings, ineffective minimum height, dropped touch readings, late-frame
+  measurement, premature ninth-cell compaction, a tinted two-sided midpoint, an RTL key mismatch,
+  and delimiter-based coordinate collisions. Each admitted defect has focused regression coverage
+  and is corrected.
+- Renewed browser operation confirms boundary-preserving traversal, two-axis keyboard reveal,
+  retained touch readings, functional minimum height, fit-based dense behavior, neutral midpoint
+  styling, and logical RTL key direction. Renewed package verification passes React 18.3.1 and
+  React 19.2.8 consumers; the showcase build and `git diff --check` pass.
+- Correction review then found that temporary mouse hover could hide a retained touch tooltip and
+  that a compact-width shortcut still suppressed values even when cells fit. Focused regressions
+  failed before and pass after both corrections. Direct browser operation at 400px confirms all
+  eleven recorded values remain visible and a Morning touch reading returns after a Midday mouse
+  hover leaves. The complete 522-test and package evidence was renewed afterward.
+- Independent intent and engineering correction reviews pass with no findings across every admitted
+  Heatmap correction. A possible dense-grid cursor-update cost remains a nonblocking engineering
+  judgment pending evidence from profiling rather than active ticket work.
 
 ## Out of scope
 
@@ -238,7 +275,7 @@ the same parent ticket.
 
 - Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
 - Branch: `master`.
-- Relevant commits: `9780036` (`[Feature] Add paged pie and donut charts`) and the current
-  `[Feature] Add RadarChart` commit.
-- Owned uncommitted paths: none after Radar delivery.
-- Next action: begin the Heatmap implementation slice from its accepted specification and ticket.
+- Relevant commits: `9780036` (`[Feature] Add paged pie and donut charts`) and `d9ddcd5`
+  (`[Feature] Add RadarChart`).
+- Owned uncommitted paths: none after Heatmap delivery.
+- Next action: begin Sparkline from its accepted specification, prototype decisions, and ticket.

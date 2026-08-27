@@ -45,6 +45,7 @@ import {
   FormSection,
   IconButton,
   Histogram,
+  Heatmap,
   InlineAlert,
   InlineGroup,
   Link,
@@ -164,6 +165,44 @@ const vehicleProfileData: readonly [VehicleProfile, VehicleProfile] = [
 const sparseVehicleProfileData: readonly [VehicleProfile, VehicleProfile] = [
   {id: 'relay', label: 'Relay', range: 8},
   {comfort: 5, id: 'utility', label: 'Utility', reliability: 7, speed: 6},
+] as const;
+const heatmapRows = [
+  {id: 'north', label: 'North room'},
+  {id: 'south', label: 'South room'},
+  {id: 'east', label: 'East room'},
+  {id: 'west', label: 'West room'},
+] as const;
+const heatmapColumns = [
+  {id: 'morning', label: 'Morning'},
+  {id: 'midday', label: 'Midday'},
+  {id: 'evening', label: 'Evening'},
+  {id: 'night', label: 'Night'},
+] as const;
+const roomTemperatureData = [
+  {period: 'morning', room: 'north', value: 0},
+  {period: 'midday', room: 'north', value: 18},
+  {period: 'evening', room: 'north', value: 15},
+  {period: 'morning', room: 'south', value: 9},
+  {period: 'midday', room: 'south', value: 24},
+  {period: 'night', room: 'south', value: 11},
+  {period: 'morning', room: 'east', value: 6},
+  {period: 'evening', room: 'east', value: 20},
+  {period: 'night', room: 'east', value: 8},
+  {period: 'midday', room: 'west', value: 16},
+  {period: 'evening', room: 'west', value: 13},
+] as const;
+const roomDeviationData = [
+  {period: 'morning', room: 'north', value: -4},
+  {period: 'midday', room: 'north', value: 2},
+  {period: 'evening', room: 'north', value: 0},
+  {period: 'morning', room: 'south', value: -2},
+  {period: 'midday', room: 'south', value: 5},
+  {period: 'night', room: 'south', value: -1},
+  {period: 'morning', room: 'east', value: -5},
+  {period: 'evening', room: 'east', value: 4},
+  {period: 'night', room: 'east', value: 1},
+  {period: 'midday', room: 'west', value: 3},
+  {period: 'evening', room: 'west', value: -3},
 ] as const;
 const statisticalPointData = [
   {demand: 28, id: 'north-1', label: 'North Monday', loop: 'north', stored: 42, temperature: 18},
@@ -2068,6 +2107,28 @@ function ChartSpecimens() {
     legend: {label: 'Vehicles'},
     value: {label: 'Score', unit: 'points'},
   } as const;
+  const heatmapCommon = {
+    columnAccessor: 'period',
+    columns: heatmapColumns,
+    dataTableLabel: 'Room readings by time of day',
+    emptyState: {
+      description: 'Declare rooms and times to begin.',
+      title: 'No reading grid',
+    },
+    invalidData: {
+      description: 'Correct non-finite room readings.',
+      title: 'Invalid room readings',
+    },
+    labels: {
+      colorKey: 'Reading scale',
+      column: 'Time of day',
+      missing: 'No reading',
+      row: 'Room',
+      scrollRegion: 'Room reading grid',
+    },
+    rowAccessor: 'room',
+    rows: heatmapRows,
+  } as const;
 
   return (
     <>
@@ -2184,6 +2245,32 @@ function ChartSpecimens() {
             data={sparseVehicleProfileData}
             description="Missing qualities remain zero while isolated scores retain a readable fill."
             title="Sparse vehicle profiles"
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Show one numeric measure across two ordered domains. Zero is colored as a real value; patterned cells have no data. Use a two-sided scale only when its midpoint has a clear meaning. Dense grids hide inline values before moving into a labeled local scroll region."
+        name="Heatmap"
+      >
+        <Example label="Sequential Heatmap with zero and missing cells">
+          <Heatmap
+            {...heatmapCommon}
+            data={roomTemperatureData}
+            description="Temperature by room and time; patterned cells have no recorded reading."
+            scale={{type: 'sequential'}}
+            title="Room temperature"
+            value={{accessor: 'value', label: 'Temperature', unit: '°C'}}
+          />
+        </Example>
+        <Example label="Two-sided Heatmap around target">
+          <Heatmap
+            {...heatmapCommon}
+            data={roomDeviationData}
+            description="Degrees below or above the target; zero means the room met its target."
+            scale={{domain: [-6, 6], midpoint: 0, type: 'two-sided'}}
+            title="Temperature deviation"
+            value={{accessor: 'value', label: 'Deviation', unit: '°C'}}
           />
         </Example>
       </Specimen>
