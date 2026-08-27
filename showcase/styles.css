@@ -372,7 +372,7 @@
     margin: 0;
   }
 
-  .showcase-example figcaption {
+  .showcase-example > figcaption {
     color: var(--wcl-text-muted);
     font-family: var(--wcl-font-utility);
     font-size: 0.625rem;

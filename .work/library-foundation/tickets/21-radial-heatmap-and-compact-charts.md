@@ -5,9 +5,9 @@ their less precise or reduced-context uses.
 
 **Blocked by:** [Cartesian Chart Foundation](19-cartesian-chart-foundation.md)
 
-**Status:** blocked
+**Status:** active
 
-- [ ] Pie and donut charts enforce part-to-whole semantics and guide against excessive categories
+- [x] Pie and donut charts enforce part-to-whole semantics and guide against excessive categories
       or precision claims.
 - [ ] Radar charts require comparable dimensions on a shared normalized interpretation and guide
       against precise comparison, negative values, or excessive series and axes.
@@ -21,6 +21,7 @@ their less precise or reduced-context uses.
 ## Accepted sources
 
 - [Specification](../spec.md)
+- [Radial, heatmap, and compact chart specification](../../radial-heatmap-compact-charts/spec.md)
 - [Charting Scope](../decisions/13-charting-scope.md)
 - [Architecture decision: Own an Accessible Chart Family](../../../docs/adr/0008-own-an-accessible-chart-family.md)
 

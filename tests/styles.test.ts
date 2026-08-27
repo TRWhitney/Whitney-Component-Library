@@ -75,6 +75,36 @@ describe('static appearance styles', () => {
     expect(reducedMotion).not.toBeNull();
   });
 
+  it('keeps part-to-whole slices and the transient legend scrollbar legible across modes', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const radialLegend = styles.match(/\[data-wcl-radial-legend\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(styles).toMatch(
+      /\[data-wcl-radial-segment\]\[data-aggregate\][\s\S]*?\[data-wcl-radial-slice\]\s*\{[^}]*stroke-dasharray:\s*3 2/,
+    );
+    expect(styles).toMatch(/\[data-wcl-radial-aggregate-label\]\s*\{[^}]*font-weight:\s*800/);
+    expect(radialLegend).toContain('scrollbar-color: transparent transparent');
+    expect(radialLegend).toContain('scrollbar-width: thin');
+    expect(styles).toMatch(
+      /@supports\s+not\s*\(scrollbar-color:\s*auto\)\s*\{[\s\S]*\[data-wcl-radial-legend\]::-webkit-scrollbar-thumb/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-radial-segment\][\s\S]*transition:\s*none/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-radial-slice\][\s\S]*stroke:\s*CanvasText/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-radial-legend\][\s\S]*scrollbar-color:\s*CanvasText Canvas/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-part-to-whole-chart\]\s*\{[^}]*grid-template-rows:\s*auto auto minmax\(0, 1fr\)[^}]*overflow:\s*hidden/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-part-to-whole-canvas\]\s*\{[^}]*block-size:\s*100%[^}]*aspect-ratio:\s*auto/,
+    );
+  });
+
   it('gives PageHeader its endpoint Route and SplitView a responsive two-way rail', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const route = styles.match(/\[data-wcl-page-header-route\]\s*\{([^}]*)\}/)?.[1];

@@ -1,0 +1,201 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #11171b;
+}
+
+[data-wcl-provider] {
+  min-block-size: 100vh;
+  background: var(--wcl-canvas);
+  color: var(--wcl-text);
+  font-family: var(--wcl-font-body);
+}
+
+.prototype-page {
+  display: grid;
+  gap: 1.5rem;
+  inline-size: min(100%, 76rem);
+  min-block-size: 100vh;
+  margin-inline: auto;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.prototype-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.prototype-header > div {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.prototype-header :is(h1, p),
+.prototype-notes p {
+  margin: 0;
+}
+
+.prototype-header h1 {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.prototype-notes p,
+.prototype-header p:last-child {
+  max-inline-size: 66ch;
+  color: var(--wcl-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.prototype-kicker {
+  color: var(--wcl-accent-rail);
+  font-family: var(--wcl-font-utility);
+  font-size: 0.6875rem;
+  font-weight: 750;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.prototype-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(15rem, 1fr));
+  gap: 1rem 1.5rem;
+  align-items: end;
+  padding-block: 1rem;
+  border-block: 1px solid var(--wcl-border);
+}
+
+.width-control {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem 1rem;
+  color: var(--wcl-text-muted);
+  font: 650 0.8125rem/1.3 var(--wcl-font-utility);
+}
+
+.width-control input {
+  grid-column: 1 / -1;
+  inline-size: 100%;
+  accent-color: var(--wcl-accent-rail);
+}
+
+.width-control output {
+  color: var(--wcl-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.prototype-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-block-size: 22rem;
+  padding: clamp(1rem, 5vw, 4rem);
+  overflow: auto;
+  border-block: 1px solid var(--wcl-border);
+  background: var(--wcl-surface-subtle);
+}
+
+.sparkline-register {
+  max-inline-size: 100%;
+  padding: 1rem;
+  border-block: 1px solid var(--wcl-border);
+  background: var(--wcl-surface);
+}
+
+.sparkline-chart {
+  min-inline-size: 0;
+}
+
+.sparkline-chart [data-wcl-chart] {
+  gap: 0.5rem;
+}
+
+.sparkline-chart [data-wcl-chart-axis] {
+  display: none;
+}
+
+.sparkline-chart [data-wcl-chart-canvas] {
+  min-block-size: 2.5rem;
+}
+
+.sparkline-chart [data-wcl-chart-point] {
+  display: none;
+}
+
+.sparkline-chart [data-prototype-cue='current'] {
+  fill: var(--wcl-chart-series-color);
+  r: 6.5px;
+  stroke-width: calc(var(--wcl-chart-point-stroke-width) * 1.35);
+}
+
+.sparkline-register[data-cue-mode='current'] [data-prototype-cue='current'],
+.sparkline-register[data-cue-mode='range'] [data-prototype-cue] {
+  display: inline;
+}
+
+.sparkline-register[data-cue-mode='range']
+  :is([data-prototype-cue='low'], [data-prototype-cue='high']) {
+  r: 5.5px;
+  stroke-width: calc(var(--wcl-chart-point-stroke-width) * 1.25);
+}
+
+.prototype-notes {
+  display: grid;
+  gap: 0.3rem;
+  max-inline-size: 66ch;
+}
+
+.prototype-notes strong {
+  font-size: 0.875rem;
+}
+
+[data-identify] [data-region] {
+  position: relative;
+}
+
+[data-identify] [data-region]:is(:hover, :focus-within) {
+  outline: 1px dashed var(--wcl-warning);
+  outline-offset: 2px;
+}
+
+[data-identify] [data-region]:is(:hover, :focus-within)::before {
+  position: absolute;
+  z-index: 30;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  padding: 0.15rem 0.3rem;
+  background: var(--wcl-warning);
+  color: var(--wcl-surface);
+  content: attr(data-region);
+  font: 700 0.65rem/1.2 var(--wcl-font-utility);
+  pointer-events: none;
+}
+
+@media (width <= 42rem) {
+  .prototype-header {
+    display: grid;
+  }
+
+  .prototype-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prototype-stage {
+    place-items: center start;
+    min-block-size: 18rem;
+    padding-inline: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prototype-page * {
+    scroll-behavior: auto;
+  }
+}

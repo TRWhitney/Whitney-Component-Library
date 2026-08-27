@@ -1,4 +1,5 @@
 export {AreaChart, BarChart, CartesianChart, ColumnChart, LineChart} from './cartesian-chart.js';
+export {DonutChart, PieChart} from './part-to-whole-chart.js';
 export {BoxPlot, BubbleChart, Histogram, ScatterChart} from './statistical-chart.js';
 export type {
   AreaChartProps,
@@ -30,6 +31,7 @@ export type {
   ChartTone,
   ChartValueAxis,
   ColumnChartProps,
+  DonutChartProps,
   HistogramDistribution,
   HistogramOrdinate,
   HistogramProps,
@@ -38,6 +40,11 @@ export type {
   LogarithmicChartScale,
   NormalizedChartScale,
   NonEmptyChartSeries,
+  PartToWholeAggregateSizing,
+  PartToWholeChartLabels,
+  PartToWholeChartRange,
+  PartToWholeChartValue,
+  PieChartProps,
   QuantitativeChartDataAxis,
   ScatterChartProps,
   StatisticalChartSeries,

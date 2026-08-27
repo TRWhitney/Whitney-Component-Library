@@ -72,6 +72,8 @@ export const showcaseGroups = [
       'AreaChart',
       'ColumnChart',
       'BarChart',
+      'PieChart',
+      'DonutChart',
       'CartesianChart',
       'ScatterChart',
       'BubbleChart',

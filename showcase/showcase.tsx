@@ -35,6 +35,7 @@ import {
   DescriptionList,
   Divider,
   Disclosure,
+  DonutChart,
   DropZone,
   Drawer,
   EmptyState,
@@ -56,6 +57,7 @@ import {
   NumberField,
   Pagination,
   PageHeader,
+  PieChart,
   ProcessTracker,
   ProgressBar,
   Popover,
@@ -103,6 +105,23 @@ const chartData = [
   {capacity: 64, demand: 51, month: 'Feb'},
   {capacity: 68, demand: 61, month: 'Mar'},
   {capacity: 72, demand: 57, month: 'Apr'},
+] as const;
+const energyCategoryData = [
+  {id: 'residential', label: 'Residential', value: 43},
+  {id: 'food', label: 'Food processing', value: 31},
+  {id: 'offices', label: 'Offices', value: 26},
+  {id: 'retail', label: 'Retail', value: 18},
+  {id: 'schools', label: 'Schools', value: 14},
+  {id: 'manufacturing', label: 'Manufacturing', value: 12},
+  {id: 'hospitality', label: 'Hospitality', value: 9},
+  {id: 'data-centers', label: 'Data centers', value: 8},
+  {id: 'transit', label: 'Transit', value: 7},
+  {id: 'libraries', label: 'Libraries', value: 6},
+  {id: 'workshops', label: 'Workshops', value: 5},
+  {id: 'agriculture', label: 'Agriculture', value: 4},
+  {id: 'civic', label: 'Civic buildings', value: 3},
+  {id: 'markets', label: 'Public markets', value: 2},
+  {id: 'storage', label: 'Storage', value: 0},
 ] as const;
 const statisticalPointData = [
   {demand: 28, id: 'north-1', label: 'North Monday', loop: 'north', stored: 42, temperature: 18},
@@ -1964,6 +1983,32 @@ function ChartSpecimens() {
       title: 'Some observations are invalid',
     },
   } as const;
+  const partToWholeCommon = {
+    data: energyCategoryData,
+    dataTableLabel: 'Annual energy use by customer category',
+    description: 'Annual metered use by customer category, ranked by megawatt-hours.',
+    emptyState: {
+      description: 'Choose a year with recorded use.',
+      title: 'No energy use',
+    },
+    idAccessor: 'id',
+    invalidData: {
+      description: 'Correct negative or non-finite category values.',
+      title: 'Invalid energy use',
+    },
+    labelAccessor: 'label',
+    labels: {
+      back: 'Back',
+      category: 'Customer category',
+      categoryRange: ({end, start, total}: {end: number; start: number; total: number}) =>
+        `Categories ${start}–${end} of ${total}`,
+      moreCategories: (count: number) => `More categories (${count})`,
+      shareOfTotal: 'Share of total',
+      shareOnPage: 'Share on this page',
+    },
+    legend: {label: 'Visible categories'},
+    value: {accessor: 'value', label: 'Energy use', unit: 'MWh'},
+  } as const;
 
   return (
     <>
@@ -2036,6 +2081,28 @@ function ChartSpecimens() {
             title="Demand by month"
             xAxis={{label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'}}
             yAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Show how categories make up one whole. More than eight positive categories use a proportional aggregate that opens the next page. Hover slices for readings, or use the legend to emphasize and pin a category without opening a tooltip."
+        name="PieChart"
+      >
+        <Example label="Paged proportional PieChart">
+          <PieChart {...partToWholeCommon} title="Community energy use" />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Use the same part-to-whole and paging behavior with a derived total in the center. Zero values remain in the generated table but do not create slices."
+        name="DonutChart"
+      >
+        <Example label="Paged DonutChart with center total">
+          <DonutChart
+            {...partToWholeCommon}
+            title="Community energy use by category"
+            totalLabel="MWh total"
           />
         </Example>
       </Specimen>

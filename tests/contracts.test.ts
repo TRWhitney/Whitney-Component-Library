@@ -64,6 +64,7 @@ describe('canonical component contracts', () => {
       'DescriptionList',
       'Disclosure',
       'Divider',
+      'DonutChart',
       'Drawer',
       'DropZone',
       'EmptyState',
@@ -85,6 +86,7 @@ describe('canonical component contracts', () => {
       'NumberField',
       'Pagination',
       'PageHeader',
+      'PieChart',
       'ProcessTracker',
       'ProgressBar',
       'Popover',
@@ -143,6 +145,20 @@ describe('canonical component contracts', () => {
     expect(box.appearance.join(' ')).toMatch(/whisker/i);
     expect(box.appearance.join(' ')).toMatch(/median/i);
     expect(box.localization.join(' ')).not.toMatch(/bubble|formatValue/i);
+  });
+
+  it('documents paged part-to-whole behavior without presenting the aggregate as data', () => {
+    const contractFor = (exportName: string) =>
+      componentContracts.find((contract) => contract.exportName === exportName)!;
+    const pie = contractFor('PieChart');
+    const donut = contractFor('DonutChart');
+
+    expect(pie.controlBehavior.join(' ')).toMatch(/seven.*aggregate.*next.*eight/i);
+    expect(pie.appearance.join(' ')).toMatch(/aggregate.*dashed.*\+N/i);
+    expect(pie.validation.join(' ')).toMatch(/zero.*valid.*negative.*non-finite/i);
+    expect(pie.inappropriateUses.join(' ')).toMatch(/precise comparison/i);
+    expect(donut.parts.join(' ')).toMatch(/derived total.*center/i);
+    expect(donut.contentRules.join(' ')).not.toMatch(/arbitrary.*center content/i);
   });
 
   it('keeps static data, description pairs, option selection, and cards distinct', () => {

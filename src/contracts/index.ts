@@ -7,8 +7,10 @@ export {
   bubbleChartContract,
   cartesianChartContract,
   columnChartContract,
+  donutChartContract,
   histogramContract,
   lineChartContract,
+  pieChartContract,
   scatterChartContract,
 } from './chart.contracts.js';
 export {
@@ -112,8 +114,10 @@ import {
   bubbleChartContract,
   cartesianChartContract,
   columnChartContract,
+  donutChartContract,
   histogramContract,
   lineChartContract,
+  pieChartContract,
   scatterChartContract,
 } from './chart.contracts.js';
 import {
@@ -227,6 +231,7 @@ export const componentContracts = [
   descriptionListContract,
   disclosureContract,
   dropZoneContract,
+  donutChartContract,
   drawerContract,
   emptyStateContract,
   fieldContract,
@@ -249,6 +254,7 @@ export const componentContracts = [
   progressBarContract,
   paginationContract,
   pageHeaderContract,
+  pieChartContract,
   popoverContract,
   rangeSliderContract,
   responsiveGridContract,

@@ -166,6 +166,54 @@ export interface ChartMinimumSize {
   readonly width: number;
 }
 
+export type PartToWholeAggregateSizing = 'proportional' | 'smallest';
+
+export interface PartToWholeChartValue<Datum extends object> {
+  readonly accessor: ChartAccessor<Datum, number>;
+  readonly formatValue?: (value: number) => string;
+  readonly label: string;
+  readonly unit?: string;
+}
+
+export interface PartToWholeChartRange {
+  readonly end: number;
+  readonly start: number;
+  readonly total: number;
+}
+
+export interface PartToWholeChartLabels {
+  readonly back: string;
+  readonly category: string;
+  readonly categoryRange: (range: PartToWholeChartRange) => string;
+  readonly moreCategories: (count: number) => string;
+  readonly shareOfTotal: string;
+  readonly shareOnPage: string;
+}
+
+interface PartToWholeChartCommonProps<Datum extends object> {
+  readonly aggregateSizing?: PartToWholeAggregateSizing;
+  readonly aspectRatio?: number;
+  readonly data: readonly Datum[];
+  readonly dataTableLabel: string;
+  readonly description: string;
+  readonly emptyState: ChartStateCopy;
+  readonly idAccessor: ChartAccessor<Datum, string>;
+  readonly invalidData: ChartStateCopy;
+  readonly labelAccessor: ChartAccessor<Datum, string>;
+  readonly labels: PartToWholeChartLabels;
+  readonly legend: ChartLegend;
+  readonly minimumSize?: ChartMinimumSize;
+  readonly status?: ChartStatus;
+  readonly title: string;
+  readonly value: PartToWholeChartValue<Datum>;
+}
+
+export type PieChartProps<Datum extends object> = PartToWholeChartCommonProps<Datum>;
+
+export interface DonutChartProps<Datum extends object> extends PartToWholeChartCommonProps<Datum> {
+  readonly totalLabel: string;
+}
+
 interface ChartCommonProps<Datum extends object> {
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];
