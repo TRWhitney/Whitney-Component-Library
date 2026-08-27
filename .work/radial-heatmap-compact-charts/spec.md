@@ -115,8 +115,9 @@ Left and Right move across columns. Up and Down move across rows. Home and End r
 Control with Home or End reaches the first or last cell in the complete grid. Pointer and touch
 begin only on a cell. Missing cells remain reachable and announce the missing-data label. Cells show
 formatted values when space permits. Dense grids omit visible text before shrinking cells below a
-legible size, then use a labeled local scroll region with ScrollRegion's scrollbar behavior. The
-generated table preserves every declared row and column intersection.
+legible size, then use a labeled local scroll region with ScrollRegion's scrollbar behavior. A
+fitted grid is not a scroll container, and local overflow does not trap surrounding page scrolling.
+The generated table preserves every declared row and column intersection.
 
 ### Sparkline
 
@@ -132,9 +133,12 @@ range by default and accepts a fixed range for direct comparison.
 
 The component derives exact first, last, lowest, and highest valid values. The consumer description
 provides the domain meaning and does not ask Sparkline to infer whether change is good or bad. The
-current record uses a filled series-color point. Every record tied at the observed low or high uses
-a hollow series-color point unless it is current, in which case the filled current treatment wins.
-These static cues supplement the tooltip, announcement, and table without persistent value labels.
+current record uses a hollow series-color circle. Every other record tied at the observed low fills
+the lower half of its circle, while records tied at the observed high fill the upper half. Reading
+an existing cue fills its open area with the foreground color; an ordinary active reading uses the
+solid foreground point. The tooltip names an active observed low or high and adds no range label to
+ordinary readings. These static cues supplement the tooltip, announcement, and table without
+persistent value labels.
 
 Sparkline keeps LineChart's nearest-record pointer reading and ordered Left and Right keyboard
 reading. Home and End reach the sequence endpoints. Missing positions remain reachable and report

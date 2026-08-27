@@ -304,6 +304,50 @@ export interface HeatmapProps<Datum extends object> {
   readonly value: HeatmapValue<Datum>;
 }
 
+export type SparklinePositionScale<Value extends ChartDomainValue> = Exclude<
+  ChartScale<Value>,
+  NormalizedChartScale
+>;
+
+export interface SparklinePosition<Datum extends object, Value extends ChartDomainValue> {
+  readonly accessor: ChartAccessor<Datum, Value>;
+  readonly formatValue?: (value: Value) => string;
+  readonly label: string;
+  readonly scale: SparklinePositionScale<Value>;
+  readonly unit?: string;
+}
+
+export interface SparklineValue<Datum extends object> {
+  readonly accessor: ChartAccessor<Datum, number>;
+  readonly formatValue?: (value: number) => string;
+  readonly label: string;
+  readonly unit?: string;
+}
+
+export interface SparklineLabels {
+  readonly first: string;
+  readonly highest: string;
+  readonly last: string;
+  readonly lowest: string;
+  readonly missing: string;
+}
+
+export interface SparklineProps<Datum extends object, Position extends ChartDomainValue> {
+  readonly aspectRatio?: number;
+  readonly data: readonly Datum[];
+  readonly dataTableLabel: string;
+  readonly description: string;
+  readonly emptyState: ChartStateCopy;
+  readonly invalidData: ChartStateCopy;
+  readonly labels: SparklineLabels;
+  readonly minimumSize?: ChartMinimumSize;
+  readonly position: SparklinePosition<Datum, Position>;
+  readonly status?: ChartStatus;
+  readonly title: string;
+  readonly value: SparklineValue<Datum>;
+  readonly valueRange?: readonly [number, number];
+}
+
 interface ChartCommonProps<Datum extends object> {
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];

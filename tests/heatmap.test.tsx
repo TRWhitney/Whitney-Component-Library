@@ -62,6 +62,75 @@ describe('Heatmap', () => {
     expect(table.getAllByRole('cell', {name: common.labels.missing})).toHaveLength(2);
   });
 
+  it('does not reveal scrollbar chrome when a fitted grid is hovered', () => {
+    const {container} = render(
+      <Heatmap {...common} data={[{hour: 'morning', location: 'north', value: 12}]} />,
+    );
+    const frame = container.querySelector('[data-wcl-heatmap-frame]')!;
+
+    expect(frame.hasAttribute('data-scrollable')).toBe(false);
+    expect(frame.getAttribute('data-overflow')).toBe('clip');
+    fireEvent.pointerEnter(frame);
+    fireEvent.pointerMove(container.querySelector('[data-wcl-heatmap-cell]')!);
+    expect(frame.hasAttribute('data-scrollbar-active')).toBe(false);
+  });
+
+  it('sizes the row-label column from its labels instead of reserving a fixed wide track', () => {
+    const {container, rerender} = render(
+      <Heatmap
+        {...common}
+        data={[{hour: 'morning', location: 'north', value: 12}]}
+        rows={[{id: 'north', label: 'A'}]}
+      />,
+    );
+    const frame = container.querySelector<HTMLElement>('[data-wcl-heatmap-frame]')!;
+    const shortWidth = Number.parseFloat(
+      frame.style.getPropertyValue('--wcl-heatmap-row-label-width'),
+    );
+
+    rerender(
+      <Heatmap
+        {...common}
+        data={[{hour: 'morning', location: 'north', value: 12}]}
+        rows={[{id: 'north', label: 'Temperature laboratory'}]}
+      />,
+    );
+    const longWidth = Number.parseFloat(
+      frame.style.getPropertyValue('--wcl-heatmap-row-label-width'),
+    );
+
+    expect(Number.isFinite(shortWidth)).toBe(true);
+    expect(shortWidth).toBeLessThan(112);
+    expect(longWidth).toBeGreaterThan(shortWidth);
+  });
+
+  it('uses the standard chart proportions by default', () => {
+    const {container} = render(
+      <Heatmap {...common} data={[{hour: 'morning', location: 'north', value: 12}]} />,
+    );
+    const frame = container.querySelector<HTMLElement>('[data-wcl-heatmap-frame]')!;
+
+    expect(frame.style.getPropertyValue('--wcl-chart-aspect-ratio')).toBe('1.75');
+    expect(frame.style.getPropertyValue('--wcl-chart-minimum-height')).toBe('180px');
+    expect(frame.style.getPropertyValue('--wcl-chart-minimum-width')).toBe('320px');
+  });
+
+  it('lets a consumer minimum width exceed the default bound', () => {
+    const {container} = render(
+      <Heatmap
+        {...common}
+        data={[{hour: 'morning', location: 'north', value: 12}]}
+        minimumSize={{height: 180, width: 640}}
+      />,
+    );
+
+    expect(
+      container
+        .querySelector<HTMLElement>('[data-wcl-heatmap]')
+        ?.style.getPropertyValue('--wcl-chart-minimum-width'),
+    ).toBe('640px');
+  });
+
   it('renders a visible numeric key and a distinct missing key', () => {
     const {container} = render(
       <Heatmap
@@ -397,6 +466,7 @@ describe('Heatmap', () => {
     );
     const region = screen.getByRole('region', {name: common.labels.scrollRegion});
     expect(region.hasAttribute('data-scrollable')).toBe(true);
+    expect(region.getAttribute('data-overflow')).toBe('scroll');
     expect(container.querySelector('[data-show-values]')).toBeNull();
     fireEvent.scroll(region);
     expect(region.hasAttribute('data-scrollbar-active')).toBe(true);
@@ -454,6 +524,70 @@ describe('Heatmap', () => {
       />,
     );
 
+    expect(container.querySelector('[data-show-values]')).toBeTruthy();
+    bounds.mockRestore();
+  });
+
+  it('resizes an ordinary grid to compact bounds before enabling local scrolling', () => {
+    const bounds = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      bottom: 183,
+      height: 183,
+      left: 0,
+      right: 320,
+      toJSON: () => ({}),
+      top: 0,
+      width: 320,
+      x: 0,
+      y: 0,
+    });
+    const rows = Array.from({length: 4}, (_, index) => ({
+      id: `room-${index}`,
+      label: `Room ${index + 1}`,
+    }));
+    const {container} = render(
+      <Heatmap {...common} data={[{hour: 'morning', location: 'room-0', value: 12}]} rows={rows} />,
+    );
+
+    expect(screen.queryByRole('region', {name: common.labels.scrollRegion})).toBeNull();
+    expect(
+      container
+        .querySelector<HTMLElement>('[data-wcl-heatmap-frame]')
+        ?.style.getPropertyValue('--wcl-heatmap-row-height'),
+    ).toBe('32px');
+    expect(container.querySelector('[data-show-values]')).toBeTruthy();
+    bounds.mockRestore();
+  });
+
+  it('uses compact cells above the narrow-width breakpoint when full cells do not fit', () => {
+    const bounds = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      bottom: 300,
+      height: 300,
+      left: 0,
+      right: 420,
+      toJSON: () => ({}),
+      top: 0,
+      width: 420,
+      x: 0,
+      y: 0,
+    });
+    const columns = Array.from({length: 6}, (_, index) => ({
+      id: `period-${index}`,
+      label: `Period ${index + 1}`,
+    }));
+    const {container} = render(
+      <Heatmap
+        {...common}
+        columns={columns}
+        data={[{hour: 'period-0', location: 'north', value: 12}]}
+      />,
+    );
+
+    expect(screen.queryByRole('region', {name: common.labels.scrollRegion})).toBeNull();
+    expect(
+      container
+        .querySelector<HTMLElement>('[data-wcl-heatmap-frame]')
+        ?.style.getPropertyValue('--wcl-heatmap-row-height'),
+    ).toBe('32px');
     expect(container.querySelector('[data-show-values]')).toBeTruthy();
     bounds.mockRestore();
   });

@@ -350,6 +350,35 @@ describe('part-to-whole charts', () => {
     });
   });
 
+  it('uses the standard chart bounds by default', () => {
+    const {container} = render(
+      <PieChart {...common} data={categories} idAccessor="id" labelAccessor="label" />,
+    );
+    const frame = container.querySelector<HTMLElement>('[data-wcl-chart-frame]')!;
+
+    expect(frame.style.getPropertyValue('--wcl-chart-aspect-ratio')).toBe('1.72');
+    expect(frame.style.getPropertyValue('--wcl-chart-minimum-height')).toBe('180px');
+    expect(frame.style.getPropertyValue('--wcl-chart-minimum-width')).toBe('320px');
+  });
+
+  it('lets a consumer minimum width exceed the default bound', () => {
+    const {container} = render(
+      <PieChart
+        {...common}
+        data={categories}
+        idAccessor="id"
+        labelAccessor="label"
+        minimumSize={{height: 180, width: 640}}
+      />,
+    );
+
+    expect(
+      container
+        .querySelector<HTMLElement>('[data-wcl-part-to-whole-chart]')
+        ?.style.getPropertyValue('--wcl-chart-minimum-width'),
+    ).toBe('640px');
+  });
+
   it('keeps structured data with partial results but hides it while loading or unavailable', () => {
     const {rerender} = render(
       <PieChart

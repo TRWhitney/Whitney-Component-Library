@@ -2,6 +2,7 @@ export {AreaChart, BarChart, CartesianChart, ColumnChart, LineChart} from './car
 export {DonutChart, PieChart} from './part-to-whole-chart.js';
 export {Heatmap} from './heatmap.js';
 export {RadarChart} from './radar-chart.js';
+export {Sparkline} from './sparkline.js';
 export {BoxPlot, BubbleChart, Histogram, ScatterChart} from './statistical-chart.js';
 export type {
   AreaChartProps,
@@ -58,6 +59,11 @@ export type {
   RadarChartProps,
   RadarChartValue,
   QuantitativeChartDataAxis,
+  SparklineLabels,
+  SparklinePosition,
+  SparklinePositionScale,
+  SparklineProps,
+  SparklineValue,
   ScatterChartProps,
   StatisticalChartSeries,
   TimeChartScale,

@@ -372,6 +372,15 @@
     margin: 0;
   }
 
+  :is(
+      [data-showcase-component='PieChart'],
+      [data-showcase-component='DonutChart'],
+      [data-showcase-component='Heatmap']
+    )
+    .showcase-example {
+    inline-size: min(100%, 26rem);
+  }
+
   .showcase-example > figcaption {
     color: var(--wcl-text-muted);
     font-family: var(--wcl-font-utility);

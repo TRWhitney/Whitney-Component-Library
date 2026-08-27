@@ -104,6 +104,7 @@ describe('canonical component contracts', () => {
       'Skeleton',
       'Slider',
       'Spinner',
+      'Sparkline',
       'SplitView',
       'Stack',
       'StatusIndicator',
@@ -180,7 +181,24 @@ describe('canonical component contracts', () => {
     expect(heatmap.validation.join(' ')).toMatch(/zero.*negative.*missing.*non-finite/i);
     expect(heatmap.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*Up.*Down.*Control Home/i);
     expect(heatmap.responsiveBehavior.join(' ')).toMatch(/text.*scroll.*table/i);
+    expect(heatmap.responsiveBehavior.join(' ')).toMatch(/fitted.*not.*scroll.*surrounding page/i);
     expect(heatmap.preferredAlternatives.join(' ')).toMatch(/Table.*large/i);
+  });
+
+  it('documents Sparkline gaps, context, cues, and full-chart alternatives honestly', () => {
+    const sparkline = componentContracts.find((contract) => contract.exportName === 'Sparkline')!;
+
+    expect(sparkline.validation.join(' ')).toMatch(/negative.*zero.*missing.*non-finite/i);
+    const appearance = sparkline.appearance.join(' ');
+    expect(appearance).toMatch(/current.*hollow/i);
+    expect(appearance).toMatch(/low.*lower half/i);
+    expect(appearance).toMatch(/high.*upper half/i);
+    expect(appearance).toMatch(/reading.*fills.*open area/i);
+    expect(appearance).toMatch(/ordinary active reading.*solid foreground/i);
+    expect(sparkline.controlBehavior.join(' ')).toMatch(/tooltip.*lowest.*highest.*otherwise/i);
+    expect(sparkline.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*Home.*End.*Escape/i);
+    expect(sparkline.responsiveBehavior.join(' ')).toMatch(/caption.*axes.*legend.*scroll/i);
+    expect(sparkline.preferredAlternatives.join(' ')).toMatch(/LineChart.*axes.*series/i);
   });
 
   it('keeps static data, description pairs, option selection, and cards distinct', () => {

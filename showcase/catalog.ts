@@ -76,6 +76,7 @@ export const showcaseGroups = [
       'DonutChart',
       'RadarChart',
       'Heatmap',
+      'Sparkline',
       'CartesianChart',
       'ScatterChart',
       'BubbleChart',

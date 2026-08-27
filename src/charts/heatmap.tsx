@@ -20,7 +20,9 @@ import {
   Feedback,
   assertText,
   clamp,
+  estimatedUtilityTextWidth,
   readAccessor,
+  type BoundedChartStyles,
   type ChartTooltipStyles,
 } from './cartesian-chart.js';
 import type {HeatmapDomainItem, HeatmapProps, HeatmapScale, HeatmapValue} from './chart-types.js';
@@ -30,9 +32,13 @@ type HeatmapStyles = CSSProperties & {
   '--wcl-chart-minimum-height': string;
   '--wcl-chart-minimum-width': string;
   '--wcl-heatmap-columns': number;
+  '--wcl-heatmap-cell-minimum-width': string;
   '--wcl-heatmap-grid-height': string;
   '--wcl-heatmap-grid-width': string;
+  '--wcl-heatmap-header-height': string;
   '--wcl-heatmap-midpoint-position': string;
+  '--wcl-heatmap-row-label-width': string;
+  '--wcl-heatmap-row-height': string;
   '--wcl-heatmap-rows': number;
 };
 
@@ -370,7 +376,7 @@ function HeatmapTable<Datum extends object>({
 export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): ReactElement {
   const model = prepareModel(props);
   const status = props.status ?? {kind: 'ready'};
-  const minimumSize = props.minimumSize ?? {height: 260, width: 320};
+  const minimumSize = props.minimumSize ?? {height: 180, width: 320};
   const titleId = useId();
   const descriptionId = useId();
   const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
@@ -389,8 +395,25 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
   }>();
   const columnCount = props.columns.length;
   const rowCount = props.rows.length;
-  const calculatedGridWidth = 112 + columnCount * 64 + columnCount * 4;
-  const calculatedGridHeight = 34 + rowCount * 44;
+  const widestEstimatedRowLabel = Math.max(
+    estimatedUtilityTextWidth(props.labels.row),
+    ...props.rows.map((row) => estimatedUtilityTextWidth(row.label)),
+  );
+  const fullRowLabelWidth = clamp(48, Math.ceil(widestEstimatedRowLabel * (12 / 16) + 16), 160);
+  const fullGridWidth = fullRowLabelWidth + columnCount * 64 + columnCount * 4;
+  const fullGridHeight = 30 + rowCount * 44;
+  const isCompact =
+    availableSize !== undefined &&
+    (availableSize.width <= 400 ||
+      availableSize.width < Math.max(fullGridWidth, minimumSize.width) ||
+      availableSize.height < Math.max(fullGridHeight, minimumSize.height));
+  const cellMinimumWidth = isCompact ? 48 : 64;
+  const headerHeight = isCompact ? 26 : 30;
+  const rowHeight = isCompact ? 32 : 40;
+  const labelFontScale = (isCompact ? 11 : 12) / 16;
+  const rowLabelWidth = clamp(48, Math.ceil(widestEstimatedRowLabel * labelFontScale + 16), 160);
+  const calculatedGridWidth = rowLabelWidth + columnCount * cellMinimumWidth + columnCount * 4;
+  const calculatedGridHeight = headerHeight + rowCount * (rowHeight + 4);
   const preferredGridWidth = Math.max(calculatedGridWidth, minimumSize.width);
   const preferredGridHeight = Math.max(calculatedGridHeight, minimumSize.height);
   const fallbackDense = columnCount > 8 || rowCount > 8;
@@ -398,7 +421,6 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
     availableSize === undefined
       ? fallbackDense
       : availableSize.width < preferredGridWidth || availableSize.height < preferredGridHeight;
-  const isCompact = availableSize !== undefined && availableSize.width <= 400;
   const showCellValues =
     availableSize === undefined
       ? !fallbackDense
@@ -420,14 +442,21 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
     setPointerPosition(undefined);
   }
   const frameStyle: HeatmapStyles = {
-    '--wcl-chart-aspect-ratio': props.aspectRatio ?? 1.6,
+    '--wcl-chart-aspect-ratio': props.aspectRatio ?? 1.75,
     '--wcl-chart-minimum-height': `${minimumSize.height}px`,
     '--wcl-chart-minimum-width': `${minimumSize.width}px`,
+    '--wcl-heatmap-cell-minimum-width': `${cellMinimumWidth}px`,
     '--wcl-heatmap-columns': Math.max(1, columnCount),
     '--wcl-heatmap-grid-height': `${preferredGridHeight}px`,
     '--wcl-heatmap-grid-width': `${preferredGridWidth}px`,
+    '--wcl-heatmap-header-height': `${headerHeight}px`,
     '--wcl-heatmap-midpoint-position': `${model.midpointPosition * 100}%`,
+    '--wcl-heatmap-row-label-width': `${rowLabelWidth}px`,
+    '--wcl-heatmap-row-height': `${rowHeight}px`,
     '--wcl-heatmap-rows': Math.max(1, rowCount),
+  };
+  const rootStyle: BoundedChartStyles = {
+    '--wcl-chart-minimum-width': `${minimumSize.width}px`,
   };
 
   useLayoutEffect(() => {
@@ -560,9 +589,9 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
         {model.invalidCount > 0 ? <Feedback copy={props.invalidData} kind="invalid" /> : null}
         <div data-wcl-heatmap-visual="">
           <div
-            {...scrollbarActivityProps}
+            {...(hasLocalOverflow ? scrollbarActivityProps : {})}
             aria-label={hasLocalOverflow ? props.labels.scrollRegion : undefined}
-            data-overflow="scroll"
+            data-overflow={hasLocalOverflow ? 'scroll' : 'clip'}
             data-scrollable={hasLocalOverflow ? '' : undefined}
             data-wcl-chart-frame=""
             data-wcl-heatmap-frame=""
@@ -717,6 +746,7 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
       data-wcl-chart=""
       data-wcl-heatmap=""
       ref={setRootElement}
+      style={rootStyle}
     >
       <figcaption data-wcl-chart-caption="">
         <strong id={titleId}>{props.title}</strong>

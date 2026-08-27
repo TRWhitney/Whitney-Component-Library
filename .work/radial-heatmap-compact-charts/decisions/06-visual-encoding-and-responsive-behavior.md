@@ -48,11 +48,14 @@ embedded and compact-caption treatments are rejected. The caption prototype's fi
 hidden-axis padding, aspect ratio, minimum height, and CSS remain flexible and do not specify
 production measurements or implementation.
 
-Whitney accepted static Current and observed range cues. Sparkline fills the current record and
-uses hollow series-color marks for every record tied at the observed low or high. A current record
-that is also an extreme keeps the filled current treatment. The cues remain visible at rest and
-supplement exact caption, tooltip, announcement, and table values without adding persistent value
-labels. Exact marker measurements remain flexible, but their hierarchy must stay obvious.
+Whitney accepted static Current and observed range cues. Sparkline uses a hollow circle for the
+current record, fills the lower half of observed-low circles, and fills the upper half of
+observed-high circles, including ties. Reading any existing cue fills its open area. An ordinary
+reading keeps the solid foreground point because there is no static circle to complete. The cues
+remain visible at rest and supplement exact caption, tooltip, announcement, and table values. The
+tooltip names an active observed low or high and adds no range label to ordinary readings. These
+treatments add no persistent value labels. Exact marker measurements remain flexible, but their
+hierarchy must stay obvious.
 
 The LineChart adapter cannot faithfully settle a Sparkline minimum because it retains hidden axis
 margins and a Cartesian view box. Production will start from a provisional compact default using

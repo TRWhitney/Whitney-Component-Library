@@ -578,6 +578,36 @@ describe('RadarChart', () => {
     });
   });
 
+  it('uses the standard chart proportions by default', () => {
+    const {container} = render(
+      <RadarChart
+        {...common}
+        data={[{id: 'courier', label: 'Courier', range: 4, reliability: 3, speed: 5}]}
+      />,
+    );
+    const frame = container.querySelector<HTMLElement>('[data-wcl-chart-frame]')!;
+
+    expect(frame.style.getPropertyValue('--wcl-chart-aspect-ratio')).toBe('1.75');
+    expect(frame.style.getPropertyValue('--wcl-chart-minimum-height')).toBe('180px');
+    expect(frame.style.getPropertyValue('--wcl-chart-minimum-width')).toBe('320px');
+  });
+
+  it('lets a consumer minimum width exceed the default bound', () => {
+    const {container} = render(
+      <RadarChart
+        {...common}
+        data={[{id: 'courier', label: 'Courier', range: 4, reliability: 3, speed: 5}]}
+        minimumSize={{height: 180, width: 640}}
+      />,
+    );
+
+    expect(
+      container
+        .querySelector<HTMLElement>('[data-wcl-radar-chart]')
+        ?.style.getPropertyValue('--wcl-chart-minimum-width'),
+    ).toBe('640px');
+  });
+
   it('uses the chart family local-overflow convention at its legibility limit', () => {
     const {container, rerender} = render(
       <RadarChart

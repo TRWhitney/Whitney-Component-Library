@@ -23,6 +23,7 @@ import {
   clamp,
   defaultColors,
   readAccessor,
+  type BoundedChartStyles,
   type ChartTooltipStyles,
 } from './cartesian-chart.js';
 import type {ChartColor, RadarChartProps, RadarChartValue} from './chart-types.js';
@@ -406,7 +407,7 @@ function RadarTable<Datum extends object>({
 
 export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>): ReactElement {
   const model = prepareModel(props);
-  const minimumSize = props.minimumSize ?? {height: 300, width: 320};
+  const minimumSize = props.minimumSize ?? {height: 180, width: 320};
   const overflow = props.overflow ?? 'scroll';
   const status = props.status ?? {kind: 'ready'};
   const titleId = useId();
@@ -465,8 +466,11 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
     : null;
   const emphasizedSeriesId = validDirectSeriesId ?? validPinnedSeriesId ?? validTransientSeriesId;
   const frameStyle: RadarFrameStyles = {
-    '--wcl-chart-aspect-ratio': props.aspectRatio ?? 1.45,
+    '--wcl-chart-aspect-ratio': props.aspectRatio ?? 1.75,
     '--wcl-chart-minimum-height': `${minimumSize.height}px`,
+    '--wcl-chart-minimum-width': `${minimumSize.width}px`,
+  };
+  const rootStyle: BoundedChartStyles = {
     '--wcl-chart-minimum-width': `${minimumSize.width}px`,
   };
   const dimensionCount = props.dimensions.length;
@@ -892,6 +896,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
       data-wcl-chart=""
       data-wcl-radar-chart=""
       ref={setRootElement}
+      style={rootStyle}
     >
       <figcaption data-wcl-chart-caption="">
         <strong id={titleId}>{props.title}</strong>

@@ -105,6 +105,65 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('keeps a heatmap reading inside its cell bounds', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const activeCell = styles.match(/\[data-wcl-heatmap-cell\]\[data-active\]\s*\{([^}]*)\}/)?.[1];
+
+    expect(activeCell).toContain('inset');
+    expect(activeCell).not.toContain('transform:');
+  });
+
+  it('keeps newer chart families in the established bounded chart area', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+
+    for (const selector of [
+      'data-wcl-part-to-whole-chart',
+      'data-wcl-radar-chart',
+      'data-wcl-heatmap',
+      'data-wcl-sparkline',
+    ]) {
+      const rule = styles.match(new RegExp(`\\[${selector}\\]\\s*\\{([^}]*)\\}`))?.[1];
+      expect(rule).toContain('inline-size: min(100%, max(32rem, var(--wcl-chart-minimum-width)))');
+    }
+  });
+
+  it('uses half-filled Sparkline extremes and completes only existing cues on reading', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const ordinaryReading = styles.match(
+      /\[data-wcl-chart-reading-node\]\[data-wcl-sparkline-reading-node='ordinary'\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const completedReading = styles.match(
+      /\[data-wcl-chart-reading-node\]\[data-wcl-sparkline-reading-node='complete'\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(styles).toMatch(/\[data-wcl-sparkline-cue-fill\]\s*\{[^}]*fill:/);
+    expect(ordinaryReading).toContain('fill: var(--wcl-text)');
+    expect(ordinaryReading).toContain('stroke: none');
+    expect(completedReading).toContain('fill: var(--wcl-text)');
+    expect(completedReading).toContain('stroke: none');
+    expect(styles).toMatch(/\[data-wcl-sparkline-tooltip-extreme\]\s*\{[^}]*font-weight:/);
+  });
+
+  it('keeps the large radial and heatmap examples compact in the showcase', async () => {
+    const styles = await readFile('showcase/styles.css', 'utf8');
+
+    expect(styles).toMatch(
+      /:is\(\s*\[data-showcase-component='PieChart'\],[\s\S]*?\[data-showcase-component='Heatmap'\]\s*\)\s+\.showcase-example\s*\{[^}]*inline-size:\s*min\(100%, 26rem\)/,
+    );
+  });
+
+  it('lets page scrolling pass through fitted Heatmaps', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+
+    expect(styles).toMatch(/\[data-wcl-heatmap-frame\]\s*\{[^}]*overflow:\s*hidden/);
+    expect(styles).toMatch(
+      /\[data-wcl-heatmap-frame\]\[data-scrollable\]\s*\{[^}]*overflow:\s*auto/,
+    );
+    expect(styles).not.toMatch(
+      /\[data-wcl-heatmap-frame\][^{]*\{[^}]*overscroll-behavior:\s*contain/,
+    );
+  });
+
   it('keeps radar geometry, series patterns, and readings legible across modes', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
 

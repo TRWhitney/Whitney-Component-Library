@@ -54,7 +54,7 @@ Show category shares of one whole in a proportional pie with bounded paging.
 ## Appearance and responsive behavior
 
 - Ordinary slices remain proportional to one another. The aggregate uses a dashed boundary and bold +N count. It is proportional by default, while aggregateSizing="smallest" makes it smaller than every ordinary slice without changing their relative proportions.
-- Available width and height both bound the chart. Compact layouts reduce caption, paging, Back, legend type, swatches, gaps, and padding while preserving a balanced plot. Tall narrow areas may stack. The legend uses ScrollRegion transient scrollbar behavior without container chrome.
+- Like other chart figures, the default area stays bounded instead of filling an arbitrarily wide parent. Available width and height both bound the chart. Compact layouts reduce caption, paging, Back, legend type, swatches, gaps, and padding while preserving a balanced plot. Tall narrow areas may stack. The legend uses ScrollRegion transient scrollbar behavior without container chrome.
 
 ## Accent, forced colors, and reduced motion
 

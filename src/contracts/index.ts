@@ -14,6 +14,7 @@ export {
   pieChartContract,
   radarChartContract,
   scatterChartContract,
+  sparklineContract,
 } from './chart.contracts.js';
 export {
   buttonContract,
@@ -123,6 +124,7 @@ import {
   pieChartContract,
   radarChartContract,
   scatterChartContract,
+  sparklineContract,
 } from './chart.contracts.js';
 import {
   buttonContract,
@@ -267,6 +269,7 @@ export const componentContracts = [
   radioGroupContract,
   scrollRegionContract,
   scatterChartContract,
+  sparklineContract,
   searchFieldContract,
   sectionContract,
   selectContract,

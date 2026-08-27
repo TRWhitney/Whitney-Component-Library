@@ -67,6 +67,10 @@ export type ChartFrameStyles = CSSProperties & {
   '--wcl-chart-point-stroke-width': string;
 };
 
+export type BoundedChartStyles = CSSProperties & {
+  '--wcl-chart-minimum-width': string;
+};
+
 export type ChartTooltipStyles = CSSProperties & {
   '--wcl-chart-tooltip-left': string;
   '--wcl-chart-tooltip-y': string;
@@ -397,7 +401,7 @@ function truncateTickLabel(label: string, maximumCharacters: number): string {
   return `${characters.slice(0, prefixLength).join('')}…${characters.slice(-suffixLength).join('')}`;
 }
 
-function estimatedUtilityTextWidth(label: string): number {
+export function estimatedUtilityTextWidth(label: string): number {
   return [...label].reduce((width, character) => {
     if (character === ' ') return width + 5.25;
     if (/[1Iil.,:|]/.test(character)) return width + 5;

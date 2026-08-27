@@ -9,7 +9,7 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 20, including the intervening Ticket 03A accent correction, are complete.
+Tickets 01 through 21, including the intervening Ticket 03A accent correction, are complete.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
 contracts, direct reading, pinned overlap priority, and Whitney's selected translucent marks.
 The future-ticket audit is complete. Ticket 18 delivers ProcessTracker and a non-exported
@@ -20,8 +20,9 @@ is removed, and the release gates no longer require public application construct
 screen-reader operation remains consolidated in the pre-`1.0` release gate.
 
 The library remains pre-adoption. Four completed `0.x` integration fixtures, a broad conventional
-catalog, the accepted Markdown editing surface, the accessible chart family including radar
-charts, and the final compatibility and quality gates are required before `1.0`.
+catalog, the accepted Markdown editing surface, the accessible chart family including radial,
+radar, heatmap, and compact charts, and the final compatibility and quality gates are required
+before `1.0`.
 
 ## Accepted foundation
 
@@ -277,10 +278,17 @@ legend pinning gives overlapping groups paint and hit-test priority. Translucent
 axes, compact point bounds, proportional bubble area, split whiskers, separate outliers, generated
 tables, and chart-specific guidance preserve the accepted visual and reading decisions.
 
+### Ticket 21 — radial, heatmap, and compact charts
+
+PieChart, DonutChart, RadarChart, Heatmap, and Sparkline extend the chart family through bounded
+part-to-whole paging, comparable radial profiles, sparse two-dimensional value grids, and compact
+single-series trends. Each chart retains the shared caption, feedback, reading, tooltip,
+announcement, generated-table, responsive, theme, forced-color, reduced-motion, SSR, hydration,
+type, and contract conventions while adding only the behavior its data unit requires.
+
 ## Frontier
 
-See the [decision map](map.md). The current decision frontier is
-[statistical chart visual encoding](decisions/19-statistical-chart-visual-encoding.md).
+See the [decision map](map.md). Ticket 21 is complete; Ticket 22 is the next chart-family frontier.
 
 ## Accepted sources
 
@@ -522,6 +530,7 @@ See the [decision map](map.md). The current decision frontier is
   chart baseline includes the later role-aware palette and reading-interaction commits through
   `d8cce02` (`[Feature] Make charts readable and interactive`).
 - Ticket 20 is implemented and validated as one delivery change; no follow-up correction remains.
+- Ticket 21 is delivered through `9780036`, `d9ddcd5`, `6680a5c`, and the current Sparkline commit.
 - Start a new `novel-work` effort before taking up the next ticket.
-- Next action: plan Ticket 21's radial, heatmap, and compact chart family against the delivered
-  Cartesian and statistical-chart foundations.
+- Next action: plan Ticket 22's chart interaction and composition work against the completed chart
+  family.

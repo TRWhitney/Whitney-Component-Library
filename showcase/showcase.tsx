@@ -68,6 +68,7 @@ import {
   RadioGroup,
   ScrollRegion,
   ScatterChart,
+  Sparkline,
   SearchField,
   Section,
   Select,
@@ -203,6 +204,15 @@ const roomDeviationData = [
   {period: 'night', room: 'east', value: 1},
   {period: 'midday', room: 'west', value: 3},
   {period: 'evening', room: 'west', value: -3},
+] as const;
+const compactDemandData = [
+  {day: 'Mon', demand: 42},
+  {day: 'Tue', demand: null},
+  {day: 'Wed', demand: 38},
+  {day: 'Thu', demand: 52},
+  {day: 'Fri', demand: 38},
+  {day: 'Sat', demand: 65},
+  {day: 'Sun', demand: 65},
 ] as const;
 const statisticalPointData = [
   {demand: 28, id: 'north-1', label: 'North Monday', loop: 'north', stored: 42, temperature: 18},
@@ -2271,6 +2281,35 @@ function ChartSpecimens() {
             scale={{domain: [-6, 6], midpoint: 0, type: 'two-sided'}}
             title="Temperature deviation"
             value={{accessor: 'value', label: 'Deviation', unit: '°C'}}
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Show one compact ordered trend with a standard caption, honest gaps, exact current and observed-range cues, and a complete reading that names lows and highs. Use LineChart when visible axes or multiple series matter."
+        name="Sparkline"
+      >
+        <Example label="Fixed-range Sparkline with a gap and tied extremes">
+          <Sparkline
+            data={compactDemandData}
+            dataTableLabel="Daily thermal demand history"
+            description="Daily demand; Tuesday has no reading, current demand is 65 MWh, and the observed range is 38 to 65 MWh."
+            emptyState={{description: 'Record daily demand to begin.', title: 'No demand history'}}
+            invalidData={{
+              description: 'Correct non-finite demand readings.',
+              title: 'Invalid demand history',
+            }}
+            labels={{
+              first: 'First',
+              highest: 'Highest',
+              last: 'Last',
+              lowest: 'Lowest',
+              missing: 'No reading',
+            }}
+            position={{accessor: 'day', label: 'Day', scale: {type: 'categorical'}}}
+            title="Thermal demand this week"
+            value={{accessor: 'demand', label: 'Demand', unit: 'MWh'}}
+            valueRange={[0, 80]}
           />
         </Example>
       </Specimen>

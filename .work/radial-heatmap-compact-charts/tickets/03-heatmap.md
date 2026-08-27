@@ -64,3 +64,6 @@ example.
   reproduces touch, mouse, and mouse-leave ownership and shows all recorded values at a 400px frame.
 - Independent intent and engineering correction reviews pass with no findings across every admitted
   keyboard, overflow, sizing, scale, identity, lifecycle, and hybrid-input correction.
+- A fitted Heatmap uses a clipped frame instead of an inert scroll container. Dense grids retain
+  labeled local overflow, but wheel input can continue into the surrounding page rather than being
+  trapped by the chart.

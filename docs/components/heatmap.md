@@ -53,7 +53,7 @@ Show one numeric measure across the complete intersections of two ordered domain
 ## Appearance and responsive behavior
 
 - Every numeric cell uses one visible continuous color key. Sequential color represents low-to-high magnitude. Two-sided color meets at the declared midpoint. Missing cells use a neutral dashed crosshatch that cannot be mistaken for zero or a numeric extreme.
-- Heatmap keeps labels and cells legible before preserving inline cell text. Values disappear when space becomes tight. If the complete grid still does not fit, a separately labeled local region scrolls in both directions with the transient ScrollRegion scrollbar treatment. Every intersection remains in the generated table.
+- Like other chart figures, Heatmap keeps a bounded default area instead of filling an arbitrarily wide parent. Row labels use only the width their text needs. Rows and cells shrink to their compact legible sizes before inline values disappear; only a grid that still cannot fit becomes a separately labeled local scroll region with the transient ScrollRegion scrollbar treatment. Fitted grids do not become scroll containers, and local overflow does not trap scrolling from the surrounding page. Every intersection remains in the generated table.
 
 ## Accent, forced colors, and reduced motion
 

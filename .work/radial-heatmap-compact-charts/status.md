@@ -9,12 +9,11 @@ necessary context.
 
 ## Current state
 
-[PieChart and DonutChart](tickets/01-pie-and-donut.md) were delivered in `9780036`.
-[RadarChart](tickets/02-radar-chart.md) is delivered in `d9ddcd5`. [Heatmap](tickets/03-heatmap.md)
-is delivered in the current `[Feature] Add Heatmap` commit. The accepted
-[specification](spec.md) and four vertical implementation slices resolve the chart-specific
-contracts, prototype decisions, public boundaries, verification, and delivery order within parent
-Ticket 21.
+[PieChart and DonutChart](tickets/01-pie-and-donut.md) were delivered in `9780036`,
+[RadarChart](tickets/02-radar-chart.md) in `d9ddcd5`, and [Heatmap](tickets/03-heatmap.md) in
+`6680a5c`. [Sparkline](tickets/04-sparkline.md) is delivered in the current
+`[Feature] Add Sparkline` commit. The accepted [specification](spec.md) and all four vertical
+implementation slices complete parent Ticket 21.
 
 ## Progress
 
@@ -55,9 +54,9 @@ Ticket 21.
 - Built the focused [Sparkline cue prototype](prototypes/sparkline-cues.md) on the production
   LineChart. It compares line only, a filled current endpoint, and a filled current endpoint with
   hollow observed-range markers while holding the accepted caption and reading behavior fixed.
-- Whitney selected Current and observed range after the bounded marker revision. The prototype
-  contract is confirmed: current is filled, every observed low and high is hollow, and ties retain
-  their source positions.
+- Whitney selected Current and observed range after the bounded marker revision, then refined the
+  production encoding after rendered review: current is hollow, lows fill the lower half, highs
+  fill the upper half, and ties retain their source positions.
 - Closed the Sparkline minimum-size prototype route because the LineChart adapter keeps hidden axis
   margins and a Cartesian view box. Production will use a provisional compact default and the
   accepted size override, with review against the real Sparkline geometry.
@@ -119,13 +118,21 @@ Ticket 21.
 - Integrated neutral crosshatched missing cells, continuous numeric and missing keys, compact and
   height-bounded layout, forced-color and reduced-motion behavior, public contracts and types,
   generated documentation, and sequential and two-sided showcase specimens.
+- Implemented Sparkline with typed categorical, numeric, logarithmic, and time positions, derived
+  or fixed value ranges, honest gaps, complete tables, exact first, last, lowest, and highest
+  summaries, and the accepted current plus tied-range cues.
+- Preserved the delivered chart reading model through nearest-record pointer reading,
+  cursor-following tooltips, retained touch, ordered keyboard reading, atomic announcements,
+  feedback states, and reading-state reconciliation without axes, a legend, or local scrolling.
+- Added compact and forced-color styling, stable isolated-record and active-reading marks,
+  boundary-safe geometry, canonical contracts, generated documentation, public type fixtures, and
+  a production showcase specimen with a fixed comparison range.
 
 ## Frontier
 
-The [decision map](map.md) is resolved. [PieChart and DonutChart](tickets/01-pie-and-donut.md) are
-delivered. [RadarChart](tickets/02-radar-chart.md) is also delivered.
-[Heatmap](tickets/03-heatmap.md) is delivered. [Sparkline](tickets/04-sparkline.md) remains the final
-accepted implementation slice of the same parent ticket.
+The [decision map](map.md) and all four implementation slices are complete. Parent
+[Ticket 21](../library-foundation/tickets/21-radial-heatmap-and-compact-charts.md) is delivered.
+Ticket 22 is the next chart-family frontier.
 
 ## Accepted sources
 
@@ -260,6 +267,40 @@ accepted implementation slice of the same parent ticket.
 - Independent intent and engineering correction reviews pass with no findings across every admitted
   Heatmap correction. A possible dense-grid cursor-update cost remains a nonblocking engineering
   judgment pending evidence from profiling rather than active ticket work.
+- Sparkline focused coverage passes for honest gaps and isolated values, all tied extrema, current
+  precedence, exact summaries, complete and all-missing tables, negative and zero values, fixed
+  ranges, invalid records, state handling, every admitted position scale, numeric and date
+  boundaries, pointer, touch, keyboard, reconciliation, SSR, hydration, and public types.
+- `npm run check` passes 552 tests together with formatting, lint, types, generated documentation,
+  the supported TypeScript matrix, builds, and chart isolation for the completed family. Package
+  verification passes with React 18.3.1 and React 19.2.8, and the production showcase build and
+  `git diff --check` pass.
+- Playwright inspection covers light, dark, forced-color, normal, 280px compact, and 100px narrow
+  rendering. Direct operation confirms the tooltip follows the cursor, names only active lows and
+  highs, missing positions remain readable, Escape clears readings, local overflow is absent, and
+  the active reading point keeps a stable rendered size. Static low and high halves, the hollow
+  endpoint, foreground hover completion, and ordinary foreground reading point were inspected at
+  three-times pixel density.
+- Delivery review corrections preserve all-missing table rows, atomic live readings, visible active
+  reading points, finite derived logarithmic and boundary-date geometry, and the shared fractional
+  logarithmic-base contract. Independent intent and engineering correction reviews pass with no
+  findings.
+- Final correction keeps the accepted Sparkline hierarchy visible in the rendered example. Tied
+  lows fill the lower half of their circles, highs fill the upper half, current is hollow, and an
+  otherwise invisible isolated value stays solid. Hover completes any existing cue and keeps the
+  solid foreground point for ordinary readings. Tooltips name active lows and highs without adding
+  a label to ordinary readings. An ordinary connected value has no static marker. Pie, Donut, and
+  Heatmap examples now use a smaller showcase footprint while production chart sizing remains
+  consumer-controlled.
+- Heatmap now sizes its label track from actual labels, reduces ordinary row and cell geometry before
+  enabling local scrolling, and draws its active boundary inside the cell. Playwright confirms that
+  512px and 320px four-row grids have matching client and scroll bounds before and after hover, with
+  no scroll region, in light, dark, and forced-color rendering. Fitted grids use clipped frames
+  rather than inert scroll containers, and wheel input over them continues scrolling the page.
+- Final delivery review found that inset high and low fills used the small reflected arc on hover
+  instead of the complete open area, and that an all-equal range cue was recolored despite having no
+  open area. Hover now uses the complementary large arc. Complete range cues remain unchanged while
+  the reading needle and `Lowest, Highest` tooltip identify the active constant-series value.
 
 ## Out of scope
 
@@ -273,9 +314,10 @@ accepted implementation slice of the same parent ticket.
 
 ## Continuation
 
-- Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
+- Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work complete`.
 - Branch: `master`.
-- Relevant commits: `9780036` (`[Feature] Add paged pie and donut charts`) and `d9ddcd5`
-  (`[Feature] Add RadarChart`).
-- Owned uncommitted paths: none after Heatmap delivery.
-- Next action: begin Sparkline from its accepted specification, prototype decisions, and ticket.
+- Relevant commits: `9780036` (`[Feature] Add paged pie and donut charts`), `d9ddcd5`
+  (`[Feature] Add RadarChart`), `6680a5c` (`[Feature] Add Heatmap`), and the current
+  `[Feature] Add Sparkline` commit.
+- Owned uncommitted paths: none after Sparkline delivery.
+- Next action: start a new effort before taking up Ticket 22.

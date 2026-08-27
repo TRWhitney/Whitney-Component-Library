@@ -24,6 +24,7 @@ import {
   clamp,
   defaultColors,
   readAccessor,
+  type BoundedChartStyles,
   type ChartTooltipStyles,
 } from './cartesian-chart.js';
 import type {
@@ -524,7 +525,7 @@ function PartToWholeFrame<Datum extends object>({
   const aggregateLabelFontSize = aggregateLabelRenderedSize / svgViewScale;
   const donutTotalFontSize = clamp(26, 25 / svgViewScale, 38);
   const donutUnitFontSize = clamp(13, 13 / svgViewScale, 24);
-  const minimumSize = props.minimumSize ?? {height: 280, width: 300};
+  const minimumSize = props.minimumSize ?? {height: 180, width: 320};
   const status = props.status ?? {kind: 'ready'};
   const rangeLabel = (selectedPage: Page): string =>
     props.labels.categoryRange({
@@ -533,7 +534,7 @@ function PartToWholeFrame<Datum extends object>({
       total: model.positiveCategories.length,
     });
   const isCompact =
-    availableSize !== undefined && (availableSize.width <= 400 || availableSize.height <= 352);
+    availableSize !== undefined && (availableSize.width <= 480 || availableSize.height <= 352);
   const isStacked =
     availableSize !== undefined && availableSize.width <= 400 && availableSize.height >= 512;
 
@@ -683,6 +684,9 @@ function PartToWholeFrame<Datum extends object>({
     '--wcl-radial-count-font-size': `${aggregateLabelFontSize}px`,
     '--wcl-radial-total-font-size': `${donutTotalFontSize}px`,
     '--wcl-radial-unit-font-size': `${donutUnitFontSize}px`,
+  };
+  const rootStyle: BoundedChartStyles = {
+    '--wcl-chart-minimum-width': `${minimumSize.width}px`,
   };
 
   let content: ReactNode;
@@ -911,6 +915,7 @@ function PartToWholeFrame<Datum extends object>({
       data-wcl-chart=""
       data-wcl-part-to-whole-chart={kind}
       ref={setRootElement}
+      style={rootStyle}
     >
       <figcaption data-wcl-chart-caption="">
         <strong id={titleId}>{props.title}</strong>

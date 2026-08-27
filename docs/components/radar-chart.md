@@ -54,7 +54,7 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 ## Appearance and responsive behavior
 
 - Every series uses the same nonnegative scale. Exact source values place the points. Direct hover draws a center-to-point guide and mutes the other series. When an isolated positive point would collapse a fill into a line, small shoulders shape the neighboring corners. These shoulders are visual-only and never change exact points, readings, or table values.
-- Available width and height bound the chart. Compact layouts reduce caption, legend type, swatches, gaps, and padding while increasing SVG label size enough to survive plot scaling. Long plot labels may shorten while the table keeps their complete text. Tall narrow areas stack the legend below the plot. minimumSize and overflow retain the chart family local-scroll choice, and the legend uses the transient ScrollRegion scrollbar behavior without container chrome.
+- Like other chart figures, the default area stays bounded instead of filling an arbitrarily wide parent. Available width and height bound the chart. Compact layouts reduce caption, legend type, swatches, gaps, and padding while increasing SVG label size enough to survive plot scaling. Long plot labels may shorten while the table keeps their complete text. Tall narrow areas stack the legend below the plot. minimumSize and overflow retain the chart family local-scroll choice, and the legend uses the transient ScrollRegion scrollbar behavior without container chrome.
 
 ## Accent, forced colors, and reduced motion
 

@@ -5,18 +5,18 @@ their less precise or reduced-context uses.
 
 **Blocked by:** [Cartesian Chart Foundation](19-cartesian-chart-foundation.md)
 
-**Status:** active
+**Status:** complete
 
 - [x] Pie and donut charts enforce part-to-whole semantics and guide against excessive categories
       or precision claims.
 - [x] Radar charts require comparable dimensions on a shared normalized interpretation and guide
       against precise comparison, negative values, or excessive series and axes.
-- [ ] Heatmaps expose row, column, value, scale, missing-cell, and color-independent meaning.
-- [ ] Sparklines retain an accessible label, summary, range, and trend meaning despite reduced
+- [x] Heatmaps expose row, column, value, scale, missing-cell, and color-independent meaning.
+- [x] Sparklines retain an accessible label, summary, range, and trend meaning despite reduced
       chrome.
-- [ ] Labels, legends, tooltips, patterns or marks, and structured alternatives remain available.
-- [ ] Responsive sizing avoids illegible labels and defines compact fallback behavior.
-- [ ] Theme, semantic color, forced-color, reduced-motion, SSR, hydration, types, and contracts pass.
+- [x] Labels, legends, tooltips, patterns or marks, and structured alternatives remain available.
+- [x] Responsive sizing avoids illegible labels and defines compact fallback behavior.
+- [x] Theme, semantic color, forced-color, reduced-motion, SSR, hydration, types, and contracts pass.
 
 ## Accepted sources
 
@@ -27,4 +27,11 @@ their less precise or reduced-context uses.
 
 ## Completion evidence
 
-Pending implementation.
+- PieChart and DonutChart are delivered in `9780036`, RadarChart in `d9ddcd5`, and Heatmap in
+  `6680a5c`. Sparkline is delivered in the current `[Feature] Add Sparkline` commit.
+- Each component has typed public inputs, canonical guidance, generated documentation, production
+  showcase specimens, complete structured alternatives, focused interaction and appearance tests,
+  SSR and hydration coverage, and clean React 18 and React 19 package verification.
+- The final Sparkline repository check passes 532 tests together with formatting, lint, types,
+  generated artifacts, the supported TypeScript matrix, builds, and chart isolation. Independent
+  intent and engineering correction reviews report no remaining findings.
