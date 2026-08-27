@@ -11,6 +11,7 @@ export {
   histogramContract,
   lineChartContract,
   pieChartContract,
+  radarChartContract,
   scatterChartContract,
 } from './chart.contracts.js';
 export {
@@ -118,6 +119,7 @@ import {
   histogramContract,
   lineChartContract,
   pieChartContract,
+  radarChartContract,
   scatterChartContract,
 } from './chart.contracts.js';
 import {
@@ -255,6 +257,7 @@ export const componentContracts = [
   paginationContract,
   pageHeaderContract,
   pieChartContract,
+  radarChartContract,
   popoverContract,
   rangeSliderContract,
   responsiveGridContract,

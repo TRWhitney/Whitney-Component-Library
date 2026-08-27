@@ -214,6 +214,49 @@ export interface DonutChartProps<Datum extends object> extends PartToWholeChartC
   readonly totalLabel: string;
 }
 
+export interface RadarChartDimension<Datum extends object> {
+  readonly accessor: ChartAccessor<Datum, number>;
+  readonly id: string;
+  readonly label: string;
+}
+
+export type RadarChartDimensions<Datum extends object> = readonly [
+  RadarChartDimension<Datum>,
+  RadarChartDimension<Datum>,
+  RadarChartDimension<Datum>,
+  ...RadarChartDimension<Datum>[],
+];
+
+export interface RadarChartValue {
+  readonly formatValue?: (value: number) => string;
+  readonly label: string;
+  readonly unit?: string;
+}
+
+export interface RadarChartLabels {
+  readonly dimension: string;
+}
+
+export interface RadarChartProps<Datum extends object> {
+  readonly aspectRatio?: number;
+  readonly colorAccessor?: ChartAccessor<Datum, ChartColor>;
+  readonly data: NonEmptyChartSeries<Datum>;
+  readonly dataTableLabel: string;
+  readonly description: string;
+  readonly dimensions: RadarChartDimensions<Datum>;
+  readonly emptyState: ChartStateCopy;
+  readonly idAccessor: ChartAccessor<Datum, string>;
+  readonly invalidData: ChartStateCopy;
+  readonly labelAccessor: ChartAccessor<Datum, string>;
+  readonly labels: RadarChartLabels;
+  readonly legend: ChartLegend;
+  readonly minimumSize?: ChartMinimumSize;
+  readonly overflow?: ChartOverflow;
+  readonly status?: ChartStatus;
+  readonly title: string;
+  readonly value: RadarChartValue;
+}
+
 interface ChartCommonProps<Datum extends object> {
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];

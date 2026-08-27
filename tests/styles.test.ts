@@ -105,6 +105,38 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('keeps radar geometry, series patterns, and readings legible across modes', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+
+    expect(styles).toMatch(/\[data-wcl-radar-guide\]\s+polygon,[^{]*\{[^}]*stroke:/);
+    expect(styles).toMatch(/\[data-wcl-radar-area\]\s*\{[^}]*fill:[^}]*stroke:/);
+    expect(styles).toMatch(/\[data-wcl-radar-point\]\s*\{[^}]*stroke:/);
+    expect(styles).toMatch(
+      /\[data-wcl-radar-reading-line\]\s*\{[^}]*stroke:\s*var\(--wcl-text\)[^}]*stroke-dasharray:/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-radar-reading-point\]\s*\{[^}]*fill:\s*var\(--wcl-text\)[^}]*stroke:\s*none/,
+    );
+    expect(styles).toMatch(
+      /\[data-wcl-radar-canvas\]\s*\{[^}]*aspect-ratio:\s*var\(--wcl-chart-aspect-ratio\)/,
+    );
+    expect(styles).toMatch(/\[data-wcl-radar-series\]\[data-muted\]\s*\{[^}]*opacity:/);
+    expect(styles).toMatch(/\[data-wcl-radar-series\]\[data-pattern-index='1'\]/);
+    for (const index of [1, 2, 3, 4, 5]) {
+      expect(styles).toMatch(
+        new RegExp(
+          `\\[data-wcl-radar-legend-swatch\\] rect\\[data-pattern-index='${index}'\\]\\s*\\{[^}]*stroke-dasharray:`,
+        ),
+      );
+    }
+    expect(styles).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*\[data-wcl-radar-series\][\s\S]*transition:\s*none/,
+    );
+    expect(styles).toMatch(
+      /@media\s*\(forced-colors:\s*active\)[\s\S]*\[data-wcl-radar-area\][\s\S]*stroke:\s*CanvasText/,
+    );
+  });
+
   it('gives PageHeader its endpoint Route and SplitView a responsive two-way rail', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const route = styles.match(/\[data-wcl-page-header-route\]\s*\{([^}]*)\}/)?.[1];

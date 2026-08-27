@@ -61,6 +61,7 @@ import {
   ProcessTracker,
   ProgressBar,
   Popover,
+  RadarChart,
   RangeSlider,
   ResponsiveGrid,
   RadioGroup,
@@ -95,6 +96,7 @@ import {
   type DrawerPlacement,
   type FieldControlProps,
   type FileAcquisitionResult,
+  type RadarChartDimensions,
   type TableSortDescriptor,
 } from '../src/index.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
@@ -122,6 +124,46 @@ const energyCategoryData = [
   {id: 'civic', label: 'Civic buildings', value: 3},
   {id: 'markets', label: 'Public markets', value: 2},
   {id: 'storage', label: 'Storage', value: 0},
+] as const;
+interface VehicleProfile {
+  readonly comfort?: number;
+  readonly efficiency?: number;
+  readonly id: string;
+  readonly label: string;
+  readonly range?: number;
+  readonly reliability?: number;
+  readonly speed?: number;
+}
+const vehicleProfileDimensions: RadarChartDimensions<VehicleProfile> = [
+  {accessor: 'speed', id: 'speed', label: 'Speed'},
+  {accessor: 'range', id: 'range', label: 'Range'},
+  {accessor: 'efficiency', id: 'efficiency', label: 'Efficiency'},
+  {accessor: 'comfort', id: 'comfort', label: 'Comfort'},
+  {accessor: 'reliability', id: 'reliability', label: 'Reliability'},
+];
+const vehicleProfileData: readonly [VehicleProfile, VehicleProfile] = [
+  {
+    comfort: 6,
+    efficiency: 8,
+    id: 'courier',
+    label: 'Courier',
+    range: 7,
+    reliability: 9,
+    speed: 5,
+  },
+  {
+    comfort: 8,
+    efficiency: 6,
+    id: 'scout',
+    label: 'Scout',
+    range: 9,
+    reliability: 7,
+    speed: 8,
+  },
+] as const;
+const sparseVehicleProfileData: readonly [VehicleProfile, VehicleProfile] = [
+  {id: 'relay', label: 'Relay', range: 8},
+  {comfort: 5, id: 'utility', label: 'Utility', reliability: 7, speed: 6},
 ] as const;
 const statisticalPointData = [
   {demand: 28, id: 'north-1', label: 'North Monday', loop: 'north', stored: 42, temperature: 18},
@@ -2009,6 +2051,23 @@ function ChartSpecimens() {
     legend: {label: 'Visible categories'},
     value: {accessor: 'value', label: 'Energy use', unit: 'MWh'},
   } as const;
+  const radarCommon = {
+    dataTableLabel: 'Vehicle profile scores',
+    dimensions: vehicleProfileDimensions,
+    emptyState: {
+      description: 'Choose vehicles with recorded scores.',
+      title: 'No vehicle scores',
+    },
+    idAccessor: 'id',
+    invalidData: {
+      description: 'Correct negative or non-finite scores.',
+      title: 'Invalid vehicle scores',
+    },
+    labelAccessor: 'label',
+    labels: {dimension: 'Quality'},
+    legend: {label: 'Vehicles'},
+    value: {label: 'Score', unit: 'points'},
+  } as const;
 
   return (
     <>
@@ -2103,6 +2162,28 @@ function ChartSpecimens() {
             {...partToWholeCommon}
             title="Community energy use by category"
             totalLabel="MWh total"
+          />
+        </Example>
+      </Specimen>
+
+      <Specimen
+        description="Compare a few subjects across ordered qualities that share one nonnegative scale. A dimension is one spoke; a series is one subject and one polygon. Hover near a profile point to isolate it and trace its axis. Missing dimensions read as zero, while small visual shoulders keep isolated values legible without changing their readings."
+        name="RadarChart"
+      >
+        <Example label="Comparable vehicle profiles">
+          <RadarChart
+            {...radarCommon}
+            data={vehicleProfileData}
+            description="Courier and Scout scores across five shared vehicle qualities."
+            title="Vehicle profiles"
+          />
+        </Example>
+        <Example label="Sparse profiles with exact zero readings">
+          <RadarChart
+            {...radarCommon}
+            data={sparseVehicleProfileData}
+            description="Missing qualities remain zero while isolated scores retain a readable fill."
+            title="Sparse vehicle profiles"
           />
         </Example>
       </Specimen>

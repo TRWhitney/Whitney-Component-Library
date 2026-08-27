@@ -91,6 +91,7 @@ describe('canonical component contracts', () => {
       'ProgressBar',
       'Popover',
       'RadioGroup',
+      'RadarChart',
       'RangeSlider',
       'ResponsiveGrid',
       'ScrollRegion',
@@ -159,6 +160,16 @@ describe('canonical component contracts', () => {
     expect(pie.inappropriateUses.join(' ')).toMatch(/precise comparison/i);
     expect(donut.parts.join(' ')).toMatch(/derived total.*center/i);
     expect(donut.contentRules.join(' ')).not.toMatch(/arbitrary.*center content/i);
+  });
+
+  it('documents radar dimensions, series, and sparse values without changing source readings', () => {
+    const radar = componentContracts.find((contract) => contract.exportName === 'RadarChart')!;
+
+    expect(radar.composition.join(' ')).toMatch(/dimension.*spoke.*series.*polygon/i);
+    expect(radar.validation.join(' ')).toMatch(/missing.*zero.*negative.*non-finite.*series/i);
+    expect(radar.appearance.join(' ')).toMatch(/shoulder.*visual.*exact/i);
+    expect(radar.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*dimension/i);
+    expect(radar.inappropriateUses.join(' ')).toMatch(/unrelated units.*precise/i);
   });
 
   it('keeps static data, description pairs, option selection, and cards distinct', () => {

@@ -34,9 +34,11 @@ value. Page position and activation communicate what opens next; sizing policy i
 tooltip content. DonutChart continues to show the complete derived total in its center.
 
 RadarChart traverses dimensions in declared order with Left and Right and reports every valid
-series value at the selected dimension. Its legend retains the existing temporary and pinned
-series emphasis. Readings and the table use exact source values; presentation-only radar shoulders
-never become data.
+series value at the selected dimension. Pointer and touch choose one series at an axis, draw a
+center-to-point guide, mute the other series, and show only that series and axis in the tooltip. A
+series pinned from the legend receives priority when targets are close or overlap. The legend
+otherwise retains the existing temporary and pinned series emphasis. Readings and the table use
+exact source values; presentation-only radar shoulders never become data.
 
 Heatmap uses Left and Right across columns and Up and Down across rows. Home and End reach the row
 endpoints; Control with Home or End reaches the first or last cell in the complete grid. Missing

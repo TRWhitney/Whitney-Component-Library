@@ -1,5 +1,6 @@
 export {AreaChart, BarChart, CartesianChart, ColumnChart, LineChart} from './cartesian-chart.js';
 export {DonutChart, PieChart} from './part-to-whole-chart.js';
+export {RadarChart} from './radar-chart.js';
 export {BoxPlot, BubbleChart, Histogram, ScatterChart} from './statistical-chart.js';
 export type {
   AreaChartProps,
@@ -45,6 +46,11 @@ export type {
   PartToWholeChartRange,
   PartToWholeChartValue,
   PieChartProps,
+  RadarChartDimension,
+  RadarChartDimensions,
+  RadarChartLabels,
+  RadarChartProps,
+  RadarChartValue,
   QuantitativeChartDataAxis,
   ScatterChartProps,
   StatisticalChartSeries,

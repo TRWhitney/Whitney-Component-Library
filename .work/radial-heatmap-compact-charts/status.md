@@ -9,10 +9,12 @@ necessary context.
 
 ## Current state
 
-Delivery is ready for [PieChart and DonutChart](tickets/01-pie-and-donut.md) after renewed validation
-and clean correction review. The accepted [specification](spec.md) and four vertical implementation
-tickets resolve the chart-specific contracts, prototype decisions, public boundaries,
-verification, and delivery order.
+[PieChart and DonutChart](tickets/01-pie-and-donut.md) were delivered in `9780036`.
+[RadarChart](tickets/02-radar-chart.md) is delivered in the current `[Feature] Add RadarChart`
+commit. The accepted
+[specification](spec.md) and four vertical implementation slices resolve the chart-specific
+contracts, prototype decisions, public boundaries, verification, and delivery order within parent
+Ticket 21.
 
 ## Progress
 
@@ -112,8 +114,9 @@ verification, and delivery order.
 ## Frontier
 
 The [decision map](map.md) is resolved. [PieChart and DonutChart](tickets/01-pie-and-donut.md) are
-validated. [RadarChart](tickets/02-radar-chart.md), [Heatmap](tickets/03-heatmap.md), and
-[Sparkline](tickets/04-sparkline.md) are ready for implementation, with RadarChart next.
+delivered. [RadarChart](tickets/02-radar-chart.md) is also delivered. [Heatmap](tickets/03-heatmap.md)
+is next, and [Sparkline](tickets/04-sparkline.md) remains the final accepted implementation slice of
+the same parent ticket.
 
 ## Accepted sources
 
@@ -191,6 +194,35 @@ validated. [RadarChart](tickets/02-radar-chart.md), [Heatmap](tickets/03-heatmap
 - Independent intent and engineering correction reviews pass with no findings after inspecting the
   admitted aggregate identity, duplicate detection, zero-plus-invalid feedback, runtime validation,
   and later-page coverage corrections.
+- RadarChart applies the existing chart visual language: role-aware series colors, standard caption
+  and utility type, a bounded plot with an adjacent legend, exact source points, restrained emphasis
+  motion, and the accepted sparse-fill shoulder as its distinctive visual behavior. Compact and
+  forced-color states preserve those relationships without introducing new chart conventions.
+- Radar pointer and touch readings now isolate the nearest series value on an axis, draw a guide
+  from the center to its exact point, include the axis name, and report only that series. A
+  legend-pinned series wins close or overlapping targets. Keyboard dimension readings retain every
+  valid series value.
+- `npm run check` passes 501 tests together with formatting, lint, types, generated documentation,
+  the supported TypeScript matrix, builds, and chart isolation for RadarChart. Package verification
+  passes with React 18.3.1 and React 19.2.8, and the production showcase build passes.
+- Current browser inspection covers regular and sparse profiles, pointer and touch readings,
+  keyboard traversal, pinned overlap priority, compact and stacked sizing, 278px local overflow,
+  light and dark themes, forced colors, and reduced motion. The final guide marker is solid,
+  theme-aware, halo-free, and smaller than its source point.
+- Delivery review found four blocking gaps: fractional values were compressed by an integer-like
+  scale, `aspectRatio` was serialized but ineffective, retained direct readings could survive data
+  changes, and legend patterns covered only three of six series. Each correction now has focused
+  green coverage. The browser confirms aspect ratios 1 and 2 produce matching canvas proportions
+  while a fixed 300px square remains height-bounded.
+- Renewed package verification passes clean React 18.3.1 and React 19.2.8 consumers. The showcase
+  production build and `git diff --check` also pass after the corrections. Current light and dark
+  screenshots show the corrected sizing and retain the accepted guide, legend, and sparse geometry.
+- Bounded correction review caught overflow at the finite-number extremes and value updates that
+  cleared otherwise valid legend emphasis. Radar scale geometry now remains finite for
+  `Number.MIN_VALUE` and `Number.MAX_VALUE`; model changes clear direct readings while stable series
+  pins and focus emphasis persist. The full 501-test and package validation was renewed afterward.
+- Independent intent and engineering correction reviews pass with no findings after checking every
+  admitted scale, sizing, reading-state, and legend-pattern correction.
 
 ## Out of scope
 
@@ -206,8 +238,7 @@ validated. [RadarChart](tickets/02-radar-chart.md), [Heatmap](tickets/03-heatmap
 
 - Resume with `python3 /home/trwhitney/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
 - Branch: `master`.
-- Owned uncommitted paths: `.work/radial-heatmap-compact-charts/`, `CONTEXT.md`, and
-  `docs/adr/0015-page-large-part-to-whole-charts.md`, and
-  `docs/adr/0016-preserve-radar-values-while-shaping-sparse-fills.md`.
-- Next action: commit the delivered PieChart and DonutChart outcome, then continue with
-  [RadarChart](tickets/02-radar-chart.md).
+- Relevant commits: `9780036` (`[Feature] Add paged pie and donut charts`) and the current
+  `[Feature] Add RadarChart` commit.
+- Owned uncommitted paths: none after Radar delivery.
+- Next action: begin the Heatmap implementation slice from its accepted specification and ticket.

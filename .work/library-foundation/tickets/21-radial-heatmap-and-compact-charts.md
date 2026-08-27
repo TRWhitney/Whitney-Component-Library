@@ -9,7 +9,7 @@ their less precise or reduced-context uses.
 
 - [x] Pie and donut charts enforce part-to-whole semantics and guide against excessive categories
       or precision claims.
-- [ ] Radar charts require comparable dimensions on a shared normalized interpretation and guide
+- [x] Radar charts require comparable dimensions on a shared normalized interpretation and guide
       against precise comparison, negative values, or excessive series and axes.
 - [ ] Heatmaps expose row, column, value, scale, missing-cell, and color-independent meaning.
 - [ ] Sparklines retain an accessible label, summary, range, and trend meaning despite reduced

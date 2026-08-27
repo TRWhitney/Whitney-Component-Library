@@ -85,11 +85,14 @@ percent of the radius or twenty-five percent of that positive value. Adjacent po
 not receive shoulders, and an all-zero series stays empty. Marks, tooltips, announcements, and the
 table always report the source values.
 
-Left and Right traverse dimensions in declared order. A reading reports every valid series value
-at that dimension. Legend hover, focus, pinning, replacement, and Escape use the existing series
-emphasis behavior. The generated table uses dimensions as rows and series as columns. The contract
-warns against excessive spokes, overlapping polygons, precise lookup, and unrelated units without
-imposing a hard dimension maximum.
+Left and Right traverse dimensions in declared order and report every valid series value at the
+selected dimension. Pointer and touch choose the nearest series value on an axis, draw a guide from
+the center to that exact point, mute the other series, and report only the chosen series with the
+axis name. A series pinned from the legend wins close or overlapping pointer targets. Legend hover,
+focus, pinning, replacement, and Escape otherwise use the existing series-emphasis behavior. The
+generated table uses dimensions as rows and series as columns. The contract warns against excessive
+spokes, overlapping polygons, precise lookup, and unrelated units without imposing a hard dimension
+maximum.
 
 ### Heatmap
 
