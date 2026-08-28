@@ -25,7 +25,7 @@ Show one numeric measure across the complete intersections of two ordered domain
 
 ## Content
 
-- Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. State what the color means in the description, and choose a two-sided scale only when its midpoint has a real interpretation.
+- Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. Choose colors that match the measure, state what they mean in the description, and use a two-sided scale only when its midpoint has a real interpretation.
 
 ## States
 
@@ -36,7 +36,7 @@ Show one numeric measure across the complete intersections of two ordered domain
 - Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.
 - Heatmap emits no consumer events and does not select, filter, reorder, or mutate records.
 - Heatmap manages cell readings and local scrolling internally. Pointer, keyboard, and touch interaction do not change consumer data.
-- Runtime preparation requires unique nonblank row and column ids, declared record coordinates, and at most one record per cell. Zero and negative values are valid. Missing pairs remain missing. Non-finite values are invalid. Fixed domains must be ascending and finite, and a two-sided midpoint must be finite and inside its fixed domain.
+- Runtime preparation requires unique nonblank row and column ids, declared record coordinates, and at most one record per cell. Scale colors must be nonblank strings containing browser-supported CSS color values. Sequential scales require one color, and two-sided scales require ordered low and high colors. Zero and negative values are valid. Missing pairs remain missing. Non-finite values are invalid. Fixed domains must be ascending and finite, and a two-sided midpoint must be finite and inside its fixed domain.
 - Heatmap is not a form control and does not submit, validate, or reset values. Place dataset and scale controls beside it in consumer-owned composition.
 
 ## Accessibility
@@ -57,7 +57,7 @@ Show one numeric measure across the complete intersections of two ordered domain
 
 ## Accent, forced colors, and reduced motion
 
-- A sequential scale moves from the surface toward the application accent. A two-sided scale uses the second chart color below its midpoint and the accent above it. Missing cells stay neutral and outside both numeric scales.
+- Heatmap does not read the application accent. A sequential scale accepts one color. A two-sided scale accepts ordered low and high colors. Callers may pass their application accent when it fits the measure. Missing cells stay neutral and outside both numeric scales.
 - Forced colors preserve numeric cells, missing patterns, active boundaries, labels, and the complete table in system colors. The table remains the exact non-color representation.
 - Reduced motion removes active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same. Grid geometry does not animate.
 
@@ -85,7 +85,7 @@ export function HeatmapExample() {
         labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}
         rowAccessor="location"
         rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}
-        scale={{type: "sequential"}}
+        scale={{color: "#d14f00", type: "sequential"}}
         title="Room temperature"
         value={{accessor: "value", label: "Temperature", unit: "°C"}}
       />
@@ -118,7 +118,7 @@ export function MisusedHeatmap() {
         labels={{row: "Device", column: "Date", colorKey: "Reading scale", missing: "No reading", scrollRegion: "Device grid"}}
         rowAccessor="device"
         rows={Array.from({length: 1000}, (_, index) => ({id: String(index), label: `Device ${index + 1}`}))}
-        scale={{type: "sequential"}}
+        scale={{color: "#2878ff", type: "sequential"}}
         title="All device history"
         value={{accessor: "value", label: "Reading"}}
       />

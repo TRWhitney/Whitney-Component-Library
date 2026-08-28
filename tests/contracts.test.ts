@@ -177,6 +177,9 @@ describe('canonical component contracts', () => {
   it('documents Heatmap scales, missing cells, and dense-grid alternatives honestly', () => {
     const heatmap = componentContracts.find((contract) => contract.exportName === 'Heatmap')!;
 
+    expect(heatmap.accentBehavior.join(' ')).toMatch(
+      /does not read.*accent.*sequential.*one color.*two-sided.*low and high/i,
+    );
     expect(heatmap.appearance.join(' ')).toMatch(/sequential.*two-sided.*midpoint/i);
     expect(heatmap.validation.join(' ')).toMatch(/zero.*negative.*missing.*non-finite/i);
     expect(heatmap.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*Up.*Down.*Control Home/i);

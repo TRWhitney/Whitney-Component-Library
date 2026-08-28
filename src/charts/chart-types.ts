@@ -263,8 +263,13 @@ export interface HeatmapDomainItem {
 }
 
 export type HeatmapScale =
-  | {readonly domain?: readonly [number, number]; readonly type: 'sequential'}
   | {
+      readonly color: string;
+      readonly domain?: readonly [number, number];
+      readonly type: 'sequential';
+    }
+  | {
+      readonly colors: readonly [low: string, high: string];
       readonly domain?: readonly [number, number];
       readonly midpoint: number;
       readonly type: 'two-sided';

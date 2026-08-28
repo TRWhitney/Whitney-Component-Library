@@ -43,12 +43,16 @@ type HeatmapStyles = CSSProperties & {
 };
 
 type CellStyles = CSSProperties & {'--wcl-heatmap-intensity': string};
+type HeatmapRootStyles = BoundedChartStyles & {
+  '--wcl-heatmap-high-color': string;
+  '--wcl-heatmap-low-color': string;
+};
 
 interface PreparedCell {
   readonly columnIndex: number;
   readonly index: number;
   readonly rowIndex: number;
-  readonly tone: 'accent' | 'series-2';
+  readonly range: 'high' | 'low';
   readonly ratio: number;
   readonly value: number | undefined;
 }
@@ -90,6 +94,15 @@ function validateScale(scale: HeatmapScale): void {
   }
   if (scale.type === 'two-sided' && !Number.isFinite(scale.midpoint)) {
     throw new Error('Heatmap scale midpoint must be finite.');
+  }
+  if (scale.type === 'sequential') {
+    assertText(scale.color, 'Heatmap sequential color');
+  } else {
+    if (!Array.isArray(scale.colors) || scale.colors.length !== 2) {
+      throw new Error('Heatmap two-sided scale must contain exactly two colors.');
+    }
+    assertText(scale.colors[0], 'Heatmap low color');
+    assertText(scale.colors[1], 'Heatmap high color');
   }
   if (scale.domain === undefined) return;
   const [minimum, maximum] = scale.domain;
@@ -186,23 +199,23 @@ function valueEncoding(
   value: number,
   domain: readonly [number, number],
   scale: HeatmapScale,
-): Pick<PreparedCell, 'ratio' | 'tone'> {
+): Pick<PreparedCell, 'range' | 'ratio'> {
   const [minimum, maximum] = domain;
   if (scale.type === 'sequential') {
     return {
       ratio: minimum === maximum ? 0.62 : relativePosition(value, minimum, maximum),
-      tone: 'accent',
+      range: 'high',
     };
   }
   if (value < scale.midpoint) {
     return {
       ratio: minimum === scale.midpoint ? 0 : 1 - relativePosition(value, minimum, scale.midpoint),
-      tone: 'series-2',
+      range: 'low',
     };
   }
   return {
     ratio: maximum === scale.midpoint ? 0 : relativePosition(value, scale.midpoint, maximum),
-    tone: 'accent',
+    range: 'high',
   };
 }
 
@@ -247,14 +260,14 @@ function prepareModel<Datum extends object>(props: HeatmapProps<Datum>): Heatmap
       const value = records.get(row.id)?.get(column.id) ?? undefined;
       const encoding =
         value === undefined
-          ? {ratio: 0, tone: 'accent' as const}
+          ? {range: 'high' as const, ratio: 0}
           : valueEncoding(value, domain, props.scale);
       return {
         columnIndex,
         index: rowIndex * props.columns.length + columnIndex,
         ratio: encoding.ratio,
         rowIndex,
-        tone: encoding.tone,
+        range: encoding.range,
         value,
       };
     }),
@@ -455,8 +468,12 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
     '--wcl-heatmap-row-height': `${rowHeight}px`,
     '--wcl-heatmap-rows': Math.max(1, rowCount),
   };
-  const rootStyle: BoundedChartStyles = {
+  const [lowColor, highColor] =
+    props.scale.type === 'sequential' ? [props.scale.color, props.scale.color] : props.scale.colors;
+  const rootStyle: HeatmapRootStyles = {
     '--wcl-chart-minimum-width': `${minimumSize.width}px`,
+    '--wcl-heatmap-high-color': highColor,
+    '--wcl-heatmap-low-color': lowColor,
   };
 
   useLayoutEffect(() => {
@@ -676,7 +693,7 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
                         <span
                           data-active={activeIndex === cell.index ? '' : undefined}
                           data-cell-index={cell.index}
-                          data-color={cell.value === undefined ? undefined : cell.tone}
+                          data-range={cell.value === undefined ? undefined : cell.range}
                           data-missing={cell.value === undefined ? '' : undefined}
                           data-scale-ratio={
                             cell.value === undefined ? undefined : cell.ratio.toFixed(4)

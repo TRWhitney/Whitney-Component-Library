@@ -2054,7 +2054,7 @@ function FeedbackSpecimens() {
   );
 }
 
-function ChartSpecimens() {
+function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   const verticalAxes = {
     xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
     yAxis: {label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'},
@@ -2270,7 +2270,7 @@ function ChartSpecimens() {
             {...heatmapCommon}
             data={roomTemperatureData}
             description="Temperature by room and time; patterned cells have no recorded reading."
-            scale={{type: 'sequential'}}
+            scale={{color: accent, type: 'sequential'}}
             title="Room temperature"
             value={{accessor: 'value', label: 'Temperature', unit: '°C'}}
           />
@@ -2280,7 +2280,12 @@ function ChartSpecimens() {
             {...heatmapCommon}
             data={roomDeviationData}
             description="Degrees below or above the target; zero means the room met its target."
-            scale={{domain: [-6, 6], midpoint: 0, type: 'two-sided'}}
+            scale={{
+              colors: [accent, '#d14f00'],
+              domain: [-6, 6],
+              midpoint: 0,
+              type: 'two-sided',
+            }}
             title="Temperature deviation"
             value={{accessor: 'value', label: 'Deviation', unit: '°C'}}
           />
@@ -2859,7 +2864,7 @@ export function Showcase() {
                     Plot data without prescribing the surrounding workspace
                   </h2>
                 </header>
-                <StaticChartSpecimens />
+                <StaticChartSpecimens accent={accent} />
               </section>
 
               <section aria-labelledby="ranges-heading" className="showcase-family">

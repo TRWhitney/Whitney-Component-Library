@@ -5,7 +5,7 @@ import {cleanup, fireEvent, render, screen, within} from '@testing-library/react
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import {Heatmap} from '../src/index.js';
-import type {HeatmapProps} from '../src/index.js';
+import type {HeatmapProps, HeatmapScale} from '../src/index.js';
 
 afterEach(cleanup);
 
@@ -37,12 +37,52 @@ const common: Omit<HeatmapProps<Reading>, 'data'> = {
     {id: 'north', label: 'North room'},
     {id: 'south', label: 'South room'},
   ],
-  scale: {type: 'sequential'},
+  scale: {color: '#2878ff', type: 'sequential'},
   title: 'Room temperature',
   value: {accessor: 'value', label: 'Temperature', unit: '°C'},
 };
 
 describe('Heatmap', () => {
+  it('uses the consumer colors declared by sequential and two-sided scales', () => {
+    const {container, rerender} = render(
+      <Heatmap
+        {...common}
+        data={[
+          {hour: 'morning', location: 'north', value: -10},
+          {hour: 'evening', location: 'north', value: 30},
+        ]}
+        scale={{color: 'oklch(62% 0.2 250)', type: 'sequential'}}
+      />,
+    );
+    const root = container.querySelector<HTMLElement>('[data-wcl-heatmap]')!;
+
+    expect(root.style.getPropertyValue('--wcl-heatmap-low-color')).toBe('oklch(62% 0.2 250)');
+    expect(root.style.getPropertyValue('--wcl-heatmap-high-color')).toBe('oklch(62% 0.2 250)');
+    expect(container.querySelectorAll('[data-wcl-heatmap-cell][data-range="high"]')).toHaveLength(
+      2,
+    );
+
+    rerender(
+      <Heatmap
+        {...common}
+        data={[
+          {hour: 'morning', location: 'north', value: -10},
+          {hour: 'evening', location: 'north', value: 30},
+        ]}
+        scale={{colors: ['#2878ff', '#d14f00'], midpoint: 10, type: 'two-sided'}}
+      />,
+    );
+
+    expect(root.style.getPropertyValue('--wcl-heatmap-low-color')).toBe('#2878ff');
+    expect(root.style.getPropertyValue('--wcl-heatmap-high-color')).toBe('#d14f00');
+    expect(
+      container.querySelector('[data-wcl-heatmap-cell][data-cell-index="0"][data-range="low"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-wcl-heatmap-cell][data-cell-index="1"][data-range="high"]'),
+    ).toBeTruthy();
+  });
+
   it('preserves the declared grid, zero, and missing cells in its visual and table', () => {
     const data: readonly Reading[] = [
       {hour: 'morning', location: 'north', value: 0},
@@ -150,7 +190,7 @@ describe('Heatmap', () => {
     expect(container.querySelector('[data-wcl-heatmap-key-missing]')).toBeTruthy();
   });
 
-  it('derives sequential and centered two-sided color scales and clamps fixed ranges', () => {
+  it('derives sequential and centered two-sided scale ratios and clamps fixed ranges', () => {
     const {container, rerender} = render(
       <Heatmap
         {...common}
@@ -173,12 +213,12 @@ describe('Heatmap', () => {
           {hour: 'morning', location: 'north', value: -10},
           {hour: 'evening', location: 'north', value: 30},
         ]}
-        scale={{midpoint: 10, type: 'two-sided'}}
+        scale={{colors: ['#2878ff', '#d14f00'], midpoint: 10, type: 'two-sided'}}
       />,
     );
     expect(ratios()).toEqual([1, 1]);
-    expect(container.querySelector('[data-color="series-2"]')).toBeTruthy();
-    expect(container.querySelector('[data-color="accent"]')).toBeTruthy();
+    expect(container.querySelector('[data-range="low"]')).toBeTruthy();
+    expect(container.querySelector('[data-range="high"]')).toBeTruthy();
     expect(screen.getByText('10 °C', {selector: '[data-wcl-heatmap-key-midpoint]'})).toBeTruthy();
 
     rerender(
@@ -188,7 +228,12 @@ describe('Heatmap', () => {
           {hour: 'morning', location: 'north', value: -20},
           {hour: 'evening', location: 'north', value: 50},
         ]}
-        scale={{domain: [-10, 30], midpoint: 10, type: 'two-sided'}}
+        scale={{
+          colors: ['#2878ff', '#d14f00'],
+          domain: [-10, 30],
+          midpoint: 10,
+          type: 'two-sided',
+        }}
       />,
     );
     expect(ratios()).toEqual([1, 1]);
@@ -201,7 +246,12 @@ describe('Heatmap', () => {
       <Heatmap
         {...common}
         data={[{hour: 'morning', location: 'north', value: 10}]}
-        scale={{domain: [0, 20], midpoint: 10, type: 'two-sided'}}
+        scale={{
+          colors: ['#2878ff', '#d14f00'],
+          domain: [0, 20],
+          midpoint: 10,
+          type: 'two-sided',
+        }}
       />,
     );
 
@@ -243,12 +293,31 @@ describe('Heatmap', () => {
     expect(renderInvalid({data: [{hour: 'morning', location: 'basement', value: 1}]})).toThrow(
       /undeclared row/,
     );
-    expect(renderInvalid({scale: {domain: [2, 2], type: 'sequential'}})).toThrow(
+    expect(renderInvalid({scale: {color: '#2878ff', domain: [2, 2], type: 'sequential'}})).toThrow(
       /ascending finite/,
     );
-    expect(renderInvalid({scale: {domain: [0, 10], midpoint: 10, type: 'two-sided'}})).toThrow(
-      /midpoint must be inside/,
+    expect(
+      renderInvalid({
+        scale: {
+          colors: ['#2878ff', '#d14f00'],
+          domain: [0, 10],
+          midpoint: 10,
+          type: 'two-sided',
+        },
+      }),
+    ).toThrow(/midpoint must be inside/);
+    expect(renderInvalid({scale: {color: ' ', type: 'sequential'}})).toThrow(
+      /sequential color must not be blank/,
     );
+    expect(
+      renderInvalid({
+        scale: {
+          colors: ['#2878ff'],
+          midpoint: 0,
+          type: 'two-sided',
+        } as unknown as HeatmapScale,
+      }),
+    ).toThrow(/exactly two colors/);
   });
 
   it('keeps distinct coordinate pairs distinct even when ids contain separator characters', () => {
@@ -319,7 +388,11 @@ describe('Heatmap', () => {
           {hour: 'morning', location: 'north', value: -Number.MAX_VALUE},
           {hour: 'evening', location: 'north', value: Number.MAX_VALUE},
         ]}
-        scale={{domain: [-Number.MAX_VALUE, Number.MAX_VALUE], type: 'sequential'}}
+        scale={{
+          color: '#2878ff',
+          domain: [-Number.MAX_VALUE, Number.MAX_VALUE],
+          type: 'sequential',
+        }}
       />,
     );
     const assertFiniteRatios = () => {
@@ -337,6 +410,7 @@ describe('Heatmap', () => {
           {hour: 'evening', location: 'north', value: Number.MAX_VALUE},
         ]}
         scale={{
+          colors: ['#2878ff', '#d14f00'],
           domain: [-Number.MAX_VALUE, Number.MAX_VALUE],
           midpoint: 0,
           type: 'two-sided',

@@ -113,6 +113,31 @@ describe('static appearance styles', () => {
     expect(activeCell).not.toContain('transform:');
   });
 
+  it('maps caller-supplied Heatmap colors into cells and numeric keys', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const cell = styles.match(/\[data-wcl-heatmap-cell\]\s*\{([^}]*)\}/)?.[1];
+    const lowCell = styles.match(
+      /\[data-wcl-heatmap-cell\]\[data-range='low'\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const highCell = styles.match(
+      /\[data-wcl-heatmap-cell\]\[data-range='high'\]\s*\{([^}]*)\}/,
+    )?.[1];
+    const sequentialKey = styles.match(/\[data-wcl-heatmap-key-gradient\]\s*\{([^}]*)\}/)?.[1];
+    const twoSidedKey = styles.match(
+      /\[data-wcl-heatmap-key\]\[data-scale='two-sided'\] \[data-wcl-heatmap-key-gradient\]\s*\{([^}]*)\}/,
+    )?.[1];
+
+    expect(lowCell).toContain('--wcl-heatmap-cell-color: var(--wcl-heatmap-low-color)');
+    expect(highCell).toContain('--wcl-heatmap-cell-color: var(--wcl-heatmap-high-color)');
+    expect(cell).toContain('var(--wcl-heatmap-cell-color) 72%');
+    expect(cell).toContain('var(--wcl-heatmap-cell-color) var(--wcl-heatmap-intensity)');
+    expect(sequentialKey).toContain('var(--wcl-heatmap-high-color) 12%');
+    expect(sequentialKey).toContain('var(--wcl-heatmap-high-color) 84%');
+    expect(twoSidedKey).toContain('var(--wcl-heatmap-low-color) 84%');
+    expect(twoSidedKey).toContain('var(--wcl-heatmap-high-color) 84%');
+    expect(twoSidedKey).toContain('var(--wcl-surface) var(--wcl-heatmap-midpoint-position)');
+  });
+
   it('keeps newer chart families in the established bounded chart area', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
 

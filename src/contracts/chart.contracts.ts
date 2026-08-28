@@ -392,7 +392,7 @@ export const radarChartContract: ComponentContract = {
 
 export const heatmapContract: ComponentContract = {
   accentBehavior: [
-    'A sequential scale moves from the surface toward the application accent. A two-sided scale uses the second chart color below its midpoint and the accent above it. Missing cells stay neutral and outside both numeric scales.',
+    'Heatmap does not read the application accent. A sequential scale accepts one color. A two-sided scale accepts ordered low and high colors. Callers may pass their application accent when it fits the measure. Missing cells stay neutral and outside both numeric scales.',
   ],
   accessibility: [
     'The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. The visual grid is hidden from assistive technology, and a generated native table preserves every declared row and column intersection.',
@@ -407,7 +407,7 @@ export const heatmapContract: ComponentContract = {
     'Render Heatmap inside AppearanceProvider in consumer-owned layout. Supply ordered labeled row and column domains, sparse cell records, coordinate and value accessors, one shared unit and formatter, scale configuration, localized labels, state copy, and a table label.',
   ],
   contentRules: [
-    'Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. State what the color means in the description, and choose a two-sided scale only when its midpoint has a real interpretation.',
+    'Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. Choose colors that match the measure, state what they mean in the description, and use a two-sided scale only when its midpoint has a real interpretation.',
   ],
   controlBehavior: [
     'Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.',
@@ -417,7 +417,7 @@ export const heatmapContract: ComponentContract = {
     {
       code: example(
         'MisusedHeatmap',
-        '<Heatmap\n  columnAccessor="date"\n  columns={Array.from({length: 200}, (_, index) => ({id: String(index), label: `Day ${index + 1}`}))}\n  data={[{date: "0", device: "0", value: 1}]}\n  dataTableLabel="All device readings"\n  description="Every raw device reading."\n  emptyState={{title: "No grid", description: "Declare devices and dates."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Device", column: "Date", colorKey: "Reading scale", missing: "No reading", scrollRegion: "Device grid"}}\n  rowAccessor="device"\n  rows={Array.from({length: 1000}, (_, index) => ({id: String(index), label: `Device ${index + 1}`}))}\n  scale={{type: "sequential"}}\n  title="All device history"\n  value={{accessor: "value", label: "Reading"}}\n/>',
+        '<Heatmap\n  columnAccessor="date"\n  columns={Array.from({length: 200}, (_, index) => ({id: String(index), label: `Day ${index + 1}`}))}\n  data={[{date: "0", device: "0", value: 1}]}\n  dataTableLabel="All device readings"\n  description="Every raw device reading."\n  emptyState={{title: "No grid", description: "Declare devices and dates."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Device", column: "Date", colorKey: "Reading scale", missing: "No reading", scrollRegion: "Device grid"}}\n  rowAccessor="device"\n  rows={Array.from({length: 1000}, (_, index) => ({id: String(index), label: `Device ${index + 1}`}))}\n  scale={{color: "#2878ff", type: "sequential"}}\n  title="All device history"\n  value={{accessor: "value", label: "Reading"}}\n/>',
       ),
       description:
         'Use a summarized chart, filtered view, or virtualized data table when the complete grid is too large to scan as color.',
@@ -434,7 +434,7 @@ export const heatmapContract: ComponentContract = {
     {
       code: example(
         'HeatmapExample',
-        '<Heatmap\n  columnAccessor="hour"\n  columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}\n  data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}\n  dataTableLabel="Room temperature data"\n  description="Temperature by room and time; patterned cells have no reading."\n  emptyState={{title: "No grid", description: "Declare rooms and times to begin."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}\n  rowAccessor="location"\n  rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}\n  scale={{type: "sequential"}}\n  title="Room temperature"\n  value={{accessor: "value", label: "Temperature", unit: "°C"}}\n/>',
+        '<Heatmap\n  columnAccessor="hour"\n  columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}\n  data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}\n  dataTableLabel="Room temperature data"\n  description="Temperature by room and time; patterned cells have no reading."\n  emptyState={{title: "No grid", description: "Declare rooms and times to begin."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}\n  rowAccessor="location"\n  rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}\n  scale={{color: "#d14f00", type: "sequential"}}\n  title="Room temperature"\n  value={{accessor: "value", label: "Temperature", unit: "°C"}}\n/>',
       ),
       description:
         'Show sparse values across a complete declared grid while keeping zero separate from missing.',
@@ -486,7 +486,7 @@ export const heatmapContract: ComponentContract = {
   stylesheet: './styles.css',
   summary: 'Show one numeric measure across two ordered categorical domains.',
   validation: [
-    'Runtime preparation requires unique nonblank row and column ids, declared record coordinates, and at most one record per cell. Zero and negative values are valid. Missing pairs remain missing. Non-finite values are invalid. Fixed domains must be ascending and finite, and a two-sided midpoint must be finite and inside its fixed domain.',
+    'Runtime preparation requires unique nonblank row and column ids, declared record coordinates, and at most one record per cell. Scale colors must be nonblank strings containing browser-supported CSS color values. Sequential scales require one color, and two-sided scales require ordered low and high colors. Zero and negative values are valid. Missing pairs remain missing. Non-finite values are invalid. Fixed domains must be ascending and finite, and a two-sided midpoint must be finite and inside its fixed domain.',
   ],
 };
 

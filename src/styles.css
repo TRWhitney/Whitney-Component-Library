@@ -7137,11 +7137,11 @@
     min-inline-size: var(--wcl-heatmap-cell-minimum-width);
     min-block-size: var(--wcl-heatmap-row-height);
     overflow: hidden;
-    border: 1px solid color-mix(in oklch, var(--wcl-chart-series-color) 72%, var(--wcl-border));
+    border: 1px solid color-mix(in oklch, var(--wcl-heatmap-cell-color) 72%, var(--wcl-border));
     border-radius: calc(var(--wcl-radius) * 0.55);
     background: color-mix(
       in oklch,
-      var(--wcl-chart-series-color) var(--wcl-heatmap-intensity),
+      var(--wcl-heatmap-cell-color) var(--wcl-heatmap-intensity),
       var(--wcl-surface)
     );
     color: var(--wcl-text);
@@ -7149,6 +7149,14 @@
     transition:
       border-color 120ms ease,
       box-shadow 120ms ease;
+  }
+
+  [data-wcl-heatmap-cell][data-range='low'] {
+    --wcl-heatmap-cell-color: var(--wcl-heatmap-low-color);
+  }
+
+  [data-wcl-heatmap-cell][data-range='high'] {
+    --wcl-heatmap-cell-color: var(--wcl-heatmap-high-color);
   }
 
   [data-wcl-heatmap-cell][data-missing] {
@@ -7220,8 +7228,8 @@
     border-radius: 999px;
     background: linear-gradient(
       to right,
-      color-mix(in oklch, var(--wcl-accent-rail) 12%, var(--wcl-surface)),
-      color-mix(in oklch, var(--wcl-accent-rail) 84%, var(--wcl-surface))
+      color-mix(in oklch, var(--wcl-heatmap-high-color) 12%, var(--wcl-surface)),
+      color-mix(in oklch, var(--wcl-heatmap-high-color) 84%, var(--wcl-surface))
     );
   }
 
@@ -7232,9 +7240,9 @@
   [data-wcl-heatmap-key][data-scale='two-sided'] [data-wcl-heatmap-key-gradient] {
     background: linear-gradient(
       to right,
-      color-mix(in oklch, var(--wcl-chart-series-2) 84%, var(--wcl-surface)),
+      color-mix(in oklch, var(--wcl-heatmap-low-color) 84%, var(--wcl-surface)),
       var(--wcl-surface) var(--wcl-heatmap-midpoint-position),
-      color-mix(in oklch, var(--wcl-accent-rail) 84%, var(--wcl-surface))
+      color-mix(in oklch, var(--wcl-heatmap-high-color) 84%, var(--wcl-surface))
     );
   }
 
@@ -8505,7 +8513,7 @@
       forced-color-adjust: none;
     }
 
-    [data-wcl-heatmap-cell][data-color] {
+    [data-wcl-heatmap-cell][data-range] {
       background: Highlight;
       color: HighlightText;
     }

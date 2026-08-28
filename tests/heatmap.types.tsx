@@ -23,7 +23,12 @@ const common: Omit<HeatmapProps<Reading>, 'data'> = {
   },
   rowAccessor: (reading) => reading.location,
   rows: [{id: 'north', label: 'North room'}],
-  scale: {domain: [-10, 30], midpoint: 10, type: 'two-sided'},
+  scale: {
+    colors: ['#2878ff', '#d14f00'],
+    domain: [-10, 30],
+    midpoint: 10,
+    type: 'two-sided',
+  },
   title: 'Room temperature',
   value: {
     accessor: 'value',
@@ -67,7 +72,25 @@ export const invalidScale = (
     {...common}
     data={[]}
     // @ts-expect-error Two-sided scales require a declared midpoint.
-    scale={{type: 'two-sided'}}
+    scale={{colors: ['#2878ff', '#d14f00'], type: 'two-sided'}}
+  />
+);
+
+export const missingSequentialColor = (
+  <Heatmap
+    {...common}
+    data={[]}
+    // @ts-expect-error Sequential scales require one color.
+    scale={{type: 'sequential'}}
+  />
+);
+
+export const invalidTwoSidedColorCount = (
+  <Heatmap
+    {...common}
+    data={[]}
+    // @ts-expect-error Two-sided scales require low and high colors.
+    scale={{colors: ['#2878ff'], midpoint: 0, type: 'two-sided'}}
   />
 );
 
