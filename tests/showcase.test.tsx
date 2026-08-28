@@ -53,6 +53,41 @@ describe('component showcase', () => {
     expect(getByText('#ff0000')).toBeTruthy();
   });
 
+  it('reveals each pane scrollbar while the reader scrolls', () => {
+    const {container} = render(<Showcase />);
+    const main = container.querySelector('.showcase-main-pane');
+    const index = container.querySelector('aside');
+
+    fireEvent.scroll(main as HTMLElement);
+    fireEvent.scroll(index as HTMLElement);
+
+    expect(main?.getAttribute('data-scrollbar-active')).toBe('true');
+    expect(index?.getAttribute('data-scrollbar-active')).toBe('true');
+  });
+
+  it('scrolls the masthead with the main pane while the sidebar starts at the top', () => {
+    const {container} = render(<Showcase />);
+    const frame = container.querySelector('.showcase-frame');
+    const index = container.querySelector('.showcase-index');
+    const mainPane = container.querySelector('.showcase-main-pane');
+
+    expect(frame?.firstElementChild).toBe(index);
+    expect(mainPane?.querySelector(':scope > .showcase-masthead')).toBeTruthy();
+    expect(mainPane?.querySelector(':scope > .showcase-content')).toBeTruthy();
+  });
+
+  it('makes both desktop scroll panes keyboard reachable', () => {
+    const {container} = render(<Showcase />);
+    const index = container.querySelector('.showcase-index');
+    const mainPane = container.querySelector('.showcase-main-pane');
+
+    expect(index?.getAttribute('aria-label')).toBe('Showcase controls and component index');
+    expect(index?.getAttribute('tabindex')).toBe('0');
+    expect(mainPane?.getAttribute('aria-label')).toBe('Component examples');
+    expect(mainPane?.getAttribute('role')).toBe('region');
+    expect(mainPane?.getAttribute('tabindex')).toBe('0');
+  });
+
   it('shows distinct automatic colors for the mixed Cartesian bars and line', () => {
     const {container} = render(<Showcase />);
     const specimen = container.querySelector('[data-showcase-component="CartesianChart"]');

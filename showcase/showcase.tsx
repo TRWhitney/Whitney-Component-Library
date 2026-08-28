@@ -101,6 +101,7 @@ import {
   type RadarChartDimensions,
   type TableSortDescriptor,
 } from '../src/index.js';
+import {useScrollbarActivity} from '../src/scrollbar-activity.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
 
 const defaultAccent: AccentColor = '#2878ff';
@@ -2668,29 +2669,19 @@ function DrawerShowcase() {
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
+  const indexScrollbarProps = useScrollbarActivity<HTMLElement>();
+  const mainScrollbarProps = useScrollbarActivity<HTMLElement>();
 
   return (
     <AppearanceProvider accent={accent} appearance={appearance}>
       <div className="showcase-shell">
-        <header className="showcase-masthead">
-          <div className="showcase-identity">
-            <span className="showcase-kicker">Whitney component library</span>
-            <h1>Component showcase</h1>
-            <p>Compare intended uses, working interactions, and component states.</p>
-          </div>
-          <div aria-hidden="true" className="showcase-route">
-            <span className="showcase-route-origin" />
-            <span className="showcase-route-track" />
-            <span className="showcase-route-endpoint" />
-          </div>
-          <div className="showcase-status">
-            <span className="showcase-status-label">Catalog current</span>
-            <strong>{showcasedComponentNames.length} components</strong>
-          </div>
-        </header>
-
         <div className="showcase-frame">
-          <aside className="showcase-index">
+          <aside
+            {...indexScrollbarProps}
+            aria-label="Showcase controls and component index"
+            className="showcase-index"
+            tabIndex={0}
+          >
             <div className="showcase-index-controls">
               <div className="showcase-index-control">
                 <span className="showcase-index-label">Appearance</span>
@@ -2733,142 +2724,169 @@ export function Showcase() {
             </nav>
           </aside>
 
-          <main className="showcase-content">
-            <section aria-labelledby="foundation-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Foundation</span>
-                <h2 id="foundation-heading">Theme every component together</h2>
-              </header>
-              <Specimen
-                description="Choose light or dark appearance and one accent at the application boundary. Every library component below the provider uses those values."
-                name="AppearanceProvider"
-              >
-                <div className="showcase-provider-sample">
-                  <span className="showcase-accent-swatch" />
-                  <div>
-                    <strong>{appearance === 'dark' ? 'Dark' : 'Light'} appearance</strong>
-                    <p className="showcase-muted">
-                      Accent {accent} shapes focus, rails, and emphasis.
-                    </p>
+          <div
+            {...mainScrollbarProps}
+            aria-label="Component examples"
+            className="showcase-main-pane"
+            role="region"
+            tabIndex={0}
+          >
+            <header className="showcase-masthead">
+              <div className="showcase-identity">
+                <span className="showcase-kicker">Whitney component library</span>
+                <h1>Component showcase</h1>
+                <p>Compare intended uses, working interactions, and component states.</p>
+              </div>
+              <div aria-hidden="true" className="showcase-route">
+                <span className="showcase-route-origin" />
+                <span className="showcase-route-track" />
+                <span className="showcase-route-endpoint" />
+              </div>
+              <div className="showcase-status">
+                <span className="showcase-status-label">Catalog current</span>
+                <strong>{showcasedComponentNames.length} components</strong>
+              </div>
+            </header>
+
+            <main className="showcase-content">
+              <section aria-labelledby="foundation-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Foundation</span>
+                  <h2 id="foundation-heading">Theme every component together</h2>
+                </header>
+                <Specimen
+                  description="Choose light or dark appearance and one accent at the application boundary. Every library component below the provider uses those values."
+                  name="AppearanceProvider"
+                >
+                  <div className="showcase-provider-sample">
+                    <span className="showcase-accent-swatch" />
+                    <div>
+                      <strong>{appearance === 'dark' ? 'Dark' : 'Light'} appearance</strong>
+                      <p className="showcase-muted">
+                        Accent {accent} shapes focus, rails, and emphasis.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Specimen>
-            </section>
+                </Specimen>
+              </section>
 
-            <section aria-labelledby="layout-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Layout</span>
-                <h2 id="layout-heading">Arrange and contain related content</h2>
-              </header>
-              <LayoutSpecimens />
-            </section>
+              <section aria-labelledby="layout-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Layout</span>
+                  <h2 id="layout-heading">Arrange and contain related content</h2>
+                </header>
+                <LayoutSpecimens />
+              </section>
 
-            <section aria-labelledby="application-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Application structure</span>
-                <h2 id="application-heading">
-                  Assign regions and preserve workspace relationships
-                </h2>
-              </header>
-              <ApplicationStructureSpecimens />
-            </section>
+              <section aria-labelledby="application-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Application structure</span>
+                  <h2 id="application-heading">
+                    Assign regions and preserve workspace relationships
+                  </h2>
+                </header>
+                <ApplicationStructureSpecimens />
+              </section>
 
-            <section aria-labelledby="actions-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Actions</span>
-                <h2 id="actions-heading">Run commands, navigate, and retain state</h2>
-              </header>
-              <ActionSpecimens />
-            </section>
+              <section aria-labelledby="actions-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Actions</span>
+                  <h2 id="actions-heading">Run commands, navigate, and retain state</h2>
+                </header>
+                <ActionSpecimens />
+              </section>
 
-            <section aria-labelledby="navigation-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Navigation and disclosure</span>
-                <h2 id="navigation-heading">Move through locations and reveal related content</h2>
-              </header>
-              <NavigationSpecimens />
-            </section>
+              <section aria-labelledby="navigation-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Navigation and disclosure</span>
+                  <h2 id="navigation-heading">Move through locations and reveal related content</h2>
+                </header>
+                <NavigationSpecimens />
+              </section>
 
-            <section aria-labelledby="fields-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Fields</span>
-                <h2 id="fields-heading">Enter values and organize forms</h2>
-              </header>
-              <FieldSpecimens />
-            </section>
+              <section aria-labelledby="fields-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Fields</span>
+                  <h2 id="fields-heading">Enter values and organize forms</h2>
+                </header>
+                <FieldSpecimens />
+              </section>
 
-            <section aria-labelledby="choices-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Choices</span>
-                <h2 id="choices-heading">Present choices that remain visible</h2>
-              </header>
-              <ChoiceSpecimens />
-            </section>
+              <section aria-labelledby="choices-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Choices</span>
+                  <h2 id="choices-heading">Present choices that remain visible</h2>
+                </header>
+                <ChoiceSpecimens />
+              </section>
 
-            <section aria-labelledby="selection-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Selection</span>
-                <h2 id="selection-heading">Choose from collapsible collections</h2>
-              </header>
-              <SelectionSpecimens />
-            </section>
+              <section aria-labelledby="selection-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Selection</span>
+                  <h2 id="selection-heading">Choose from collapsible collections</h2>
+                </header>
+                <SelectionSpecimens />
+              </section>
 
-            <section aria-labelledby="collections-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Data and collections</span>
-                <h2 id="collections-heading">Query, compare, and navigate keyed data</h2>
-              </header>
-              <CollectionSpecimens />
-            </section>
+              <section aria-labelledby="collections-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Data and collections</span>
+                  <h2 id="collections-heading">Query, compare, and navigate keyed data</h2>
+                </header>
+                <CollectionSpecimens />
+              </section>
 
-            <section aria-labelledby="charts-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Charts</span>
-                <h2 id="charts-heading">Plot data without prescribing the surrounding workspace</h2>
-              </header>
-              <ChartSpecimens />
-            </section>
+              <section aria-labelledby="charts-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Charts</span>
+                  <h2 id="charts-heading">
+                    Plot data without prescribing the surrounding workspace
+                  </h2>
+                </header>
+                <ChartSpecimens />
+              </section>
 
-            <section aria-labelledby="ranges-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Ranges</span>
-                <h2 id="ranges-heading">Adjust approximate numeric values</h2>
-              </header>
-              <RangeSpecimens />
-            </section>
+              <section aria-labelledby="ranges-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Ranges</span>
+                  <h2 id="ranges-heading">Adjust approximate numeric values</h2>
+                </header>
+                <RangeSpecimens />
+              </section>
 
-            <section aria-labelledby="date-time-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Date and time</span>
-                <h2 id="date-time-heading">Enter dates, times, and intervals</h2>
-              </header>
-              <DateTimeSpecimens />
-            </section>
+              <section aria-labelledby="date-time-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Date and time</span>
+                  <h2 id="date-time-heading">Enter dates, times, and intervals</h2>
+                </header>
+                <DateTimeSpecimens />
+              </section>
 
-            <section aria-labelledby="files-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Files</span>
-                <h2 id="files-heading">Acquire files through picker, drop, or paste</h2>
-              </header>
-              <FileSpecimens />
-            </section>
+              <section aria-labelledby="files-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Files</span>
+                  <h2 id="files-heading">Acquire files through picker, drop, or paste</h2>
+                </header>
+                <FileSpecimens />
+              </section>
 
-            <section aria-labelledby="feedback-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Feedback</span>
-                <h2 id="feedback-heading">Report status, progress, and problems</h2>
-              </header>
-              <FeedbackSpecimens />
-            </section>
+              <section aria-labelledby="feedback-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Feedback</span>
+                  <h2 id="feedback-heading">Report status, progress, and problems</h2>
+                </header>
+                <FeedbackSpecimens />
+              </section>
 
-            <section aria-labelledby="overlays-heading" className="showcase-family">
-              <header className="showcase-family-header">
-                <span>Overlays</span>
-                <h2 id="overlays-heading">Focus temporary tasks and consequential decisions</h2>
-              </header>
-              <OverlaySpecimens />
-            </section>
-          </main>
+              <section aria-labelledby="overlays-heading" className="showcase-family">
+                <header className="showcase-family-header">
+                  <span>Overlays</span>
+                  <h2 id="overlays-heading">Focus temporary tasks and consequential decisions</h2>
+                </header>
+                <OverlaySpecimens />
+              </section>
+            </main>
+          </div>
         </div>
       </div>
     </AppearanceProvider>

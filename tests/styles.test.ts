@@ -152,6 +152,38 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('contains document overflow and gives both showcase panes a transient thin scrollbar', async () => {
+    const styles = await readFile('showcase/styles.css', 'utf8');
+    const body = styles.match(/body\s*\{([^}]*)\}/)?.[1];
+    const provider = styles.match(/#root > \[data-wcl-provider\]\s*\{([^}]*)\}/)?.[1];
+    const shell = styles.match(/\.showcase-shell\s*\{([^}]*)\}/)?.[1];
+    const frame = styles.match(/\.showcase-frame\s*\{([^}]*)\}/)?.[1];
+    const index = styles.match(/\.showcase-index\s*\{([^}]*)\}/)?.[1];
+    const content = styles.match(/\.showcase-main-pane\s*\{([^}]*)\}/)?.[1];
+    const contentBody = styles.match(/\.showcase-content\s*\{([^}]*)\}/)?.[1];
+
+    expect(body).toContain('overflow: hidden');
+    expect(provider).toContain('block-size: 100%');
+    expect(provider).toContain('min-block-size: 0');
+    expect(shell).toContain('overflow: hidden');
+    expect(frame).toContain('block-size: 100%');
+    expect(content).toContain('overflow: hidden auto');
+    expect(content).toContain('contain: paint');
+    expect(contentBody).toContain('contain: paint');
+    expect(content).toContain('scrollbar-color: transparent transparent');
+    expect(content).toContain('scrollbar-gutter: stable');
+    expect(content).toContain('scrollbar-width: thin');
+    expect(index).toContain('scrollbar-color: transparent transparent');
+    expect(index).toContain('scrollbar-gutter: stable');
+    expect(index).toContain('scrollbar-width: thin');
+    expect(styles).toMatch(
+      /:is\(\.showcase-index, \.showcase-main-pane\)\[data-scrollbar-active\][^{]*\{[^}]*scrollbar-color:\s*var\(--wcl-border-strong\) transparent/,
+    );
+    expect(styles).toMatch(
+      /:is\(\.showcase-index, \.showcase-main-pane\):focus-visible\s*\{[^}]*outline-color:\s*var\(--wcl-accent-focus\)/,
+    );
+  });
+
   it('lets page scrolling pass through fitted Heatmaps', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
 
