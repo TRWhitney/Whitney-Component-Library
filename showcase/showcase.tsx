@@ -1,4 +1,5 @@
 import {
+  memo,
   useState,
   type CSSProperties,
   type KeyboardEvent,
@@ -2666,6 +2667,21 @@ function DrawerShowcase() {
   );
 }
 
+const StaticLayoutSpecimens = memo(LayoutSpecimens);
+const StaticApplicationStructureSpecimens = memo(ApplicationStructureSpecimens);
+const StaticActionSpecimens = memo(ActionSpecimens);
+const StaticNavigationSpecimens = memo(NavigationSpecimens);
+const StaticFieldSpecimens = memo(FieldSpecimens);
+const StaticChoiceSpecimens = memo(ChoiceSpecimens);
+const StaticSelectionSpecimens = memo(SelectionSpecimens);
+const StaticCollectionSpecimens = memo(CollectionSpecimens);
+const StaticChartSpecimens = memo(ChartSpecimens);
+const StaticRangeSpecimens = memo(RangeSpecimens);
+const StaticDateTimeSpecimens = memo(DateTimeSpecimens);
+const StaticFileSpecimens = memo(FileSpecimens);
+const StaticFeedbackSpecimens = memo(FeedbackSpecimens);
+const StaticOverlaySpecimens = memo(OverlaySpecimens);
+
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
@@ -2775,7 +2791,7 @@ export function Showcase() {
                   <span>Layout</span>
                   <h2 id="layout-heading">Arrange and contain related content</h2>
                 </header>
-                <LayoutSpecimens />
+                <StaticLayoutSpecimens />
               </section>
 
               <section aria-labelledby="application-heading" className="showcase-family">
@@ -2785,7 +2801,7 @@ export function Showcase() {
                     Assign regions and preserve workspace relationships
                   </h2>
                 </header>
-                <ApplicationStructureSpecimens />
+                <StaticApplicationStructureSpecimens />
               </section>
 
               <section aria-labelledby="actions-heading" className="showcase-family">
@@ -2793,7 +2809,7 @@ export function Showcase() {
                   <span>Actions</span>
                   <h2 id="actions-heading">Run commands, navigate, and retain state</h2>
                 </header>
-                <ActionSpecimens />
+                <StaticActionSpecimens />
               </section>
 
               <section aria-labelledby="navigation-heading" className="showcase-family">
@@ -2801,7 +2817,7 @@ export function Showcase() {
                   <span>Navigation and disclosure</span>
                   <h2 id="navigation-heading">Move through locations and reveal related content</h2>
                 </header>
-                <NavigationSpecimens />
+                <StaticNavigationSpecimens />
               </section>
 
               <section aria-labelledby="fields-heading" className="showcase-family">
@@ -2809,7 +2825,7 @@ export function Showcase() {
                   <span>Fields</span>
                   <h2 id="fields-heading">Enter values and organize forms</h2>
                 </header>
-                <FieldSpecimens />
+                <StaticFieldSpecimens />
               </section>
 
               <section aria-labelledby="choices-heading" className="showcase-family">
@@ -2817,7 +2833,7 @@ export function Showcase() {
                   <span>Choices</span>
                   <h2 id="choices-heading">Present choices that remain visible</h2>
                 </header>
-                <ChoiceSpecimens />
+                <StaticChoiceSpecimens />
               </section>
 
               <section aria-labelledby="selection-heading" className="showcase-family">
@@ -2825,7 +2841,7 @@ export function Showcase() {
                   <span>Selection</span>
                   <h2 id="selection-heading">Choose from collapsible collections</h2>
                 </header>
-                <SelectionSpecimens />
+                <StaticSelectionSpecimens />
               </section>
 
               <section aria-labelledby="collections-heading" className="showcase-family">
@@ -2833,7 +2849,7 @@ export function Showcase() {
                   <span>Data and collections</span>
                   <h2 id="collections-heading">Query, compare, and navigate keyed data</h2>
                 </header>
-                <CollectionSpecimens />
+                <StaticCollectionSpecimens />
               </section>
 
               <section aria-labelledby="charts-heading" className="showcase-family">
@@ -2843,7 +2859,7 @@ export function Showcase() {
                     Plot data without prescribing the surrounding workspace
                   </h2>
                 </header>
-                <ChartSpecimens />
+                <StaticChartSpecimens />
               </section>
 
               <section aria-labelledby="ranges-heading" className="showcase-family">
@@ -2851,7 +2867,7 @@ export function Showcase() {
                   <span>Ranges</span>
                   <h2 id="ranges-heading">Adjust approximate numeric values</h2>
                 </header>
-                <RangeSpecimens />
+                <StaticRangeSpecimens />
               </section>
 
               <section aria-labelledby="date-time-heading" className="showcase-family">
@@ -2859,7 +2875,7 @@ export function Showcase() {
                   <span>Date and time</span>
                   <h2 id="date-time-heading">Enter dates, times, and intervals</h2>
                 </header>
-                <DateTimeSpecimens />
+                <StaticDateTimeSpecimens />
               </section>
 
               <section aria-labelledby="files-heading" className="showcase-family">
@@ -2867,7 +2883,7 @@ export function Showcase() {
                   <span>Files</span>
                   <h2 id="files-heading">Acquire files through picker, drop, or paste</h2>
                 </header>
-                <FileSpecimens />
+                <StaticFileSpecimens />
               </section>
 
               <section aria-labelledby="feedback-heading" className="showcase-family">
@@ -2875,7 +2891,7 @@ export function Showcase() {
                   <span>Feedback</span>
                   <h2 id="feedback-heading">Report status, progress, and problems</h2>
                 </header>
-                <FeedbackSpecimens />
+                <StaticFeedbackSpecimens />
               </section>
 
               <section aria-labelledby="overlays-heading" className="showcase-family">
@@ -2883,7 +2899,7 @@ export function Showcase() {
                   <span>Overlays</span>
                   <h2 id="overlays-heading">Focus temporary tasks and consequential decisions</h2>
                 </header>
-                <OverlaySpecimens />
+                <StaticOverlaySpecimens />
               </section>
             </main>
           </div>
