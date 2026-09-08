@@ -30,6 +30,7 @@ import {EmptyState} from '../feedback/empty-state.js';
 import {InlineAlert} from '../feedback/alerts.js';
 import {Spinner} from '../feedback/spinner.js';
 import {useScrollbarActivity} from '../scrollbar-activity.js';
+import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import type {
   AreaChartProps,
   BarChartProps,
@@ -51,6 +52,7 @@ import type {
   ChartStatus,
   ChartTone,
   ChartValueAxis,
+  ChartVisibilityLabels,
   ColumnChartProps,
   LineChartProps,
   NonEmptyChartSeries,
@@ -117,6 +119,7 @@ export function plotHeight(plot: PlotBounds): number {
 }
 
 interface InternalSeries<Datum extends object> {
+  readonly patternIndex: number;
   readonly accessor: ChartAccessor<Datum, number>;
   readonly color: ChartColor;
   readonly curve: 'linear' | 'step';
@@ -147,6 +150,7 @@ interface ReadingReference {
 
 export interface Projection<Value extends ChartDomainValue> {
   readonly bandwidth: number;
+  readonly domain?: readonly Value[];
   readonly position: (value: Value) => number | undefined;
   readonly ticks: readonly Value[];
 }
@@ -167,6 +171,7 @@ interface ChartFrameProps<
   Category extends ChartDomainValue,
 > extends RenderModel<Datum, Category> {
   readonly aspectRatio?: number;
+  readonly visibilityLabels?: ChartVisibilityLabels;
   readonly description: string;
   readonly emptyState: ChartStateCopy;
   readonly invalidData: ChartStateCopy;
@@ -341,6 +346,7 @@ export function createProjection<Value extends ChartDomainValue>(
   if (scale.type !== 'normalized' && scale.domain === undefined) numeric.nice();
   return {
     bandwidth: 0,
+    domain: numeric.domain() as Value[],
     position: (value) => (typeof value === 'number' ? numeric(value) : undefined),
     ticks: numeric.ticks(tickCount) as Value[],
   };
@@ -762,7 +768,7 @@ function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>
             data-muted={
               emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
             }
-            data-series-index={seriesIndex}
+            data-series-index={item.patternIndex}
             data-wcl-chart-reading-node=""
             key={item.id}
             r="4.5"
@@ -902,7 +908,7 @@ function ReadingTooltip<Datum extends object, Category extends ChartDomainValue>
                 <svg
                   aria-hidden="true"
                   data-color={item.color}
-                  data-series-index={seriesIndex}
+                  data-series-index={item.patternIndex}
                   data-wcl-chart-tooltip-swatch=""
                   focusable="false"
                   viewBox="0 0 20 8"
@@ -1003,7 +1009,7 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
                 emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
               }
               data-series-id={item.id}
-              data-series-index={seriesIndex}
+              data-series-index={item.patternIndex}
               data-wcl-chart-series=""
               key={item.id}
             >
@@ -1048,7 +1054,7 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
               }
               data-series={item.id}
               data-series-id={item.id}
-              data-series-index={seriesIndex}
+              data-series-index={item.patternIndex}
               data-wcl-chart-area=""
               data-wcl-chart-series=""
               key={item.id}
@@ -1072,7 +1078,7 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
               emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
             }
             data-series-id={item.id}
-            data-series-index={seriesIndex}
+            data-series-index={item.patternIndex}
             data-wcl-chart-series=""
             key={item.id}
           >
@@ -1201,6 +1207,8 @@ function Annotations<Category extends ChartDomainValue>({
 }
 
 function DataTable<Datum extends object, Category extends ChartDomainValue>({
+  hiddenIds = [],
+  hiddenLabel,
   categoryAxis,
   dataTableLabel,
   layout,
@@ -1208,6 +1216,8 @@ function DataTable<Datum extends object, Category extends ChartDomainValue>({
   series,
   valueAxis,
 }: {
+  readonly hiddenIds?: readonly string[];
+  readonly hiddenLabel?: string;
   readonly categoryAxis: ChartDataAxis<Datum, Category>;
   readonly dataTableLabel: string;
   readonly layout: ChartBarLayout | ChartStacking;
@@ -1229,6 +1239,7 @@ function DataTable<Datum extends object, Category extends ChartDomainValue>({
             <th key={item.id} scope="col">
               {item.label}
               {unit}
+              {hiddenIds.includes(item.id) ? ` ${hiddenLabel ?? ''}` : null}
             </th>
           ))}
         </tr>
@@ -1293,6 +1304,10 @@ function AnnotationSummary<Datum extends object, Category extends ChartDomainVal
 }
 
 function Legend<Datum extends object>({
+  hiddenIds,
+  visibilityLabels,
+  onVisibilityChange,
+  onFirstEye,
   emphasizedSeriesId,
   legend,
   onClear,
@@ -1301,6 +1316,10 @@ function Legend<Datum extends object>({
   pinnedSeriesId,
   series,
 }: {
+  readonly hiddenIds: readonly string[];
+  readonly visibilityLabels: ChartVisibilityLabels | undefined;
+  readonly onVisibilityChange: (id: string) => void;
+  readonly onFirstEye: (element: HTMLButtonElement | null) => void;
   readonly emphasizedSeriesId: string | undefined;
   readonly legend: ChartLegend;
   readonly onClear: () => void;
@@ -1310,7 +1329,11 @@ function Legend<Datum extends object>({
   readonly series: readonly InternalSeries<Datum>[];
 }): ReactElement {
   return (
-    <ul aria-label={legend.label} data-wcl-chart-legend="">
+    <ul
+      aria-label={legend.label}
+      data-wcl-chart-legend=""
+      data-visibility={visibilityLabels === undefined ? undefined : ''}
+    >
       {series.map((item, index) => (
         <li
           data-color={item.color}
@@ -1318,21 +1341,29 @@ function Legend<Datum extends object>({
           data-muted={
             emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
           }
-          data-series-index={index}
+          data-series-index={item.patternIndex}
+          data-hidden={hiddenIds.includes(item.id) ? '' : undefined}
           key={item.id}
         >
           <button
+            aria-disabled={hiddenIds.includes(item.id) ? true : undefined}
             aria-pressed={pinnedSeriesId === item.id}
             data-wcl-chart-legend-button=""
             onBlur={() => onTransientChange(null)}
-            onClick={() => onPin(item.id)}
-            onFocus={() => onTransientChange(item.id)}
+            onClick={() => {
+              if (!hiddenIds.includes(item.id)) onPin(item.id);
+            }}
+            onFocus={() => {
+              if (!hiddenIds.includes(item.id)) onTransientChange(item.id);
+            }}
             onKeyDown={(event) => {
               if (event.key !== 'Escape') return;
               event.preventDefault();
               onClear();
             }}
-            onMouseEnter={() => onTransientChange(item.id)}
+            onMouseEnter={() => {
+              if (!hiddenIds.includes(item.id)) onTransientChange(item.id);
+            }}
             onMouseLeave={() => onTransientChange(null)}
             type="button"
           >
@@ -1346,6 +1377,45 @@ function Legend<Datum extends object>({
             </svg>
             {item.label}
           </button>
+          {visibilityLabels === undefined ? null : (
+            <button
+              aria-label={
+                hiddenIds.includes(item.id)
+                  ? visibilityLabels.showSeries(item.label)
+                  : visibilityLabels.hideSeries(item.label)
+              }
+              data-wcl-chart-visibility=""
+              data-hidden={hiddenIds.includes(item.id) ? '' : undefined}
+              onClick={() => onVisibilityChange(item.id)}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  event.preventDefault();
+                  onClear();
+                }
+              }}
+              ref={index === 0 ? onFirstEye : undefined}
+              title={
+                hiddenIds.includes(item.id)
+                  ? visibilityLabels.showSeries(item.label)
+                  : visibilityLabels.hideSeries(item.label)
+              }
+              type="button"
+            >
+              <svg aria-hidden="true" data-wcl-chart-eye="" focusable="false" viewBox="0 0 24 24">
+                {hiddenIds.includes(item.id) ? (
+                  <g>
+                    <path d="M3 10 Q12 20 21 10" />
+                    <path d="m5 12-2 3m6-1-1 4m7-4 1 4m3-6 2 3" />
+                  </g>
+                ) : (
+                  <g>
+                    <path d="M2 12 Q12 1 22 12 Q12 23 2 12Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </g>
+                )}
+              </svg>
+            </button>
+          )}
         </li>
       ))}
     </ul>
@@ -1434,7 +1504,19 @@ function validateChart<Datum extends object, Category extends ChartDomainValue>(
   status,
   title,
   valueAxis,
+  visibilityLabels,
 }: ChartFrameProps<Datum, Category>): void {
+  if (visibilityLabels !== undefined) {
+    if (legend === undefined) throw new Error('Chart visibility controls require a named legend.');
+    assertText(visibilityLabels.hidden, 'Hidden-series label');
+    assertText(visibilityLabels.showAll, 'Show-all label');
+    assertText(visibilityLabels.allHidden.title, 'All-hidden title');
+    assertText(visibilityLabels.allHidden.description, 'All-hidden description');
+    for (const item of series) {
+      assertText(visibilityLabels.hideSeries(item.label), 'Hide-series label');
+      assertText(visibilityLabels.showSeries(item.label), 'Show-series label');
+    }
+  }
   assertText(title, 'Chart title');
   assertText(description, 'Chart description');
   assertText(dataTableLabel, 'Chart data-table label');
@@ -1521,10 +1603,11 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   minimumSize = {height: 180, width: 320},
   overflow = 'scroll',
   rootAttribute,
-  series,
+  series: allSeries,
   status = {kind: 'ready'},
   title,
   valueAxis,
+  visibilityLabels,
 }: ChartFrameProps<Datum, Category>): ReactElement {
   validateChart({
     annotations,
@@ -1541,13 +1624,15 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     ...(minimumSize === undefined ? {} : {minimumSize}),
     ...(overflow === undefined ? {} : {overflow}),
     rootAttribute,
-    series,
+    series: allSeries,
+    ...(visibilityLabels === undefined ? {} : {visibilityLabels}),
     ...(status === undefined ? {} : {status}),
     title,
     valueAxis,
   });
   const titleId = useId();
   const descriptionId = useId();
+  const plotClipId = useId();
   const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
   const [frameElement, setFrameElement] = useState<HTMLDivElement | null>(null);
   const [availableWidth, setAvailableWidth] = useState<number | null>(null);
@@ -1557,8 +1642,47 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   const [touchReading, setTouchReading] = useState<ChartReading | null>(null);
   const [transientLegendSeriesId, setTransientLegendSeriesId] = useState<string | null>(null);
   const [pinnedLegendSeriesId, setPinnedLegendSeriesId] = useState<string | null>(null);
+  const [hiddenSeriesIds, setHiddenSeriesIds] = useState<readonly string[]>([]);
+  const firstEye = useRef<HTMLButtonElement | null>(null);
+  const hasVisibilityControls = visibilityLabels !== undefined;
+  const seriesIdentity = JSON.stringify(allSeries.map((item) => item.id));
+  const visibilityIdentity = `${hasVisibilityControls}:${seriesIdentity}`;
+  const [previousVisibilityIdentity, setPreviousVisibilityIdentity] = useState(visibilityIdentity);
+  if (previousVisibilityIdentity !== visibilityIdentity) {
+    setPreviousVisibilityIdentity(visibilityIdentity);
+    const ids = allSeries.map((item) => item.id);
+    setHiddenSeriesIds((current) =>
+      hasVisibilityControls ? current.filter((id) => ids.includes(id)) : [],
+    );
+    setPinnedLegendSeriesId((current) =>
+      current !== null && !ids.includes(current) ? null : current,
+    );
+    setTransientLegendSeriesId((current) =>
+      current !== null && !ids.includes(current) ? null : current,
+    );
+  }
+  const hiddenIds = visibilityLabels === undefined ? [] : hiddenSeriesIds;
+  const visibleIndexes = allSeries.flatMap((item, index) =>
+    hiddenIds.includes(item.id) ? [] : [index],
+  );
+  const series = allSeries.filter((item) => !hiddenIds.includes(item.id));
+  const allPrepared = prepareRows(data, categoryAxis, allSeries, valueAxis, layout);
+  const prepared = {
+    invalidCount: allPrepared.invalidCount,
+    rows: allPrepared.rows.map((row) => ({
+      ...row,
+      values: visibleIndexes.map((index) => row.values[index] ?? 0),
+    })),
+  };
+  const activeReading = pointerReading ?? touchReading ?? keyboardReading;
+  const availableSeriesId = (id: string | null | undefined): string | undefined =>
+    id !== null && id !== undefined && series.some((item) => item.id === id) ? id : undefined;
+  const validPinnedLegendSeriesId = availableSeriesId(pinnedLegendSeriesId) ?? null;
+  const emphasizedSeriesId =
+    availableSeriesId(pinnedLegendSeriesId) ??
+    availableSeriesId(transientLegendSeriesId) ??
+    availableSeriesId(activeReading?.seriesId);
   const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
-  const prepared = prepareRows(data, categoryAxis, series, valueAxis, layout);
   const isLoading = status.kind === 'loading';
   const isError = status.kind === 'error';
   const hasData = prepared.rows.length > 0;
@@ -1617,6 +1741,34 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     return () => document.removeEventListener('pointerdown', dismissTouchReading);
   }, [rootElement, touchReading]);
 
+  const rawDomain = valueDomain(prepared.rows, layout, series);
+  const targetProjection = createProjection(
+    valueAxis.scale,
+    rawDomain,
+    [0, 1],
+    valueAxis.tickCount ?? 5,
+    false,
+  );
+  const targetDomain: readonly [number, number] = [
+    targetProjection.domain?.[0] ?? 0,
+    targetProjection.domain?.[1] ?? 1,
+  ];
+  const animatedDomain = useAnimatedChartDomain(
+    targetDomain,
+    hasVisibilityControls &&
+      !isLoading &&
+      !isError &&
+      hasData &&
+      series.length > 0 &&
+      valueAxis.scale.type !== 'normalized' &&
+      valueAxis.scale.domain === undefined,
+    valueAxis.scale.type === 'logarithmic',
+  );
+  const animatedScale =
+    valueAxis.scale.type === 'normalized'
+      ? valueAxis.scale
+      : {...valueAxis.scale, domain: animatedDomain};
+
   let content: ReactNode;
   if (isLoading) {
     content = (
@@ -1634,9 +1786,29 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         title={data.length === 0 ? emptyState.title : invalidData.title}
       />
     );
+  } else if (series.length === 0 && visibilityLabels !== undefined) {
+    content = (
+      <>
+        {status.kind === 'partial' ? <Feedback copy={status} kind="partial" /> : null}
+        {prepared.invalidCount > 0 ? <Feedback copy={invalidData} kind="invalid" /> : null}
+        <div data-wcl-chart-all-hidden="" style={frameStyle}>
+          <strong>{visibilityLabels.allHidden.title}</strong>
+          <p>{visibilityLabels.allHidden.description}</p>
+          <button
+            data-wcl-chart-show-all=""
+            onClick={() => {
+              setHiddenSeriesIds([]);
+              firstEye.current?.focus();
+            }}
+            type="button"
+          >
+            {visibilityLabels.showAll}
+          </button>
+        </div>
+      </>
+    );
   } else {
     const usesBars = series.some((item) => item.kind === 'bar' || item.kind === 'column');
-    const rawDomain = valueDomain(prepared.rows, layout, series);
     const categoryValues = prepared.rows.map((row) => row.category);
     const createPlotProjections = (bounds: PlotBounds) => ({
       categoryProjection: createProjection(
@@ -1647,7 +1819,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         usesBars,
       ),
       valueProjection: createProjection(
-        valueAxis.scale,
+        animatedScale,
         rawDomain,
         categoryPlacement === 'x' ? [bounds.bottom, bounds.top] : [bounds.left, bounds.right],
         valueAxis.tickCount ?? 5,
@@ -1658,7 +1830,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     const preliminaryProjections = createPlotProjections(presentationPlot);
     const yAxisLabels =
       categoryPlacement === 'x'
-        ? preliminaryProjections.valueProjection.ticks.map((tick) => axisTickLabel(tick, valueAxis))
+        ? targetProjection.ticks.map((tick) => axisTickLabel(tick, valueAxis))
         : preliminaryProjections.categoryProjection.ticks.map((tick) => {
             const label = axisTickLabel(tick, categoryAxis);
             return categoryAxis.scale.type === 'categorical' ? truncateTickLabel(label, 14) : label;
@@ -1670,16 +1842,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     );
     const {categoryProjection, valueProjection} = createPlotProjections(plot);
     const references = readingReferences(annotations, categoryPlacement);
-    const activeReading = pointerReading ?? touchReading ?? keyboardReading;
-    const availableSeriesId = (seriesId: string | null | undefined): string | undefined =>
-      seriesId !== null && seriesId !== undefined && series.some((item) => item.id === seriesId)
-        ? seriesId
-        : undefined;
-    const validPinnedLegendSeriesId = availableSeriesId(pinnedLegendSeriesId) ?? null;
-    const emphasizedSeriesId =
-      availableSeriesId(pinnedLegendSeriesId) ??
-      availableSeriesId(transientLegendSeriesId) ??
-      availableSeriesId(activeReading?.seriesId);
     const readingRow = activeReading === null ? undefined : prepared.rows[activeReading.index];
     const readingValues =
       readingRow === undefined
@@ -1792,22 +1954,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       <>
         {status.kind === 'partial' ? <Feedback copy={status} kind="partial" /> : null}
         {prepared.invalidCount > 0 ? <Feedback copy={invalidData} kind="invalid" /> : null}
-        {legend === undefined ? null : (
-          <Legend
-            emphasizedSeriesId={emphasizedSeriesId}
-            legend={legend}
-            onClear={() => {
-              setPinnedLegendSeriesId(null);
-              setTransientLegendSeriesId(null);
-            }}
-            onPin={(seriesId) =>
-              setPinnedLegendSeriesId((current) => (current === seriesId ? null : seriesId))
-            }
-            onTransientChange={setTransientLegendSeriesId}
-            pinnedSeriesId={validPinnedLegendSeriesId}
-            series={series}
-          />
-        )}
         <div
           {...scrollbarActivityProps}
           aria-labelledby={hasLocalOverflow ? titleId : undefined}
@@ -1887,6 +2033,16 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 x={plot.left}
                 y={plot.top}
               />
+              <defs>
+                <clipPath id={plotClipId}>
+                  <rect
+                    x={plot.left - 4}
+                    y={plot.top - 4}
+                    width={plotWidth(plot) + 8}
+                    height={plotHeight(plot) + 8}
+                  />
+                </clipPath>
+              </defs>
               <Annotations
                 annotations={annotations}
                 categoryPlacement={categoryPlacement}
@@ -1895,16 +2051,18 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 plot={plot}
                 valueProjection={valueProjection}
               />
-              <Marks
-                categoryPlacement={categoryPlacement}
-                categoryProjection={categoryProjection}
-                emphasizedSeriesId={emphasizedSeriesId}
-                layout={layout}
-                plot={plot}
-                rows={prepared.rows}
-                series={series}
-                valueProjection={valueProjection}
-              />
+              <g clipPath={hasVisibilityControls ? `url(#${plotClipId})` : undefined}>
+                <Marks
+                  categoryPlacement={categoryPlacement}
+                  categoryProjection={categoryProjection}
+                  emphasizedSeriesId={emphasizedSeriesId}
+                  layout={layout}
+                  plot={plot}
+                  rows={prepared.rows}
+                  series={series}
+                  valueProjection={valueProjection}
+                />
+              </g>
               <Annotations
                 annotations={annotations}
                 categoryPlacement={categoryPlacement}
@@ -1913,19 +2071,21 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 plot={plot}
                 valueProjection={valueProjection}
               />
-              {activeReading === null ? null : (
-                <ReadingOverlay
-                  categoryPlacement={categoryPlacement}
-                  categoryProjection={categoryProjection}
-                  emphasizedSeriesId={emphasizedSeriesId}
-                  layout={layout}
-                  plot={plot}
-                  reading={activeReading}
-                  rows={prepared.rows}
-                  series={series}
-                  valueProjection={valueProjection}
-                />
-              )}
+              <g clipPath={hasVisibilityControls ? `url(#${plotClipId})` : undefined}>
+                {activeReading === null ? null : (
+                  <ReadingOverlay
+                    categoryPlacement={categoryPlacement}
+                    categoryProjection={categoryProjection}
+                    emphasizedSeriesId={emphasizedSeriesId}
+                    layout={layout}
+                    plot={plot}
+                    reading={activeReading}
+                    rows={prepared.rows}
+                    series={series}
+                    valueProjection={valueProjection}
+                  />
+                )}
+              </g>
             </svg>
             {activeReading === null ? null : (
               <ReadingTooltip
@@ -1950,20 +2110,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         <div aria-atomic="true" aria-live="polite" data-wcl-chart-reading-announcement="">
           {readingAnnouncement}
         </div>
-        <DataTable
-          categoryAxis={categoryAxis}
-          dataTableLabel={dataTableLabel}
-          layout={layout}
-          rows={prepared.rows}
-          series={series}
-          valueAxis={valueAxis}
-        />
-        <AnnotationSummary
-          annotations={annotations}
-          categoryAxis={categoryAxis}
-          categoryPlacement={categoryPlacement}
-          valueAxis={valueAxis}
-        />
       </>
     );
   }
@@ -1980,7 +2126,54 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         <strong id={titleId}>{title}</strong>
         <p id={descriptionId}>{description}</p>
       </figcaption>
+      {!isLoading && !isError && hasData && legend !== undefined ? (
+        <Legend
+          hiddenIds={hiddenIds}
+          visibilityLabels={visibilityLabels}
+          onFirstEye={(element) => {
+            firstEye.current = element;
+          }}
+          onVisibilityChange={(id) => {
+            setHiddenSeriesIds((current) =>
+              current.includes(id) ? current.filter((hidden) => hidden !== id) : [...current, id],
+            );
+            if (pinnedLegendSeriesId === id) setPinnedLegendSeriesId(null);
+            if (transientLegendSeriesId === id) setTransientLegendSeriesId(null);
+            setPointerReading(null);
+          }}
+          emphasizedSeriesId={emphasizedSeriesId}
+          legend={legend}
+          onClear={() => {
+            setPinnedLegendSeriesId(null);
+            setTransientLegendSeriesId(null);
+          }}
+          onPin={(id) => setPinnedLegendSeriesId((current) => (current === id ? null : id))}
+          onTransientChange={setTransientLegendSeriesId}
+          pinnedSeriesId={validPinnedLegendSeriesId}
+          series={allSeries}
+        />
+      ) : null}
       {content}
+      {!isLoading && !isError && hasData ? (
+        <>
+          <DataTable
+            categoryAxis={categoryAxis}
+            dataTableLabel={dataTableLabel}
+            hiddenIds={hiddenIds}
+            {...(visibilityLabels === undefined ? {} : {hiddenLabel: visibilityLabels.hidden})}
+            layout={layout}
+            rows={allPrepared.rows}
+            series={allSeries}
+            valueAxis={valueAxis}
+          />
+          <AnnotationSummary
+            annotations={annotations}
+            categoryAxis={categoryAxis}
+            categoryPlacement={categoryPlacement}
+            valueAxis={valueAxis}
+          />
+        </>
+      ) : null}
     </figure>
   );
 }
@@ -2014,10 +2207,11 @@ function normalizeSeries<Datum extends object>(
     return color;
   };
 
-  return series.map((item) => {
+  return series.map((item, patternIndex) => {
     const color = item.color ?? nextAutomaticColor();
     return {
       accessor: item.accessor,
+      patternIndex,
       color,
       curve: 'curve' in item ? (item.curve ?? 'linear') : 'linear',
       id: item.id,

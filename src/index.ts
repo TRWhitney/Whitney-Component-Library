@@ -60,6 +60,7 @@ export {
   type ChartStatus,
   type ChartTone,
   type ChartValueAxis,
+  type ChartVisibilityLabels,
   type ColumnChartProps,
   type DonutChartProps,
   type HistogramDistribution,

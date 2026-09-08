@@ -7,7 +7,8 @@ mixed-chart combinations.
 **Blocked by:** none. [Statistical Chart Family](20-statistical-chart-family.md) and
 [Radial, Heatmap, and Compact Charts](21-radial-heatmap-and-compact-charts.md) are complete.
 
-**Status:** partially complete; remaining work ready for planning
+**Status:** active; delivered foundation complete, remaining work in
+[active implementation effort](../../chart-interaction-composition/status.md)
 
 ## Delivered foundation
 
@@ -72,7 +73,7 @@ General coordination between separate charts remains in scope; no dashboard or p
 is added.
 
 Implementation planning still needs to settle exact controls and gestures, selection multiplicity,
-all-series-hidden behavior, and the interaction between visibility fitting, zoom, and explicit
+visibility semantics for the other chart families, and the interaction between visibility fitting, zoom, and explicit
 consumer domains. This reconciliation records requirements, not a finished interface design.
 
 ## Accepted sources
@@ -98,3 +99,5 @@ A focused test rerun during this review could not start because `vitest` was not
 checkout; the historical validation above is not a fresh test result.
 
 The remaining acceptance checks are not implemented or validated by this documentation change.
+
+The first [Cartesian visibility implementation](../../chart-interaction-composition/tickets/01-cartesian-visibility.md) is complete with passing checks and independent intent and engineering reviews. It delivers eye controls, animated automatic scale fitting, and all-hidden recovery for five Cartesian charts. Other chart families, activation, selection, exploration, general data animation, and the two added compositions remain open.

@@ -33,6 +33,7 @@ export type {
   ChartStatus,
   ChartTone,
   ChartValueAxis,
+  ChartVisibilityLabels,
   ColumnChartProps,
   DonutChartProps,
   HeatmapDomainItem,

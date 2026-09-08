@@ -155,6 +155,14 @@ export interface ChartStateCopy {
   readonly title: string;
 }
 
+export interface ChartVisibilityLabels {
+  readonly allHidden: ChartStateCopy;
+  readonly hidden: string;
+  readonly hideSeries: (seriesLabel: string) => string;
+  readonly showAll: string;
+  readonly showSeries: (seriesLabel: string) => string;
+}
+
 export type ChartStatus =
   | {readonly kind: 'ready'}
   | {readonly kind: 'loading'; readonly label: string}
@@ -354,6 +362,7 @@ export interface SparklineProps<Datum extends object, Position extends ChartDoma
 }
 
 interface ChartCommonProps<Datum extends object> {
+  readonly visibilityLabels?: ChartVisibilityLabels;
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];
   readonly dataTableLabel: string;

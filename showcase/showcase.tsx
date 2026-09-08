@@ -95,6 +95,7 @@ import {
   type AccentColor,
   type Appearance,
   type BreadcrumbItems,
+  type ChartVisibilityLabels,
   type CollectionQueryFor,
   type DrawerPlacement,
   type FieldControlProps,
@@ -2059,11 +2060,24 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
     xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
     yAxis: {label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'},
   } as const;
+  const visibilityLabels: ChartVisibilityLabels = {
+    allHidden: {
+      description: 'Use an eye control to show one series, or restore all series below.',
+      title: 'All series hidden',
+    },
+    hidden: 'Hidden',
+    hideSeries: (label) => `Hide ${label}`,
+    showAll: 'Show all series',
+    showSeries: (label) => `Show ${label}`,
+  };
+  const visibilityGuidance =
+    'Click a series name to pin its highlight; use its separate eye to hide or show it. The scale briefly animates to fit visible values. Hide every series to try Show all series. The data table retains all values and labels hidden series.';
   const common = {
     ...chartStateCopy,
     data: chartData,
     dataTableLabel: 'Monthly energy data',
     description: 'Monthly demand remains within available thermal capacity.',
+    visibilityLabels,
   } as const;
   const statisticalCommon = {
     dataTableLabel: 'Statistical chart data',
@@ -2145,7 +2159,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   return (
     <>
       <Specimen
-        description="Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category, its series values, and the target reference; or focus it and use the arrow keys. Chart type and marks scale with available space, while categorical labels use a second row before local scrolling is needed."
+        description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference, or focus it and use the arrow keys. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
         name="LineChart"
       >
         <Example label="Two-series LineChart">
@@ -2164,7 +2178,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Show magnitude or contribution across an ordered domain. Shared readings report component values for stacks and displayed shares for normalized areas."
+        description={`Show magnitude or contribution across an ordered domain. Hiding a series recomputes the stack. Normalized areas and readings use visible shares, while the complete table retains shares of all supplied data. ${visibilityGuidance}`}
         name="AreaChart"
       >
         <Example label="Stacked AreaChart">
@@ -2183,7 +2197,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Compare discrete categories with grouped, stacked, or normalized vertical columns. A touch reading stays open until another category or an outside press replaces it."
+        description={`Compare discrete categories with grouped, stacked, or normalized vertical columns. Columns retain a zero baseline as visibility changes. A touch reading stays open until another category or an outside press replaces it. ${visibilityGuidance}`}
         name="ColumnChart"
       >
         <Example label="Grouped ColumnChart">
@@ -2202,15 +2216,19 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Compare discrete categories on a horizontal plot. Up and Down move through its vertical category axis when the plot has keyboard focus."
+        description={`Compare discrete categories on a horizontal plot. Up and Down move through its vertical category axis when the plot has keyboard focus. Bars retain a zero baseline as visibility changes. ${visibilityGuidance}`}
         name="BarChart"
       >
         <Example label="Horizontal BarChart">
           <BarChart
             {...common}
             layout="grouped"
-            series={[{accessor: 'demand', id: 'demand', label: 'Demand'}]}
-            title="Demand by month"
+            legend={{label: 'Energy series'}}
+            series={[
+              {accessor: 'demand', id: 'demand', label: 'Demand'},
+              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
+            ]}
+            title="Demand and capacity by month"
             xAxis={{label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'}}
             yAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
           />
@@ -2322,7 +2340,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Hover or focus a legend item to emphasize a series; press it to pin that emphasis."
+        description={`Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Restored series keep their original colors and patterns. ${visibilityGuidance}`}
         name="CartesianChart"
       >
         <Example label="Mixed CartesianChart">
