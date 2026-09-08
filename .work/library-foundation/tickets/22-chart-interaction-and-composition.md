@@ -35,6 +35,13 @@ mixed-chart combinations.
       and points, with sufficient identity and associated data to act on them. Activation does not
       require adopting chart selection. Pointer, keyboard, and touch have equivalent activation
       paths.
+- [ ] Apply the [accepted indicator convention](../../chart-interaction-composition/spec.md#accepted-activation-and-selection-convention)
+      consistently: filled centers mark current readings on circular point markers, a brief pulse
+      acknowledges activation without retained inspection state, outer rings mark selected points,
+      and underlines mark selected months. With selection enabled, ordinary clicks select and
+      Control/Command-clicks activate without changing selection. With selection disabled, ordinary
+      clicks activate. Reading previews and clicks target the same item. Category activation emits
+      one category event with associated values. Reduced motion retains a brief static acknowledgment.
 - [ ] Charts support visible selection and application-controlled selection. Applications can
       deliberately coordinate charts, tables, detail views, or filters through explicit public
       state and callbacks without hidden global coupling or a prescribed application action.
@@ -98,6 +105,22 @@ and ticket history. The old Ticket 22 checklist had not been reconciled with tho
 A focused test rerun during this review could not start because `vitest` was not installed in the
 checkout; the historical validation above is not a fresh test result.
 
-The remaining acceptance checks are not implemented or validated by this documentation change.
+The remaining checks span chart families and capabilities beyond the delivered portions below.
+They remain unchecked until that broader scope is complete.
 
-The first [Cartesian visibility implementation](../../chart-interaction-composition/tickets/01-cartesian-visibility.md) is complete with passing checks and independent intent and engineering reviews. It delivers eye controls, animated automatic scale fitting, and all-hidden recovery for five Cartesian charts. Other chart families, activation, selection, exploration, general data animation, and the two added compositions remain open.
+The first [Cartesian visibility implementation](../../chart-interaction-composition/tickets/01-cartesian-visibility.md) is complete with passing checks and independent intent and engineering reviews. It delivers eye controls, animated automatic scale fitting, and all-hidden recovery for five Cartesian charts. Visibility for other chart families, exploration, general data animation, and the two added compositions remain open.
+
+Whitney approved the final [activation and selection prototype](../../chart-interaction-composition/prototypes/activation-selection.md#accepted-convention)
+on 2026-09-08, including the reviewed gestures, targeting, indicator meanings, pulse feedback, and
+light/dark marker spacing. The [LineChart production slice](../../chart-interaction-composition/tickets/03-line-chart-activation-selection.md)
+is complete, including touch tap to select and press-and-hold to activate without changing selection.
+It delivers independent callbacks, stable category/point identities, controlled or internal selection,
+range/rectangle dragging, accepted indicators, and activation feedback. The
+[pointer-focus fix](../../chart-interaction-composition/tickets/02-pointer-reading-focus.md)
+also prevents mouse input from restoring a January keyboard reading.
+
+Production contracts, generated guidance, and the rendered showcase are updated. All 591 tests,
+repository checks, showcase build, and packed React 18/19 verification pass. Independent intent and
+engineering reviews pass after two focused rendering/announcement corrections. Activation and
+selection for other chart families remain open; the accepted LineChart behavior is the convention
+for their planning.

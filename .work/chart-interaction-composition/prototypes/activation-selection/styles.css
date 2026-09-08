@@ -1,0 +1,315 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+[data-wcl-provider] {
+  min-block-size: 100vh;
+  background: var(--wcl-canvas);
+  color: var(--wcl-text);
+  font-family: var(--wcl-font-body);
+}
+
+.study {
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+.study-header,
+.study-settings,
+.specimen {
+  max-inline-size: 52rem;
+  margin-inline: auto;
+}
+
+.study-header h1 {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.study-header p {
+  margin-block: 0;
+  color: var(--wcl-text-muted);
+  font-size: 0.9375rem;
+}
+
+.study-header .kicker {
+  font: 0.75rem/1.5 var(--wcl-font-utility);
+}
+
+.study-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+  padding-block-start: 1.25rem;
+}
+
+.appearance-settings {
+  align-items: center;
+  padding-block-end: 1.5rem;
+}
+
+.specimen {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  background: var(--wcl-surface);
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-radius);
+}
+
+.specimen[data-compact] {
+  max-inline-size: 25rem;
+}
+
+.instruction {
+  margin-block: 0 1.25rem;
+  color: var(--wcl-text-muted);
+  font-size: 0.9375rem;
+}
+
+.interaction-example [data-wcl-chart] {
+  inline-size: 100%;
+}
+
+.interaction-example [data-wcl-chart-svg] {
+  cursor: pointer;
+}
+
+.keyboard-help {
+  color: var(--wcl-text-muted);
+  font: 0.75rem/1.5 var(--wcl-font-utility);
+}
+
+.application-detail,
+.selection-summary {
+  border-block-start: 1px solid var(--wcl-border);
+  padding-block-start: 1rem;
+  min-block-size: 4rem;
+  font: 0.8125rem/1.5 var(--wcl-font-utility);
+}
+
+.application-detail p {
+  margin-block: 0.25rem 0;
+  color: var(--wcl-text-muted);
+}
+
+.selection-summary {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.selection-summary ul {
+  flex-basis: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  color: var(--wcl-text-muted);
+}
+
+.clear-selection {
+  border: 0;
+  padding: 0.25rem;
+  background: transparent;
+  color: var(--wcl-text);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  font: inherit;
+  cursor: pointer;
+}
+
+.clear-selection:focus-visible {
+  outline: 2px solid var(--wcl-accent-focus);
+}
+
+.selected-month-band {
+  fill: color-mix(in srgb, var(--wcl-accent) 10%, transparent);
+  stroke: none;
+}
+
+.selected-month-check {
+  fill: var(--wcl-text);
+  stroke: var(--wcl-surface);
+  stroke-width: 1.5px;
+}
+
+.selected-checkmark {
+  fill: none;
+  stroke: var(--wcl-surface);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.selected-ring {
+  fill: none;
+  stroke: var(--wcl-text);
+  stroke-width: 2px;
+}
+
+.keyboard-target {
+  fill: var(--wcl-text);
+  stroke: none;
+}
+
+[data-example-selection] {
+  animation: selection-enter 140ms ease-out;
+}
+
+.element-name {
+  position: fixed;
+  inset-block-end: 1rem;
+  inset-inline-start: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--wcl-border);
+  border-radius: 0.25rem;
+  background: var(--wcl-surface-raised);
+  color: var(--wcl-text);
+  font: 0.75rem/1.4 var(--wcl-font-utility);
+  pointer-events: none;
+}
+
+[data-identify] [data-element]:is(:hover, :focus-within) {
+  outline: 1px dashed var(--wcl-accent-focus);
+  outline-offset: 3px;
+}
+
+@keyframes selection-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-example-selection] {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .selected-month-check {
+    fill: CanvasText;
+    stroke: Canvas;
+  }
+
+  .selected-checkmark {
+    stroke: Canvas;
+  }
+
+  .selected-ring,
+  .keyboard-target {
+    stroke: CanvasText;
+  }
+
+  .selected-month-band {
+    fill: transparent;
+    stroke: GrayText;
+  }
+}
+
+.study-settings [data-wcl-choice-support] {
+  display: none;
+}
+
+[data-example-selection] > * {
+  vector-effect: non-scaling-stroke;
+}
+
+.selected-month-underline {
+  stroke: var(--wcl-text);
+  stroke-width: 3px;
+  stroke-linecap: round;
+}
+.selected-month-bracket {
+  fill: none;
+  stroke: var(--wcl-text-muted);
+  stroke-width: 1.25px;
+}
+[data-drag-box] {
+  fill: color-mix(in srgb, var(--wcl-accent) 8%, transparent);
+  stroke: var(--wcl-text-muted);
+  stroke-width: 1px;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+[data-selecting] [data-wcl-chart-svg] {
+  touch-action: none;
+  user-select: none;
+}
+[data-wcl-provider]:has([data-dragging]) [data-wcl-chart-tooltip] {
+  visibility: hidden;
+}
+[data-dragging] [data-wcl-chart-reading] {
+  visibility: hidden;
+}
+[data-dragging] [data-example-selection] {
+  animation: none;
+}
+
+/* Prototype convention: filled center reads; a pulse activates; outer ring selects. */
+.interaction-example [data-wcl-chart-reading-node],
+.interaction-example [data-wcl-chart-reading-needle] {
+  visibility: hidden;
+}
+.reading-center {
+  fill: var(--wcl-text);
+  stroke: none;
+}
+.reading-guide {
+  stroke: var(--wcl-text-muted);
+  stroke-width: 1.25px;
+  stroke-dasharray: 3 3;
+}
+[data-activation-pulse] {
+  pointer-events: none;
+}
+[data-activation-pulse] circle {
+  fill: var(--wcl-text);
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: activation-pulse 620ms ease-out both;
+}
+[data-activation-pulse] line {
+  stroke: var(--wcl-text);
+  stroke-width: 2.5px;
+  vector-effect: non-scaling-stroke;
+  animation: activation-guide 620ms ease-out both;
+}
+@keyframes activation-pulse {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.65);
+  }
+  35% {
+    opacity: 0.75;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+@keyframes activation-guide {
+  0%,
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-activation-pulse] :is(circle, line) {
+    animation: none;
+    opacity: 0.8;
+  }
+}

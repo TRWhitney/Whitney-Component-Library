@@ -86,7 +86,9 @@ function chartContract({
       'Legend hover and focus emphasize one series. Click, Enter, or Space pins that emphasis; repeat the action or press Escape to clear it. Emphasis never hides data, changes a domain, or filters records.',
       'Optional visibilityLabels enables unboxed open/closed eye buttons alongside series names. Each eye hides or restores its series without changing name-based emphasis. Hidden entries keep their order, color, and pattern. Hiding clears that series pin; restoring it does not repin it.',
       'Automatic numeric bounds fit visible series with brief, interruptible animation. Explicit consumer domains stay fixed, filled marks keep their zero baseline, and logarithmic bounds remain positive. Stacks recompute from visible series. Normalized plots and readings recompute visible shares on a 0-to-1 scale; the complete table retains shares of the full supplied data.',
-      `${name} emits no consumer events and does not coordinate selection, mutate data, or own application workflow.`,
+      name === 'LineChart'
+        ? 'Optional interaction enables application activation and selection independently. The chart does not mutate supplied data or own application workflow.'
+        : `${name} emits no consumer events and does not coordinate selection, mutate data, or own application workflow.`,
     ],
     counterExamples: [
       {
@@ -99,7 +101,7 @@ function chartContract({
       'Titles, descriptions, legends, and category labels follow inherited writing direction. Numeric axes preserve their mathematical order and horizontal plots retain low-to-high value progression.',
     ],
     events: [
-      `${name} manages reading, legend emphasis, and optional series visibility internally without emitting consumer callbacks. Hiding or restoring series changes automatic bounds and visible readings without changing the supplied records. Stable series ids preserve visibility across value changes; removed series lose their hidden and pinned state, and new series start visible.`,
+      `${name} manages reading, legend emphasis, and optional series visibility internally${name === 'LineChart' ? '' : ' without emitting consumer callbacks'}. Hiding or restoring series changes automatic bounds and visible readings without changing the supplied records. Stable series ids preserve visibility across value changes; removed series lose their hidden and pinned state, and new series start visible.`,
     ],
     examples: [
       {
@@ -594,7 +596,7 @@ export const sparklineContract: ComponentContract = {
   ],
 };
 
-export const lineChartContract = chartContract({
+const lineChartBaseContract = chartContract({
   alternative:
     'Use AreaChart for accumulated magnitude, ColumnChart for discrete comparison, or CartesianChart only when compatible mark types share one honest scale.',
   counterExample: `<LineChart\n  data={[{product: "Alpha", defects: 4}, {product: "Beta", defects: 7}]}\n  description="Defects for unrelated products."\n  ${counterState}\n  series={[{id: "defects", label: "Defects", accessor: "defects"}]}\n  title="Product defects"\n  xAxis={{accessor: "product", label: "Product", scale: {type: "categorical"}}}\n  yAxis={{label: "Defects", scale: {type: "linear"}}}\n/>`,
@@ -605,6 +607,63 @@ export const lineChartContract = chartContract({
   purpose: 'Show change across an ordered or continuous domain with one or more lines.',
   use: 'one or more numeric series must show trend or change across an ordered category, numeric, logarithmic, or time domain',
 });
+
+export const lineChartContract: ComponentContract = {
+  ...lineChartBaseContract,
+  accessibility: [
+    ...lineChartBaseContract.accessibility,
+    'Selection instructions describe the available gestures. A localized count, item names, hidden-item labels, and Clear selection expose the persistent selection outside the SVG. Application activation and selection are separate actions with keyboard equivalents.',
+  ],
+  appearance: [
+    ...lineChartBaseContract.appearance,
+    'Filled point centers identify the current reading. Outer rings identify selected points; underlines identify selected categories. Fills and selection rings meet the marker outline without background gaps in light and dark appearances. A finite pulse acknowledges each activation and does not create a persistent inspected state. Optional idle point markers remain optional.',
+  ],
+  composition: [
+    ...lineChartBaseContract.composition,
+    'Supply interaction with target="category" or target="point", getRowId, and independently optional onActivate and selection. Application details, navigation, and other callback responses belong outside the chart. Share controlled selection between charts when their stable item identities represent the same records.',
+  ],
+  controlBehavior: [
+    ...lineChartBaseContract.controlBehavior,
+    'With selection enabled, ordinary click or touch tap toggles an item. Control/Command-click activates without changing selection. On touchscreens, press and hold activates once; release does not also select. Drag movement and pointer cancellation cancel a pending hold. Without selection, ordinary click or tap activates. Selection and activation never both fire merely because both capabilities are enabled.',
+    'Drag horizontally to select a category range or draw a rectangle to select points. A new drag replaces selection. Shift or Control/Command adds; Alt removes. Escape or pointer cancellation restores the selection from before the drag. Dragging never activates and selection does not change chart domains.',
+    'Reading previews and activation resolve the same nearest visible category, then the nearest visible point vertically for point targeting. Duplicate category coordinates use input order for category ties; point ties use input order then visible series order. Hidden points cannot be targeted. No rows are implicitly aggregated.',
+  ],
+  events: [
+    ...lineChartBaseContract.events,
+    'interaction.onActivate receives ChartActivation with item, category, original datum, input method, and associated raw values. The item has rowId and, for a point, seriesId. Each value contains seriesId, label, value, and hidden. A category produces one callback for one source row with all its series values, including hidden associated values. A point identifies its own series value. No renderer objects are exposed and no inspected state persists.',
+    'selection accepts controlled selectedItems with required onSelectionChange, or uncontrolled defaultSelectedItems with optional onSelectionChange. These ownership models cannot be combined. onSelectionChange receives item identities independently of activation.',
+    'Stable row and series IDs preserve selection through value updates and reorderings. Internal selection drops deleted rows and series; controlled state remains consumer-owned while unavailable items are omitted from rendering and commands. Hidden items remain selected and identified in the summary. Data replacement or visibility changes cancel active gestures. Changing target kinds discards incompatible selection.',
+  ],
+  examples: [
+    ...lineChartBaseContract.examples,
+    {
+      code: `import {useState} from "react";\n\nexport function SelectableDemandChart() {\n  const [detail, setDetail] = useState<string | null>(null);\n  return (\n    <AppearanceProvider appearance="dark" accent="#2878ff">\n      <LineChart\n        ${commonProps.replaceAll('\n  ', '\n        ')}\n        interaction={{\n          target: "category",\n          getRowId: (datum) => datum.month,\n          onActivate: ({datum}) => setDetail(\`\${datum.month}: \${datum.demand} MWh\`),\n          selection: {\n            defaultSelectedItems: [],\n            labels: {\n              instructions: "Click or tap to select. Drag to select a range; Shift or Control/Command adds, Alt removes, and Escape cancels. Control/Command-click or press and hold to open details. Enter or Space selects; add Control/Command to open details.",\n              clear: "Clear selection",\n              empty: "Nothing selected",\n              summary: (count) => \`\${count} months selected\`,\n              item: ({rowId}) => rowId,\n              hidden: (label) => \`\${label} (hidden)\`,\n            },\n          },\n        }}\n        series={[{id: "demand", label: "Demand", accessor: "demand", showPoints: true}]}\n        title="Thermal demand"\n        xAxis={{accessor: "month", label: "Month", scale: {type: "categorical"}}}\n        yAxis={{label: "Energy", unit: "MWh", scale: {type: "linear"}}}\n      />\n      {detail ? <p>{detail}</p> : null}\n    </AppearanceProvider>\n  );\n}`,
+      description:
+        'Keep application details separate from chart selection. Ordinary clicks select a month; modified clicks or touch holds update the application detail without changing selection.',
+      title: 'Independent activation and category selection',
+    },
+  ],
+  keyboardBehavior: [
+    ...lineChartBaseContract.keyboardBehavior,
+    'Point readings announce the targeted series and value first while retaining the complete category reading. For interaction, Left/Right move between categories; point targeting also uses Up/Down to move between visible series. Home/End reach category endpoints. With selection enabled, Enter or Space toggles selection; Control/Command plus Enter or Space activates without changing selection. Without selection, Enter or Space activates. Escape cancels an active drag before clearing a reading.',
+  ],
+  localization: [
+    ...lineChartBaseContract.localization,
+    'selection.labels supplies instructions, clear, empty, summary(count), item(item), and hidden(label). Name selections from stable IDs with application labels. Instructions must describe the gestures enabled by this chart, including Control/Command activation and touch press-and-hold when activation and selection are both present.',
+  ],
+  parts: [
+    ...lineChartBaseContract.parts,
+    'Optional interaction adds category underlines, point selection rings, temporary activation feedback, and a localized selection summary with Clear selection. Application details and experiment controls are consumer-owned composition.',
+  ],
+  reducedMotionBehavior: [
+    ...lineChartBaseContract.reducedMotionBehavior,
+    'Repeated activation restarts finite feedback. Reduced motion replaces the activation pulse with a brief static acknowledgment while preserving callback and selection behavior.',
+  ],
+  validation: [
+    ...lineChartBaseContract.validation,
+    'interaction.getRowId must return a unique nonempty stable string for each datum, including when category labels repeat. Preserve IDs across sorting and refreshes and change an ID when its underlying identity changes. A category selection has rowId; a point selection also has seriesId. Selection geometry stays within explicit plotted domains.',
+  ],
+};
 
 export const areaChartContract = chartContract({
   alternative:

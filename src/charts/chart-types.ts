@@ -376,10 +376,58 @@ interface ChartCommonProps<Datum extends object> {
   readonly title: string;
 }
 
+export interface ChartSelectionItem {
+  readonly rowId: string;
+  readonly seriesId?: string;
+}
+
+export interface ChartActivation<Datum extends object, Category extends ChartDomainValue> {
+  readonly item: ChartSelectionItem;
+  readonly category: Category;
+  readonly datum: Datum;
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+  readonly values: readonly {
+    readonly seriesId: string;
+    readonly label: string;
+    readonly value: number;
+    readonly hidden: boolean;
+  }[];
+}
+
+export interface ChartSelectionLabels {
+  readonly instructions: string;
+  readonly clear: string;
+  readonly empty: string;
+  readonly summary: (count: number) => string;
+  readonly item: (item: ChartSelectionItem) => string;
+  readonly hidden: (label: string) => string;
+}
+
+export type ChartSelection = {readonly labels: ChartSelectionLabels} & (
+  | {
+      readonly selectedItems: readonly ChartSelectionItem[];
+      readonly defaultSelectedItems?: never;
+      readonly onSelectionChange: (items: readonly ChartSelectionItem[]) => void;
+    }
+  | {
+      readonly selectedItems?: never;
+      readonly defaultSelectedItems?: readonly ChartSelectionItem[];
+      readonly onSelectionChange?: (items: readonly ChartSelectionItem[]) => void;
+    }
+);
+
+export interface LineChartInteraction<Datum extends object, Category extends ChartDomainValue> {
+  readonly target: 'category' | 'point';
+  readonly getRowId: (datum: Datum) => string;
+  readonly onActivate?: (activation: ChartActivation<Datum, Category>) => void;
+  readonly selection?: ChartSelection;
+}
+
 export interface LineChartProps<
   Datum extends object,
   XValue extends ChartDomainValue,
 > extends ChartCommonProps<Datum> {
+  readonly interaction?: LineChartInteraction<Datum, XValue>;
   readonly annotations?: readonly ChartAnnotation<NoInfer<XValue>, number>[];
   readonly series: NonEmptyChartSeries<ChartLineSeries<Datum>>;
   readonly xAxis: ChartDataAxis<Datum, XValue>;

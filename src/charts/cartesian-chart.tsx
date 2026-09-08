@@ -31,6 +31,12 @@ import {EmptyState} from '../feedback/empty-state.js';
 import {InlineAlert} from '../feedback/alerts.js';
 import {Spinner} from '../feedback/spinner.js';
 import {useScrollbarActivity} from '../scrollbar-activity.js';
+import {
+  nearestInteraction,
+  selectionKey,
+  useLineChartInteraction,
+  type InteractionPoint,
+} from './line-chart-interaction.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import type {
   AreaChartProps,
@@ -56,6 +62,7 @@ import type {
   ChartVisibilityLabels,
   ColumnChartProps,
   LineChartProps,
+  LineChartInteraction,
   NonEmptyChartSeries,
 } from './chart-types.js';
 
@@ -172,6 +179,7 @@ interface ChartFrameProps<
   Category extends ChartDomainValue,
 > extends RenderModel<Datum, Category> {
   readonly aspectRatio?: number;
+  readonly interaction?: LineChartInteraction<Datum, Category>;
   readonly visibilityLabels?: ChartVisibilityLabels;
   readonly description: string;
   readonly emptyState: ChartStateCopy;
@@ -723,6 +731,8 @@ export function clientPointFromViewBox(
 }
 
 function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>({
+  pointTarget = false,
+  filledPresentation,
   categoryPlacement,
   categoryProjection,
   emphasizedSeriesId,
@@ -733,6 +743,8 @@ function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>
   series,
   valueProjection,
 }: {
+  readonly pointTarget?: boolean;
+  readonly filledPresentation?: PresentationMetrics;
   readonly categoryPlacement: 'x' | 'y';
   readonly categoryProjection: Projection<Category>;
   readonly emphasizedSeriesId: string | undefined;
@@ -757,23 +769,48 @@ function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>
         y2={categoryPlacement === 'x' ? plot.bottom : category}
       />
       {series.map((item, seriesIndex) => {
+        if (pointTarget && reading.seriesId !== item.id) return null;
         const plottedValue = coordinates(row, seriesIndex, layout).end;
         const value = valueProjection.position(plottedValue);
         if (value === undefined) return null;
+        const stroke = filledPresentation
+          ? filledPresentation.pointStrokeWidth * (emphasizedSeriesId === item.id ? 1.5 : 1)
+          : 0;
         return (
-          <circle
-            cx={categoryPlacement === 'x' ? category : value}
-            cy={categoryPlacement === 'x' ? value : category}
-            data-active={emphasizedSeriesId === item.id ? '' : undefined}
-            data-color={item.color}
-            data-muted={
-              emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
-            }
-            data-series-index={item.patternIndex}
-            data-wcl-chart-reading-node=""
-            key={item.id}
-            r="4.5"
-          />
+          <g key={item.id} data-color={item.color}>
+            {filledPresentation ? (
+              <circle
+                cx={category}
+                cy={value}
+                r={filledPresentation.pointRadius / filledPresentation.viewScale}
+                data-wcl-chart-reading-outline=""
+                style={{strokeWidth: stroke}}
+              />
+            ) : null}
+            <circle
+              cx={categoryPlacement === 'x' ? category : value}
+              cy={categoryPlacement === 'x' ? value : category}
+              data-active={emphasizedSeriesId === item.id ? '' : undefined}
+              data-color={item.color}
+              data-muted={
+                emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
+              }
+              data-series-index={item.patternIndex}
+              data-wcl-chart-reading-node=""
+              data-filled={filledPresentation ? '' : undefined}
+              style={
+                filledPresentation
+                  ? {
+                      r:
+                        (filledPresentation.pointRadius - stroke / 2 + 0.35) /
+                        filledPresentation.viewScale,
+                    }
+                  : undefined
+              }
+              key={item.id}
+              r="4.5"
+            />
+          </g>
         );
       })}
     </g>
@@ -1591,6 +1628,7 @@ function validateChart<Datum extends object, Category extends ChartDomainValue>(
 
 function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   annotations,
+  interaction,
   aspectRatio = 1.75,
   categoryAxis,
   categoryPlacement,
@@ -1676,7 +1714,42 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       values: visibleIndexes.map((index) => row.values[index] ?? 0),
     })),
   };
-  const activeReading = pointerReading ?? touchReading ?? keyboardReading;
+  const rowIds = interaction === undefined ? [] : data.map(interaction.getRowId);
+  if (
+    interaction &&
+    (rowIds.some((id) => typeof id !== 'string' || id.trim() === '') ||
+      new Set(rowIds).size !== rowIds.length)
+  ) {
+    throw new Error(
+      'LineChart interaction getRowId must return a unique nonempty string for every row.',
+    );
+  }
+  if (
+    interaction?.selection?.selectedItems !== undefined &&
+    interaction.selection.defaultSelectedItems !== undefined
+  ) {
+    throw new Error('LineChart selection cannot combine selectedItems and defaultSelectedItems.');
+  }
+  const interactionRows = (interaction ? allPrepared.rows : []).map((row) => ({
+    id: rowIds[row.index] ?? '',
+    category: row.category,
+    datum: row.datum,
+    values: allSeries.map((item, index) => ({
+      seriesId: item.id,
+      label: item.label,
+      value: row.values[index]!,
+      hidden: hiddenIds.includes(item.id),
+    })),
+  }));
+  const interactionVersion = JSON.stringify([
+    interactionRows.map((row) => [row.id, domainValueKey(row.category), row.values]),
+    status.kind,
+    categoryAxis.scale,
+    valueAxis.scale,
+  ]);
+  const actions = useLineChartInteraction(interaction, interactionRows, interactionVersion, data);
+  const activeReading =
+    actions.box !== null ? null : (pointerReading ?? touchReading ?? keyboardReading);
   const availableSeriesId = (id: string | null | undefined): string | undefined =>
     id !== null && id !== undefined && series.some((item) => item.id === id) ? id : undefined;
   const validPinnedLegendSeriesId = availableSeriesId(pinnedLegendSeriesId) ?? null;
@@ -1854,17 +1927,76 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         ? ''
         : [
             axisTickLabel(readingRow.category, categoryAxis),
+            ...(interaction?.target === 'point' && activeReading?.seriesId
+              ? series.flatMap((item, index) =>
+                  item.id === activeReading.seriesId
+                    ? [`${item.label}: ${readingValues[index] ?? ''}`]
+                    : [],
+                )
+              : []),
             ...series.map((item, index) => `${item.label}: ${readingValues[index] ?? ''}`),
             ...references.map(
               (reference) =>
                 `${reference.label}: ${formatReadingValue(reference.value, valueAxis)}`,
             ),
           ].join('. ');
+    const interactionPoints: InteractionPoint[] =
+      interaction === undefined
+        ? []
+        : prepared.rows.flatMap((row, index) =>
+            series.flatMap((item, seriesIndex) => {
+              const x = categoryProjection.position(row.category),
+                y = valueProjection.position(row.values[seriesIndex]!);
+              if (
+                x === undefined ||
+                y === undefined ||
+                x < plot.left - 1e-8 ||
+                x > plot.right + 1e-8 ||
+                y < plot.top - 1e-8 ||
+                y > plot.bottom + 1e-8
+              )
+                return [];
+              return [
+                {
+                  item: {
+                    rowId: rowIds[row.index]!,
+                    ...(interaction.target === 'point' ? {seriesId: item.id} : {}),
+                  },
+                  index,
+                  x,
+                  y,
+                },
+              ];
+            }),
+          );
+    const interactionPointFromPointer = (event: PointerEvent<SVGSVGElement>) => {
+      const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+      const padding =
+        (presentation.pointRadius + presentation.pointStrokeWidth) / presentation.viewScale;
+      if (
+        x < plot.left - padding ||
+        x > plot.right + padding ||
+        y < plot.top - padding ||
+        y > plot.bottom + padding
+      )
+        return undefined;
+      return nearestInteraction(interactionPoints, x, y, interaction?.target ?? 'category');
+    };
     const readingFromPointer = (
       event: PointerEvent<SVGSVGElement>,
       followPointer: boolean,
     ): ChartReading | null => {
       const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+      if (interaction) {
+        const point = interactionPointFromPointer(event);
+        return point
+          ? {
+              index: point.index,
+              ...(point.item.seriesId === undefined ? {} : {seriesId: point.item.seriesId}),
+              ...(followPointer ? {pointer: {x: event.clientX, y: event.clientY}} : {}),
+            }
+          : null;
+      }
       if (x < plot.left || x > plot.right || y < plot.top || y > plot.bottom) return null;
       const target = event.target instanceof Element ? event.target : null;
       const targetRow = Number(target?.closest('[data-row-index]')?.getAttribute('data-row-index'));
@@ -1882,10 +2014,22 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       };
     };
     const movePointerReading = (event: PointerEvent<SVGSVGElement>): void => {
+      if (interaction) {
+        const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+        if (actions.move(event, x, y, interactionPoints, plot)) {
+          event.preventDefault();
+          return;
+        }
+      }
       if (event.pointerType === 'touch') return;
       setPointerReading(readingFromPointer(event, true));
     };
     const retainTouchReading = (event: PointerEvent<SVGSVGElement>): void => {
+      if (interaction && event.button === 0 && event.isPrimary !== false) {
+        const point = interactionPointFromPointer(event);
+        const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+        if (point) actions.begin(event, point, x, y);
+      }
       if (event.pointerType !== 'touch') return;
       const reading = readingFromPointer(event, false);
       if (reading === null) return;
@@ -1909,7 +2053,10 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     const focusChart = (event: FocusEvent<HTMLDivElement>): void => {
       if (event.currentTarget === event.target && isFocusVisible && keyboardReading === null) {
         revealCategory(0, event.currentTarget.parentElement);
-        setKeyboardReading({index: 0});
+        setKeyboardReading({
+          index: 0,
+          ...(interaction?.target === 'point' && series[0] ? {seriesId: series[0].id} : {}),
+        });
       }
     };
     const blurChart = (event: FocusEvent<HTMLDivElement>): void => {
@@ -1923,6 +2070,33 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     };
     const readWithKeyboard = (event: KeyboardEvent<HTMLDivElement>): void => {
       const previousIndex = keyboardReading?.index ?? activeReading?.index ?? 0;
+      const currentSeriesId = keyboardReading?.seriesId ?? activeReading?.seriesId ?? series[0]?.id;
+      if (interaction && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        const point = interactionPoints.find(
+          (p) =>
+            p.index === previousIndex &&
+            (interaction.target === 'category' || p.item.seriesId === currentSeriesId),
+        );
+        if (point) actions.activate(point.item, 'keyboard', event.ctrlKey || event.metaKey);
+        return;
+      }
+      if (
+        interaction?.target === 'point' &&
+        (event.key === 'ArrowUp' || event.key === 'ArrowDown')
+      ) {
+        event.preventDefault();
+        const at = Math.max(
+          0,
+          series.findIndex((item) => item.id === currentSeriesId),
+        );
+        const next =
+          series[(at + (event.key === 'ArrowUp' ? -1 : 1) + series.length) % series.length]!;
+        setKeyboardReading({index: previousIndex, seriesId: next.id});
+        setPointerReading(null);
+        setTouchReading(null);
+        return;
+      }
       let nextIndex: number | null = null;
       if (event.key === 'Home') nextIndex = 0;
       if (event.key === 'End') nextIndex = prepared.rows.length - 1;
@@ -1939,6 +2113,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         nextIndex = Math.min(prepared.rows.length - 1, previousIndex + 1);
       }
       if (event.key === 'Escape') {
+        actions.cancel();
         event.preventDefault();
         setKeyboardReading(null);
         setPointerReading(null);
@@ -1948,7 +2123,12 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       if (nextIndex === null) return;
       event.preventDefault();
       revealCategory(nextIndex, event.currentTarget.parentElement);
-      setKeyboardReading({index: nextIndex});
+      setKeyboardReading({
+        index: nextIndex,
+        ...(interaction?.target === 'point' && currentSeriesId !== undefined
+          ? {seriesId: currentSeriesId}
+          : {}),
+      });
       setPointerReading(null);
       setTouchReading(null);
     };
@@ -1969,11 +2149,16 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         >
           <div
             aria-keyshortcuts={
-              categoryPlacement === 'x'
-                ? 'ArrowLeft ArrowRight Home End Escape'
-                : 'ArrowUp ArrowDown Home End Escape'
+              interaction
+                ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape Enter Space Control+Enter Meta+Enter Control+Space Meta+Space'
+                : categoryPlacement === 'x'
+                  ? 'ArrowLeft ArrowRight Home End Escape'
+                  : 'ArrowUp ArrowDown Home End Escape'
             }
             aria-labelledby={titleId}
+            aria-describedby={
+              interaction?.selection ? `${descriptionId}-selection-instructions` : undefined
+            }
             data-stagger={presentation.staggerLabels ? '' : undefined}
             data-wcl-chart-canvas=""
             onBlur={blurChart}
@@ -1986,8 +2171,30 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             <svg
               aria-hidden="true"
               data-wcl-chart-svg=""
+              data-selection-enabled={interaction?.selection ? '' : undefined}
               focusable="false"
               onPointerDown={retainTouchReading}
+              onPointerUp={
+                interaction
+                  ? (event) => {
+                      actions.end(event, interactionPointFromPointer(event));
+                      if (actions.box) {
+                        setPointerReading(null);
+                        setKeyboardReading(null);
+                        setTouchReading(null);
+                      }
+                    }
+                  : undefined
+              }
+              onPointerCancel={interaction ? () => actions.cancel() : undefined}
+              onLostPointerCapture={interaction ? () => actions.cancel() : undefined}
+              onContextMenu={
+                interaction
+                  ? (event) => {
+                      if (actions.isHolding()) event.preventDefault();
+                    }
+                  : undefined
+              }
               onPointerLeave={() => setPointerReading(null)}
               onPointerMove={movePointerReading}
               ref={setSvgElement}
@@ -2074,9 +2281,38 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 plot={plot}
                 valueProjection={valueProjection}
               />
+              {interaction?.target === 'point' ? (
+                <g pointerEvents="none">
+                  {actions.selected.map((item) => {
+                    const point = interactionPoints.find(
+                      (p) => selectionKey(p.item) === selectionKey(item),
+                    );
+                    const selectedSeries = series.find((s) => s.id === item.seriesId);
+                    if (!point || !selectedSeries || selectedSeries.showPoints) return null;
+                    const stroke =
+                      presentation.pointStrokeWidth *
+                      (emphasizedSeriesId === item.seriesId ? 1.5 : 1);
+                    return (
+                      <circle
+                        key={selectionKey(item)}
+                        data-color={selectedSeries.color}
+                        data-wcl-chart-reading-outline=""
+                        cx={point.x}
+                        cy={point.y}
+                        r={presentation.pointRadius / presentation.viewScale}
+                        style={{strokeWidth: stroke}}
+                      />
+                    );
+                  })}
+                </g>
+              ) : null}
               <g clipPath={hasVisibilityControls ? `url(#${plotClipId})` : undefined}>
                 {activeReading === null ? null : (
                   <ReadingOverlay
+                    pointTarget={interaction?.target === 'point'}
+                    {...(rootAttribute === 'data-wcl-line-chart'
+                      ? {filledPresentation: presentation}
+                      : {})}
                     categoryPlacement={categoryPlacement}
                     categoryProjection={categoryProjection}
                     emphasizedSeriesId={emphasizedSeriesId}
@@ -2089,6 +2325,86 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   />
                 )}
               </g>
+              {interaction ? (
+                <g data-wcl-chart-interaction-overlay="" pointerEvents="none">
+                  {actions.selected.map((item) => {
+                    const point = interactionPoints.find(
+                      (p) => selectionKey(p.item) === selectionKey(item),
+                    );
+                    if (!point) return null;
+                    if (interaction.target === 'category') {
+                      const row = prepared.rows[point.index]!;
+                      const tickIndex = categoryProjection.ticks.findIndex(
+                        (tick) => domainValueKey(tick) === domainValueKey(row.category),
+                      );
+                      const labelOffset = presentation.staggerLabels
+                        ? tickIndex % 2 === 0
+                          ? 0.875
+                          : 1.75
+                        : 1.125;
+                      const y =
+                        plot.bottom +
+                        (presentation.fontSize * labelOffset + 5) / presentation.viewScale;
+                      return (
+                        <line
+                          key={selectionKey(item)}
+                          data-wcl-chart-selected-category=""
+                          x1={point.x - 12 / presentation.viewScale}
+                          x2={point.x + 12 / presentation.viewScale}
+                          y1={y}
+                          y2={y}
+                        />
+                      );
+                    }
+                    const selectedSeries = series.find((s) => s.id === item.seriesId)!;
+                    const stroke =
+                      presentation.pointStrokeWidth *
+                      (emphasizedSeriesId === item.seriesId ? 1.5 : 1);
+                    return (
+                      <g key={selectionKey(item)} data-color={selectedSeries.color}>
+                        <circle
+                          data-wcl-chart-selected-point=""
+                          cx={point.x}
+                          cy={point.y}
+                          r={(presentation.pointRadius + stroke / 2 + 1) / presentation.viewScale}
+                        />
+                      </g>
+                    );
+                  })}
+                  {actions.box ? <rect data-wcl-chart-selection-box="" {...actions.box} /> : null}
+                  {actions.pulse ? (
+                    <g key={actions.pulse.sequence} data-wcl-chart-activation="">
+                      {interactionPoints
+                        .filter((p) => selectionKey(p.item) === selectionKey(actions.pulse!.item))
+                        .map((point, index) => (
+                          <circle
+                            key={index}
+                            data-wcl-chart-activation-dot=""
+                            cx={point.x}
+                            cy={point.y}
+                            r={10 / presentation.viewScale}
+                          />
+                        ))}
+                      {interaction.target === 'category'
+                        ? (() => {
+                            const point = interactionPoints.find(
+                              (p) => p.item.rowId === actions.pulse!.item.rowId,
+                            );
+                            return point ? (
+                              <line
+                                data-wcl-chart-activation-guide=""
+                                x1={point.x}
+                                x2={point.x}
+                                y1={plot.top}
+                                y2={plot.bottom}
+                              />
+                            ) : null;
+                          })()
+                        : null}
+                    </g>
+                  ) : null}
+                </g>
+              ) : null}
             </svg>
             {activeReading === null ? null : (
               <ReadingTooltip
@@ -2157,6 +2473,47 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         />
       ) : null}
       {content}
+      {interaction?.selection ? (
+        <div data-wcl-chart-selection="">
+          <p id={`${descriptionId}-selection-instructions`}>
+            {interaction.selection.labels.instructions}
+          </p>
+          <div aria-live="polite" aria-atomic="true">
+            <span>
+              {actions.selected.length
+                ? interaction.selection.labels.summary(actions.selected.length)
+                : interaction.selection.labels.empty}
+            </span>
+            {actions.selected.length ? (
+              <ul>
+                {actions.selected.map((item) => {
+                  const label = interaction.selection!.labels.item(item);
+                  return (
+                    <li key={selectionKey(item)}>
+                      {item.seriesId && hiddenIds.includes(item.seriesId)
+                        ? interaction.selection!.labels.hidden(label)
+                        : label}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+          </div>
+          {actions.selected.length ? (
+            <button
+              type="button"
+              data-wcl-chart-clear-selection=""
+              onClick={() => {
+                actions.cancel();
+                actions.change([]);
+                rootElement?.querySelector<HTMLElement>('[data-wcl-chart-canvas]')?.focus();
+              }}
+            >
+              {interaction.selection.labels.clear}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       {!isLoading && !isError && hasData ? (
         <>
           <DataTable

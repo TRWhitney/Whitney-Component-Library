@@ -52,6 +52,72 @@ parent ticket; this first delivery does not complete Ticket 22.
 - Existing public limits on inputs, minimum sizes, status states, scales, and renderer privacy stay
   in force. Public contracts and all five showcase specimens explain the delivered visibility.
 
+### Accepted activation and selection convention
+
+Whitney approved the final prototype's reviewed behaviors and styles on 2026-09-08. Its
+[accepted contract](prototypes/activation-selection.md#accepted-convention) binds the next
+[LineChart production slice](tickets/03-line-chart-activation-selection.md). This is prototype
+acceptance, not production completion. The public identity and data-replacement rules below complete this slice's planning boundary; the reviewed styles and gestures do not need reapproval.
+
+- Activation callbacks are independent of optional selection. With selection enabled, ordinary
+  clicks toggle selection and Control/Command-click activates without changing selection. With
+  selection disabled, ordinary clicks activate. Selection and activation never both fire merely
+  because both capabilities are enabled. Callbacks fire immediately for a category or point; the
+  chart does not retain an inspected item or prescribe the application's response.
+- Current reading and click targeting use one rule: choose the nearest visible category along the
+  horizontal axis, then the nearest visible point vertically for point mode. The filled preview
+  must identify exactly what a click would target, including between series. Category activation
+  is one callback identifying the category with associated series data, not multiple point events.
+- The prototype mirrors mouse modifiers with Control/Command plus Enter or Space for activation
+  when selection is enabled. On touchscreens, tap selects and press-and-hold activates without
+  changing selection. Releasing after a hold must not also select; movement into a drag or pointer
+  cancellation cancels the pending hold. Whitney explicitly chose press-and-hold on 2026-09-08.
+  The prototype uses a 500ms hold threshold, an implementation detail rather than a fixed API.
+  With selection disabled, ordinary tap activates.
+- For charts with circular point markers, a filled center consistently identifies the current
+  pointer, keyboard, or touch reading. Align Cartesian reading indicators with radar and sparkline;
+  do not reinterpret data-bearing fills or invent circular markers for other geometries.
+- A brief pulse acknowledges each activation, including repeated activation of the same item.
+  It disappears without creating selection. Reduced motion uses a brief static acknowledgment.
+- Persistent point selection uses an outer ring; categorical month selection uses an underline.
+  Point fills and selection rings meet the actual marker outline without background gaps or an
+  additional halo, in both appearances and as emphasis changes the outline width.
+  Reading and selection can coexist. Whole-series legend emphasis remains distinct.
+- Preserve the accepted prototype click-and-drag semantics, including range/rectangle selection,
+  additive and subtractive modifiers, and cancellation. See the
+  [activation example](prototypes/activation-selection.md#accepted-convention).
+- Apply the convention consistently across applicable chart families during production delivery,
+  with matching public documentation and showcase examples. The prototype demonstrates intent;
+  it does not establish a production API or complete the parent ticket.
+
+### LineChart production boundary
+
+- This delivery covers LineChart only. Remaining chart families and other parent-ticket capabilities
+  continue as later portions; their unreviewed geometry and gestures are not inferred here.
+- An optional interaction object declares category or point targeting, a getRowId callback returning
+  a nonempty stable string for each datum, an optional onActivate callback, and optional selection.
+  Interaction IDs must be unique, including when category labels repeat. Existing charts without
+  interactions retain their input boundary. The application must preserve IDs across sorting and
+  refreshes and change an ID when the underlying item changes identity.
+- A selection item identifies a rowId; a point additionally identifies seriesId. Category activation
+  identifies one source row and all its series values. Duplicate category coordinates remain
+  supported: category ties use input order, and point ties use input order then visible series order.
+  No rows are implicitly aggregated. Callback payloads contain the item identity, original datum,
+  category, associated raw values with series identity/label/visibility, and input method. They expose
+  no renderer objects. Hidden series values remain associated data, but hidden points are not targets.
+- Selection supports typed controlled selectedItems plus onSelectionChange, or uncontrolled
+  defaultSelectedItems with optional onSelectionChange. The two ownership models cannot be combined.
+  Selection labels supply instructions, clear, empty, count summary, item names, and hidden-item copy.
+  Application code can coordinate charts by sharing selection and responding to activation separately.
+- Retain IDs across value updates and reorderings. Remove deleted rows/series from internal selection;
+  controlled state remains consumer-owned, with unavailable items omitted from rendering and commands.
+  Hidden series remain selected. Data replacement or visibility changes cancel in-progress gestures
+  to prevent acting on outdated geometry. Switching target kinds discards incompatible selection.
+- Optional point markers remain optional when idle; interaction reading/selection may mark an item
+  on a line even when showPoints is false. Keep selection geometry within explicit plotted domains.
+- The approved pointer-focus correction is included as a prerequisite in this delivery and will be
+  reviewed alongside production code. Prototype adaptation and experiment switches remain isolated.
+
 ## Testing Decisions
 
 - Exercise hiding, restoring, all-hidden recovery, focus, order, stable identity, and clear-pin

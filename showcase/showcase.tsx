@@ -95,6 +95,8 @@ import {
   type AccentColor,
   type Appearance,
   type BreadcrumbItems,
+  type ChartActivation,
+  type ChartSelectionItem,
   type ChartVisibilityLabels,
   type CollectionQueryFor,
   type DrawerPlacement,
@@ -113,6 +115,7 @@ const chartData = [
   {capacity: 68, demand: 61, month: 'Mar'},
   {capacity: 72, demand: 57, month: 'Apr'},
 ] as const;
+const chartRowId = (datum: (typeof chartData)[number]) => datum.month;
 const energyCategoryData = [
   {id: 'residential', label: 'Residential', value: 43},
   {id: 'food', label: 'Food processing', value: 31},
@@ -2056,6 +2059,19 @@ function FeedbackSpecimens() {
 }
 
 function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
+  const [lineTarget, setLineTarget] = useState<'category' | 'point'>('category');
+  const [lineSelectionEnabled, setLineSelectionEnabled] = useState(true);
+  const [lineDetailsEnabled, setLineDetailsEnabled] = useState(true);
+  const [lineSelection, setLineSelection] = useState<readonly ChartSelectionItem[]>([]);
+  const [lineDetails, setLineDetails] = useState<ChartActivation<
+    (typeof chartData)[number],
+    (typeof chartData)[number]['month']
+  > | null>(null);
+  const lineInstructions = lineSelectionEnabled
+    ? `Click or tap to select ${lineTarget === 'category' ? 'a month' : 'a point'}. Drag to select ${lineTarget === 'category' ? 'a month range' : 'points inside a rectangle'}. Hold Shift or Control/Command to add, or Alt to remove. Escape cancels a drag.${lineDetailsEnabled ? ' Control/Command-click or press and hold to open details without changing selection. With keyboard focus, Enter or Space selects; add Control/Command to open details.' : ' With keyboard focus, Enter or Space selects.'}`
+    : lineDetailsEnabled
+      ? 'Click, tap, or press Enter or Space to open details. Opening details does not select an item.'
+      : 'Move across the chart or use the arrow keys to read its values.';
   const verticalAxes = {
     xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
     yAxis: {label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'},
@@ -2162,18 +2178,103 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference. Tab into the plot and use the arrow keys for keyboard readings; mouse readings clear when the pointer leaves the plot. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
         name="LineChart"
       >
-        <Example label="Two-series LineChart">
-          <LineChart
-            {...common}
-            {...verticalAxes}
-            annotations={[{axis: 'y', kind: 'line', label: 'Target', value: 60}]}
-            legend={{label: 'Energy series'}}
-            series={[
-              {accessor: 'demand', id: 'demand', label: 'Demand', showPoints: true},
-              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
-            ]}
-            title="Thermal demand"
-          />
+        <Example label="Two-series LineChart with selection and details">
+          <Stack gap="regular">
+            <InlineGroup align="start" gap="regular" wrap>
+              <SegmentedControl
+                label="Click target"
+                onChange={(target) => {
+                  setLineTarget(target);
+                  setLineSelection([]);
+                  setLineDetails(null);
+                }}
+                options={[
+                  {label: 'Month', value: 'category'},
+                  {label: 'Point', value: 'point'},
+                ]}
+                value={lineTarget}
+              />
+              <Switch
+                isSelected={lineSelectionEnabled}
+                label="Enable selection"
+                onChange={setLineSelectionEnabled}
+              />
+              <Switch
+                isSelected={lineDetailsEnabled}
+                label="Open details on activation"
+                onChange={(enabled) => {
+                  setLineDetailsEnabled(enabled);
+                  if (!enabled) setLineDetails(null);
+                }}
+              />
+            </InlineGroup>
+            <p>{lineInstructions}</p>
+            <LineChart
+              {...common}
+              {...verticalAxes}
+              annotations={[{axis: 'y', kind: 'line', label: 'Target', value: 60}]}
+              interaction={{
+                getRowId: chartRowId,
+                ...(lineDetailsEnabled ? {onActivate: setLineDetails} : {}),
+                ...(lineSelectionEnabled
+                  ? {
+                      selection: {
+                        labels: {
+                          clear: 'Clear selection',
+                          empty: 'Nothing selected',
+                          hidden: (label) => `${label} (hidden)`,
+                          instructions: lineInstructions,
+                          item: ({rowId, seriesId}) =>
+                            seriesId
+                              ? `${rowId}, ${seriesId === 'demand' ? 'Demand' : 'Capacity'}`
+                              : rowId,
+                          summary: (count) =>
+                            `${count} ${lineTarget === 'category' ? (count === 1 ? 'month' : 'months') : count === 1 ? 'point' : 'points'} selected`,
+                        },
+                        onSelectionChange: setLineSelection,
+                        selectedItems: lineSelection,
+                      },
+                    }
+                  : {}),
+                target: lineTarget,
+              }}
+              legend={{label: 'Energy series'}}
+              series={[
+                {accessor: 'demand', id: 'demand', label: 'Demand', showPoints: true},
+                {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
+              ]}
+              title="Thermal demand"
+            />
+            <p className="showcase-muted">
+              Filled centers identify the current reading. Underlines mark selected months and outer
+              rings mark selected points. A brief pulse acknowledges activation. A month opens one
+              set of details containing both series; a point opens its own value. Selection remains
+              when a series is hidden. These controls and details belong to this example.
+            </p>
+            {lineDetails ? (
+              <Stack gap="regular">
+                <DescriptionList
+                  ariaLabel={`${lineDetails.category} energy details`}
+                  emptyState={{
+                    kind: 'no-data',
+                    title: 'No readings',
+                    description: 'Choose a period with recorded values.',
+                  }}
+                  items={[
+                    {description: lineDetails.category, id: 'month', term: 'Month'},
+                    ...lineDetails.values.map(({hidden, label, seriesId, value}) => ({
+                      description: `${value} MWh${hidden ? ' (hidden on chart)' : ''}`,
+                      id: seriesId,
+                      term: label,
+                    })),
+                  ]}
+                />
+                <Button onPress={() => setLineDetails(null)} variant="quiet">
+                  Close details
+                </Button>
+              </Stack>
+            ) : null}
+          </Stack>
         </Example>
       </Specimen>
 

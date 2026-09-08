@@ -6,37 +6,41 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-Whitney accepted the first working example and its
-[contract](prototypes/legend-visibility.md#accepted-contract). The
-[first production ticket](tickets/01-cartesian-visibility.md) covers the five Cartesian charts.
-The first portion is complete, with passing validation and independent intent and engineering
-reviews. Other portions of
-the parent ticket remain active future work.
+The LineChart activation and selection portion is complete. Its independent production reviews
+and validation pass. Parent Ticket 22 remains active; planning the next portion is the continuation.
 
 ## Progress
 
-- The reconciled scope is accepted in `e899b8e`.
-- Production eye controls and automatic animated visible-data scales are implemented in all five
-  Cartesian charts. Public contracts, generated guides, and showcase examples are current.
-- Production Cartesian reading, emphasis, and responsive behavior are reused in the isolated
-  [legend visibility example](prototypes/legend-visibility.md).
+- Reconciled scope accepted in `e899b8e`.
+- Cartesian eye controls and automatic animated visible-data scales delivered in `a3ea65b`,
+  documented in [ticket 01](tickets/01-cartesian-visibility.md).
+- Pointer focus no longer starts or restores a January keyboard reading (`162c5aa`), documented in
+  [ticket 02](tickets/02-pointer-reading-focus.md).
+- LineChart delivers the approved activation, selection, dragging, indicators, and touch hold
+  behavior through its public API, documented in [ticket 03](tickets/03-line-chart-activation-selection.md).
+  Public contracts, generated guides, and the rendered showcase are current.
 
 ## Frontier
 
-Continue planning the remaining chart
-families and selection/exploration behavior against the parent ticket.
+Plan the next chart-family portion using the accepted LineChart convention. Other Cartesian,
+statistical, radial, and compact chart interaction, exploration, general data animation,
+responsiveness budgets, and the added mixed geometries remain in Ticket 22.
+The approved styles, mouse/keyboard gestures, and touch hold behavior are settled.
 
 ## Accepted sources
 
 - [Reconciled Ticket 22](../library-foundation/tickets/22-chart-interaction-and-composition.md)
+- [Specification](spec.md)
+- [Approved activation and selection contract](prototypes/activation-selection.md#accepted-convention)
 - [Chart scope](../library-foundation/decisions/13-charting-scope.md#ticket-22-reconciliation)
 - [Existing Cartesian interaction](../chart-interactivity/spec.md)
 
 ## Verification
 
-Current production checks, test-first evidence, direct browser observations, and documentation
-impact are recorded in the [first ticket](tickets/01-cartesian-visibility.md#completion-evidence).
-Prototype evidence remains in the [accepted example](prototypes/legend-visibility.md).
+[Ticket 03](tickets/03-line-chart-activation-selection.md#completion-evidence) records the current
+591 passing tests, full repository and package checks, native browser observations, and independent
+intent and engineering review results. Both review corrections passed focused correction review.
+Prototype approval is separate from production verification.
 
 ## Out of scope
 
@@ -45,11 +49,10 @@ and any change to the accepted chart palette or existing reading semantics.
 
 ## Continuation
 
-- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-- Branch: `main`; base: `e899b8e`.
-- Live example: `http://localhost:5173`; Vite process session `13071` serves the isolated prototype.
-- First delivered outcome: `[Feature] Add chart series visibility`.
-- Production showcase: `http://localhost:5174`.
-- Next action: continue planning the remaining portions. The next interface decision is how
-  category/point activation and optional selection coexist with readings. The parent ticket is
-  not complete.
+- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
+- Branch: `main`. The completed focus fix and LineChart capability are separate local commits.
+- Production showcase: `http://localhost:5174/#line-chart`, Vite session `7315`.
+- Accepted isolated prototype: `http://localhost:5175`, Vite session `28120`.
+- Next action: plan the next bounded portion of parent Ticket 22; apply the accepted convention
+  to the remaining Cartesian chart components before extending it to other reading units.
+- No subagents or automated suites for prototype iteration; production work follows its own checks.

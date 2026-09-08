@@ -161,3 +161,44 @@ export const tooManySeries = (
     yAxis={{label: 'Value', scale: {type: 'linear'}}}
   />
 );
+
+export const interactiveLine = (
+  <LineChart<Datum, Date>
+    {...common}
+    xAxis={{accessor: 'when', label: 'When', scale: {type: 'time'}}}
+    yAxis={{label: 'Value', scale: {type: 'linear'}}}
+    interaction={{
+      target: 'point',
+      getRowId: (datum) => datum.category,
+      onActivate: (activation) => {
+        const date: Date = activation.category;
+        const datum: Datum = activation.datum;
+        void date;
+        void datum;
+        // @ts-expect-error Activation contains source values, not a DOM/renderer target.
+        void activation.target;
+      },
+    }}
+  />
+);
+
+const selectionLabels = {
+  instructions: 'Click selects',
+  clear: 'Clear',
+  empty: 'None',
+  summary: (count: number) => String(count),
+  item: (item: import('../src/index.js').ChartSelectionItem) => item.rowId,
+  hidden: (label: string) => label,
+};
+// @ts-expect-error Controlled selection requires its change callback.
+export const missingSelectionCallback: import('../src/index.js').ChartSelection = {
+  labels: selectionLabels,
+  selectedItems: [],
+};
+// @ts-expect-error Controlled and uncontrolled selection cannot be combined.
+export const mixedSelectionOwnership: import('../src/index.js').ChartSelection = {
+  labels: selectionLabels,
+  selectedItems: [],
+  defaultSelectedItems: [],
+  onSelectionChange: () => {},
+};

@@ -8732,3 +8732,160 @@
     }
   }
 }
+
+@layer wcl.components {
+  [data-wcl-chart-reading-outline] {
+    transition: stroke-width 120ms ease;
+    fill: var(--wcl-surface);
+    stroke: var(--wcl-chart-series-color);
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-chart-reading-node][data-filled] {
+    transition: r 120ms ease;
+    fill: var(--wcl-text);
+    stroke: none;
+    opacity: 1;
+  }
+
+  [data-wcl-chart-interaction-overlay] > *,
+  [data-wcl-chart-selected-point] {
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-chart-selected-point] {
+    transition: r 120ms ease;
+    fill: none;
+    stroke: var(--wcl-text);
+    stroke-width: 2px;
+  }
+
+  [data-wcl-chart-selected-category] {
+    stroke: var(--wcl-text);
+    stroke-width: 3px;
+    stroke-linecap: round;
+  }
+
+  [data-wcl-chart-selection-box] {
+    fill: color-mix(in srgb, var(--wcl-accent) 8%, transparent);
+    stroke: var(--wcl-text-muted);
+    stroke-width: 1px;
+    stroke-dasharray: 4 3;
+  }
+
+  [data-wcl-chart-svg][data-selection-enabled] {
+    touch-action: none;
+    user-select: none;
+  }
+
+  [data-wcl-chart-activation-dot] {
+    fill: var(--wcl-text);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: wcl-chart-activation 620ms ease-out both;
+  }
+
+  [data-wcl-chart-activation-guide] {
+    stroke: var(--wcl-text);
+    stroke-width: 2.5px;
+    vector-effect: non-scaling-stroke;
+    animation: wcl-chart-activation-guide 620ms ease-out both;
+  }
+
+  [data-wcl-chart-selection] {
+    margin-block: 1rem;
+    font: 0.8125rem/1.5 var(--wcl-font-utility);
+  }
+
+  [data-wcl-chart-selection] p,
+  [data-wcl-chart-selection] ul {
+    color: var(--wcl-text-muted);
+  }
+
+  [data-wcl-chart-selection] ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  [data-wcl-chart-clear-selection] {
+    color: var(--wcl-text);
+    font: inherit;
+    background: transparent;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  [data-wcl-chart-clear-selection]:focus-visible {
+    outline: 2px solid var(--wcl-accent-focus);
+  }
+}
+
+@keyframes wcl-chart-activation {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.65);
+  }
+
+  35% {
+    opacity: 0.75;
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes wcl-chart-activation-guide {
+  0%,
+  35% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wcl-chart-activation-dot],
+  [data-wcl-chart-activation-guide] {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wcl-chart-selected-point],
+  [data-wcl-chart-reading-node][data-filled],
+  [data-wcl-chart-reading-outline] {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-wcl-chart-selected-point],
+  [data-wcl-chart-selected-category],
+  [data-wcl-chart-activation-guide] {
+    stroke: CanvasText;
+  }
+
+  [data-wcl-chart-reading-node][data-filled],
+  [data-wcl-chart-activation-dot] {
+    fill: CanvasText;
+  }
+
+  [data-wcl-chart-reading-outline] {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+
+  [data-wcl-chart-selection-box] {
+    fill: transparent;
+    stroke: Highlight;
+  }
+}
