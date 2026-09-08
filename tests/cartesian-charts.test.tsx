@@ -299,6 +299,7 @@ describe('Cartesian charts', () => {
       'ArrowLeft ArrowRight Home End Escape',
     );
     expect(container.querySelector('[data-wcl-chart-instructions]')).toBeNull();
+    fireEvent.keyDown(document, {key: 'Tab'});
     fireEvent.focus(lineReader);
     expect(within(screen.getByRole('tooltip')).getByText('Jan')).toBeTruthy();
     fireEvent.keyDown(lineReader, {key: 'ArrowRight'});
@@ -320,6 +321,7 @@ describe('Cartesian charts', () => {
     );
     const barReader = screen.getByRole('group', {name: 'Energy by month'});
     expect(barReader.getAttribute('aria-keyshortcuts')).toBe('ArrowUp ArrowDown Home End Escape');
+    fireEvent.keyDown(document, {key: 'Tab'});
     fireEvent.focus(barReader);
     fireEvent.keyDown(barReader, {key: 'ArrowRight'});
     expect(within(screen.getByRole('tooltip')).getByText('Jan')).toBeTruthy();
@@ -382,6 +384,7 @@ describe('Cartesian charts', () => {
       />,
     );
     const reader = screen.getByRole('group', {name: 'January energy'});
+    fireEvent.keyDown(document, {key: 'Tab'});
     fireEvent.focus(reader);
     expect(within(screen.getByRole('tooltip')).getByText('42 MWh')).toBeTruthy();
     expect(within(screen.getByRole('tooltip')).getByText('58 MWh')).toBeTruthy();
@@ -395,6 +398,7 @@ describe('Cartesian charts', () => {
         yAxis={{label: 'Share', scale: {type: 'normalized'}, unit: '%'}}
       />,
     );
+    fireEvent.keyDown(document, {key: 'Tab'});
     fireEvent.focus(screen.getByRole('group', {name: 'January energy'}));
     expect(within(screen.getByRole('tooltip')).getByText('42%')).toBeTruthy();
     expect(within(screen.getByRole('tooltip')).getByText('58%')).toBeTruthy();
@@ -1188,6 +1192,7 @@ describe('Cartesian charts', () => {
       scrollWidth: {configurable: true, value: 727},
     });
     const reader = screen.getByRole('group', {name: 'Default demand plot'});
+    fireEvent.keyDown(document, {key: 'Tab'});
     fireEvent.focus(reader);
     fireEvent.keyDown(reader, {key: 'End'});
     expect((frame as HTMLElement).scrollLeft).toBeGreaterThan(0);
@@ -1227,6 +1232,7 @@ describe('Cartesian charts', () => {
     });
 
     const reader = screen.getByRole('group', {name: 'RTL demand'});
+    fireEvent.keyDown(document, {key: 'Tab'});
     fireEvent.focus(reader);
     expect(frame.scrollLeft).toBeLessThan(0);
     fireEvent.keyDown(reader, {key: 'End'});

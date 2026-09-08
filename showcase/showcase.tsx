@@ -2159,7 +2159,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   return (
     <>
       <Specimen
-        description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference, or focus it and use the arrow keys. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
+        description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference. Tab into the plot and use the arrow keys for keyboard readings; mouse readings clear when the pointer leaves the plot. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
         name="LineChart"
       >
         <Example label="Two-series LineChart">

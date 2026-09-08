@@ -25,6 +25,7 @@ import {
   type ReactNode,
 } from 'react';
 import {createPortal} from 'react-dom';
+import {useFocusVisible} from 'react-aria';
 
 import {EmptyState} from '../feedback/empty-state.js';
 import {InlineAlert} from '../feedback/alerts.js';
@@ -1630,6 +1631,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     title,
     valueAxis,
   });
+  const {isFocusVisible} = useFocusVisible();
   const titleId = useId();
   const descriptionId = useId();
   const plotClipId = useId();
@@ -1905,7 +1907,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       });
     };
     const focusChart = (event: FocusEvent<HTMLDivElement>): void => {
-      if (event.currentTarget === event.target && keyboardReading === null) {
+      if (event.currentTarget === event.target && isFocusVisible && keyboardReading === null) {
         revealCategory(0, event.currentTarget.parentElement);
         setKeyboardReading({index: 0});
       }
@@ -1977,6 +1979,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             onBlur={blurChart}
             onFocus={focusChart}
             onKeyDown={readWithKeyboard}
+            onPointerDownCapture={() => setKeyboardReading(null)}
             role="group"
             tabIndex={0}
           >
