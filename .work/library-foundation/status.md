@@ -288,7 +288,11 @@ type, and contract conventions while adding only the behavior its data unit requ
 
 ## Frontier
 
-See the [decision map](map.md). Ticket 21 is complete; Ticket 22 is the next chart-family frontier.
+See the [decision map](map.md). Ticket 21 is complete. The
+[reconciled Ticket 22](tickets/22-chart-interaction-and-composition.md) credits delivered reading,
+emphasis, sizing, tables, and mixed Cartesian support. Its prerequisites are complete; remaining
+work is ready for planning around visibility, activation callbacks, selection and coordination,
+domain exploration, animation, scatter with a line, and a line with a changing range band.
 
 ## Accepted sources
 

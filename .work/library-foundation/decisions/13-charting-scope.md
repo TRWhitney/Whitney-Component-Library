@@ -38,6 +38,31 @@ advanced composition layer supports mixed series, custom annotations, scales, an
 views without exposing the private renderer. Geographic maps, network graphs, Sankey diagrams,
 treemaps, candlesticks, 3D charts, and dashboard layout are outside this initial chart family.
 
+## Ticket 22 reconciliation
+
+Whitney refined the remaining scope on 2026-09-07. Preserve legend click-to-highlight while adding
+separate, obvious, understated hide/show controls. An opening/closing eye is the leading visual
+candidate. Hiding and restoring series automatically fits the scale to visible data while
+preserving required chart baselines.
+
+Activation callbacks identify the actual chart item and supply enough associated data for an
+application to act without requiring chart selection. Visible selection can also be controlled by
+the application, which decides how related charts, tables, details, and filters respond. Meaningful
+domains support pan, zoom, and brush/range selection with callbacks, keyboard operation, and reset.
+Controls and gestures require review in working examples for intuitive operation and restrained
+appearance. Brief, purposeful data and scale animations are preferred and settle under reduced
+motion.
+
+Composition includes the existing compatible line/area/column combinations, including supplied
+moving averages, plus scatter with a line and a line with a changing lower/upper range band.
+Applications supply calculated values rather than charts silently choosing statistical methods.
+Scatter with adjacent distribution charts is excluded as a separate-chart arrangement, while
+general coordination between separate charts remains accepted.
+
+The [reconciled ticket](../tickets/22-chart-interaction-and-composition.md) separates delivered
+capabilities from remaining acceptance checks and records the unresolved implementation details.
+Its new requirements extend the intentionally narrower scope of the completed chart efforts.
+
 ## Evidence
 
 - Whitney explicitly requires standard chart types including a radar chart before stable release.

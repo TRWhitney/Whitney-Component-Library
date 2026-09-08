@@ -231,6 +231,13 @@ supplement color where needed. Purposeful data transitions honor reduced motion,
 idle decorative animation. An advanced composition API permits compatible mixed series, scales,
 annotations, and coordinated views while keeping the renderer private.
 
+The [Ticket 22 reconciliation](decisions/13-charting-scope.md#ticket-22-reconciliation) specifies
+separate legend visibility controls with automatic scale fitting, activation callbacks independent
+of selection, application-controlled coordination, intuitive domain exploration, and purposeful
+animations. Mixed combinations include line/area/column, scatter with a supplied line, and a line
+with a changing supplied range band. Applications supply calculated values; adjacent scatter and
+distribution charts are not an additional mixed-chart requirement.
+
 Geographic maps, network graphs, Sankey diagrams, treemaps, candlesticks, 3D charts, and dashboard
 layout are outside the initial chart family.
 
