@@ -13,6 +13,7 @@ export interface InteractionRow<Datum extends object, Category extends ChartDoma
   readonly values: ChartActivation<Datum, Category>['values'];
 }
 export interface InteractionPoint {
+  readonly seriesId: string;
   readonly item: ChartSelectionItem;
   readonly index: number;
   readonly x: number;

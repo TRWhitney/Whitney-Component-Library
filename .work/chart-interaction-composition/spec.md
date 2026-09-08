@@ -77,6 +77,10 @@ acceptance, not production completion. The public identity and data-replacement 
 - For charts with circular point markers, a filled center consistently identifies the current
   pointer, keyboard, or touch reading. Align Cartesian reading indicators with radar and sparkline;
   do not reinterpret data-bearing fills or invent circular markers for other geometries.
+- Hover emphasis follows the nearest visible line in both category and point modes. Filled centers
+  still preview the click target: all visible series in category mode, one series in point mode.
+  Whitney clarified this distinction after the LineChart delivery. Hover emphasis does not narrow
+  category selection or its activation payload.
 - A brief pulse acknowledges each activation, including repeated activation of the same item.
   It disappears without creating selection. Reduced motion uses a brief static acknowledgment.
 - Persistent point selection uses an outer ring; categorical month selection uses an underline.

@@ -1963,6 +1963,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                     ...(interaction.target === 'point' ? {seriesId: item.id} : {}),
                   },
                   index,
+                  seriesId: item.id,
                   x,
                   y,
                 },
@@ -1989,10 +1990,14 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
       if (interaction) {
         const point = interactionPointFromPointer(event);
+        const hoveredPoint =
+          interaction.target === 'category'
+            ? nearestInteraction(interactionPoints, x, y, 'point')
+            : point;
         return point
           ? {
               index: point.index,
-              ...(point.item.seriesId === undefined ? {} : {seriesId: point.item.seriesId}),
+              seriesId: hoveredPoint?.seriesId ?? point.seriesId,
               ...(followPointer ? {pointer: {x: event.clientX, y: event.clientY}} : {}),
             }
           : null;

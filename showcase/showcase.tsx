@@ -2246,10 +2246,11 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
               title="Thermal demand"
             />
             <p className="showcase-muted">
-              Filled centers identify the current reading. Underlines mark selected months and outer
-              rings mark selected points. A brief pulse acknowledges activation. A month opens one
-              set of details containing both series; a point opens its own value. Selection remains
-              when a series is hidden. These controls and details belong to this example.
+              Hover highlights a line in either mode. Filled centers show what clicking will select:
+              both series in Month mode, one in Point mode. Underlines mark selected months and
+              outer rings mark selected points. A brief pulse acknowledges activation. A month opens
+              one set of details containing both series; a point opens its own value. Selection
+              remains when a series is hidden. These controls and details belong to this example.
             </p>
             {lineDetails ? (
               <Stack gap="regular">

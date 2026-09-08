@@ -444,3 +444,51 @@ it('keeps the reading center above an optional marker when a point is selected',
   for (const outline of outlines)
     expect(outline.compareDocumentPosition(center) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
+
+it.each(['category', 'point'] as const)(
+  'preserves line hover emphasis independently of the %s click target',
+  (target) => {
+    const onActivate = vi.fn<NonNullable<LineChartInteraction<Row, string>['onActivate']>>(),
+      onSelectionChange = vi.fn();
+    const {container} = render(
+      example(config({target, onActivate, selection: {labels, onSelectionChange}})),
+    );
+    const svg = geometry(container);
+    const a = container.querySelector('[data-wcl-chart-series][data-series-id="a"]')!;
+    const b = container.querySelector('[data-wcl-chart-series][data-series-id="b"]')!;
+    const at = point(container, 1, 'b');
+    fireEvent.pointerMove(svg, {...at, pointerType: 'mouse'});
+    expect(b.hasAttribute('data-emphasized')).toBe(true);
+    expect(a.hasAttribute('data-muted')).toBe(true);
+    expect(container.querySelectorAll('[data-wcl-chart-reading-node][data-filled]')).toHaveLength(
+      target === 'category' ? 2 : 1,
+    );
+    const item = target === 'category' ? {rowId: 'feb'} : {rowId: 'feb', seriesId: 'b'};
+    click(svg, at);
+    expect(onSelectionChange).toHaveBeenLastCalledWith([item]);
+    click(svg, at, {ctrlKey: true});
+    expect(onActivate.mock.calls[0]![0].item).toEqual(item);
+    expect(onActivate.mock.calls[0]![0].values).toHaveLength(target === 'category' ? 2 : 1);
+    fireEvent.pointerMove(svg, {...point(container, 1, 'a'), pointerType: 'mouse'});
+    expect(a.hasAttribute('data-emphasized')).toBe(true);
+    fireEvent.pointerLeave(svg);
+    expect(a.hasAttribute('data-emphasized')).toBe(false);
+    expect(b.hasAttribute('data-emphasized')).toBe(false);
+  },
+);
+
+it('keeps category fills on the activated row when coordinates repeat', () => {
+  const onActivate = vi.fn();
+  const data = [rows[0]!, {...rows[1]!, month: 'Jan'}, rows[2]!];
+  const {container} = render(example(config({target: 'category', onActivate}), data));
+  const svg = geometry(container),
+    at = point(container, 1, 'b');
+  fireEvent.pointerMove(svg, {...at, pointerType: 'mouse'});
+  const fills = [...container.querySelectorAll('[data-wcl-chart-reading-node][data-filled]')];
+  expect(fills.map((node) => Number(node.getAttribute('cy')))).toEqual([
+    point(container, 0, 'a').clientY,
+    point(container, 0, 'b').clientY,
+  ]);
+  click(svg, at);
+  expect(onActivate.mock.calls[0]![0]).toMatchObject({item: {rowId: 'jan'}});
+});

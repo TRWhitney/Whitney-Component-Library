@@ -20,6 +20,9 @@ and validation pass. Parent Ticket 22 remains active; planning the next portion 
   behavior through its public API, documented in [ticket 03](tickets/03-line-chart-activation-selection.md).
   Public contracts, generated guides, and the rendered showcase are current.
 
+- Line hover emphasis remains independent of month/point targeting, documented in
+  [ticket 04](tickets/04-category-hover-emphasis.md). Month mode retains all visible filled centers.
+
 ## Frontier
 
 Plan the next chart-family portion using the accepted LineChart convention. Other Cartesian,

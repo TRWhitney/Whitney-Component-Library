@@ -616,7 +616,7 @@ export const lineChartContract: ComponentContract = {
   ],
   appearance: [
     ...lineChartBaseContract.appearance,
-    'Filled point centers identify the current reading. Outer rings identify selected points; underlines identify selected categories. Fills and selection rings meet the marker outline without background gaps in light and dark appearances. A finite pulse acknowledges each activation and does not create a persistent inspected state. Optional idle point markers remain optional.',
+    'Filled point centers preview the click target: all visible points in category mode, one in point mode. Hover emphasizes the nearest visible line in either mode without narrowing a category selection or activation. Outer rings identify selected points; underlines identify selected categories. Fills and selection rings meet the marker outline without background gaps in light and dark appearances. A finite pulse acknowledges each activation and does not create a persistent inspected state. Optional idle point markers remain optional.',
   ],
   composition: [
     ...lineChartBaseContract.composition,
