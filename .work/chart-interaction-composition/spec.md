@@ -241,3 +241,35 @@ cover the normal border. Neutral radar reading fills reach the inner edge of tha
 reading centers retain their intentional small size and magnitude encoding. Noncircular selection
 outlines retain their existing shapes. Existing Cartesian point spacing already satisfies this
 contract; separate pie/donut outer arcs and transient activation halos retain their accepted forms.
+
+## Radar interaction
+
+RadarChart adds optional interaction with target `point` or `dimension`, independently optional
+selection and activation, and existing stable series/dimension IDs. A selection item has
+`dimensionId` and, for points, `seriesId`. Activation carries that item, the dimension ID/label,
+input method, and values containing series ID/label, exact numeric value and original series datum.
+Point activation includes one value; dimension activation includes all valid series values.
+
+Preserve the accepted [radar study](prototypes/radar-selection.md). Selected points have rings
+joined to their colored border; selected dimensions underline their labels. Neutral reading fills
+match the radial guide and preview exactly the action target. Profile emphasis stays independent
+of point/dimension targeting. Legend priority applies only among overlapping hit profiles.
+Dimension activation draws a pulse from the center to the furthest actual value, holds at full
+length, then fades. Point activation pulses its circle. Reduced motion uses brief static feedback.
+
+Clicks/taps select when selection is enabled; modified click/key or touch hold activates without
+changing selection. With selection disabled, ordinary click/key activates. A visible rectangle
+selects positive value centers inside, replacing by default, adding with Shift/Control/Command and
+removing with Alt. In dimension mode, any included center qualifies its dimension. Escape or
+pointer cancellation restores the committed selection. Data, geometry, target, enabled selection
+or activation changes cancel gestures and feedback. Callback identity updates alone do not cancel.
+
+Keyboard Left/Right traverses dimensions, Up/Down traverses profiles, Home/End reaches dimension
+endpoints. Enter/Space selects or activates according to enabled behavior; Control/Command activates
+independently. Keyboard focus is shown by the current reading, with no whole-chart outline.
+Zero values remain selectable by keyboard and as part of dimension selection. Pointer/rectangle
+selection uses positive actual values only; coincident zero values and visual shoulders create no
+pointer selection target. Missing values retain the existing zero interpretation, and invalid
+series stay unavailable. Internal selection survives reorder and retires removed/invalid IDs;
+controlled selection remains application-owned. Complete tables and original reading semantics
+remain available. No visibility or normalization controls are added in this portion.

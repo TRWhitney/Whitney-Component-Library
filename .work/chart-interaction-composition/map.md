@@ -24,11 +24,11 @@ The [pie/donut study](prototypes/radial-selection.md) is accepted. Whitney chose
 
 The [radar study](prototypes/radar-selection.md) uses the chosen Label underline, point rings and visible rectangle selection. Reading fills now match the existing neutral radial guide. Dimension activation animates that guide rather than circles; the revision is accepted.
 
-The radar record also documents a read-only marker-spacing audit: Cartesian point rings already account for border width; statistical circle selection rings leave a small gap at the rendered normal border width. Ticket 10 corrects that spacing. Zero radar values are keyboard/dimension targets, with no center-click target. Radar interaction is ready for a production ticket.
+The radar record also documents a read-only marker-spacing audit: Cartesian point rings already account for border width; statistical circle selection rings leave a small gap at the rendered normal border width. Ticket 10 corrects that spacing. Zero radar values are keyboard/dimension targets, with no center-click target. [Ticket 11](tickets/11-radar-interaction.md) delivers the approved radar interaction with passing validation and independent production reviews.
 
 ## Not yet specified
 
-- Visibility for statistical families; visibility for pie/donut, and selection and visibility for radar, heatmap, and compact reading units.
+- Visibility for statistical families; visibility for pie/donut, and visibility for radar, and selection and visibility for heatmap and compact reading units.
 - Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.

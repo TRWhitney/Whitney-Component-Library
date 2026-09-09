@@ -33,10 +33,15 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 
 ## Control, events, validation, and forms
 
-- Pointer and touch readings choose the nearest series value on one axis, draw a guide from the center to its exact point, mute the other series, and report only the chosen series with the axis name. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them.
+- Pointer and touch readings emphasize one profile on one axis. Point mode reports the chosen profile; dimension mode reports all valid profiles on that axis. Radial guides reach exact values. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them.
 - Legend hover and focus emphasize one series. Click, Enter, or Space pins it; another legend choice replaces it. A pinned series receives pointer priority where values are close or overlap. Repeat the pinned choice or press Escape to clear it. Emphasis never hides source data.
-- RadarChart emits no consumer events and does not filter, select, or mutate records.
-- RadarChart manages dimension readings and legend emphasis internally. Pointer, keyboard, touch, and legend interaction do not change consumer data.
+- Optional interaction targets one point or a whole dimension. Click or tap selects when selection is enabled; Control/Command-click activates independently. Touch press-and-hold activates without changing selection on release. Without selection, click or tap activates directly.
+- Drag a visible rectangle to select positive value centers inside. In dimension mode, one included center qualifies the dimension. A drag replaces selection, Shift or Control/Command adds, Alt removes, and Escape or pointer cancellation restores the prior selection. Dragging never activates.
+- Zero and missing-as-zero values remain keyboard targets and belong to whole-dimension selection. Pointer clicks target visible positive value dots. The shared center and visual shoulders are not pointer targets; rectangle selection uses positive centers only.
+- Selected points use rings joined to their colored borders. Selected dimensions underline their labels. Neutral filled centers preview the exact target while profile hover stays independent of target mode. Legend focus and pinning prioritize only profiles that overlap the pointer.
+- interaction.selection accepts ChartSelection<RadarSelectionItem>. Each item contains a stable dimensionId and, for point targets, seriesId. Omit selectedItems for internal selection or supply selectedItems with onSelectionChange for application ownership. Selection survives reordering, retains zero values, and retires removed or invalid targets. Changing target mode retires incompatible items.
+- interaction.onActivate receives RadarActivation<Datum> with item, dimension id and label, input, and values. Each value has seriesId, label, exact value, and the original datum record. A point activation includes one profile; a dimension activation includes all valid profiles, including zeros. Activation is independent of persistent selection.
+- Data, geometry, presentation, target, and enabled interaction changes cancel pending gestures and activation feedback. Replacing a callback alone preserves a pending gesture and uses the current callback. Readings and legend emphasis remain internal and never mutate consumer records.
 - TypeScript requires at least three dimensions and limits data to one through six series. Runtime preparation requires unique usable ids and labels. A missing dimension becomes zero. A negative or non-finite dimension value invalidates the entire series.
 - RadarChart is not a form control and does not submit, validate, or reset values. Place dataset controls beside it in consumer-owned composition.
 
@@ -46,7 +51,7 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 
 ## Keyboard, labeling, localization, and direction
 
-- Tab reaches one title-named chart boundary. Left and Right move through dimensions in declared order, stop at the ends, and report every valid series at the selected dimension. Escape clears the reading. Legend buttons retain their usual focus, pin, replacement, and Escape behavior.
+- Tab reaches one title-named chart boundary. Left and Right traverse dimensions and stop at the ends. With interaction, Up and Down traverse profiles, including zero values, and Home and End reach the first and last dimension. Enter or Space selects; Control/Command plus Enter or Space activates independently. Without selection, Enter or Space activates directly. Escape cancels a drag or clears a reading. Focus appears at the current value without outlining the whole chart. Legend buttons retain their own focus, pin, replacement, and Escape behavior.
 - title, description, dataTableLabel, value label, dimension heading, legend label, and state copy are required. Dimension and series ids stay stable while their labels provide readable names.
 - Localize all visible and announced copy, dimension labels, series labels, and units. value.formatValue controls locale-specific number formatting.
 - Caption, legend, tooltip, and table content follow inherited writing direction. Declared dimension order remains fixed around the chart.
@@ -60,7 +65,7 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 
 - Application accent identifies the first series. Later series use the role-aware chart palette. Line patterns supplement color when polygons overlap.
 - Forced colors preserve guides, spokes, point boundaries, and polygon line patterns in system colors. The generated table remains the complete non-color representation.
-- Reduced motion removes series-emphasis and scrollbar-fade transitions. Reading, focus, legend, and native scrolling behavior stays the same. Plot geometry does not animate.
+- Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. Plot geometry does not animate.
 
 ## Examples
 
@@ -87,6 +92,37 @@ export function RadarChartExample() {
         labels={{dimension: "Quality"}}
         legend={{label: "Vehicles"}}
         title="Vehicle profiles"
+        value={{label: "Score", unit: "points"}}
+      />
+    </AppearanceProvider>
+  );
+}
+```
+
+### RadarChart activation with original profile data
+
+Use the original profile record from a point activation to open application-owned details. Add interaction.selection to enable independent persistent selection.
+
+```tsx
+import '@trwhitney/component-library/styles.css';
+import {AppearanceProvider, RadarChart} from '@trwhitney/component-library';
+
+export function RadarActivationExample() {
+  return (
+    <AppearanceProvider appearance="dark" accent="#2878ff">
+      <RadarChart
+        data={[{id: "courier", label: "Courier", speed: 5, range: 4, reliability: 3, detailsUrl: "/vehicles/courier"}]}
+        dataTableLabel="Vehicle profile data"
+        description="Open a measured value to view its vehicle."
+        dimensions={[{id: "speed", label: "Speed", accessor: "speed"}, {id: "range", label: "Range", accessor: "range"}, {id: "reliability", label: "Reliability", accessor: "reliability"}]}
+        emptyState={{title: "No scores", description: "Choose a vehicle with scores."}}
+        idAccessor="id"
+        interaction={{target: "point", onActivate: ({values}) => { const profile = values[0]; if (profile) window.location.assign(profile.datum.detailsUrl); }}}
+        invalidData={{title: "Invalid scores", description: "Correct negative or non-finite scores."}}
+        labelAccessor="label"
+        labels={{dimension: "Quality"}}
+        legend={{label: "Vehicles"}}
+        title="Open vehicle details"
         value={{label: "Score", unit: "points"}}
       />
     </AppearanceProvider>

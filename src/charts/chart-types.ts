@@ -265,7 +265,31 @@ export interface RadarChartLabels {
   readonly dimension: string;
 }
 
+export interface RadarSelectionItem {
+  readonly dimensionId: string;
+  readonly seriesId?: string;
+}
+
+export interface RadarActivation<Datum extends object> {
+  readonly item: RadarSelectionItem;
+  readonly dimension: {readonly id: string; readonly label: string};
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+  readonly values: readonly {
+    readonly seriesId: string;
+    readonly label: string;
+    readonly value: number;
+    readonly datum: Datum;
+  }[];
+}
+
+export interface RadarInteraction<Datum extends object> {
+  readonly target: 'point' | 'dimension';
+  readonly selection?: ChartSelection<RadarSelectionItem>;
+  readonly onActivate?: (activation: RadarActivation<Datum>) => void;
+}
+
 export interface RadarChartProps<Datum extends object> {
+  readonly interaction?: RadarInteraction<Datum>;
   readonly aspectRatio?: number;
   readonly colorAccessor?: ChartAccessor<Datum, ChartColor>;
   readonly data: NonEmptyChartSeries<Datum>;

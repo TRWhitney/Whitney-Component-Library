@@ -115,6 +115,9 @@ import {
   type PointChartActivation,
   type PointChartInteraction,
   type RadarChartDimensions,
+  type RadarActivation,
+  type RadarInteraction,
+  type RadarSelectionItem,
   type TableSortDescriptor,
 } from '../src/index.js';
 import {useScrollbarActivity} from '../src/scrollbar-activity.js';
@@ -2916,6 +2919,146 @@ function BoxPlotInteractionExample() {
   );
 }
 
+const radarCommon = {
+  dataTableLabel: 'Vehicle profile scores',
+  dimensions: vehicleProfileDimensions,
+  emptyState: {
+    description: 'Choose vehicles with recorded scores.',
+    title: 'No vehicle scores',
+  },
+  idAccessor: 'id',
+  invalidData: {
+    description: 'Correct negative or non-finite scores.',
+    title: 'Invalid vehicle scores',
+  },
+  labelAccessor: 'label',
+  labels: {dimension: 'Quality'},
+  legend: {label: 'Vehicles'},
+  value: {label: 'Score', unit: 'points'},
+} as const;
+
+function RadarInteractionExample({sparse = false}: {readonly sparse?: boolean}) {
+  const data = sparse ? sparseVehicleProfileData : vehicleProfileData;
+  const [target, setTarget] = useState<'point' | 'dimension'>('point');
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly RadarSelectionItem[]>([]);
+  const [details, setDetails] = useState<RadarActivation<VehicleProfile> | null>(null);
+  const instructions = selectionEnabled
+    ? `Click or tap a visible value dot to select. Drag a rectangle to select value centers inside it. A drag replaces selection; Shift or Control/Command adds, Alt removes, and Escape cancels. Enter or Space selects.${detailsEnabled ? ' Control/Command-click, Control/Command plus Enter or Space, or touch press-and-hold opens details without changing selection.' : ''}`
+    : detailsEnabled
+      ? 'Click or tap a visible value dot, or press Enter or Space, to open details.'
+      : 'Hover a profile or use the arrow keys to read its values.';
+  const interaction: RadarInteraction<VehicleProfile> = {
+    target,
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              hidden: (label) => `${label} (hidden)`,
+              item: ({dimensionId, seriesId}) => {
+                const dimension =
+                  vehicleProfileDimensions.find((item) => item.id === dimensionId)?.label ??
+                  dimensionId;
+                const profile = data.find((item) => item.id === seriesId);
+                return profile ? `${profile.label}, ${dimension}` : dimension;
+              },
+              summary: (count) =>
+                `${count} ${target === 'dimension' ? (count === 1 ? 'dimension' : 'dimensions') : count === 1 ? 'value' : 'values'} selected`,
+            },
+          },
+        }
+      : {}),
+  };
+  return (
+    <Stack gap="regular">
+      <SegmentedControl
+        label={sparse ? 'Sparse radar click target' : 'Radar click target'}
+        onChange={(nextTarget) => {
+          setTarget(nextTarget);
+          setSelectedItems([]);
+          setDetails(null);
+        }}
+        options={[
+          {label: 'Point', value: 'point'},
+          {label: 'Dimension', value: 'dimension'},
+        ]}
+        value={target}
+      />
+      <InlineGroup align="start" gap="regular" wrap>
+        <Switch
+          isSelected={selectionEnabled}
+          label="Enable selection"
+          onChange={setSelectionEnabled}
+        />
+        <Switch
+          isSelected={detailsEnabled}
+          label="Open details on activation"
+          onChange={(enabled) => {
+            setDetailsEnabled(enabled);
+            if (!enabled) setDetails(null);
+          }}
+        />
+      </InlineGroup>
+      <p>{instructions}</p>
+      <RadarChart
+        {...radarCommon}
+        data={data}
+        description={
+          sparse
+            ? 'Missing qualities remain zero while isolated scores retain a readable fill.'
+            : 'Courier and Scout scores across five shared vehicle qualities.'
+        }
+        interaction={interaction}
+        title={sparse ? 'Sparse vehicle profiles' : 'Vehicle profiles'}
+      />
+      <p className="showcase-muted">
+        Left and Right move between dimensions. Up and Down switch profiles. Home and End reach the
+        first and last dimension. Zero and missing values share the center. Reach them with the
+        keyboard or include them by selecting a whole dimension. Center clicks and the small visual
+        shoulders do not select zero values. A dimension qualifies for rectangle selection when any
+        positive value center is inside.
+      </p>
+      <p className="showcase-muted">
+        A ring marks a selected point; a label underline marks a selected dimension. Filled centers
+        preview the click target. Hovering still emphasizes the profile beneath the pointer in
+        either mode. A focused or pinned legend profile takes priority only where profiles overlap.
+        Opening point details pulses the point. Opening dimension details animates its radial guide
+        to the furthest value, with static feedback for reduced motion. An all-zero dimension
+        briefly underlines its label. This example owns selection and shows the original profile
+        records supplied with each activation.
+      </p>
+      {details ? (
+        <DescriptionList
+          ariaLabel="Vehicle profile details"
+          emptyState={{
+            kind: 'no-data',
+            title: 'No profile details',
+            description: 'Open a value or dimension.',
+          }}
+          items={[
+            {id: 'dimension', term: 'Quality', description: details.dimension.label},
+            {id: 'input', term: 'Opened with', description: details.input},
+            ...details.values.map((entry) => ({
+              id: entry.seriesId,
+              term: entry.label,
+              description: `${entry.value} points; original record ${entry.datum.id}`,
+            })),
+          ]}
+        />
+      ) : (
+        <p className="showcase-muted">No profile details opened.</p>
+      )}
+    </Stack>
+  );
+}
+
 function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'}) {
   const [selectionEnabled, setSelectionEnabled] = useState(true);
   const [detailsEnabled, setDetailsEnabled] = useState(true);
@@ -3090,23 +3233,6 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
     dataTableLabel: 'Monthly energy data',
     description: 'Monthly demand remains within available thermal capacity.',
     visibilityLabels,
-  } as const;
-  const radarCommon = {
-    dataTableLabel: 'Vehicle profile scores',
-    dimensions: vehicleProfileDimensions,
-    emptyState: {
-      description: 'Choose vehicles with recorded scores.',
-      title: 'No vehicle scores',
-    },
-    idAccessor: 'id',
-    invalidData: {
-      description: 'Correct negative or non-finite scores.',
-      title: 'Invalid vehicle scores',
-    },
-    labelAccessor: 'label',
-    labels: {dimension: 'Quality'},
-    legend: {label: 'Vehicles'},
-    value: {label: 'Score', unit: 'points'},
   } as const;
   const heatmapCommon = {
     columnAccessor: 'period',
@@ -3287,21 +3413,11 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Compare a few subjects across ordered qualities that share one nonnegative scale. A dimension is one spoke; a series is one subject and one polygon. Hover near a profile point to isolate it and trace its axis. Its neutral reading fill meets the colored point border at every chart size. Missing dimensions read as zero, while small visual shoulders keep isolated values legible without changing their readings."
         name="RadarChart"
       >
-        <Example label="Comparable vehicle profiles">
-          <RadarChart
-            {...radarCommon}
-            data={vehicleProfileData}
-            description="Courier and Scout scores across five shared vehicle qualities."
-            title="Vehicle profiles"
-          />
+        <Example label="Comparable vehicle profiles with selection and details">
+          <RadarInteractionExample />
         </Example>
-        <Example label="Sparse profiles with exact zero readings">
-          <RadarChart
-            {...radarCommon}
-            data={sparseVehicleProfileData}
-            description="Missing qualities remain zero while isolated scores retain a readable fill."
-            title="Sparse vehicle profiles"
-          />
+        <Example label="Sparse profiles with keyboard access to zero values">
+          <RadarInteractionExample sparse />
         </Example>
       </Specimen>
 

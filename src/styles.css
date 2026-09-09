@@ -6936,6 +6936,7 @@
   }
 
   [data-wcl-radar-reading-point] {
+    transition: r 120ms ease;
     fill: var(--wcl-text);
     stroke: none;
   }
@@ -9128,5 +9129,55 @@
 
   [data-wcl-radial-sweep] polyline:last-child {
     stroke: CanvasText;
+  }
+}
+
+@layer wcl.components {
+  [data-wcl-radar-canvas]:focus-visible {
+    outline: none;
+  }
+
+  [data-wcl-radar-selected-dimension],
+  [data-wcl-radar-zero-dimension-activation] {
+    text-decoration: underline;
+    text-decoration-color: var(--wcl-text);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+
+  [data-wcl-radar-zero-dimension-activation] {
+    text-decoration-thickness: 4px;
+  }
+
+  [data-wcl-radar-dimension-activation] {
+    stroke: var(--wcl-text);
+    stroke-width: 2.5px;
+    vector-effect: non-scaling-stroke;
+    transform-origin: 0 0;
+    animation: wcl-radar-dimension-activation 620ms ease-out both;
+  }
+}
+
+@keyframes wcl-radar-dimension-activation {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+
+  45%,
+  70% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wcl-radar-dimension-activation] {
+    animation: none;
   }
 }

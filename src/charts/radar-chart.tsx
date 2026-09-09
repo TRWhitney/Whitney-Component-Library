@@ -14,6 +14,9 @@ import {
 } from 'react';
 import {createPortal} from 'react-dom';
 
+import {Button} from '../actions/button.js';
+import {itemInteractionSetup} from './item-interaction.js';
+import {useChartInteraction, type InteractionPoint} from './chart-interaction.js';
 import {EmptyState} from '../feedback/empty-state.js';
 import {Spinner} from '../feedback/spinner.js';
 import {useScrollbarActivity} from '../scrollbar-activity.js';
@@ -26,8 +29,15 @@ import {
   type BoundedChartStyles,
   type ChartTooltipStyles,
 } from './cartesian-chart.js';
-import type {ChartColor, RadarChartProps, RadarChartValue} from './chart-types.js';
+import type {
+  ChartColor,
+  RadarChartProps,
+  RadarChartValue,
+  RadarSelectionItem,
+} from './chart-types.js';
 
+const radarKey = (item: RadarSelectionItem): string =>
+  JSON.stringify([item.dimensionId, item.seriesId ?? null]);
 const viewSize = 480;
 const center = viewSize / 2;
 const plotRadius = 150;
@@ -42,6 +52,7 @@ type RadarFrameStyles = CSSProperties & {
 };
 
 interface PreparedRadarSeries {
+  readonly sourceIndex: number;
   readonly areaRatios: readonly number[];
   readonly color: ChartColor;
   readonly id: string;
@@ -263,6 +274,7 @@ function prepareModel<Datum extends object>(props: RadarChartProps<Datum>): Rada
       return;
     }
     valid.push({
+      sourceIndex,
       id,
       label,
       requestedColor: requestedColor ?? undefined,
@@ -407,18 +419,33 @@ function RadarTable<Datum extends object>({
 
 export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>): ReactElement {
   const model = prepareModel(props);
+  const interaction = props.interaction;
   const minimumSize = props.minimumSize ?? {height: 180, width: 320};
   const overflow = props.overflow ?? 'scroll';
   const status = props.status ?? {kind: 'ready'};
   const titleId = useId();
   const descriptionId = useId();
   const canvasRef = useRef<HTMLDivElement>(null);
+  const pointerFocus = useRef(false);
+  const [keyboardCursor, setKeyboardCursor] = useState<RadarSelectionItem>();
+  const [svgGeometry, setSvgGeometry] = useState<readonly number[]>([]);
   const frameScrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
   const legendScrollbarActivityProps = useScrollbarActivity<HTMLUListElement>();
   const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
   const [svgElement, setSvgElement] = useState<SVGSVGElement | null>(null);
   const [viewScale, setViewScale] = useState(1);
+  const [formatPresentation, setFormatPresentation] = useState({
+    format: props.value.formatValue,
+    version: 0,
+  });
+  if (formatPresentation.format !== props.value.formatValue) {
+    setFormatPresentation({
+      format: props.value.formatValue,
+      version: formatPresentation.version + 1,
+    });
+  }
   const [keyboardIndex, setKeyboardIndex] = useState<number | null>(null);
+  const [pointerHasTarget, setPointerHasTarget] = useState(false);
   const [pointerIndex, setPointerIndex] = useState<number | null>(null);
   const [pointerSeriesId, setPointerSeriesId] = useState<string | null>(null);
   const [pointerPosition, setPointerPosition] = useState<{
@@ -435,8 +462,8 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   }>();
   const modelIdentity = JSON.stringify([
     status.kind,
-    props.dimensions.map((dimension) => dimension.id),
-    model.series.map((item) => [item.id, ...item.values]),
+    props.dimensions.map((dimension) => [dimension.id, dimension.label]),
+    model.series.map((item) => [item.id, item.label, item.color, ...item.values]),
   ]);
   const [retainedModelIdentity, setRetainedModelIdentity] = useState(modelIdentity);
   if (retainedModelIdentity !== modelIdentity) {
@@ -461,7 +488,16 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   const validTransientSeriesId = model.series.some((item) => item.id === transientSeriesId)
     ? transientSeriesId
     : null;
-  const directSeriesId = pointerIndex !== null ? pointerSeriesId : touchSeriesId;
+  const directSeriesId =
+    pointerIndex !== null
+      ? pointerSeriesId
+      : touchIndex !== null
+        ? touchSeriesId
+        : interaction && keyboardIndex !== null
+          ? (model.series.find((series) => series.id === keyboardCursor?.seriesId)?.id ??
+            model.series[0]?.id ??
+            null)
+          : null;
   const validDirectSeriesId = model.series.some((item) => item.id === directSeriesId)
     ? directSeriesId
     : null;
@@ -482,14 +518,9 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   const hasLocalOverflow =
     overflow === 'scroll' && availableSize !== undefined && availableSize.width < minimumSize.width;
   const readingSeries =
-    validDirectSeriesId === null
+    validDirectSeriesId === null || interaction?.target === 'dimension'
       ? model.series
       : model.series.filter((item) => item.id === validDirectSeriesId);
-  const directSeries = model.series.find((item) => item.id === validDirectSeriesId);
-  const directPoint =
-    directSeries === undefined
-      ? undefined
-      : pointAt(activeIndex, dimensionCount, directSeries.values[activeIndex]! / model.maximum);
   const readingAnnouncement = !isReading
     ? ''
     : [
@@ -498,6 +529,117 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
           (item) => `${item.label}: ${formatRadarValue(item.values[activeIndex]!, props.value)}`,
         ),
       ].join('. ');
+
+  const entries = props.dimensions.flatMap((dimension, index) => {
+    if (model.series.length === 0) return [];
+    const values = model.series.map((series) => ({
+      seriesId: series.id,
+      label: series.label,
+      value: series.values[index]!,
+      datum: props.data[series.sourceIndex]!,
+    }));
+    const items: RadarSelectionItem[] =
+      interaction?.target === 'dimension'
+        ? [{dimensionId: dimension.id}]
+        : model.series.map((series) => ({dimensionId: dimension.id, seriesId: series.id}));
+    return items.map((item) => ({
+      item,
+      activate: (input: 'pointer' | 'keyboard' | 'touch') =>
+        interaction?.onActivate?.({
+          item,
+          dimension: {id: dimension.id, label: dimension.label},
+          input,
+          values: values.filter(
+            (value) => item.seriesId === undefined || item.seriesId === value.seriesId,
+          ),
+        }),
+    }));
+  });
+  const setup = interaction
+    ? itemInteractionSetup(entries, interaction.selection, !!interaction.onActivate, radarKey)
+    : undefined;
+  const actions = useChartInteraction(
+    setup
+      ? {
+          target: 'point',
+          ...(setup.selection ? {selection: setup.selection} : {}),
+          ...(setup.onActivate
+            ? {
+                onActivate: (event: {
+                  item: {rowId: string};
+                  input: 'pointer' | 'keyboard' | 'touch';
+                }) => setup.onActivate?.(event.item.rowId, event.input),
+              }
+            : {}),
+        }
+      : undefined,
+    entries.map(({item}) => ({
+      id: radarKey(item),
+      category: item.dimensionId,
+      datum: props.data[0],
+      values: [{seriesId: '', label: item.dimensionId, value: 0, hidden: false}],
+    })),
+    JSON.stringify([
+      modelIdentity,
+      interaction?.target,
+      !!interaction?.onActivate,
+      viewScale,
+      svgGeometry,
+      props.minimumSize,
+      props.aspectRatio,
+      props.overflow,
+      props.value,
+      formatPresentation.version,
+      props.labels,
+      props.legend,
+      props.title,
+      props.description,
+    ]),
+    props.data,
+  );
+  const selectedIds = new Set(actions.selected.map((item) => item.rowId));
+  const itemFor = (dimensionIndex: number, seriesId: string): RadarSelectionItem => ({
+    dimensionId: props.dimensions[dimensionIndex]!.id,
+    ...(interaction?.target === 'dimension' ? {} : {seriesId}),
+  });
+  const interactionPoints: InteractionPoint[] = model.series.flatMap((series) =>
+    series.values.flatMap((value, index) => {
+      if (value <= 0) return [];
+      const [x, y] = pointAt(index, dimensionCount, value / model.maximum);
+      return [
+        {
+          index,
+          x,
+          y,
+          categoryPosition: index,
+          seriesId: series.id,
+          item: {rowId: radarKey(itemFor(index, series.id)), seriesId: ''},
+        },
+      ];
+    }),
+  );
+  const clientPoint = (event: PointerEvent<SVGSVGElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const scale = Math.min(rect.width, rect.height) / viewSize || 1;
+    return {
+      x: (event.clientX - rect.left - (rect.width - viewSize * scale) / 2) / scale,
+      y: (event.clientY - rect.top - (rect.height - viewSize * scale) / 2) / scale,
+      scale,
+    };
+  };
+  const hitPoint = (event: PointerEvent<SVGSVGElement>) => {
+    const {x, y, scale} = clientPoint(event);
+    // Legend priority never manufactures a hit away from an actual positive value.
+    const hits = interactionPoints.filter(
+      (point) => Math.hypot(point.x - x, point.y - y) * scale <= 14,
+    );
+    return (
+      hits.find((point) => point.seriesId === validPinnedSeriesId) ??
+      hits.find((point) => point.seriesId === validTransientSeriesId) ??
+      hits.sort((a, b) => Math.hypot(a.x - x, a.y - y) - Math.hypot(b.x - x, b.y - y))[0]
+    );
+  };
+  const pulseItem = entries.find(({item}) => radarKey(item) === actions.pulse?.item.rowId)?.item;
 
   useLayoutEffect(() => {
     if (rootElement === null) return;
@@ -519,6 +661,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
     if (svgElement === null) return;
     const measure = () => {
       const rect = svgElement.getBoundingClientRect();
+      setSvgGeometry([rect.width, rect.height]);
       const scale = Math.min(rect.width, rect.height) / viewSize;
       if (Number.isFinite(scale) && scale > 0) setViewScale(scale);
     };
@@ -528,7 +671,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
     const observer = new Observer(measure);
     observer.observe(svgElement);
     return () => observer.disconnect();
-  }, [svgElement]);
+  }, [svgElement, availableSize]);
 
   useEffect(() => {
     if (touchIndex === null) return;
@@ -543,6 +686,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   }, [rootElement, touchIndex]);
 
   function clearReading(): void {
+    setPointerHasTarget(false);
     setKeyboardIndex(null);
     setPointerIndex(null);
     setPointerSeriesId(null);
@@ -552,29 +696,63 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
+    if (event.target !== event.currentTarget) return;
     if (event.key === 'Escape') {
       event.preventDefault();
+      actions.cancel();
       clearReading();
       return;
     }
-    const current = keyboardIndex ?? activeIndex;
-    if (event.key === 'ArrowRight') {
+    if (!interaction && !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    const current =
+      keyboardIndex ??
+      pointerIndex ??
+      touchIndex ??
+      (interaction
+        ? Math.max(
+            0,
+            props.dimensions.findIndex((dimension) => dimension.id === keyboardCursor?.dimensionId),
+          )
+        : activeIndex);
+    let next = current;
+    let seriesIndex = Math.max(
+      0,
+      model.series.findIndex(
+        (series) => series.id === (validDirectSeriesId ?? keyboardCursor?.seriesId),
+      ),
+    );
+    if (event.key === 'ArrowRight') next = Math.min(current + 1, dimensionCount - 1);
+    else if (event.key === 'ArrowLeft') next = Math.max(current - 1, 0);
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = dimensionCount - 1;
+    else if (event.key === 'ArrowDown')
+      seriesIndex = Math.min(seriesIndex + 1, model.series.length - 1);
+    else if (event.key === 'ArrowUp') seriesIndex = Math.max(seriesIndex - 1, 0);
+    else if (
+      interaction &&
+      (event.key === 'Enter' || event.key === ' ') &&
+      model.series[seriesIndex]
+    ) {
       event.preventDefault();
-      setPointerIndex(null);
-      setPointerSeriesId(null);
-      setPointerPosition(undefined);
-      setTouchIndex(null);
-      setTouchSeriesId(null);
-      setKeyboardIndex(Math.min(current + 1, dimensionCount - 1));
-    } else if (event.key === 'ArrowLeft') {
-      event.preventDefault();
-      setPointerIndex(null);
-      setPointerSeriesId(null);
-      setPointerPosition(undefined);
-      setTouchIndex(null);
-      setTouchSeriesId(null);
-      setKeyboardIndex(Math.max(current - 1, 0));
-    }
+      setKeyboardCursor({
+        dimensionId: props.dimensions[current]!.id,
+        seriesId: model.series[seriesIndex]!.id,
+      });
+      if (!isReading) setKeyboardIndex(current);
+      actions.activate(
+        {rowId: radarKey(itemFor(current, model.series[seriesIndex]!.id)), seriesId: ''},
+        'keyboard',
+        event.ctrlKey || event.metaKey,
+      );
+      return;
+    } else return;
+    event.preventDefault();
+    clearReading();
+    setKeyboardCursor({
+      dimensionId: props.dimensions[next]!.id,
+      seriesId: model.series[seriesIndex]!.id,
+    });
+    setKeyboardIndex(next);
   }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>): void {
@@ -587,7 +765,8 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   function dimensionFromEvent(event: PointerEvent<SVGSVGElement>): number | null {
     const target =
       event.target instanceof Element ? event.target.closest('[data-dimension-index]') : null;
-    const index = Number(target?.getAttribute('data-dimension-index'));
+    if (target === null) return null;
+    const index = Number(target.getAttribute('data-dimension-index'));
     return Number.isInteger(index) && props.dimensions[index] !== undefined ? index : null;
   }
 
@@ -619,6 +798,10 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
       (candidate) => candidate.id === validPinnedSeriesId && candidate.hit,
     );
     if (pinned !== undefined) return pinned.id;
+    const transient = candidates.find(
+      (candidate) => candidate.id === validTransientSeriesId && candidate.hit,
+    );
+    if (transient !== undefined) return transient.id;
     const paintedHit = [...candidates].reverse().find((candidate) => candidate.hit);
     if (paintedHit !== undefined) return paintedHit.id;
     const nearest = candidates.reduce((closest, candidate) =>
@@ -628,15 +811,34 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   }
 
   function handlePointerMove(event: PointerEvent<SVGSVGElement>): void {
+    if (interaction) {
+      const {x, y} = clientPoint(event);
+      if (
+        actions.move(event, x, y, interactionPoints, {
+          left: 0,
+          right: viewSize,
+          top: 0,
+          bottom: viewSize,
+        })
+      )
+        return;
+    }
     if (event.pointerType === 'touch') return;
-    const index = dimensionFromEvent(event);
+    if (interaction) {
+      setKeyboardIndex(null);
+      setTouchIndex(null);
+      setTouchSeriesId(null);
+    }
+    const point = interaction ? hitPoint(event) : undefined;
+    setPointerHasTarget(point !== undefined);
+    const index = point?.index ?? dimensionFromEvent(event);
     if (index === null) {
       setPointerIndex(null);
       setPointerSeriesId(null);
       setPointerPosition(undefined);
       return;
     }
-    const seriesId = seriesFromEvent(event, index);
+    const seriesId = point?.seriesId ?? seriesFromEvent(event, index);
     if (seriesId === null) {
       setPointerIndex(null);
       setPointerSeriesId(null);
@@ -644,21 +846,45 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
       return;
     }
     setKeyboardIndex(null);
+    if (interaction) setKeyboardCursor({dimensionId: props.dimensions[index]!.id, seriesId});
     setPointerIndex(index);
     setPointerSeriesId(seriesId);
     setPointerPosition({x: event.clientX, y: event.clientY});
   }
 
   function handlePointerDown(event: PointerEvent<SVGSVGElement>): void {
+    if (interaction) {
+      if (event.button !== 0 || event.isPrimary === false) return;
+      const {x, y} = clientPoint(event);
+      const point = hitPoint(event);
+      pointerFocus.current = true;
+      canvasRef.current?.focus({preventScroll: true});
+      pointerFocus.current = false;
+      actions.begin(event, point, x, y);
+      clearReading();
+      if (point) {
+        setPointerHasTarget(true);
+        setKeyboardCursor({
+          dimensionId: props.dimensions[point.index]!.id,
+          seriesId: point.seriesId,
+        });
+        if (event.pointerType === 'touch') {
+          setTouchIndex(point.index);
+          setTouchSeriesId(point.seriesId);
+        } else {
+          setPointerIndex(point.index);
+          setPointerSeriesId(point.seriesId);
+          setPointerPosition({x: event.clientX, y: event.clientY});
+        }
+      }
+      return;
+    }
     if (event.pointerType !== 'touch') return;
     const index = dimensionFromEvent(event);
     if (index === null) return;
     const seriesId = seriesFromEvent(event, index);
     if (seriesId === null) return;
-    setKeyboardIndex(null);
-    setPointerIndex(null);
-    setPointerSeriesId(null);
-    setPointerPosition(undefined);
+    clearReading();
     setTouchIndex(index);
     setTouchSeriesId(seriesId);
   }
@@ -697,13 +923,17 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
           tabIndex={hasLocalOverflow ? 0 : undefined}
         >
           <div
-            aria-keyshortcuts="ArrowLeft ArrowRight Escape"
+            aria-describedby={
+              interaction?.selection ? `${descriptionId}-selection-instructions` : undefined
+            }
+            aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home End Enter Space Control+Enter Meta+Enter Escape"
             aria-labelledby={titleId}
             data-wcl-chart-canvas=""
             data-wcl-radar-canvas=""
             onBlur={handleBlur}
             onFocus={(event) => {
-              if (event.currentTarget === event.target && !isReading) setKeyboardIndex(0);
+              if (event.currentTarget === event.target && !pointerFocus.current && !isReading)
+                setKeyboardIndex(0);
             }}
             onKeyDown={handleKeyDown}
             ref={canvasRef}
@@ -714,8 +944,17 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
               <svg
                 aria-hidden="true"
                 data-wcl-chart-svg=""
+                data-selection-enabled={interaction?.selection ? '' : undefined}
                 focusable="false"
                 onPointerDown={handlePointerDown}
+                onPointerUp={(event) => {
+                  if (interaction) actions.end(event, hitPoint(event));
+                }}
+                onPointerCancel={() => {
+                  actions.cancel();
+                  clearReading();
+                }}
+                onLostPointerCapture={() => actions.cancel()}
                 onPointerLeave={() => {
                   setPointerIndex(null);
                   setPointerSeriesId(null);
@@ -758,7 +997,24 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                   return (
                     <g data-wcl-radar-spoke="" key={dimension.id}>
                       <line x1={center} x2={x} y1={center} y2={y} />
-                      <text textAnchor={anchor} x={safeLabelX} y={labelY}>
+                      <text
+                        data-wcl-radar-zero-dimension-activation={
+                          pulseItem?.dimensionId === dimension.id &&
+                          pulseItem.seriesId === undefined &&
+                          model.series.every((series) => series.values[index] === 0)
+                            ? ''
+                            : undefined
+                        }
+                        data-wcl-radar-selected-dimension={
+                          interaction?.selection &&
+                          selectedIds.has(radarKey({dimensionId: dimension.id}))
+                            ? ''
+                            : undefined
+                        }
+                        textAnchor={anchor}
+                        x={safeLabelX}
+                        y={labelY}
+                      >
                         {displayedLabel}
                       </text>
                     </g>
@@ -801,28 +1057,108 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                     </g>
                   );
                 })}
-                {directSeries === undefined || directPoint === undefined ? null : (
-                  <g data-color={directSeries.color} data-wcl-radar-reading-guide="">
-                    <line
-                      data-color={directSeries.color}
-                      data-wcl-radar-reading-line=""
-                      x1={center}
-                      x2={directPoint[0]}
-                      y1={center}
-                      y2={directPoint[1]}
-                    />
-                    <circle
-                      cx={directPoint[0]}
-                      cy={directPoint[1]}
-                      data-wcl-radar-reading-point=""
-                      r={
-                        directSeries.values[activeIndex] === 0
-                          ? 2.5
-                          : Math.max(0, 4 - 1.3 / viewScale)
-                      }
-                    />
+                {isReading ? (
+                  <g data-wcl-radar-reading-guide="">
+                    {(interaction || validDirectSeriesId !== null ? readingSeries : []).map(
+                      (series) => {
+                        const value = series.values[activeIndex]!;
+                        const [cx, cy] = pointAt(
+                          activeIndex,
+                          dimensionCount,
+                          value / model.maximum,
+                        );
+                        const borderWidth = emphasizedSeriesId === series.id ? 3 : 2;
+                        return (
+                          <g key={series.id} data-color={series.color}>
+                            <line
+                              data-color={series.color}
+                              data-wcl-radar-reading-line=""
+                              x1={center}
+                              y1={center}
+                              x2={cx}
+                              y2={cy}
+                            />
+                            {!interaction ||
+                            (pointerHasTarget && pointerIndex !== null) ||
+                            keyboardIndex !== null ||
+                            touchIndex !== null ? (
+                              <circle
+                                data-wcl-radar-reading-point=""
+                                cx={cx}
+                                cy={cy}
+                                r={
+                                  value === 0
+                                    ? 2.5
+                                    : Math.max(0, 4 - (borderWidth / 2 - 0.2) / viewScale)
+                                }
+                              />
+                            ) : null}
+                          </g>
+                        );
+                      },
+                    )}
                   </g>
-                )}
+                ) : null}
+                <g data-wcl-chart-interaction-overlay="" pointerEvents="none">
+                  {interaction?.selection && interaction.target === 'point'
+                    ? model.series.flatMap((series) =>
+                        series.values.map((value, index) => {
+                          if (!selectedIds.has(radarKey(itemFor(index, series.id)))) return null;
+                          const [cx, cy] = pointAt(index, dimensionCount, value / model.maximum);
+                          const borderWidth = emphasizedSeriesId === series.id ? 3 : 2;
+                          return (
+                            <circle
+                              key={radarKey(itemFor(index, series.id))}
+                              data-wcl-chart-selected-point=""
+                              cx={cx}
+                              cy={cy}
+                              r={
+                                value === 0
+                                  ? 2.5 + 1 / viewScale
+                                  : 4 + (borderWidth / 2 + 1) / viewScale
+                              }
+                            />
+                          );
+                        }),
+                      )
+                    : null}
+                  {pulseItem && actions.pulse
+                    ? (() => {
+                        const index = props.dimensions.findIndex(
+                          (dimension) => dimension.id === pulseItem.dimensionId,
+                        );
+                        const series = model.series.filter(
+                          (series) =>
+                            pulseItem.seriesId === undefined || pulseItem.seriesId === series.id,
+                        );
+                        const value = Math.max(0, ...series.map((series) => series.values[index]!));
+                        const [x, y] = pointAt(index, dimensionCount, value / model.maximum);
+                        return pulseItem.seriesId === undefined ? (
+                          <g
+                            key={actions.pulse.sequence}
+                            transform={`translate(${center} ${center})`}
+                          >
+                            <line
+                              data-wcl-radar-dimension-activation=""
+                              x1={0}
+                              y1={0}
+                              x2={x - center}
+                              y2={y - center}
+                            />
+                          </g>
+                        ) : (
+                          <circle
+                            key={actions.pulse.sequence}
+                            data-wcl-chart-activation-dot=""
+                            cx={x}
+                            cy={y}
+                            r={value === 0 ? 2.5 : 4}
+                          />
+                        );
+                      })()
+                    : null}
+                  {actions.box ? <rect data-wcl-chart-selection-box="" {...actions.box} /> : null}
+                </g>
                 {props.dimensions.map((dimension, index) => {
                   const halfAngle = Math.PI / dimensionCount;
                   const path = arc()({
@@ -923,6 +1259,34 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
         <p id={descriptionId}>{props.description}</p>
       </figcaption>
       {content}
+      {setup?.selection ? (
+        <div data-wcl-chart-selection="">
+          <p id={`${descriptionId}-selection-instructions`}>
+            {setup.selection.labels.instructions}
+          </p>
+          <div role="status" aria-atomic="true">
+            <p>
+              {actions.selected.length
+                ? setup.selection.labels.summary(actions.selected.length)
+                : setup.selection.labels.empty}
+            </p>
+            {actions.selected.length ? (
+              <ul>
+                {actions.selected.map((item) => (
+                  <li key={item.rowId}>{setup.selection!.labels.item(item)}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          <Button
+            variant="quiet"
+            isDisabled={!actions.selected.length}
+            onPress={() => actions.change([])}
+          >
+            {setup.selection.labels.clear}
+          </Button>
+        </div>
+      ) : null}
       {model.series.length > 0 && status.kind !== 'loading' && status.kind !== 'error' ? (
         <RadarTable model={model} props={props} />
       ) : null}

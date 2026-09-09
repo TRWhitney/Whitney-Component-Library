@@ -160,3 +160,10 @@ compact interaction, remaining visibility, exploration, animations and compositi
 [Ticket 10](../../chart-interaction-composition/tickets/10-marker-ring-spacing.md) corrects statistical
 circle selection spacing and scale-aware radar reading fills. All 649 tests, repository/package
 checks and independent intent/engineering review pass. Radar selection and activation remains next.
+
+[Radar ticket 11](../../chart-interaction-composition/tickets/11-radar-interaction.md) implements
+point and dimension selection, independent activation, visible rectangle selection and keyboard
+access to zero values. Public contracts and regular/sparse examples are current. The 671 tests,
+repository/build/package checks and native production inspection pass. Independent production
+reviews pass after the recorded keyboard continuity correction. Heatmap and compact interaction, remaining visibility, exploration,
+data-change animation and compositions stay open.
