@@ -42,3 +42,6 @@ The [Sparkline study](prototypes/sparkline-selection.md) is approved, including 
 ## Out of scope
 
 Scatter with adjacent distributions, application layouts, and implicit statistical calculations.
+
+[Ticket 17](tickets/17-legend-release.md) corrects repeated legend activation across chart families.
+A second activation clears temporary emphasis and button fill while preserving keyboard focus.

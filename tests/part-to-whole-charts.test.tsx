@@ -479,3 +479,43 @@ describe('part-to-whole charts', () => {
     ).toThrow(/total label.*blank/i);
   });
 });
+
+it.each(['hover', 'focus'] as const)(
+  'releases legend emphasis on a second activation while %s remains',
+  (preview) => {
+    const {container} = render(
+      <PieChart
+        {...common}
+        data={categories}
+        idAccessor="id"
+        labelAccessor="label"
+        value={{accessor: 'value', label: 'Energy', unit: 'MWh'}}
+      />,
+    );
+    const button = container.querySelector<HTMLButtonElement>('[data-wcl-chart-legend-button]')!;
+    const entry = button.closest('li')!;
+    if (preview === 'hover') fireEvent.mouseEnter(button);
+    else {
+      act(() => button.focus());
+      fireEvent.focus(button);
+    }
+    expect(entry.hasAttribute('data-emphasized')).toBe(true);
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(entry.hasAttribute('data-emphasized')).toBe(false);
+    expect(container.querySelector('[data-wcl-chart-legend] [data-muted]')).toBeNull();
+    if (preview === 'focus') expect(document.activeElement).toBe(button);
+    if (preview === 'hover') {
+      fireEvent.mouseLeave(button);
+      fireEvent.mouseEnter(button);
+    } else {
+      fireEvent.blur(button);
+      fireEvent.focus(button);
+    }
+    expect(entry.hasAttribute('data-emphasized')).toBe(true);
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+  },
+);

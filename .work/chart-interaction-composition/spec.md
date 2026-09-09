@@ -406,3 +406,11 @@ Reuse the approved eye and radar layout without another prototype. Public compon
 visibility, fitting, callbacks, selection, stable identities and recovery. Validate the rendered
 examples with keyboard, touch, compact widths, themes and interrupted animation. Update the public
 contract, generated guide and showcase in the same delivery.
+
+## Legend release
+
+The approved repeated legend activation clears its emphasis visibly, including while a mouse
+remains over the entry or keyboard focus remains on it. Clear temporary legend emphasis together
+with toggling the pin, without moving focus. A subsequent hover or focus can preview it again.
+Apply this existing toggle contract consistently to Cartesian, statistical, radar and pie/donut
+legends. No visibility, reading, data-selection or activation callback behavior changes.

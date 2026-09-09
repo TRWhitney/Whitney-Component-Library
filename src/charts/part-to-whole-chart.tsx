@@ -1146,6 +1146,7 @@ function PartToWholeFrame<Datum extends object>({
                         onBlur={() => setTransientLegendId(null)}
                         onClick={() => {
                           clearReading();
+                          setTransientLegendId(null);
                           setPinnedLegendId((current) =>
                             current === segment.identity ? null : segment.identity,
                           );

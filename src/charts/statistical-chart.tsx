@@ -2158,9 +2158,10 @@ function StatisticalFrame<Datum extends object>({
               setPinnedLegendSeriesId(null);
               setTransientLegendSeriesId(null);
             }}
-            onPin={(seriesId) =>
-              setPinnedLegendSeriesId((current) => (current === seriesId ? null : seriesId))
-            }
+            onPin={(seriesId) => {
+              setTransientLegendSeriesId(null);
+              setPinnedLegendSeriesId((current) => (current === seriesId ? null : seriesId));
+            }}
             onTransientChange={setTransientLegendSeriesId}
             pinnedSeriesId={validPinnedSeriesId}
             series={fullModel.kind === 'histogram' ? [] : fullModel.series}

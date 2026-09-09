@@ -6471,11 +6471,9 @@
     cursor: pointer;
   }
 
-  [data-wcl-chart-legend-button]:where(:not([aria-disabled])):is(
-      :hover,
-      :focus-visible,
-      [aria-pressed='true']
-    ) {
+  [data-wcl-chart-legend-button]:where(:not([aria-disabled]))[aria-pressed='true'],
+  :where([data-emphasized])
+    > [data-wcl-chart-legend-button]:where(:not([aria-disabled])):is(:hover, :focus-visible) {
     background: var(--wcl-accent-soft);
     color: var(--wcl-text);
   }

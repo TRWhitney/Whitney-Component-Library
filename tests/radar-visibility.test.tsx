@@ -264,3 +264,35 @@ it('keeps zero values reachable in a visible profile and cancels drag on hiding'
   fireEvent.pointerUp(svg, {clientX: 330, clientY: 330, pointerId: 1, pointerType: 'mouse'});
   expect(onSelectionChange).not.toHaveBeenCalled();
 });
+
+it.each(['hover', 'focus'] as const)(
+  'releases legend emphasis on a second activation while %s remains',
+  (preview) => {
+    const {container} = render(<RadarChart {...common} />);
+    const button = container.querySelector<HTMLButtonElement>('[data-wcl-chart-legend-button]')!;
+    const entry = button.closest('li')!;
+    if (preview === 'hover') fireEvent.mouseEnter(button);
+    else {
+      act(() => button.focus());
+      fireEvent.focus(button);
+    }
+    expect(entry.hasAttribute('data-emphasized')).toBe(true);
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(entry.hasAttribute('data-emphasized')).toBe(false);
+    expect(container.querySelector('[data-wcl-chart-legend] [data-muted]')).toBeNull();
+    if (preview === 'focus') expect(document.activeElement).toBe(button);
+    if (preview === 'hover') {
+      fireEvent.mouseLeave(button);
+      fireEvent.mouseEnter(button);
+    } else {
+      fireEvent.blur(button);
+      fireEvent.focus(button);
+    }
+    expect(entry.hasAttribute('data-emphasized')).toBe(true);
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+  },
+);

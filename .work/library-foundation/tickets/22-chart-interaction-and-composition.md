@@ -200,3 +200,8 @@ adds profile eyes, shared animated fitting, retained hidden selections and full-
 Its contract, guide and showcase are current. All 716 tests and repository/package checks pass;
 independent intent and engineering production reviews pass with no findings. Pie/donut percentages and heatmap
 row/column visibility remain unresolved slices.
+
+[Legend release ticket 17](../../chart-interaction-composition/tickets/17-legend-release.md)
+corrects repeated tap/click/keyboard activation so the legend entry and chart visibly release.
+The fix applies to all four legend renderers, with current guides and rendered examples. All 724
+tests and repository checks pass. Independent production review passes on intent and engineering axes with no findings.

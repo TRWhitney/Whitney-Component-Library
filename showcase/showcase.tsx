@@ -3060,9 +3060,10 @@ function RadarInteractionExample({
         positive value center is inside.
       </p>
       <p className="showcase-muted">
-        Use the eyes beside profile names to hide or restore them. The shared scale fits the visible
-        profiles. Hidden selections stay listed, and Show all restores every profile. Dimension
-        details include only visible profiles.
+        Tap or click a profile name to pin its highlight; repeat to clear it. Use the eyes beside
+        profile names to hide or restore them. The shared scale fits the visible profiles. Hidden
+        selections stay listed, and Show all restores every profile. Dimension details include only
+        visible profiles.
       </p>
       <p className="showcase-muted">
         A ring marks a selected point; a label underline marks a selected dimension. Filled centers
@@ -3507,9 +3508,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
     showAll: 'Show all groups',
   };
   const statisticalVisibilityGuidance =
-    'Use the eye after a group name to hide or show its marks. Names pin emphasis separately. Legend order, colors, and shapes stay the same; hiding clears a pin. Automatic numeric axes animate to fit visible values, while explicit axis limits stay fixed. Reduced motion makes scale changes immediate. Hide every group to try Show all groups, which restores focus to the first eye.';
+    'Use the eye after a group name to hide or show its marks. Names pin emphasis separately; tap or click the pinned name again to clear its highlight. Legend order, colors, and shapes stay the same; hiding clears a pin. Automatic numeric axes animate to fit visible values, while explicit axis limits stay fixed. Reduced motion makes scale changes immediate. Hide every group to try Show all groups, which restores focus to the first eye.';
   const visibilityGuidance =
-    'Click a series name to pin its highlight; use its separate eye to hide or show it. The scale briefly animates to fit visible values. Hide every series to try Show all series. The data table retains all values and labels hidden series.';
+    'Click a series name to pin its highlight, then click it again to clear the highlight; use its separate eye to hide or show it. The scale briefly animates to fit visible values. Hide every series to try Show all series. The data table retains all values and labels hidden series.';
   const common = {
     ...chartStateCopy,
     data: chartData,
@@ -3659,7 +3660,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Show how categories make up one whole. More than eight positive categories use a proportional aggregate that opens the next page. Hover slices for readings, or use the legend to emphasize and pin a category without opening a tooltip."
+        description="Show how categories make up one whole. More than eight positive categories use a proportional aggregate that opens the next page. Hover slices for readings, or use the legend to emphasize and pin a category without opening a tooltip. Tap or click a pinned legend name again to clear its highlight."
         name="PieChart"
       >
         <Example label="Paged PieChart with category selection and details">
@@ -3668,7 +3669,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Use the same part-to-whole and paging behavior with a derived total in the center. Zero values remain in the generated table but do not create slices."
+        description="Use the same part-to-whole and paging behavior with a derived total in the center. Tap or click a pinned legend name again to clear its highlight. Zero values remain in the generated table but do not create slices."
         name="DonutChart"
       >
         <Example label="Paged DonutChart with category selection and details">

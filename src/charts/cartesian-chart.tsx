@@ -2653,7 +2653,10 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             setPinnedLegendSeriesId(null);
             setTransientLegendSeriesId(null);
           }}
-          onPin={(id) => setPinnedLegendSeriesId((current) => (current === id ? null : id))}
+          onPin={(id) => {
+            setTransientLegendSeriesId(null);
+            setPinnedLegendSeriesId((current) => (current === id ? null : id));
+          }}
           onTransientChange={setTransientLegendSeriesId}
           pinnedSeriesId={validPinnedLegendSeriesId}
           series={allSeries}

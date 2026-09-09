@@ -6,9 +6,9 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-[Ticket 16](tickets/16-radar-visibility.md) implements profile eyes and animated visible-profile
-fitting for RadarChart. All 716 tests and repository checks pass. Direct local and remote browser,
-keyboard and touch inspection pass. Package validation and independent intent and engineering production reviews pass with no findings.
+[Ticket 17](tickets/17-legend-release.md) corrects repeated legend activation across chart families.
+Both the chart emphasis and the legend button fill now clear after a second tap, click or keyboard
+activation, while keyboard focus remains. All 724 tests and repository checks pass. Remote verification and independent intent and engineering production review pass.
 
 ## Progress
 
@@ -39,7 +39,7 @@ are settled. Scatter/bubble Centers inside selection is delivered. Radar, heatma
 
 ## Verification
 
-[Ticket 16](tickets/16-radar-visibility.md#completion-evidence) records the passing repository,
+[Ticket 17](tickets/17-legend-release.md#completion-evidence) records the passing repository,
 public type, package and browser checks, plus independent intent and engineering reviews.
 
 ## Out of scope
@@ -50,6 +50,6 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is `3e6a391`. Radar visibility is delivered in the commit containing this record.
+- Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is `3e6a391`. Radar visibility is `5c51e05`. Legend release is delivered in the commit containing this record.
 - Production showcase: `http://localhost:5174`, Vite session `54846`.
-- Next action: settle pie/donut percentages when slices are hidden, then specify that visibility slice. Heatmap row/column visibility still needs its prototype. Histogram and Sparkline visibility are excluded. No owned uncommitted changes remain after this delivery.
+- Next action: settle pie/donut percentages when slices are hidden, then specify that visibility slice. Heatmap row/column visibility still needs its prototype. No owned uncommitted changes remain after this delivery.

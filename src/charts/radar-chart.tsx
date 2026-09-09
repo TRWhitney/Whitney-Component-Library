@@ -1288,10 +1288,11 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                         aria-disabled={hidden || undefined}
                         data-wcl-chart-legend-button=""
                         onBlur={() => setTransientSeriesId(null)}
-                        onClick={() =>
-                          !hidden &&
-                          setPinnedSeriesId((current) => (current === item.id ? null : item.id))
-                        }
+                        onClick={() => {
+                          if (hidden) return;
+                          setTransientSeriesId(null);
+                          setPinnedSeriesId((current) => (current === item.id ? null : item.id));
+                        }}
                         onFocus={() => !hidden && setTransientSeriesId(item.id)}
                         onKeyDown={(event) => {
                           if (event.key !== 'Escape') return;
