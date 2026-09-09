@@ -1,3 +1,5 @@
+import {ChartVisibilityButton} from './chart-visibility-button.js';
+import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {ChartActivationOutline, chartActivationOutset} from './chart-activation.js';
 import {bin as createBins, quantileSorted} from 'd3-array';
 import {
@@ -68,6 +70,7 @@ import type {
   ChartInteraction,
   PointChartInteraction,
   ChartLegend,
+  ChartVisibilityLabels,
   ChartStateCopy,
   ChartStatus,
   ChartValueAxis,
@@ -93,6 +96,7 @@ type StatisticalFrameStyles = CSSProperties & {
 };
 
 interface CommonProps<Datum extends object> {
+  readonly visibilityLabels?: ChartVisibilityLabels;
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];
   readonly dataTableLabel: string;
@@ -678,6 +682,26 @@ function validateCommon<Datum extends object>(props: CommonProps<Datum>): void {
   }
 }
 
+function modelWithDomains<Datum extends object>(
+  model: StatisticalModel<Datum>,
+  xDomain: readonly [number, number],
+  yDomain: readonly [number, number],
+): StatisticalModel<Datum> {
+  if (model.kind === 'box')
+    return {...model, yAxis: {...model.yAxis, scale: {...model.yAxis.scale, domain: yDomain}}};
+  if (model.kind === 'histogram')
+    return {
+      ...model,
+      xAxis: {...model.xAxis, scale: {...model.xAxis.scale, domain: xDomain}},
+      yAxis: {...model.yAxis, scale: {...model.yAxis.scale, domain: yDomain}},
+    };
+  return {
+    ...model,
+    xAxis: {...model.xAxis, scale: {...model.xAxis.scale, domain: xDomain}},
+    yAxis: {...model.yAxis, scale: {...model.yAxis.scale, domain: yDomain}},
+  };
+}
+
 function projectionsFor<Datum extends object>(
   model: StatisticalModel<Datum>,
   plot: PlotBounds,
@@ -915,6 +939,10 @@ function LegendSwatch({
 }
 
 function StatisticalLegend({
+  hiddenIds,
+  visibilityLabels,
+  onVisibilityChange,
+  firstEye,
   emphasizedSeriesId,
   kind,
   legend,
@@ -926,6 +954,10 @@ function StatisticalLegend({
 }: {
   readonly emphasizedSeriesId: string | undefined;
   readonly kind: StatisticalKind;
+  readonly hiddenIds: readonly string[];
+  readonly visibilityLabels: ChartVisibilityLabels | undefined;
+  readonly onVisibilityChange: (id: string) => void;
+  readonly firstEye: React.Ref<HTMLButtonElement>;
   readonly legend: ChartLegend;
   readonly onClear: () => void;
   readonly onPin: (seriesId: string) => void;
@@ -934,7 +966,11 @@ function StatisticalLegend({
   readonly series: readonly InternalSeries[];
 }): ReactElement {
   return (
-    <ul aria-label={legend.label} data-wcl-chart-legend="">
+    <ul
+      aria-label={legend.label}
+      data-wcl-chart-legend=""
+      data-visibility={visibilityLabels ? '' : undefined}
+    >
       {series.map((item, index) => (
         <li
           data-color={item.color}
@@ -943,26 +979,47 @@ function StatisticalLegend({
             emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
           }
           data-series-index={index}
+          data-hidden={hiddenIds.includes(item.id) ? '' : undefined}
           key={item.id}
         >
           <button
+            aria-disabled={hiddenIds.includes(item.id) ? true : undefined}
             aria-pressed={pinnedSeriesId === item.id}
             data-wcl-chart-legend-button=""
             onBlur={() => onTransientChange(null)}
-            onClick={() => onPin(item.id)}
-            onFocus={() => onTransientChange(item.id)}
+            onClick={() => {
+              if (!hiddenIds.includes(item.id)) onPin(item.id);
+            }}
+            onFocus={() => {
+              if (!hiddenIds.includes(item.id)) onTransientChange(item.id);
+            }}
             onKeyDown={(event) => {
               if (event.key !== 'Escape') return;
               event.preventDefault();
               onClear();
             }}
-            onMouseEnter={() => onTransientChange(item.id)}
+            onMouseEnter={() => {
+              if (!hiddenIds.includes(item.id)) onTransientChange(item.id);
+            }}
             onMouseLeave={() => onTransientChange(null)}
             type="button"
           >
             <LegendSwatch kind={kind} series={item} />
             {item.label}
           </button>
+          {visibilityLabels ? (
+            <ChartVisibilityButton
+              hidden={hiddenIds.includes(item.id)}
+              label={
+                hiddenIds.includes(item.id)
+                  ? visibilityLabels.showSeries(item.label)
+                  : visibilityLabels.hideSeries(item.label)
+              }
+              onToggle={() => onVisibilityChange(item.id)}
+              onClear={onClear}
+              buttonRef={index === 0 ? firstEye : undefined}
+            />
+          ) : null}
         </li>
       ))}
     </ul>
@@ -1428,10 +1485,14 @@ function StatisticalMarks<Datum extends object>({
 }
 
 function StatisticalTable<Datum extends object>({
+  hiddenIds = [],
+  hiddenLabel,
   dataTableLabel,
   model,
 }: {
   readonly dataTableLabel: string;
+  readonly hiddenIds?: readonly string[];
+  readonly hiddenLabel?: string | undefined;
   readonly model: StatisticalModel<Datum>;
 }): ReactElement {
   if (model.kind === 'scatter' || model.kind === 'bubble') {
@@ -1454,7 +1515,10 @@ function StatisticalTable<Datum extends object>({
           {model.points.map((point) => (
             <tr key={point.id}>
               <th scope="row">{point.label}</th>
-              <td>{point.series.label}</td>
+              <td>
+                {point.series.label}
+                {hiddenIds.includes(point.series.id) ? ` ${hiddenLabel ?? ''}` : ''}
+              </td>
               <td>{axisTickLabel(point.x, model.xAxis)}</td>
               <td>{axisTickLabel(point.y, model.yAxis)}</td>
               {model.kind === 'bubble' ? (
@@ -1513,7 +1577,10 @@ function StatisticalTable<Datum extends object>({
       <tbody>
         {model.boxes.map((box) => (
           <tr key={box.series.id}>
-            <th scope="row">{box.series.label}</th>
+            <th scope="row">
+              {box.series.label}
+              {hiddenIds.includes(box.series.id) ? ` ${hiddenLabel ?? ''}` : ''}
+            </th>
             <td>{axisTickLabel(box.lowerWhisker, model.yAxis)}</td>
             <td>{axisTickLabel(box.q1, model.yAxis)}</td>
             <td>{axisTickLabel(box.median, model.yAxis)}</td>
@@ -1595,7 +1662,7 @@ function StatisticalFrame<Datum extends object>({
   legend,
   interaction,
   distribution,
-  model,
+  model: fullModel,
   rootAttribute,
 }: {
   readonly common: CommonProps<Datum>;
@@ -1611,10 +1678,11 @@ function StatisticalFrame<Datum extends object>({
   const overflow = common.overflow ?? 'scroll';
   const status = common.status ?? {kind: 'ready'};
   const availableSeriesIds =
-    model.kind === 'histogram' ? [] : model.series.map((series) => series.id);
+    fullModel.kind === 'histogram' ? [] : fullModel.series.map((series) => series.id);
   const seriesIdentity = JSON.stringify(availableSeriesIds);
   const titleId = useId();
   const clipId = useId();
+  const marksClipId = useId();
   const {isFocusVisible} = useFocusVisible();
   const descriptionId = useId();
   const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
@@ -1624,6 +1692,38 @@ function StatisticalFrame<Datum extends object>({
   const [transientLegendSeriesId, setTransientLegendSeriesId] = useState<string | null>(null);
   const [pinnedLegendSeriesId, setPinnedLegendSeriesId] = useState<string | null>(null);
   const [retainedSeriesIdentity, setRetainedSeriesIdentity] = useState(seriesIdentity);
+  const firstEye = useRef<HTMLButtonElement>(null);
+  const visibilityLabels = common.visibilityLabels;
+  if (visibilityLabels) {
+    if (!legend || fullModel.kind === 'histogram')
+      throw new Error('Statistical visibility requires a visible group legend.');
+    assertText(visibilityLabels.hidden, 'Hidden-group label');
+    assertText(visibilityLabels.showAll, 'Show-all label');
+    assertText(visibilityLabels.allHidden.title, 'All-hidden title');
+    assertText(visibilityLabels.allHidden.description, 'All-hidden description');
+    for (const series of fullModel.series) {
+      assertText(visibilityLabels.hideSeries(series.label), 'Hide-group label');
+      assertText(visibilityLabels.showSeries(series.label), 'Show-group label');
+    }
+  }
+  const [hiddenSeriesIds, setHiddenSeriesIds] = useState<readonly string[]>([]);
+  const hiddenIds = visibilityLabels
+    ? hiddenSeriesIds.filter((id) => availableSeriesIds.includes(id))
+    : [];
+  const visibleModel =
+    fullModel.kind === 'histogram'
+      ? fullModel
+      : fullModel.kind === 'box'
+        ? {
+            ...fullModel,
+            series: fullModel.series.filter((s) => !hiddenIds.includes(s.id)),
+            boxes: fullModel.boxes.filter((b) => !hiddenIds.includes(b.series.id)),
+          }
+        : {
+            ...fullModel,
+            series: fullModel.series.filter((s) => !hiddenIds.includes(s.id)),
+            points: fullModel.points.filter((p) => !hiddenIds.includes(p.series.id)),
+          };
   const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
   useEffect(() => {
     if (frameElement === null) return;
@@ -1637,16 +1737,39 @@ function StatisticalFrame<Datum extends object>({
     observer.observe(frameElement);
     return () => observer.disconnect();
   }, [frameElement]);
-  const categoryLabels = model.kind === 'box' ? model.series.map((item) => item.label) : [];
+  const categoryLabels =
+    visibleModel.kind === 'box' ? visibleModel.series.map((item) => item.label) : [];
   const presentation = presentationMetrics(
     availableWidth ?? minimumSize.width,
     minimumSize.width,
     categoryLabels,
   );
   const initialPlot = plotForPresentation(presentation);
-  const initialProjections = projectionsFor(model, initialPlot);
-  const yAxis = model.yAxis;
-  const yLabels = initialProjections.y.ticks.map((tick) => axisTickLabel(tick, yAxis));
+  const initialProjections = projectionsFor(visibleModel, initialPlot);
+  const yAxis = visibleModel.yAxis;
+  const visibleHasData =
+    visibleModel.kind === 'box'
+      ? !!visibleModel.boxes.length
+      : visibleModel.kind === 'histogram'
+        ? !!visibleModel.bins.length
+        : !!visibleModel.points.length;
+  const animate =
+    !!visibilityLabels && visibleHasData && status.kind !== 'loading' && status.kind !== 'error';
+  const xScale = visibleModel.kind === 'box' ? undefined : visibleModel.xAxis.scale;
+  const xDomain = useAnimatedChartDomain(
+    [initialProjections.xNumber?.domain?.[0] ?? 0, initialProjections.xNumber?.domain?.[1] ?? 1],
+    animate && xScale !== undefined && xScale.domain === undefined,
+    xScale?.type === 'logarithmic',
+  );
+  const yDomain = useAnimatedChartDomain(
+    [initialProjections.y.domain?.[0] ?? 0, initialProjections.y.domain?.[1] ?? 1],
+    animate && yAxis.scale.domain === undefined,
+    yAxis.scale.type === 'logarithmic',
+  );
+  const model = modelWithDomains(visibleModel, xDomain, yDomain);
+  const yLabels = projectionsFor(model, initialPlot).y.ticks.map((tick) =>
+    axisTickLabel(tick, yAxis),
+  );
   const plot = plotForYAxisLabels(
     yLabels,
     presentation.fontSize / presentation.viewScale / 16,
@@ -1654,6 +1777,7 @@ function StatisticalFrame<Datum extends object>({
   );
   const projections = projectionsFor(model, plot);
   const readings = readingTargets(model, projections);
+  const allReadings = readingTargets(fullModel, projectionsFor(fullModel, initialPlot));
   const distributionGeometry = distributionPoints(model, projections, readings, presentation);
   const readingIdentity = JSON.stringify(readings.map((reading) => reading.id));
   const readingGeometry = JSON.stringify({
@@ -1672,16 +1796,23 @@ function StatisticalFrame<Datum extends object>({
     readings: readings.map((reading) => [reading.id, reading.x, reading.y]),
   });
   const pointModel = model.kind === 'scatter' || model.kind === 'bubble' ? model : undefined;
-  const interactionRows = pointModel
-    ? pointModel.points.map((point) => ({
+  const fullPointModel =
+    fullModel.kind === 'scatter' || fullModel.kind === 'bubble' ? fullModel : undefined;
+  const interactionRows = fullPointModel
+    ? fullPointModel.points.map((point) => ({
         id: point.id,
         category: point.x,
         datum: common.data[point.sourceIndex]!,
         values: [
-          {seriesId: point.series.id, label: point.series.label, value: point.y, hidden: false},
+          {
+            seriesId: point.series.id,
+            label: point.series.label,
+            value: point.y,
+            hidden: hiddenIds.includes(point.series.id),
+          },
         ],
       }))
-    : readings.map((reading) => ({
+    : allReadings.map((reading) => ({
         id: reading.id,
         category: reading.x,
         datum: reading,
@@ -1726,7 +1857,7 @@ function StatisticalFrame<Datum extends object>({
   const actions = useChartInteraction(
     configuration,
     interactionRows,
-    JSON.stringify([readingGeometry, status.kind]),
+    JSON.stringify([readingGeometry, status.kind, hiddenIds]),
     common.data,
   );
   const maximumMagnitude = (pointModel?.points ?? []).reduce(
@@ -1746,6 +1877,16 @@ function StatisticalFrame<Datum extends object>({
         shape: point.series.shape,
       }))
     : distributionGeometry;
+  // Allow complete boundary marks, but contain returning groups while the axes expand.
+  const markPadding =
+    points.reduce((padding, point) => Math.max(padding, point.radius * Math.SQRT2), 0) +
+    2 / presentation.viewScale;
+  const marksBounds = {
+    left: Math.max(0, plot.left - markPadding),
+    right: Math.min(viewWidth, plot.right + markPadding),
+    top: Math.max(0, plot.top - markPadding),
+    bottom: Math.min(viewHeight, plot.bottom + markPadding),
+  };
   const inPlot = (x: number, y: number) =>
     x >= plot.left && x <= plot.right && y >= plot.top && y <= plot.bottom;
   const selectablePoints = points.filter((point) => inPlot(point.x, point.y));
@@ -1761,6 +1902,7 @@ function StatisticalFrame<Datum extends object>({
   }>();
   if (retainedSeriesIdentity !== seriesIdentity) {
     setRetainedSeriesIdentity(seriesIdentity);
+    setHiddenSeriesIds((ids) => ids.filter((id) => availableSeriesIds.includes(id)));
     setPinnedLegendSeriesId((current) =>
       current !== null && !availableSeriesIds.includes(current) ? null : current,
     );
@@ -1790,7 +1932,7 @@ function StatisticalFrame<Datum extends object>({
     document.addEventListener('pointerdown', dismiss);
     return () => document.removeEventListener('pointerdown', dismiss);
   }, [rootElement, touchReadingId]);
-  const hasData = readings.length > 0;
+  const hasData = allReadings.length > 0;
   const indexForReadingId = (id: string | null): number | null => {
     if (id === null) return null;
     const index = readings.findIndex((reading) => reading.id === id);
@@ -1802,11 +1944,15 @@ function StatisticalFrame<Datum extends object>({
   const directIndex = indexForReadingId(pointerReadingId ?? touchReadingId);
   const directReading = directIndex === null ? undefined : readings[directIndex];
   const validPinnedSeriesId =
-    pinnedLegendSeriesId !== null && availableSeriesIds.includes(pinnedLegendSeriesId)
+    pinnedLegendSeriesId !== null &&
+    availableSeriesIds.includes(pinnedLegendSeriesId) &&
+    !hiddenIds.includes(pinnedLegendSeriesId)
       ? pinnedLegendSeriesId
       : null;
   const validTransientSeriesId =
-    transientLegendSeriesId !== null && availableSeriesIds.includes(transientLegendSeriesId)
+    transientLegendSeriesId !== null &&
+    availableSeriesIds.includes(transientLegendSeriesId) &&
+    !hiddenIds.includes(transientLegendSeriesId)
       ? transientLegendSeriesId
       : null;
   const legendSeriesId = validPinnedSeriesId ?? validTransientSeriesId ?? undefined;
@@ -2017,240 +2163,297 @@ function StatisticalFrame<Datum extends object>({
             }
             onTransientChange={setTransientLegendSeriesId}
             pinnedSeriesId={validPinnedSeriesId}
-            series={model.series}
+            series={fullModel.kind === 'histogram' ? [] : fullModel.series}
+            hiddenIds={hiddenIds}
+            visibilityLabels={visibilityLabels}
+            firstEye={firstEye}
+            onVisibilityChange={(id) => {
+              actions.cancel();
+              setHiddenSeriesIds((ids) =>
+                ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id],
+              );
+              if (pinnedLegendSeriesId === id) setPinnedLegendSeriesId(null);
+              if (transientLegendSeriesId === id) setTransientLegendSeriesId(null);
+              setKeyboardReadingId(null);
+              setPointerReadingId(null);
+              setTouchReadingId(null);
+              setPointerPosition(undefined);
+            }}
           />
         )}
-        <div
-          {...scrollbarActivityProps}
-          aria-labelledby={hasLocalOverflow ? titleId : undefined}
-          data-overflow={overflow}
-          data-scrollable={hasLocalOverflow ? '' : undefined}
-          data-wcl-chart-frame=""
-          ref={setFrameElement}
-          role={hasLocalOverflow ? 'region' : undefined}
-          style={frameStyle}
-          tabIndex={hasLocalOverflow ? 0 : undefined}
-        >
-          <div
-            aria-keyshortcuts={
-              interactive
-                ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape Enter Space Control+Enter Meta+Enter Control+Space Meta+Space'
-                : 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape'
-            }
-            aria-describedby={
-              configuration?.selection ? `${descriptionId}-selection-instructions` : undefined
-            }
-            data-item-interaction={interactive ? '' : undefined}
-            aria-labelledby={titleId}
-            data-wcl-chart-canvas=""
-            onBlur={blurChart}
-            onFocus={focusChart}
-            onKeyDown={readKeyboard}
-            role="group"
-            tabIndex={0}
-          >
-            <svg
-              aria-hidden="true"
-              data-wcl-chart-svg=""
-              focusable="false"
-              data-selection-enabled={configuration?.selection ? '' : undefined}
-              onPointerDown={interactive ? beginItem : readTouch}
-              onPointerUp={
-                interactive ? (event) => actions.end(event, pointFromPointer(event)) : undefined
-              }
-              onPointerCancel={interactive ? () => actions.cancel() : undefined}
-              onLostPointerCapture={interactive ? () => actions.cancel() : undefined}
-              onPointerLeave={clearPointer}
-              onPointerMove={interactive ? moveItem : readPointer}
-              ref={setSvgElement}
-              viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+        {!visibleHasData && visibilityLabels ? (
+          <div data-wcl-chart-all-hidden="" role="status">
+            <strong>{visibilityLabels.allHidden.title}</strong>
+            <p>{visibilityLabels.allHidden.description}</p>
+            <button
+              type="button"
+              data-wcl-chart-show-all=""
+              onClick={() => {
+                actions.cancel();
+                setHiddenSeriesIds([]);
+                firstEye.current?.focus();
+              }}
             >
-              {model.kind === 'box' ? (
-                <Axis
-                  axis={{
-                    formatTick: (value) =>
-                      model.series.find((item) => item.id === value)?.label ?? value,
-                    label: model.xAxis.label,
-                    scale: {
-                      domain: model.series.map((item) => item.id),
-                      type: 'categorical',
-                    },
-                  }}
-                  placement="x"
-                  plot={plot}
-                  presentation={presentation}
-                  projection={projections.xCategory!}
-                />
-              ) : (
-                <Axis
-                  axis={model.xAxis}
-                  placement="x"
-                  plot={plot}
-                  presentation={presentation}
-                  projection={projections.xNumber!}
-                />
-              )}
-              <Axis
-                axis={model.yAxis}
-                placement="y"
-                plot={plot}
-                presentation={presentation}
-                projection={projections.y}
-              />
-              <rect
-                data-wcl-chart-hit-region=""
-                height={plotHeight(plot)}
-                width={plotWidth(plot)}
-                x={plot.left}
-                y={plot.top}
-              />
-              <defs>
-                <clipPath id={clipId}>
+              {visibilityLabels.showAll}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div
+              {...scrollbarActivityProps}
+              aria-labelledby={hasLocalOverflow ? titleId : undefined}
+              data-overflow={overflow}
+              data-scrollable={hasLocalOverflow ? '' : undefined}
+              data-wcl-chart-frame=""
+              ref={setFrameElement}
+              role={hasLocalOverflow ? 'region' : undefined}
+              style={frameStyle}
+              tabIndex={hasLocalOverflow ? 0 : undefined}
+            >
+              <div
+                aria-keyshortcuts={
+                  interactive
+                    ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape Enter Space Control+Enter Meta+Enter Control+Space Meta+Space'
+                    : 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape'
+                }
+                aria-describedby={
+                  configuration?.selection ? `${descriptionId}-selection-instructions` : undefined
+                }
+                data-item-interaction={interactive ? '' : undefined}
+                aria-labelledby={titleId}
+                data-wcl-chart-canvas=""
+                onBlur={blurChart}
+                onFocus={focusChart}
+                onKeyDown={readKeyboard}
+                role="group"
+                tabIndex={0}
+              >
+                <svg
+                  aria-hidden="true"
+                  data-wcl-chart-svg=""
+                  focusable="false"
+                  data-selection-enabled={configuration?.selection ? '' : undefined}
+                  onPointerDown={interactive ? beginItem : readTouch}
+                  onPointerUp={
+                    interactive ? (event) => actions.end(event, pointFromPointer(event)) : undefined
+                  }
+                  onPointerCancel={interactive ? () => actions.cancel() : undefined}
+                  onLostPointerCapture={interactive ? () => actions.cancel() : undefined}
+                  onPointerLeave={clearPointer}
+                  onPointerMove={interactive ? moveItem : readPointer}
+                  ref={setSvgElement}
+                  viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+                >
+                  {model.kind === 'box' ? (
+                    <Axis
+                      axis={{
+                        formatTick: (value) =>
+                          model.series.find((item) => item.id === value)?.label ?? value,
+                        label: model.xAxis.label,
+                        scale: {
+                          domain: model.series.map((item) => item.id),
+                          type: 'categorical',
+                        },
+                      }}
+                      placement="x"
+                      plot={plot}
+                      presentation={presentation}
+                      projection={projections.xCategory!}
+                    />
+                  ) : (
+                    <Axis
+                      axis={model.xAxis}
+                      placement="x"
+                      plot={plot}
+                      presentation={presentation}
+                      projection={projections.xNumber!}
+                    />
+                  )}
+                  <Axis
+                    axis={model.yAxis}
+                    placement="y"
+                    plot={plot}
+                    presentation={presentation}
+                    projection={projections.y}
+                  />
                   <rect
+                    data-wcl-chart-hit-region=""
+                    height={plotHeight(plot)}
+                    width={plotWidth(plot)}
                     x={plot.left}
                     y={plot.top}
-                    width={plotWidth(plot)}
-                    height={plotHeight(plot)}
                   />
-                </clipPath>
-              </defs>
-              <>
-                <StatisticalMarks
-                  activeIndex={activeIndex}
-                  directIndex={directIndex}
-                  legendSeriesId={legendSeriesId}
-                  model={model}
-                  pinnedSeriesId={validPinnedSeriesId}
-                  presentation={presentation}
-                  projections={projections}
-                  readings={readings}
-                />
-                {interactive ? (
-                  <g
-                    clipPath={`url(#${clipId})`}
-                    data-wcl-chart-interaction-overlay=""
-                    pointerEvents="none"
-                  >
-                    {points.map((point) => (
-                      <g key={point.item.rowId}>
-                        {selectedKeys.has(selectionKey(point.item)) ? (
-                          point.kind === 'bin' || point.kind === 'summary' ? (
-                            <DistributionCue
-                              point={point}
-                              points={points}
-                              cue="selection"
-                              scale={presentation.viewScale}
-                            />
-                          ) : (
-                            <PointShape
-                              cx={point.x}
-                              cy={point.y}
-                              radius={
-                                point.radius +
-                                (point.shape % 6 === 0
-                                  ? (presentation.pointStrokeWidth *
-                                      (activeIndex === point.index ? 1.6 : 1)) /
-                                      2 +
-                                    1
-                                  : 2) /
-                                  presentation.viewScale
-                              }
-                              shape={point.shape}
-                              cue="selection"
-                            />
-                          )
-                        ) : null}
-                        {activeIndex === point.index ? (
-                          point.kind === 'bin' || point.kind === 'summary' ? (
-                            <DistributionCue
-                              point={point}
-                              points={points}
-                              cue="reading"
-                              scale={presentation.viewScale}
-                            />
-                          ) : (
-                            <>
-                              {model.kind === 'bubble' ? (
-                                <PointShape
-                                  cx={point.x}
-                                  cy={point.y}
-                                  radius={Math.max(0, point.radius - 2 / presentation.viewScale)}
-                                  shape={point.shape}
-                                  cue="reading"
-                                />
-                              ) : null}
-                              <PointShape
-                                cx={point.x}
-                                cy={point.y}
-                                radius={Math.max(
-                                  1 / presentation.viewScale,
-                                  Math.min(
-                                    point.radius - 1 / presentation.viewScale,
-                                    3.5 / presentation.viewScale,
-                                  ),
-                                )}
-                                shape={point.shape}
-                                cue="center"
-                              />
-                            </>
-                          )
-                        ) : null}
-                        {actions.pulse &&
-                        selectionKey(actions.pulse.item) === selectionKey(point.item) ? (
-                          <g key={actions.pulse.sequence} data-wcl-point-activation="">
-                            <ChartActivationOutline
-                              outset={
-                                point.kind === 'bin' || point.kind === 'summary'
-                                  ? 0
-                                  : chartActivationOutset
-                              }
-                            >
-                              {point.kind === 'bin' || point.kind === 'summary' ? (
+                  <defs>
+                    <clipPath id={clipId}>
+                      <rect
+                        x={plot.left}
+                        y={plot.top}
+                        width={plotWidth(plot)}
+                        height={plotHeight(plot)}
+                      />
+                    </clipPath>
+                    {visibilityLabels ? (
+                      <clipPath id={marksClipId}>
+                        <rect
+                          x={marksBounds.left}
+                          y={marksBounds.top}
+                          width={marksBounds.right - marksBounds.left}
+                          height={marksBounds.bottom - marksBounds.top}
+                        />
+                      </clipPath>
+                    ) : null}
+                  </defs>
+                  <>
+                    <g clipPath={visibilityLabels ? `url(#${marksClipId})` : undefined}>
+                      <StatisticalMarks
+                        activeIndex={activeIndex}
+                        directIndex={directIndex}
+                        legendSeriesId={legendSeriesId}
+                        model={model}
+                        pinnedSeriesId={validPinnedSeriesId}
+                        presentation={presentation}
+                        projections={projections}
+                        readings={readings}
+                      />
+                    </g>
+                    {interactive ? (
+                      <g
+                        clipPath={`url(#${clipId})`}
+                        data-wcl-chart-interaction-overlay=""
+                        pointerEvents="none"
+                      >
+                        {points.map((point) => (
+                          <g key={point.item.rowId}>
+                            {selectedKeys.has(selectionKey(point.item)) ? (
+                              point.kind === 'bin' || point.kind === 'summary' ? (
                                 <DistributionCue
                                   point={point}
                                   points={points}
-                                  cue="activation"
+                                  cue="selection"
                                   scale={presentation.viewScale}
                                 />
                               ) : (
                                 <PointShape
                                   cx={point.x}
                                   cy={point.y}
-                                  radius={point.radius}
+                                  radius={
+                                    point.radius +
+                                    (point.shape % 6 === 0
+                                      ? (presentation.pointStrokeWidth *
+                                          (activeIndex === point.index ? 1.6 : 1)) /
+                                          2 +
+                                        1
+                                      : 2) /
+                                      presentation.viewScale
+                                  }
                                   shape={point.shape}
-                                  cue="activation"
+                                  cue="selection"
                                 />
-                              )}
-                            </ChartActivationOutline>
+                              )
+                            ) : null}
+                            {activeIndex === point.index ? (
+                              point.kind === 'bin' || point.kind === 'summary' ? (
+                                <DistributionCue
+                                  point={point}
+                                  points={points}
+                                  cue="reading"
+                                  scale={presentation.viewScale}
+                                />
+                              ) : (
+                                <>
+                                  {model.kind === 'bubble' ? (
+                                    <PointShape
+                                      cx={point.x}
+                                      cy={point.y}
+                                      radius={Math.max(
+                                        0,
+                                        point.radius - 2 / presentation.viewScale,
+                                      )}
+                                      shape={point.shape}
+                                      cue="reading"
+                                    />
+                                  ) : null}
+                                  <PointShape
+                                    cx={point.x}
+                                    cy={point.y}
+                                    radius={Math.max(
+                                      1 / presentation.viewScale,
+                                      Math.min(
+                                        point.radius - 1 / presentation.viewScale,
+                                        3.5 / presentation.viewScale,
+                                      ),
+                                    )}
+                                    shape={point.shape}
+                                    cue="center"
+                                  />
+                                </>
+                              )
+                            ) : null}
+                            {actions.pulse &&
+                            selectionKey(actions.pulse.item) === selectionKey(point.item) ? (
+                              <g key={actions.pulse.sequence} data-wcl-point-activation="">
+                                <ChartActivationOutline
+                                  outset={
+                                    point.kind === 'bin' || point.kind === 'summary'
+                                      ? 0
+                                      : chartActivationOutset
+                                  }
+                                >
+                                  {point.kind === 'bin' || point.kind === 'summary' ? (
+                                    <DistributionCue
+                                      point={point}
+                                      points={points}
+                                      cue="activation"
+                                      scale={presentation.viewScale}
+                                    />
+                                  ) : (
+                                    <PointShape
+                                      cx={point.x}
+                                      cy={point.y}
+                                      radius={point.radius}
+                                      shape={point.shape}
+                                      cue="activation"
+                                    />
+                                  )}
+                                </ChartActivationOutline>
+                              </g>
+                            ) : null}
                           </g>
+                        ))}
+                        {actions.box ? (
+                          <rect {...actions.box} data-wcl-chart-selection-box="" />
                         ) : null}
                       </g>
-                    ))}
-                    {actions.box ? <rect {...actions.box} data-wcl-chart-selection-box="" /> : null}
-                  </g>
-                ) : null}
-              </>
-            </svg>
-            {activeReading === undefined ? null : (
-              <StatisticalTooltip
-                activeSeriesId={emphasizedSeriesId}
-                {...(pointerPosition === undefined ? {} : {pointer: pointerPosition})}
-                portalTarget={rootElement?.closest('[data-wcl-provider]') ?? document.body}
-                reading={activeReading}
-                svg={svgElement}
-              />
-            )}
-          </div>
-        </div>
-        <div aria-atomic="true" aria-live="polite" data-wcl-chart-reading-announcement="">
-          {activeReading === undefined
-            ? ''
-            : [
-                activeReading.label,
-                ...activeReading.rows.map((row) => `${row.label}: ${row.value}`),
-              ].join('. ')}
-        </div>
-        <StatisticalTable dataTableLabel={common.dataTableLabel} model={model} />
+                    ) : null}
+                  </>
+                </svg>
+                {activeReading === undefined ? null : (
+                  <StatisticalTooltip
+                    activeSeriesId={emphasizedSeriesId}
+                    {...(pointerPosition === undefined ? {} : {pointer: pointerPosition})}
+                    portalTarget={rootElement?.closest('[data-wcl-provider]') ?? document.body}
+                    reading={activeReading}
+                    svg={svgElement}
+                  />
+                )}
+              </div>
+            </div>
+            <div aria-atomic="true" aria-live="polite" data-wcl-chart-reading-announcement="">
+              {activeReading === undefined
+                ? ''
+                : [
+                    activeReading.label,
+                    ...activeReading.rows.map((row) => `${row.label}: ${row.value}`),
+                  ].join('. ')}
+            </div>
+          </>
+        )}
+        <StatisticalTable
+          dataTableLabel={common.dataTableLabel}
+          model={fullModel}
+          hiddenIds={hiddenIds}
+          hiddenLabel={visibilityLabels?.hidden}
+        />
       </>
     );
   }
@@ -2281,7 +2484,17 @@ function StatisticalFrame<Datum extends object>({
             {actions.selected.length ? (
               <ul>
                 {actions.selected.map((item) => (
-                  <li key={selectionKey(item)}>{configuration.selection!.labels.item(item)}</li>
+                  <li key={selectionKey(item)}>
+                    {(() => {
+                      const label = configuration.selection!.labels.item(item);
+                      const seriesId =
+                        item.seriesId ||
+                        allReadings.find((reading) => reading.id === item.rowId)?.seriesId;
+                      return seriesId && hiddenIds.includes(seriesId)
+                        ? configuration.selection!.labels.hidden(label)
+                        : label;
+                    })()}
+                  </li>
                 ))}
               </ul>
             ) : null}

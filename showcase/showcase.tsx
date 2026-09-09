@@ -2480,7 +2480,13 @@ function AreaMixedInteractionExample({
   );
 }
 
-function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) {
+function PointInteractionExample({
+  kind,
+  visibilityLabels,
+}: {
+  readonly kind: 'scatter' | 'bubble';
+  readonly visibilityLabels: ChartVisibilityLabels;
+}) {
   const [selectionEnabled, setSelectionEnabled] = useState(true);
   const [detailsEnabled, setDetailsEnabled] = useState(true);
   const [selectedItems, setSelectedItems] = useState<readonly ChartSelectionItem[]>([]);
@@ -2530,16 +2536,17 @@ function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) 
     legend: {label: 'Turbine loops'},
     series: statisticalSeries,
     seriesAccessor: 'loop',
+    visibilityLabels,
     xAxis: {
       accessor: 'temperature',
       label: 'Temperature',
-      scale: {domain: [10, 90], type: 'linear'},
+      scale: {type: 'linear'},
       unit: '°F',
     },
     yAxis: {
       accessor: 'demand',
       label: 'Thermal demand',
-      scale: {domain: [20, 100], type: 'linear'},
+      scale: {type: 'linear'},
       showGrid: true,
       unit: 'MWh',
     },
@@ -2547,7 +2554,7 @@ function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) 
 
   return (
     <Stack gap="regular">
-      <InlineGroup align="start" gap="regular" wrap>
+      <Stack gap="regular">
         <Switch
           isSelected={selectionEnabled}
           label="Enable selection"
@@ -2561,7 +2568,7 @@ function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) 
             if (!enabled) setDetails(null);
           }}
         />
-      </InlineGroup>
+      </Stack>
       <p>{instructions}</p>
       {kind === 'scatter' ? (
         <ScatterChart
@@ -2578,14 +2585,16 @@ function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) 
         />
       )}
       <p className="showcase-muted">
-        Left and Right visit observations in data order, including North Tuesday and South Wednesday
-        at the same coordinates. Up and Down move spatially. Home and End reach the first and last
-        observations. A filled center marks the reading; selected outlines follow each symbol.
-        Circular selection rings meet the colored border as it changes with emphasis. Activation
-        gives brief feedback and opens the details below. Pinning a legend group gives it priority
-        only where marks overlap. Bubble edges outside the rectangle do not count toward selection,
-        and interaction preserves the magnitude shown by each bubble's area. The table retains every
-        valid observation. These controls and details belong to this example.
+        Left and Right visit visible observations in data order, including North Tuesday and South
+        Wednesday at the same coordinates. Up and Down move spatially. Home and End reach the first
+        and last observations. A filled center marks the reading; selected outlines follow each
+        symbol. Circular selection rings meet the colored border as it changes with emphasis.
+        Activation gives brief feedback and opens the details below. Pinning a legend group gives it
+        priority only where marks overlap. Bubble edges outside the rectangle do not count toward
+        selection, and interaction preserves the magnitude shown by each bubble's area. The table
+        retains every valid observation and labels hidden groups. Hide a selected group to see its
+        selection remain labeled as hidden. Hidden observations cannot be read, selected by
+        dragging, or activated. These controls and details belong to this example.
       </p>
       {details ? (
         <Stack gap="regular">
@@ -2774,7 +2783,11 @@ function boxPlotItemLabel(item: BoxPlotSelectionItem) {
   return item.kind === 'summary' ? `${group} summary` : `${group} outlier ${item.outlierId}`;
 }
 
-function BoxPlotInteractionExample() {
+function BoxPlotInteractionExample({
+  visibilityLabels,
+}: {
+  readonly visibilityLabels: ChartVisibilityLabels;
+}) {
   const [selectionEnabled, setSelectionEnabled] = useState(true);
   const [detailsEnabled, setDetailsEnabled] = useState(true);
   const [selectedItems, setSelectedItems] = useState<readonly BoxPlotSelectionItem[]>([]);
@@ -2815,11 +2828,15 @@ function BoxPlotInteractionExample() {
       : [details.source.datum];
   return (
     <Stack gap="regular">
-      <DistributionInteractionControls
-        selectionEnabled={selectionEnabled}
-        setSelectionEnabled={setSelectionEnabled}
-        detailsEnabled={detailsEnabled}
-        setDetailsEnabled={(enabled) => {
+      <Switch
+        isSelected={selectionEnabled}
+        label="Enable selection"
+        onChange={setSelectionEnabled}
+      />
+      <Switch
+        isSelected={detailsEnabled}
+        label="Open details on activation"
+        onChange={(enabled) => {
           setDetailsEnabled(enabled);
           if (!enabled) setDetails(null);
         }}
@@ -2835,23 +2852,27 @@ function BoxPlotInteractionExample() {
         interaction={interaction}
         legend={{label: 'Turbine loops'}}
         title="Recovery-time distribution"
+        visibilityLabels={visibilityLabels}
         xAxis={{label: 'Turbine loop'}}
         yAxis={{
           label: 'Recovery time',
-          scale: {domain: [0, 120], type: 'linear'},
+          scale: {type: 'linear'},
           showGrid: true,
           unit: 'minutes',
         }}
       />
       <p className="showcase-muted">
-        Arrow keys visit each group summary followed by its individual outliers. Home and End reach
-        the first and last targets. A summary reading uses an inset outline and whisker cues. The
-        median remains a line. Outlier readings have filled centers; selection adds rings that meet
-        the colored border. Summary selection frames the box and keeps outliers separate. A box with
-        no spread remains reachable at its median line. Each recovery record has a stable ID, so
-        equal outlier values can identify different observations. This example returns original
-        records. Precomputed summaries return the supplied summary record, with the outlier position
-        when applicable. These controls and details belong to this example.
+        Arrow keys visit each visible group summary followed by its individual outliers. Home and
+        End reach the first and last targets. A summary reading uses an inset outline and whisker
+        cues. The median remains a line. Outlier readings have filled centers; selection adds rings
+        that meet the colored border. Summary selection frames the box and keeps outliers separate.
+        A box with no spread remains reachable at its median line. Each recovery record has a stable
+        ID, so equal outlier values can identify different observations. This example returns
+        original records. Precomputed summaries return the supplied summary record, with the outlier
+        position when applicable. An eye hides a summary and all its outliers together. Remaining
+        groups keep their declared order, and the value axis fits their unchanged summaries. Hidden
+        selections stay labeled in the selection summary; the full table retains and labels hidden
+        groups. These controls and details belong to this example.
       </p>
       {details ? (
         <Stack gap="regular">
@@ -3465,6 +3486,16 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
     showAll: 'Show all series',
     showSeries: (label) => `Show ${label}`,
   };
+  const statisticalVisibilityLabels: ChartVisibilityLabels = {
+    ...visibilityLabels,
+    allHidden: {
+      title: 'All groups hidden',
+      description: 'Use an eye control to show one group, or restore all groups below.',
+    },
+    showAll: 'Show all groups',
+  };
+  const statisticalVisibilityGuidance =
+    'Use the eye after a group name to hide or show its marks. Names pin emphasis separately. Legend order, colors, and shapes stay the same; hiding clears a pin. Automatic numeric axes animate to fit visible values, while explicit axis limits stay fixed. Reduced motion makes scale changes immediate. Hide every group to try Show all groups, which restores focus to the first eye.';
   const visibilityGuidance =
     'Click a series name to pin its highlight; use its separate eye to hide or show it. The scale briefly animates to fit visible values. Hide every series to try Show all series. The data table retains all values and labels hidden series.';
   const common = {
@@ -3676,20 +3707,20 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Hover or focus a legend item to emphasize its group, or press it to pin the group and give it priority where points overlap."
+        description={`Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Pin a legend group to give it priority where points overlap. ${statisticalVisibilityGuidance}`}
         name="ScatterChart"
       >
-        <Example label="ScatterChart with observation selection and details">
-          <PointInteractionExample kind="scatter" />
+        <Example label="ScatterChart with group visibility, selection, and details">
+          <PointInteractionExample kind="scatter" visibilityLabels={statisticalVisibilityLabels} />
         </Example>
       </Specimen>
 
       <Specimen
-        description="Add one positive measurement through proportional mark area. The tooltip and generated table report the source magnitude rather than the rendered radius."
+        description={`Add one positive measurement through proportional mark area. Bubble areas express magnitude within the visible dataset; tooltips and the full table retain exact source values. ${statisticalVisibilityGuidance}`}
         name="BubbleChart"
       >
-        <Example label="BubbleChart with observation selection and details">
-          <PointInteractionExample kind="bubble" />
+        <Example label="BubbleChart with group visibility, selection, and details">
+          <PointInteractionExample kind="bubble" visibilityLabels={statisticalVisibilityLabels} />
         </Example>
       </Specimen>
 
@@ -3703,11 +3734,11 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Compare group medians, quartiles, whiskers, and outliers. Select group summaries and individual outliers separately, and open the original observations through details."
+        description={`Compare group medians, quartiles, whiskers, and outliers. Select group summaries and individual outliers separately, and open the original observations through details. ${statisticalVisibilityGuidance}`}
         name="BoxPlot"
       >
-        <Example label="BoxPlot with summary and outlier selection and details">
-          <BoxPlotInteractionExample />
+        <Example label="BoxPlot with group visibility, summary and outlier selection, and details">
+          <BoxPlotInteractionExample visibilityLabels={statisticalVisibilityLabels} />
         </Example>
       </Specimen>
     </>

@@ -187,3 +187,10 @@ hold. Missing readings remain readable gaps; stable application IDs preserve rec
 Public types, contracts, guide and rendered showcase are updated. All 697 tests and repository,
 build and package checks pass. Independent intent and engineering production reviews pass with no findings. Remaining visibility,
 exploration, data-change animation and the accepted added compositions keep this parent open.
+
+[Statistical visibility ticket 15](../../chart-interaction-composition/tickets/15-statistical-visibility.md)
+implements group eyes, automatic animated visible-data fitting, retained hidden selection and
+all-hidden recovery for ScatterChart, BubbleChart and BoxPlot. Its public contracts, guides and
+examples are current, and all 708 tests and repository/build/package checks pass. Independent
+intent and engineering production reviews pass, including the restoration-animation correction. Radar visibility follows. Histogram and Sparkline visibility are
+excluded; pie/donut percentages and heatmap row/column controls need their remaining decisions.

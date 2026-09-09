@@ -1,3 +1,4 @@
+import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {
   ChartActivationOutline,
   chartActivationOutset,
@@ -1432,43 +1433,17 @@ function Legend<Datum extends object>({
             {item.label}
           </button>
           {visibilityLabels === undefined ? null : (
-            <button
-              aria-label={
+            <ChartVisibilityButton
+              hidden={hiddenIds.includes(item.id)}
+              label={
                 hiddenIds.includes(item.id)
                   ? visibilityLabels.showSeries(item.label)
                   : visibilityLabels.hideSeries(item.label)
               }
-              data-wcl-chart-visibility=""
-              data-hidden={hiddenIds.includes(item.id) ? '' : undefined}
-              onClick={() => onVisibilityChange(item.id)}
-              onKeyDown={(event) => {
-                if (event.key === 'Escape') {
-                  event.preventDefault();
-                  onClear();
-                }
-              }}
-              ref={index === 0 ? onFirstEye : undefined}
-              title={
-                hiddenIds.includes(item.id)
-                  ? visibilityLabels.showSeries(item.label)
-                  : visibilityLabels.hideSeries(item.label)
-              }
-              type="button"
-            >
-              <svg aria-hidden="true" data-wcl-chart-eye="" focusable="false" viewBox="0 0 24 24">
-                {hiddenIds.includes(item.id) ? (
-                  <g>
-                    <path d="M3 10 Q12 20 21 10" />
-                    <path d="m5 12-2 3m6-1-1 4m7-4 1 4m3-6 2 3" />
-                  </g>
-                ) : (
-                  <g>
-                    <path d="M2 12 Q12 1 22 12 Q12 23 2 12Z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </g>
-                )}
-              </svg>
-            </button>
+              onToggle={() => onVisibilityChange(item.id)}
+              onClear={onClear}
+              buttonRef={index === 0 ? onFirstEye : undefined}
+            />
           )}
         </li>
       ))}

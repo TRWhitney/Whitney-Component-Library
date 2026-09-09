@@ -28,6 +28,14 @@ export const scatter = (
     idAccessor="id"
     labelAccessor="label"
     series={series}
+    legend={{label: 'Groups'}}
+    visibilityLabels={{
+      hidden: 'Hidden',
+      hideSeries: (s) => `Hide ${s}`,
+      showSeries: (s) => `Show ${s}`,
+      showAll: 'Show all',
+      allHidden: {title: 'All hidden', description: 'Restore a group.'},
+    }}
     seriesAccessor="series"
     xAxis={{accessor: 'x', label: 'Temperature', scale: {type: 'linear'}}}
     yAxis={{accessor: 'y', label: 'Demand', scale: {type: 'logarithmic'}}}
@@ -42,6 +50,14 @@ export const bubble = (
     labelAccessor="label"
     magnitude={{accessor: 'size', label: 'Stored energy', unit: 'MWh'}}
     series={series}
+    legend={{label: 'Groups'}}
+    visibilityLabels={{
+      hidden: 'Hidden',
+      hideSeries: (s) => `Hide ${s}`,
+      showSeries: (s) => `Show ${s}`,
+      showAll: 'Show all',
+      allHidden: {title: 'All hidden', description: 'Restore a group.'},
+    }}
     xAxis={{accessor: 'x', label: 'Temperature', scale: {type: 'linear'}}}
     yAxis={{accessor: 'y', label: 'Demand', scale: {type: 'linear'}}}
   />
@@ -86,6 +102,13 @@ export const summarizedBoxPlot = (
       whisker: 'tukey',
     }}
     groupAccessor="group"
+    visibilityLabels={{
+      hidden: 'Hidden',
+      hideSeries: (s) => `Hide ${s}`,
+      showSeries: (s) => `Show ${s}`,
+      showAll: 'Show all',
+      allHidden: {title: 'All hidden', description: 'Restore a group.'},
+    }}
     groups={series}
     xAxis={{label: 'Loop'}}
     yAxis={{label: 'Recovery', scale: {type: 'linear'}}}

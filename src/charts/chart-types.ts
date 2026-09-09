@@ -652,6 +652,7 @@ export interface PointChartInteraction<Datum extends object> {
 }
 
 interface PointChartProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly visibilityLabels?: ChartVisibilityLabels;
   readonly interaction?: PointChartInteraction<Datum>;
   readonly idAccessor: ChartAccessor<Datum, string>;
   readonly labelAccessor: ChartAccessor<Datum, string>;
@@ -783,6 +784,7 @@ export type BoxPlotDistribution<Datum extends object> =
     };
 
 export interface BoxPlotProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly visibilityLabels?: ChartVisibilityLabels;
   readonly interaction?: BoxPlotInteraction<Datum>;
   readonly distribution: BoxPlotDistribution<Datum>;
   readonly groupAccessor: ChartAccessor<Datum, string>;

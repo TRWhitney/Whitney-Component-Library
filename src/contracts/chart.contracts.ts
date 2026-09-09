@@ -1090,7 +1090,9 @@ ${bubble ? '        magnitude={{accessor: "stored", label: "Stored energy", unit
             },
           },
         }}
+        legend={{label: "Turbine loops"}}
         series={[{id: "north", label: "North loop"}]}
+        ${visibilityProps}
         title="${bubble ? 'Stored energy observations' : 'Temperature and demand observations'}"
         xAxis={{accessor: "temperature", label: "Temperature", unit: "°F", scale: {type: "linear"}}}
         yAxis={{accessor: "demand", label: "Thermal demand", unit: "MWh", scale: {type: "linear"}}}
@@ -1126,7 +1128,7 @@ ${histogram ? '' : '          getOutlierId: ({datum}) => datum.id,\n'}          
             },
           },
         }}
-        title="${histogram ? 'Restart latency' : 'Recovery-time distribution'}"
+${histogram ? '' : `        legend={{label: "Turbine loops"}}\n        ${visibilityProps}\n`}        title="${histogram ? 'Restart latency' : 'Recovery-time distribution'}"
         xAxis={${histogram ? '{label: "Restart latency", unit: "ms", scale: {domain: [0, 60], type: "linear"}}' : '{label: "Turbine loop"}'}}
         yAxis={${histogram ? '{label: "Restarts", scale: {type: "linear"}}' : '{label: "Recovery time", unit: "minutes", scale: {type: "linear"}}'}}
       />
@@ -1148,6 +1150,7 @@ function statisticalChartContract({
 }: StatisticalChartContractOptions): ComponentContract {
   const guidance = statisticalChartGuidance[name];
   const pointInteraction = name === 'ScatterChart' || name === 'BubbleChart';
+  const groupVisibility = name !== 'Histogram';
   return {
     accentBehavior: [guidance.accent],
     accessibility: [
@@ -1164,6 +1167,11 @@ function statisticalChartContract({
     appropriateUses: [use],
     composition: [
       guidance.composition,
+      ...(groupVisibility
+        ? [
+            'Supply optional visibilityLabels: ChartVisibilityLabels and a named visible legend to enable an eye after each group name, including for a single group.',
+          ]
+        : []),
       ...(pointInteraction
         ? [
             'Supply optional PointChartInteraction<Datum> through interaction. selection and onActivate are independent. Existing idAccessor supplies stable observation IDs; each selection item has rowId and seriesId. There is no category target or second identity accessor. Consumers own details and may share controlled selection across charts with matching observation identities.',
@@ -1174,6 +1182,16 @@ function statisticalChartContract({
     controlBehavior: [
       'Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.',
       ...guidance.control,
+      ...(groupVisibility
+        ? [
+            'Each legend eye hides or restores its group independently of name-based emphasis. Hidden entries retain legend order, colors, and shapes. Hidden names cannot emphasize invisible marks. Hiding clears that group pin; restoring does not repin it.',
+            name === 'BoxPlot'
+              ? 'Hiding a group hides its summary and every outlier together. Remaining categories use declared group order. The numeric axis fits visible summaries and outliers without recomputing statistics across groups.'
+              : 'Hiding a series hides all its observations. Both numeric axes fit visible observations. Bubble areas retain their magnitude interpretation within the visible dataset.',
+            'Automatic numeric bounds fit visible groups with interruptible animation. Explicit consumer domains remain fixed and logarithmic bounds remain positive. Readings retain exact values throughout animation.',
+            'Selections remain attached to hidden items and use the localized hidden selection label. Hidden items cannot be read, selected by dragging, or activated. Visibility, data, or geometry changes cancel pending gestures and stale readings; removed data still prunes selection.',
+          ]
+        : []),
       ...(pointInteraction
         ? [
             'With selection enabled, click or tap a mark toggles that observation. Control/Command-click activates without changing selection. Touch press-and-hold activates and suppresses selection on release. Without selection, click or tap activates when onActivate is supplied. Empty space has no click target.',
@@ -1198,6 +1216,11 @@ function statisticalChartContract({
       'Visible prose and categorical labels follow inherited writing direction. Quantitative axes preserve low-to-high mathematical order.',
     ],
     events: [
+      ...(groupVisibility
+        ? [
+            'Group visibility remains internal and never mutates consumer data. Stable group IDs retain visibility across data updates. Removing a group ID drops its hidden state; new group IDs begin visible.',
+          ]
+        : []),
       ...(pointInteraction
         ? [
             'interaction.onActivate receives PointChartActivation<Datum> with item containing rowId and seriesId, the original datum, label, raw numeric x and y, optional raw magnitude for bubbles, and input of pointer, keyboard, or touch. onSelectionChange receives the next selection items. Readings and legend emphasis remain internal; callbacks expose no renderer objects.',
@@ -1215,15 +1238,16 @@ function statisticalChartContract({
             {
               code: pointChartInteractionExample(name),
               description:
-                'Select individual observations and open application-owned details independently. The chart owns the uncontrolled selection in this example.',
+                'Hide or restore a group with its legend eye, select observations, and open application-owned details independently. Hidden selections remain labeled, and the full table retains hidden groups. Automatic axes fit visible values; Show all series restores every group. The chart owns the uncontrolled selection in this example.',
               title: `${name} with selection and activation`,
             },
           ]
         : [
             {
               code: distributionChartInteractionExample(name),
-              description:
-                'Select statistical targets and receive their values, source records, and input method in an independent activation callback. The chart owns the uncontrolled selection in this example.',
+              description: groupVisibility
+                ? 'Hide or restore a group summary and its outliers together. Select targets and open their source details independently. Hidden selections remain labeled, and the full table retains hidden groups. The automatic value axis fits visible values; Show all series restores every group. The chart owns the uncontrolled selection in this example.'
+                : 'Select statistical targets and receive their values, source records, and input method in an independent activation callback. The chart owns the uncontrolled selection in this example.',
               title: `${name} with selection and activation`,
             },
           ]),
@@ -1236,6 +1260,11 @@ function statisticalChartContract({
     importPath: '.',
     inappropriateUses: [misuse],
     keyboardBehavior: [
+      ...(groupVisibility
+        ? [
+            'Tab reaches separate legend name and eye controls. Enter or Space on an eye hides or restores its group and retains focus on that eye. Plot navigation visits visible items only. Show all restores every group and returns focus to the first eye.',
+          ]
+        : []),
       `Tab reaches one title-named chart boundary. ${pointInteraction ? 'Without interaction, arrow keys move spatially between recorded observations with stable point id as the final tie-breaker.' : `Without interaction, ${keyboard.charAt(0).toLowerCase()}${keyboard.slice(1)}`} Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.`,
       ...(pointInteraction
         ? [
@@ -1249,11 +1278,21 @@ function statisticalChartContract({
     labeling: [guidance.labeling],
     localization: [
       guidance.localization,
+      ...(groupVisibility
+        ? [
+            'ChartVisibilityLabels requires hideSeries(label) and showSeries(label) for the next eye action, hidden for table group labels, allHidden with title and description, and showAll for recovery. ChartSelection labels.hidden describes retained hidden selections separately.',
+          ]
+        : []),
       'Localize every ChartSelection label and the instructions for the enabled selection and activation behavior.',
     ],
     name,
     parts: [
       guidance.parts,
+      ...(groupVisibility
+        ? [
+            'Optional visibility adds separate legend eyes and an all-hidden recovery control. The complete native table retains every valid group and identifies hidden groups.',
+          ]
+        : []),
       ...(pointInteraction
         ? [
             'Optional interaction adds shape-following selection outlines, circular rings joined to the current mark border, filled reading centers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
@@ -1271,16 +1310,33 @@ function statisticalChartContract({
       activationTiming,
       outlineMotion,
       guidance.reducedMotion,
+      ...(groupVisibility
+        ? [
+            'Reduced motion settles automatic scale changes immediately, including when the preference changes during an animation. Otherwise axes and marks share the animated scale.',
+          ]
+        : []),
       'Reduced motion replaces the activation pulse with a brief static acknowledgment. Selection and reading retain the same meanings.',
     ],
     relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
     responsiveBehavior: [guidance.responsive],
     states: [
+      ...(groupVisibility
+        ? [
+            'Hiding every group retains the caption, legend, full table, and selection summary. Localized allHidden copy distinguishes this state from empty or invalid data, and showAll restores every group.',
+          ]
+        : []),
       'Ready, loading, empty, partial, invalid-data, and error states are explicit. Partial data remains plotted with warning copy. Invalid records are omitted and reported; an entirely invalid dataset becomes unavailable.',
     ],
     stylesheet: './styles.css',
     summary: purpose,
-    validation: [validation],
+    validation: [
+      validation,
+      ...(groupVisibility
+        ? [
+            'visibilityLabels requires a named visible legend. Validation uses the full supplied dataset before visibility, so hiding groups does not suppress invalid-data feedback.',
+          ]
+        : []),
+    ],
   };
 }
 
@@ -1312,6 +1368,7 @@ export const scatterChartContract = statisticalChartContract({
   legend={{label: "Turbine loops"}}
   series={[{id: "north", label: "North loop"}, {id: "south", label: "South loop", color: "series-2"}]}
   seriesAccessor="loop"
+  ${visibilityProps}
   title="Temperature and demand"
   xAxis={{accessor: "temperature", label: "Temperature", unit: "°F", scale: {type: "linear"}}}
   yAxis={{accessor: "demand", label: "Thermal demand", unit: "MWh", scale: {type: "linear"}}}
@@ -1350,6 +1407,8 @@ export const bubbleChartContract = statisticalChartContract({
   labelAccessor="label"
   magnitude={{accessor: "stored", label: "Stored energy", unit: "MWh"}}
   series={[{id: "north", label: "North loop"}]}
+  legend={{label: "Turbine loops"}}
+  ${visibilityProps}
   title="Stored energy"
   xAxis={{accessor: "temperature", label: "Temperature", unit: "°F", scale: {type: "linear"}}}
   yAxis={{accessor: "demand", label: "Thermal demand", unit: "MWh", scale: {type: "linear"}}}
@@ -1419,6 +1478,8 @@ export const boxPlotContract = statisticalChartContract({
   groupAccessor="group"
   groups={[{id: "north", label: "North loop"}]}
   ${statisticalState}
+  legend={{label: "Turbine loops"}}
+  ${visibilityProps}
   title="Recovery-time distribution"
   xAxis={{label: "Turbine loop"}}
   yAxis={{label: "Recovery time", unit: "minutes", scale: {type: "linear"}}}

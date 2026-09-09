@@ -345,3 +345,37 @@ Production tests exercise public selection/callback ownership and identity, gaps
 dragging, cancellation and touch hold. Direct browser inspection covers compact dark/light, dense
 readings, forced colors and reduced motion. Public contracts, generated guides and the showcase
 must demonstrate optional interaction. Independent reviews apply to production only.
+
+## Statistical group visibility
+
+Whitney approved extending the existing opening/closing eye controls first to ScatterChart,
+BubbleChart and BoxPlot, then RadarChart. This slice covers the three statistical components.
+Optional `visibilityLabels` reuses `ChartVisibilityLabels` and requires a visible legend. The eye
+follows each group name; name clicks continue to pin emphasis independently. Hidden entries retain
+legend order, colors and shapes, cannot emphasize invisible marks, and remain restorable. Hiding a
+pinned group clears its pin. Removing an ID drops hidden state; new IDs begin visible.
+
+Scatter and bubble hide all observations in a named series. Box plots hide a group's summary and
+outliers together. Visible numeric axes fit automatically with the existing interruptible animation;
+explicit app domains stay fixed and logarithmic axes stay positive. Box category positions use the
+remaining groups in declared order. Bubble areas retain their existing magnitude interpretation
+within the visible dataset. Exact values and statistical summaries are not interpolated or
+recomputed across groups.
+
+Selection stays attached to hidden records and is described as hidden in its summary. Hidden
+observations are excluded from pointer, keyboard, drag and activation targets. Hiding/restoring
+cancels gestures and stale readings. Data removal still prunes selection. The complete data table
+retains hidden groups and labels them. Input validation uses the full dataset before visibility.
+All-hidden state retains caption, legend, full table, selection and a localized Show all control
+which restores focus to the first eye.
+
+Use the approved Cartesian legend visual contract directly; no new prototype is needed for these
+three charts. Reuse existing tokens, eye shape and motion in light/dark, compact, forced-color and
+reduced-motion states. Validate through public component tests, direct rendered operation, public
+types, repository/package checks and independent production reviews. Update the component showcase
+and canonical contracts in the same change.
+
+Histogram and Sparkline hide/show controls are excluded because each currently has one dataset.
+Pie/donut percentage behavior remains a later decision. Heatmap visibility should use row/column
+labels rather than controls in cells; hover/focus reveal and touch discovery need a small later
+prototype. No heatmap prototype or radar implementation begins in this statistical slice.

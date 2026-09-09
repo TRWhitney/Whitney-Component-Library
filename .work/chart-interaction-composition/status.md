@@ -6,11 +6,9 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-[Ticket 14](tickets/14-sparkline-interaction.md) delivers the approved Sparkline rings, horizontal
-range selection and independent activation. Missing readings remain readable gaps. All 697 tests,
-repository/build/package checks and independent production reviews pass. The
-[accepted Sparkline study](prototypes/sparkline-selection.md) remains the visual contract.
-Parent Ticket 22 stays open for visibility, exploration, animations and compositions.
+[Ticket 15](tickets/15-statistical-visibility.md) implements the approved group eyes and automatic
+visible-data fitting for ScatterChart, BubbleChart and BoxPlot. All 708 tests and repository/build/package checks pass. Direct browser and touch inspection and
+independent intent and engineering production reviews pass. Radar visibility is next.
 
 ## Progress
 
@@ -41,7 +39,7 @@ are settled. Scatter/bubble Centers inside selection is delivered. Radar, heatma
 
 ## Verification
 
-[Ticket 14](tickets/14-sparkline-interaction.md#completion-evidence) records the passing repository,
+[Ticket 15](tickets/15-statistical-visibility.md#completion-evidence) records the passing repository,
 public type, package and browser checks, plus independent intent and engineering reviews.
 
 ## Out of scope
@@ -52,6 +50,6 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is delivered in the commit containing this record.
-- Production showcase: `http://localhost:5174`, Vite session `70941`.
-- Next action: specify the remaining visibility controls using the accepted eye toggle and automatic data fitting. No new prototype or implementation slice has started. Keep future prototype revisions short, without tests or agent reviews.
+- Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is delivered in the commit containing this record.
+- Production showcase: `http://localhost:5174`, Vite session `54846`.
+- Next action: plan the radar visibility slice using the approved whole-series eyes and automatic visible-data fitting. Heatmap row/column controls need a later prototype. Histogram and Sparkline visibility are excluded. No owned uncommitted changes remain after this delivery.
