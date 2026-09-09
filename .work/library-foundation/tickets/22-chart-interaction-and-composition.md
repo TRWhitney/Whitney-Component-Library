@@ -142,3 +142,10 @@ is complete with 622 passing tests, repository/build/package checks, and passing
 intent and engineering production reviews after the recorded corrections. It also separates showcase segmented controls into their
 own rows. Visibility for non-Cartesian families, other reading units, exploration, data-change
 animation, and added compositions remain open.
+
+Histogram and box-plot interaction is delivered in
+[distribution ticket 08](../../chart-interaction-composition/tickets/08-distribution-interaction.md).
+It preserves approved frames and Box touched selection, separate outlier targets, independent
+activation and touch hold, and requires stable application IDs for interactive outliers. All 634 tests, repository/build/package checks and independent production reviews pass after the
+recorded geometry-cancellation correction. This parent stays open for the remaining families,
+exploration and compositions.

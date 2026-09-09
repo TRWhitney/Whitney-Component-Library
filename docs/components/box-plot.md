@@ -18,10 +18,11 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 
 - Render BoxPlot inside AppearanceProvider in consumer-owned layout. Choose raw observations with Tukey or min-max whiskers, or one explicit summary record per declared group with quartiles, median, whiskers, outliers, and whisker method. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel. Multiple distribution groups require a visible legend.
 - BoxPlot contains a named figure, visible caption, optional feedback, a group legend when multiple groups exist, interactive SVG plot, categorical and quantitative axes, quartile boxes, medians, split whisker tails, separate outlier marks, shared tooltip, polite announcement, and generated native data table.
+- Optional interaction adds selection frames for bins or summaries, rings for outliers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.
 
 ## Preferred higher-level compositions
 
-- Compose charts with CollectionFilterBar or separate controls and application-owned layout. Keep cross-chart selection, filtering, zooming, and brushing outside this component.
+- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and zooming remain application-owned.
 
 ## Content
 
@@ -35,9 +36,15 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 
 - Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.
 - Legend hover and focus temporarily emphasize one distribution group. Click, Enter, or Space pins it. Repeat the action or press Escape to clear the pin.
-- BoxPlot emits no consumer events and does not filter records, change domains, or own selection and coordinated chart state.
-- BoxPlot manages group-summary and outlier readings plus group emphasis internally. Pointer, keyboard, touch, and legend interaction do not mutate consumer data.
-- Raw mode calculates R-7 quartiles and defaults to Tukey 1.5-IQR whiskers; min-max remains explicit. Summary mode requires one ordered finite summary per group and explicit outliers. Runtime preparation rejects unknown or duplicate groups, reversed statistics, invalid values, and values outside an explicit domain.
+- Optional BoxPlotInteraction<Datum> requires getOutlierId for both raw and summary distributions. Return a stable nonempty string unique within its group. Its context contains kind, groupId, value, and the original datum; summary mode also supplies outlierIndex. Preserve the ID only while it identifies the same observation. Equal values and array positions are not stable observation identities.
+- BoxPlotSelectionItem identifies a group summary with kind: summary and groupId, or a separate outlier with kind: outlier, groupId, and outlierId. Selecting a summary does not select its contributing records or outliers.
+- Drag selects a summary when its central quartile box touches the rectangle, including a zero-spread box at its rendered median segment. Outliers are selected only when their centers are inside the rectangle.
+- With selection enabled, click or tap toggles the target. Control/Command-click or touch press-and-hold activates without changing selection. Releasing a hold does not also select. Without selection, click or tap activates when onActivate is supplied.
+- Drag replaces selection; Shift or Control/Command adds and Alt removes. Escape, pointer cancellation, or a data or geometry change cancels a pending drag or hold without committing it.
+- Use ChartSelection<HistogramSelectionItem> or ChartSelection<BoxPlotSelectionItem> for controlled selectedItems with onSelectionChange, or uncontrolled defaultSelectedItems with optional onSelectionChange. Supply localized instructions, clear, empty, summary, item, and hidden labels. Existing ChartSelection and ChartSelectionLabels defaults remain compatible.
+- Selection stays separate from readings and activation feedback. Retain available identities after data replacement and remove retired items from internal selection. Controlled state remains consumer-owned; unavailable items are omitted from rendering and commands. Selection and activation do not mutate statistics, records, or domains.
+- interaction.onActivate receives BoxPlotActivation<Datum> with kind, item, and input of pointer, keyboard, or touch. Summary activation includes summary with lowerWhisker, q1, median, q3, upperWhisker, whisker method, and outliers. Its source is raw with valid contributing data, or summary with the supplied datum. Outlier activation includes value and source of raw with the original datum, or summary with the supplied datum and outlierIndex. Summary inputs cannot reconstruct original observations. onSelectionChange receives named summary or outlier items.
+- Raw mode calculates R-7 quartiles and defaults to Tukey 1.5-IQR whiskers; min-max remains explicit. Summary mode requires one ordered finite summary per group and explicit outliers. Runtime preparation rejects unknown or duplicate groups, reversed statistics, invalid values, and values outside an explicit domain. Interactive outlier IDs must be nonempty and unique within their group in either source mode.
 - Charts are not form controls and do not submit, validate, or reset values. Place filters and range controls beside the chart in consumer-owned composition.
 
 ## Accessibility
@@ -46,14 +53,16 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 
 ## Keyboard, labeling, localization, and direction
 
-- Tab reaches one title-named chart boundary. Left and Right traverse group summaries in declared order. Direct pointer or touch input can read each outlier separately. Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.
+- Tab reaches one title-named chart boundary. Without interaction, left and Right traverse group summaries in declared order. Direct pointer or touch input can read each outlier separately. Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.
+- With interaction, Left/Right and Up/Down traverse each group summary followed by its individual outliers in declared group order, including equal-valued outliers. Home/End reach the first and last targets. Enter or Space toggles selection; add Control/Command to activate independently. Without selection, Enter or Space activates. Escape cancels a drag before clearing a reading. The reading marks keyboard focus without a whole-chart outline.
 - title, description, both axis labels, and dataTableLabel are required. Group labels must stand alone, and the legend label names their collection. A group tooltip reports its quartiles, median, and whiskers without the method or outlier list. An outlier tooltip reports only its group and that observation. The generated table retains the complete method and outlier data.
 - Localize titles, descriptions, state copy, group labels, axis labels, units, and legend text. Use the quantitative axis formatTick for locale-specific summary and outlier formatting.
+- Localize every ChartSelection label and the instructions for the enabled selection and activation behavior.
 - Visible prose and categorical labels follow inherited writing direction. Quantitative axes preserve low-to-high mathematical order.
 
 ## Appearance and responsive behavior
 
-- Each quartile box has a translucent group-color fill and stronger boundary. Whisker tails stop at Q1 and Q3, and their caps paint above the box so short whiskers remain visible. Only the median crosses the box. Outliers remain separate marks and direct reading dims every other mark.
+- Each quartile box has a translucent group-color fill and stronger boundary. Whisker tails stop at Q1 and Q3, and their caps paint above the box so short whiskers remain visible. Only the median crosses the box. Outliers remain separate marks and direct reading dims every other mark. An interactive summary reading uses an inset outline and whisker cues, with no dot on the median. Selection frames the box; an outlier reading has a filled center and outlier selection uses a ring.
 - The production chart frame scales type, strokes, boxes, whiskers, and outliers from measured space while preserving their statistical relationships. minimumSize and overflow retain the established local-scroll behavior.
 
 ## Accent, forced colors, and reduced motion
@@ -61,6 +70,7 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 - Application accent identifies the first ordinary distribution group. Later groups use the role-aware chart palette, and automatic colors avoid explicit ordinary choices.
 - Forced colors preserve quartile, median, whisker, and outlier boundaries in system colors. Geometry and the generated table retain every statistical role without color.
 - Reduced motion removes mark-emphasis, legend, and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.
+- Reduced motion replaces the activation pulse with a brief static acknowledgment. Selection and reading retain the same meanings.
 
 ## Examples
 
@@ -84,6 +94,50 @@ export function BoxPlotExample() {
         dataTableLabel="Statistical data"
         emptyState={{title: "No observations", description: "Choose a populated interval."}}
         invalidData={{title: "Invalid observations", description: "Correct missing or non-finite values."}}
+        title="Recovery-time distribution"
+        xAxis={{label: "Turbine loop"}}
+        yAxis={{label: "Recovery time", unit: "minutes", scale: {type: "linear"}}}
+      />
+    </AppearanceProvider>
+  );
+}
+```
+
+### BoxPlot with selection and activation
+
+Select statistical targets and receive their values, source records, and input method in an independent activation callback. The chart owns the uncontrolled selection in this example.
+
+```tsx
+import '@trwhitney/component-library/styles.css';
+import {AppearanceProvider, BoxPlot} from '@trwhitney/component-library';
+
+export function SelectableBoxPlot({onOpenDetails}: {readonly onOpenDetails: (message: string) => void}) {
+  return (
+    <AppearanceProvider appearance="dark" accent="#2878ff">
+      <BoxPlot
+        data={[{id: "n-1", group: "north", value: 43}, {id: "n-2", group: "north", value: 48}, {id: "n-3", group: "north", value: 52}, {id: "n-4", group: "north", value: 54}, {id: "n-5", group: "north", value: 57}, {id: "n-6", group: "north", value: 104}]}
+        dataTableLabel="Distribution data"
+        description="Read the distribution, select statistical targets, and open their source details."
+        distribution={{kind: "raw", valueAccessor: "value", whisker: "tukey"}}
+        emptyState={{title: "No observations", description: "Choose a populated interval."}}
+        invalidData={{title: "Invalid observations", description: "Correct invalid records."}}
+        groupAccessor="group"
+        groups={[{id: "north", label: "North loop"}]}
+        interaction={{
+          getOutlierId: ({datum}) => datum.id,
+          onActivate: (activation) => onOpenDetails(JSON.stringify(activation)),
+          selection: {
+            defaultSelectedItems: [],
+            labels: {
+              instructions: "Click or tap to select. Drag to select touched boxes and outlier centers inside the rectangle; Shift or Control/Command adds, Alt removes, and Escape cancels. Control/Command-click or touch hold opens details. Enter or Space selects; add Control/Command to open details.",
+              clear: "Clear selection",
+              empty: "Nothing selected",
+              summary: (count) => `${count} targets selected`,
+              item: (item) => item.kind === "summary" ? `${item.groupId} summary` : `${item.groupId} outlier ${item.outlierId}`,
+              hidden: (label) => `${label} (hidden)`,
+            },
+          },
+        }}
         title="Recovery-time distribution"
         xAxis={{label: "Turbine loop"}}
         yAxis={{label: "Recovery time", unit: "minutes", scale: {type: "linear"}}}

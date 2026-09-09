@@ -950,14 +950,17 @@ const statisticalChartGuidance: Record<
     accent:
       'Application accent colors the histogram bins. Count, proportion, or density remains explicit in the axis, tooltip, and generated table rather than depending on color.',
     appearance:
-      'Contiguous translucent bins share the numeric baseline and use stronger boundaries to keep adjacent intervals distinct. Direct reading dims every other bin.',
+      'Contiguous translucent bins share the numeric baseline and use stronger boundaries to keep adjacent intervals distinct. Direct reading dims every other bin and uses an inset outline. Selection frames meet at exact shared edges without covering the neighboring reading outline.',
     composition:
       'Render Histogram inside AppearanceProvider in consumer-owned layout. Choose raw observations with explicit or automatic thresholds, or pre-binned records with lower, upper, ordinate accessor, and count, proportion, or density meaning. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel.',
     content:
       'Name the measured variable, its unit, and the ordinate directly. Choose thresholds that produce meaningful intervals. Do not describe unrelated categories as bins or pass pre-aggregated values as raw observations.',
-    control: [],
+    control: [
+      'Optional HistogramInteraction<Datum> enables independent activation and selection. HistogramSelectionItem identifies a bin with kind: bin, lower, upper, and upperInclusive. Identity follows that complete interval, including its inclusion rule. Count updates preserve identity; changing thresholds does not transfer selection to a different interval.',
+      'Drag selects bin rectangles that intersect the drag rectangle, including zero-height bins at their rendered baseline.',
+    ],
     events:
-      'Histogram manages direct bin readings internally. Pointer, keyboard, and touch interaction do not mutate observations, bins, or domains.',
+      'interaction.onActivate receives HistogramActivation<Datum> with the interval item, raw displayed value, ordinate of count, proportion, or density, and input of pointer, keyboard, or touch. source.kind is raw with data containing the valid original records in the bin, or binned with datum containing the supplied bin record. onSelectionChange receives named interval items. Density and proportion are never reported as counts.',
     forcedColors:
       'Forced colors preserve axes and bin boundaries in system colors. Interval and ordinate values remain complete in the generated table.',
     labeling:
@@ -975,16 +978,19 @@ const statisticalChartGuidance: Record<
     accent:
       'Application accent identifies the first ordinary distribution group. Later groups use the role-aware chart palette, and automatic colors avoid explicit ordinary choices.',
     appearance:
-      'Each quartile box has a translucent group-color fill and stronger boundary. Whisker tails stop at Q1 and Q3, and their caps paint above the box so short whiskers remain visible. Only the median crosses the box. Outliers remain separate marks and direct reading dims every other mark.',
+      'Each quartile box has a translucent group-color fill and stronger boundary. Whisker tails stop at Q1 and Q3, and their caps paint above the box so short whiskers remain visible. Only the median crosses the box. Outliers remain separate marks and direct reading dims every other mark. An interactive summary reading uses an inset outline and whisker cues, with no dot on the median. Selection frames the box; an outlier reading has a filled center and outlier selection uses a ring.',
     composition:
       'Render BoxPlot inside AppearanceProvider in consumer-owned layout. Choose raw observations with Tukey or min-max whiskers, or one explicit summary record per declared group with quartiles, median, whiskers, outliers, and whisker method. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel. Multiple distribution groups require a visible legend.',
     content:
       'Name each distribution group, numeric measure, unit, quartile method, and whisker method accurately. Use outliers as observations outside the declared whiskers, not as decorative points.',
     control: [
       'Legend hover and focus temporarily emphasize one distribution group. Click, Enter, or Space pins it. Repeat the action or press Escape to clear the pin.',
+      'Optional BoxPlotInteraction<Datum> requires getOutlierId for both raw and summary distributions. Return a stable nonempty string unique within its group. Its context contains kind, groupId, value, and the original datum; summary mode also supplies outlierIndex. Preserve the ID only while it identifies the same observation. Equal values and array positions are not stable observation identities.',
+      'BoxPlotSelectionItem identifies a group summary with kind: summary and groupId, or a separate outlier with kind: outlier, groupId, and outlierId. Selecting a summary does not select its contributing records or outliers.',
+      'Drag selects a summary when its central quartile box touches the rectangle, including a zero-spread box at its rendered median segment. Outliers are selected only when their centers are inside the rectangle.',
     ],
     events:
-      'BoxPlot manages group-summary and outlier readings plus group emphasis internally. Pointer, keyboard, touch, and legend interaction do not mutate consumer data.',
+      'interaction.onActivate receives BoxPlotActivation<Datum> with kind, item, and input of pointer, keyboard, or touch. Summary activation includes summary with lowerWhisker, q1, median, q3, upperWhisker, whisker method, and outliers. Its source is raw with valid contributing data, or summary with the supplied datum. Outlier activation includes value and source of raw with the original datum, or summary with the supplied datum and outlierIndex. Summary inputs cannot reconstruct original observations. onSelectionChange receives named summary or outlier items.',
     forcedColors:
       'Forced colors preserve quartile, median, whisker, and outlier boundaries in system colors. Geometry and the generated table retain every statistical role without color.',
     labeling:
@@ -1039,6 +1045,41 @@ ${bubble ? '        magnitude={{accessor: "stored", label: "Stored energy", unit
 }`;
 }
 
+function distributionChartInteractionExample(name: 'Histogram' | 'BoxPlot'): string {
+  const histogram = name === 'Histogram';
+  return `export function Selectable${name}({onOpenDetails}: {readonly onOpenDetails: (message: string) => void}) {
+  return (
+    <AppearanceProvider appearance="dark" accent="#2878ff">
+      <${name}
+        data={${histogram ? '[{latency: 8}, {latency: 21}, {latency: 44}, {latency: 47}]' : '[{id: "n-1", group: "north", value: 43}, {id: "n-2", group: "north", value: 48}, {id: "n-3", group: "north", value: 52}, {id: "n-4", group: "north", value: 54}, {id: "n-5", group: "north", value: 57}, {id: "n-6", group: "north", value: 104}]'}}
+        dataTableLabel="Distribution data"
+        description="Read the distribution, select statistical targets, and open their source details."
+        distribution={${histogram ? '{kind: "raw", accessor: "latency", thresholds: [0, 20, 40, 60]}' : '{kind: "raw", valueAccessor: "value", whisker: "tukey"}'}}
+        emptyState={{title: "No observations", description: "Choose a populated interval."}}
+        invalidData={{title: "Invalid observations", description: "Correct invalid records."}}
+${histogram ? '' : '        groupAccessor="group"\n        groups={[{id: "north", label: "North loop"}]}\n'}        interaction={{
+${histogram ? '' : '          getOutlierId: ({datum}) => datum.id,\n'}          onActivate: (activation) => onOpenDetails(JSON.stringify(activation)),
+          selection: {
+            defaultSelectedItems: [],
+            labels: {
+              instructions: "Click or tap to select. Drag to select ${histogram ? 'intersected bins' : 'touched boxes and outlier centers inside the rectangle'}; Shift or Control/Command adds, Alt removes, and Escape cancels. Control/Command-click or touch hold opens details. Enter or Space selects; add Control/Command to open details.",
+              clear: "Clear selection",
+              empty: "Nothing selected",
+              summary: (count) => \`\${count} targets selected\`,
+              item: ${histogram ? '({lower, upper, upperInclusive}) => `[${lower}, ${upper}${upperInclusive ? "]" : ")"} ms`' : '(item) => item.kind === "summary" ? `${item.groupId} summary` : `${item.groupId} outlier ${item.outlierId}`'},
+              hidden: (label) => \`\${label} (hidden)\`,
+            },
+          },
+        }}
+        title="${histogram ? 'Restart latency' : 'Recovery-time distribution'}"
+        xAxis={${histogram ? '{label: "Restart latency", unit: "ms", scale: {domain: [0, 60], type: "linear"}}' : '{label: "Turbine loop"}'}}
+        yAxis={${histogram ? '{label: "Restarts", scale: {type: "linear"}}' : '{label: "Recovery time", unit: "minutes", scale: {type: "linear"}}'}}
+      />
+    </AppearanceProvider>
+  );
+}`;
+}
+
 function statisticalChartContract({
   alternative,
   counterExample,
@@ -1085,7 +1126,10 @@ function statisticalChartContract({
             'Shared ChartSelection supports controlled selectedItems with onSelectionChange, or uncontrolled defaultSelectedItems. Supply labels for instructions, clear, empty, summary, item, and hidden. Selected state remains separate from the current reading and activation feedback. Neither selection nor activation changes records, scales, or domains.',
           ]
         : [
-            `${name} emits no consumer events and does not filter records, change domains, or own selection and coordinated chart state.`,
+            'With selection enabled, click or tap toggles the target. Control/Command-click or touch press-and-hold activates without changing selection. Releasing a hold does not also select. Without selection, click or tap activates when onActivate is supplied.',
+            'Drag replaces selection; Shift or Control/Command adds and Alt removes. Escape, pointer cancellation, or a data or geometry change cancels a pending drag or hold without committing it.',
+            'Use ChartSelection<HistogramSelectionItem> or ChartSelection<BoxPlotSelectionItem> for controlled selectedItems with onSelectionChange, or uncontrolled defaultSelectedItems with optional onSelectionChange. Supply localized instructions, clear, empty, summary, item, and hidden labels. Existing ChartSelection and ChartSelectionLabels defaults remain compatible.',
+            'Selection stays separate from readings and activation feedback. Retain available identities after data replacement and remove retired items from internal selection. Controlled state remains consumer-owned; unavailable items are omitted from rendering and commands. Selection and activation do not mutate statistics, records, or domains.',
           ]),
     ],
     counterExamples: [
@@ -1120,7 +1164,14 @@ function statisticalChartContract({
               title: `${name} with selection and activation`,
             },
           ]
-        : []),
+        : [
+            {
+              code: distributionChartInteractionExample(name),
+              description:
+                'Select statistical targets and receive their values, source records, and input method in an independent activation callback. The chart owns the uncontrolled selection in this example.',
+              title: `${name} with selection and activation`,
+            },
+          ]),
     ],
     exportName: name,
     forcedColorBehavior: [guidance.forcedColors],
@@ -1130,22 +1181,20 @@ function statisticalChartContract({
     importPath: '.',
     inappropriateUses: [misuse],
     keyboardBehavior: [
-      `Tab reaches one title-named chart boundary. ${pointInteraction ? 'Without interaction, arrow keys move spatially between recorded observations with stable point id as the final tie-breaker.' : keyboard} Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.`,
+      `Tab reaches one title-named chart boundary. ${pointInteraction ? 'Without interaction, arrow keys move spatially between recorded observations with stable point id as the final tie-breaker.' : `Without interaction, ${keyboard.charAt(0).toLowerCase()}${keyboard.slice(1)}`} Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.`,
       ...(pointInteraction
         ? [
             'With interaction, Left/Right visit observations in data order, including coincident observations; Up/Down move spatially. Home/End reach the first and last observations. With selection enabled, Enter or Space toggles selection. Control/Command plus Enter or Space activates without changing selection. Without selection, Enter or Space activates. Escape cancels an active drag before clearing a reading. The reading marks keyboard focus without a whole-chart outline.',
           ]
-        : []),
+        : [
+            `With interaction, Left/Right and Up/Down traverse ${name === 'Histogram' ? 'bins in interval order' : 'each group summary followed by its individual outliers in declared group order, including equal-valued outliers'}. Home/End reach the first and last targets. Enter or Space toggles selection; add Control/Command to activate independently. Without selection, Enter or Space activates. Escape cancels a drag before clearing a reading. The reading marks keyboard focus without a whole-chart outline.`,
+          ]),
     ],
     kind: 'component',
     labeling: [guidance.labeling],
     localization: [
       guidance.localization,
-      ...(pointInteraction
-        ? [
-            'Localize every ChartSelection label and the instructions for the enabled selection and activation behavior.',
-          ]
-        : []),
+      'Localize every ChartSelection label and the instructions for the enabled selection and activation behavior.',
     ],
     name,
     parts: [
@@ -1154,22 +1203,18 @@ function statisticalChartContract({
         ? [
             'Optional interaction adds shape-following selection outlines, filled reading centers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
           ]
-        : []),
+        : [
+            'Optional interaction adds selection frames for bins or summaries, rings for outliers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
+          ]),
     ],
     preferredAlternatives: [alternative],
     preferredCompositions: [
-      pointInteraction
-        ? 'Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same observations. Filtering and zooming remain application-owned.'
-        : 'Compose charts with CollectionFilterBar or separate controls and application-owned layout. Keep cross-chart selection, filtering, zooming, and brushing outside this component.',
+      'Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and zooming remain application-owned.',
     ],
     purpose,
     reducedMotionBehavior: [
       guidance.reducedMotion,
-      ...(pointInteraction
-        ? [
-            'Reduced motion replaces the activation pulse with a brief static acknowledgment. Selection and reading retain the same meanings.',
-          ]
-        : []),
+      'Reduced motion replaces the activation pulse with a brief static acknowledgment. Selection and reading retain the same meanings.',
     ],
     relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
     responsiveBehavior: [guidance.responsive],
@@ -1329,5 +1374,5 @@ export const boxPlotContract = statisticalChartContract({
   purpose: 'Compare distribution center, spread, whiskers, and outliers across declared groups.',
   use: 'one or more groups need a compact, method-explicit comparison of their numeric distributions',
   validation:
-    'Raw mode calculates R-7 quartiles and defaults to Tukey 1.5-IQR whiskers; min-max remains explicit. Summary mode requires one ordered finite summary per group and explicit outliers. Runtime preparation rejects unknown or duplicate groups, reversed statistics, invalid values, and values outside an explicit domain.',
+    'Raw mode calculates R-7 quartiles and defaults to Tukey 1.5-IQR whiskers; min-max remains explicit. Summary mode requires one ordered finite summary per group and explicit outliers. Runtime preparation rejects unknown or duplicate groups, reversed statistics, invalid values, and values outside an explicit domain. Interactive outlier IDs must be nonempty and unique within their group in either source mode.',
 });

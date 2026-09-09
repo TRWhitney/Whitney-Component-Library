@@ -95,6 +95,9 @@ import {
   type AccentColor,
   type Appearance,
   type BreadcrumbItems,
+  type BoxPlotActivation,
+  type BoxPlotInteraction,
+  type BoxPlotSelectionItem,
   type ChartActivation,
   type ChartInteraction,
   type ChartSelectionItem,
@@ -103,6 +106,9 @@ import {
   type DrawerPlacement,
   type FieldControlProps,
   type FileAcquisitionResult,
+  type HistogramActivation,
+  type HistogramInteraction,
+  type HistogramSelectionItem,
   type PointChartActivation,
   type PointChartInteraction,
   type RadarChartDimensions,
@@ -241,12 +247,35 @@ const restartLatencies = [
   8, 21, 44, 47, 63, 71, 86, 91, 95, 103, 108, 111, 116, 124, 131, 139, 151, 168, 177, 209,
 ].map((latency) => ({latency}));
 const recoveryTimes = [
-  ...[43, 48, 52, 54, 56, 57, 63, 70, 104].map((recovery) => ({loop: 'north', recovery})),
-  ...[34, 39, 43, 47, 51, 54, 56, 58, 60, 63, 75, 96, 108].map((recovery) => ({
-    loop: 'south',
-    recovery,
-  })),
-  ...[55, 59, 63, 66, 71, 75, 79].map((recovery) => ({loop: 'west', recovery})),
+  {id: 'north-recovery-1', loop: 'north', recovery: 43},
+  {id: 'north-recovery-2', loop: 'north', recovery: 48},
+  {id: 'north-recovery-3', loop: 'north', recovery: 52},
+  {id: 'north-recovery-4', loop: 'north', recovery: 54},
+  {id: 'north-recovery-5', loop: 'north', recovery: 56},
+  {id: 'north-recovery-6', loop: 'north', recovery: 57},
+  {id: 'north-recovery-7', loop: 'north', recovery: 63},
+  {id: 'north-recovery-8', loop: 'north', recovery: 70},
+  {id: 'north-recovery-9', loop: 'north', recovery: 104},
+  {id: 'south-recovery-1', loop: 'south', recovery: 34},
+  {id: 'south-recovery-2', loop: 'south', recovery: 39},
+  {id: 'south-recovery-3', loop: 'south', recovery: 43},
+  {id: 'south-recovery-4', loop: 'south', recovery: 47},
+  {id: 'south-recovery-5', loop: 'south', recovery: 51},
+  {id: 'south-recovery-6', loop: 'south', recovery: 54},
+  {id: 'south-recovery-7', loop: 'south', recovery: 56},
+  {id: 'south-recovery-8', loop: 'south', recovery: 58},
+  {id: 'south-recovery-9', loop: 'south', recovery: 60},
+  {id: 'south-recovery-10', loop: 'south', recovery: 63},
+  {id: 'south-recovery-11', loop: 'south', recovery: 75},
+  {id: 'south-recovery-12', loop: 'south', recovery: 96},
+  {id: 'south-recovery-13', loop: 'south', recovery: 108},
+  {id: 'west-recovery-1', loop: 'west', recovery: 55},
+  {id: 'west-recovery-2', loop: 'west', recovery: 59},
+  {id: 'west-recovery-3', loop: 'west', recovery: 63},
+  {id: 'west-recovery-4', loop: 'west', recovery: 66},
+  {id: 'west-recovery-5', loop: 'west', recovery: 71},
+  {id: 'west-recovery-6', loop: 'west', recovery: 75},
+  {id: 'west-recovery-7', loop: 'west', recovery: 79},
 ];
 const chartStateCopy = {
   emptyState: {
@@ -2576,6 +2605,313 @@ function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) 
   );
 }
 
+const distributionChartStateCopy = {
+  dataTableLabel: 'Statistical chart data',
+  emptyState: {
+    description: 'Choose a reporting interval with recorded observations.',
+    title: 'No observations',
+  },
+  invalidData: {
+    description: 'Correct records with missing, non-finite, or out-of-domain values.',
+    title: 'Some observations are invalid',
+  },
+} as const;
+
+function distributionInstructions(selection: boolean, details: boolean, targets: string) {
+  return selection
+    ? `Click or tap to toggle selection. Enter or Space selects the current reading. Drag to select ${targets}. A drag replaces selection; Shift or Control/Command adds, Alt removes, and Escape cancels.${details ? ' Control/Command-click, Control/Command plus Enter or Space, or touch press-and-hold opens details without changing selection.' : ''}`
+    : details
+      ? 'Click, tap, or press Enter or Space to open details.'
+      : 'Hover a mark or use the arrow keys to read its values.';
+}
+
+function DistributionInteractionControls({
+  selectionEnabled,
+  setSelectionEnabled,
+  detailsEnabled,
+  setDetailsEnabled,
+}: {
+  readonly selectionEnabled: boolean;
+  readonly setSelectionEnabled: (enabled: boolean) => void;
+  readonly detailsEnabled: boolean;
+  readonly setDetailsEnabled: (enabled: boolean) => void;
+}) {
+  return (
+    <InlineGroup align="start" gap="regular" wrap>
+      <Switch
+        isSelected={selectionEnabled}
+        label="Enable selection"
+        onChange={setSelectionEnabled}
+      />
+      <Switch
+        isSelected={detailsEnabled}
+        label="Open details on activation"
+        onChange={setDetailsEnabled}
+      />
+    </InlineGroup>
+  );
+}
+
+function histogramItemLabel({lower, upper, upperInclusive}: HistogramSelectionItem) {
+  return `${lower} to ${upper} ms, upper edge ${upperInclusive ? 'included' : 'excluded'}`;
+}
+
+function HistogramInteractionExample() {
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly HistogramSelectionItem[]>([]);
+  const [details, setDetails] = useState<HistogramActivation<
+    (typeof restartLatencies)[number]
+  > | null>(null);
+  const instructions = distributionInstructions(
+    selectionEnabled,
+    detailsEnabled,
+    'bins that intersect the rectangle',
+  );
+  const interaction: HistogramInteraction<(typeof restartLatencies)[number]> = {
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              hidden: (label) => `${label} (hidden)`,
+              item: histogramItemLabel,
+              summary: (count) => `${count} ${count === 1 ? 'bin' : 'bins'} selected`,
+            },
+          },
+        }
+      : {}),
+  };
+  return (
+    <Stack gap="regular">
+      <DistributionInteractionControls
+        selectionEnabled={selectionEnabled}
+        setSelectionEnabled={setSelectionEnabled}
+        detailsEnabled={detailsEnabled}
+        setDetailsEnabled={(enabled) => {
+          setDetailsEnabled(enabled);
+          if (!enabled) setDetails(null);
+        }}
+      />
+      <p>{instructions}</p>
+      <Histogram
+        {...distributionChartStateCopy}
+        data={restartLatencies}
+        description="See which restart-latency ranges occurred most often."
+        distribution={{
+          accessor: 'latency',
+          kind: 'raw',
+          thresholds: [0, 40, 80, 120, 160, 200, 240],
+        }}
+        interaction={interaction}
+        title="Pump restart latency"
+        xAxis={{label: 'Restart latency', scale: {domain: [0, 240], type: 'linear'}, unit: 'ms'}}
+        yAxis={{label: 'Restarts', scale: {domain: [0, 8], type: 'linear'}, showGrid: true}}
+      />
+      <p className="showcase-muted">
+        Arrow keys visit every bin in interval order. Home and End reach the first and last bins.
+        Selection frames share their adjoining edges; the inset outline marks the current reading.
+        Every bin includes its lower edge, and only the final bin includes its upper edge. Selection
+        follows the full interval even when its count changes. New thresholds can retire a selected
+        interval. Details contain the count and original records in this raw-data example.
+        Pre-binned data returns the supplied bin record and its declared count, proportion, or
+        density. These controls and details belong to this example.
+      </p>
+      {details ? (
+        <Stack gap="regular">
+          <DescriptionList
+            ariaLabel="Restart interval details"
+            emptyState={{kind: 'no-data', title: 'No bin', description: 'Open a restart interval.'}}
+            items={[
+              {id: 'interval', term: 'Interval', description: histogramItemLabel(details.item)},
+              {
+                id: 'value',
+                term: `Value (${details.ordinate})`,
+                description: String(details.value),
+              },
+              {id: 'source', term: 'Source mode', description: details.source.kind},
+              {
+                id: 'records',
+                term: 'Original restart records',
+                description:
+                  details.source.kind === 'raw'
+                    ? details.source.data.map((datum) => `${datum.latency} ms`).join(', ') ||
+                      'No restarts in this interval'
+                    : `${details.source.datum.latency} ms`,
+              },
+              {id: 'input', term: 'Input method', description: details.input},
+            ]}
+          />
+          <Button onPress={() => setDetails(null)} variant="quiet">
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
+function boxPlotItemLabel(item: BoxPlotSelectionItem) {
+  const group = statisticalSeries.find(({id}) => id === item.groupId)?.label ?? item.groupId;
+  return item.kind === 'summary' ? `${group} summary` : `${group} outlier ${item.outlierId}`;
+}
+
+function BoxPlotInteractionExample() {
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly BoxPlotSelectionItem[]>([]);
+  const [details, setDetails] = useState<BoxPlotActivation<(typeof recoveryTimes)[number]> | null>(
+    null,
+  );
+  const instructions = distributionInstructions(
+    selectionEnabled,
+    detailsEnabled,
+    'summaries whose boxes touch the rectangle and outliers whose centers are inside it',
+  );
+  const interaction: BoxPlotInteraction<(typeof recoveryTimes)[number]> = {
+    getOutlierId: ({datum}) => datum.id,
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              hidden: (label) => `${label} (hidden)`,
+              item: boxPlotItemLabel,
+              summary: (count) => `${count} ${count === 1 ? 'target' : 'targets'} selected`,
+            },
+          },
+        }
+      : {}),
+  };
+  const sourceRecords = !details
+    ? []
+    : details.kind === 'summary'
+      ? details.source.kind === 'raw'
+        ? details.source.data
+        : [details.source.datum]
+      : [details.source.datum];
+  return (
+    <Stack gap="regular">
+      <DistributionInteractionControls
+        selectionEnabled={selectionEnabled}
+        setSelectionEnabled={setSelectionEnabled}
+        detailsEnabled={detailsEnabled}
+        setDetailsEnabled={(enabled) => {
+          setDetailsEnabled(enabled);
+          if (!enabled) setDetails(null);
+        }}
+      />
+      <p>{instructions}</p>
+      <BoxPlot
+        {...distributionChartStateCopy}
+        data={recoveryTimes}
+        description="Compare the center, spread, and outliers of recovery time for three turbine loops."
+        distribution={{kind: 'raw', valueAccessor: 'recovery', whisker: 'tukey'}}
+        groupAccessor="loop"
+        groups={statisticalSeries}
+        interaction={interaction}
+        legend={{label: 'Turbine loops'}}
+        title="Recovery-time distribution"
+        xAxis={{label: 'Turbine loop'}}
+        yAxis={{
+          label: 'Recovery time',
+          scale: {domain: [0, 120], type: 'linear'},
+          showGrid: true,
+          unit: 'minutes',
+        }}
+      />
+      <p className="showcase-muted">
+        Arrow keys visit each group summary followed by its individual outliers. Home and End reach
+        the first and last targets. A summary reading uses an inset outline and whisker cues. The
+        median remains a line. Outlier readings have filled centers; selection adds rings. Summary
+        selection frames the box and keeps outliers separate. A box with no spread remains reachable
+        at its median line. Each recovery record has a stable ID, so equal outlier values can
+        identify different observations. This example returns original records. Precomputed
+        summaries return the supplied summary record, with the outlier position when applicable.
+        These controls and details belong to this example.
+      </p>
+      {details ? (
+        <Stack gap="regular">
+          <DescriptionList
+            ariaLabel="Recovery distribution details"
+            emptyState={{
+              kind: 'no-data',
+              title: 'No target',
+              description: 'Open a summary or outlier.',
+            }}
+            items={[
+              {id: 'target', term: 'Target', description: boxPlotItemLabel(details.item)},
+              ...(details.kind === 'summary'
+                ? [
+                    {
+                      id: 'lower-whisker',
+                      term: 'Lower whisker',
+                      description: `${details.summary.lowerWhisker} minutes`,
+                    },
+                    {
+                      id: 'q1',
+                      term: 'First quartile',
+                      description: `${details.summary.q1} minutes`,
+                    },
+                    {
+                      id: 'median',
+                      term: 'Median',
+                      description: `${details.summary.median} minutes`,
+                    },
+                    {
+                      id: 'q3',
+                      term: 'Third quartile',
+                      description: `${details.summary.q3} minutes`,
+                    },
+                    {
+                      id: 'upper-whisker',
+                      term: 'Upper whisker',
+                      description: `${details.summary.upperWhisker} minutes`,
+                    },
+                    {
+                      id: 'whisker-method',
+                      term: 'Whisker method',
+                      description: details.summary.whisker,
+                    },
+                    {
+                      id: 'outliers',
+                      term: 'Outlier values',
+                      description:
+                        details.summary.outliers.map((value) => `${value} minutes`).join(', ') ||
+                        'No outliers',
+                    },
+                  ]
+                : [{id: 'value', term: 'Outlier value', description: `${details.value} minutes`}]),
+              {id: 'source', term: 'Source mode', description: details.source.kind},
+              {
+                id: 'records',
+                term: 'Original recovery records',
+                description: sourceRecords
+                  .map((datum) => `${datum.id}: ${datum.recovery} minutes`)
+                  .join(', '),
+              },
+              {id: 'input', term: 'Input method', description: details.input},
+            ]}
+          />
+          <Button onPress={() => setDetails(null)} variant="quiet">
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
 function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   const [lineTarget, setLineTarget] = useState<'category' | 'point'>('category');
   const [lineSelectionEnabled, setLineSelectionEnabled] = useState(true);
@@ -2612,17 +2948,6 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
     dataTableLabel: 'Monthly energy data',
     description: 'Monthly demand remains within available thermal capacity.',
     visibilityLabels,
-  } as const;
-  const statisticalCommon = {
-    dataTableLabel: 'Statistical chart data',
-    emptyState: {
-      description: 'Choose a reporting interval with recorded observations.',
-      title: 'No observations',
-    },
-    invalidData: {
-      description: 'Correct records with missing, non-finite, or out-of-domain values.',
-      title: 'Some observations are invalid',
-    },
   } as const;
   const partToWholeCommon = {
     data: energyCategoryData,
@@ -2959,49 +3284,17 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show a numeric distribution from raw observations or explicit pre-binned intervals. Directly reading one bin dims the others; blank plot space has no inferred reading."
         name="Histogram"
       >
-        <Example label="Raw-observation Histogram">
-          <Histogram
-            {...statisticalCommon}
-            data={restartLatencies}
-            description="See which restart-latency ranges occurred most often."
-            distribution={{
-              accessor: 'latency',
-              kind: 'raw',
-              thresholds: [0, 40, 80, 120, 160, 200, 240],
-            }}
-            title="Pump restart latency"
-            xAxis={{
-              label: 'Restart latency',
-              scale: {domain: [0, 240], type: 'linear'},
-              unit: 'ms',
-            }}
-            yAxis={{label: 'Restarts', scale: {domain: [0, 8], type: 'linear'}, showGrid: true}}
-          />
+        <Example label="Histogram with bin selection and details">
+          <HistogramInteractionExample />
         </Example>
       </Specimen>
 
       <Specimen
-        description="Compare group medians, quartiles, whiskers, and outliers. Keyboard reading moves by group summary; pointer and touch can read each outlier separately."
+        description="Compare group medians, quartiles, whiskers, and outliers. Select group summaries and individual outliers separately, and open the original observations through details."
         name="BoxPlot"
       >
-        <Example label="Raw-observation BoxPlot">
-          <BoxPlot
-            {...statisticalCommon}
-            data={recoveryTimes}
-            description="Compare the center, spread, and outliers of recovery time for three turbine loops."
-            distribution={{kind: 'raw', valueAccessor: 'recovery', whisker: 'tukey'}}
-            groupAccessor="loop"
-            groups={statisticalSeries}
-            legend={{label: 'Turbine loops'}}
-            title="Recovery-time distribution"
-            xAxis={{label: 'Turbine loop'}}
-            yAxis={{
-              label: 'Recovery time',
-              scale: {domain: [0, 120], type: 'linear'},
-              showGrid: true,
-              unit: 'minutes',
-            }}
-          />
+        <Example label="BoxPlot with summary and outlier selection and details">
+          <BoxPlotInteractionExample />
         </Example>
       </Specimen>
     </>

@@ -6,9 +6,9 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-AreaChart and CartesianChart are delivered in `c0c09a6`. The
-[scatter and bubble prototype](prototypes/scatter-bubble-selection.md) is approved with Centers inside.
-[Ticket 07](tickets/07-scatter-bubble-interaction.md) is complete with passing production checks and independent reviews. Parent Ticket 22 stays open.
+[Ticket 08](tickets/08-distribution-interaction.md) implements the approved histogram and box-plot
+interaction, including stable application IDs for interactive outliers. Production validation
+and independent reviews pass; this delivery is complete. Parent Ticket 22 stays open.
 
 ## Progress
 
@@ -27,8 +27,7 @@ AreaChart and CartesianChart are delivered in `c0c09a6`. The
 ## Frontier
 
 The [decision map](map.md) indexes the remaining work. Frame for bars and Value marker for areas
-are settled. Scatter/bubble Centers inside selection is delivered. Plan interaction for histogram,
-box plot, radial, heatmap, and compact reading units next. Exploration and the added compositions remain later work.
+are settled. Scatter/bubble Centers inside selection is delivered. Plan interaction for radial, heatmap, and compact reading units next. Exploration and the added compositions remain later work.
 
 ## Accepted sources
 
@@ -40,8 +39,8 @@ box plot, radial, heatmap, and compact reading units next. Exploration and the a
 
 ## Verification
 
-[Ticket 07](tickets/07-scatter-bubble-interaction.md#completion-evidence) records the current 622 passing
-tests, repository/build/package checks, and inspected production flows. Prototype acceptance remains
+[Ticket 08](tickets/08-distribution-interaction.md#validation) records 634 passing tests,
+repository/build/package checks, and inspected production flows. Prototype acceptance remains
 separate from production verification.
 
 ## Out of scope
@@ -52,10 +51,7 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; scatter/bubble delivery follows `c0c09a6` and the separate showcase radio-row commit as `[Feature] Add scatter and bubble interaction`.
-- Production showcase: `http://localhost:5174/#scatter-chart` and `http://localhost:5174/#bubble-chart`.
-- Owned uncommitted paths: none after delivery.
-- Next action: plan selection/activation for the remaining histogram and box-plot reading units; retain the broader frontier in the decision map.
-- Active prototype: `http://localhost:5178`, Vite session `78529`.
-- Accepted prototype observations and gestures are recorded in its linked contract. No prototype
-  agents or automated suites were used. Production verification is recorded separately.
+- Branch: `main`; distribution interaction follows `118b856` as `[Feature] Select and activate distributions`.
+- Production showcase: `http://localhost:5174/#histogram` and `http://localhost:5174/#box-plot`.
+- Next action: plan the next radial reading unit and its interaction prototype. Keep statistical
+  visibility, heatmap/compact interaction, exploration and the approved compositions in the frontier.

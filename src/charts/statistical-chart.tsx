@@ -15,6 +15,14 @@ import {
 import {createPortal} from 'react-dom';
 import {useFocusVisible} from 'react-aria';
 import {selectionKey, useChartInteraction, type InteractionPoint} from './chart-interaction.js';
+import {
+  DistributionCue,
+  distributionKey,
+  distributionSetup,
+  hitsDistribution,
+  type DistributionPoint,
+  type DistributionSetup,
+} from './distribution-interaction.js';
 import {containsPointShape} from './point-interaction-geometry.js';
 
 import {EmptyState} from '../feedback/empty-state.js';
@@ -47,6 +55,10 @@ import {
 } from './cartesian-chart.js';
 import type {
   BoxPlotDistribution,
+  BoxPlotSelectionItem,
+  BoxPlotOutlierContext,
+  BoxPlotActivation,
+  HistogramActivation,
   BoxPlotProps,
   BoxWhisker,
   BubbleChartProps,
@@ -109,7 +121,8 @@ interface PreparedPoint {
   readonly y: number;
 }
 
-interface PreparedBin {
+interface PreparedBin<Datum extends object> {
+  readonly source: HistogramActivation<Datum>['source'];
   readonly final: boolean;
   readonly lower: number;
   readonly ordinate: HistogramOrdinate;
@@ -118,7 +131,10 @@ interface PreparedBin {
   readonly value: number;
 }
 
-interface PreparedBox {
+interface PreparedBox<Datum extends object> {
+  readonly source: Extract<BoxPlotActivation<Datum>, {kind: 'summary'}>['source'];
+  readonly outlierContexts: readonly BoxPlotOutlierContext<Datum>[];
+  readonly outlierIds?: readonly string[];
   readonly lowerWhisker: number;
   readonly median: number;
   readonly outliers: readonly number[];
@@ -139,8 +155,8 @@ interface PointModel<Datum extends object, Kind extends 'bubble' | 'scatter'> {
   readonly yAxis: QuantitativeChartDataAxis<Datum>;
 }
 
-interface HistogramModel {
-  readonly bins: readonly PreparedBin[];
+interface HistogramModel<Datum extends object> {
+  readonly bins: readonly PreparedBin<Datum>[];
   readonly color: ChartColor;
   readonly invalidCount: number;
   readonly kind: 'histogram';
@@ -148,8 +164,8 @@ interface HistogramModel {
   readonly yAxis: ChartValueAxis<LinearChartScale>;
 }
 
-interface BoxModel {
-  readonly boxes: readonly PreparedBox[];
+interface BoxModel<Datum extends object> {
+  readonly boxes: readonly PreparedBox<Datum>[];
   readonly invalidCount: number;
   readonly kind: 'box';
   readonly series: readonly InternalSeries[];
@@ -158,7 +174,10 @@ interface BoxModel {
 }
 
 type StatisticalModel<Datum extends object> =
-  PointModel<Datum, 'bubble'> | PointModel<Datum, 'scatter'> | HistogramModel | BoxModel;
+  | PointModel<Datum, 'bubble'>
+  | PointModel<Datum, 'scatter'>
+  | HistogramModel<Datum>
+  | BoxModel<Datum>;
 
 interface ReadingRow {
   readonly color?: ChartColor;
@@ -343,7 +362,9 @@ function validateThresholds(thresholds: number | readonly number[] | undefined):
   }
 }
 
-function prepareHistogram<Datum extends object>(props: HistogramProps<Datum>): HistogramModel {
+function prepareHistogram<Datum extends object>(
+  props: HistogramProps<Datum>,
+): HistogramModel<Datum> {
   validateScale(props.xAxis.scale, 'Histogram X axis');
   validateScale(props.yAxis.scale, 'Histogram Y axis');
   if (
@@ -353,7 +374,7 @@ function prepareHistogram<Datum extends object>(props: HistogramProps<Datum>): H
     throw new Error('Histogram Y-axis domain must include the zero baseline.');
   }
   const distribution: HistogramDistribution<Datum> = props.distribution;
-  const bins: PreparedBin[] = [];
+  const bins: PreparedBin<Datum>[] = [];
   let invalidCount = 0;
   if (distribution.kind === 'raw') {
     validateThresholds(distribution.thresholds);
@@ -363,22 +384,31 @@ function prepareHistogram<Datum extends object>(props: HistogramProps<Datum>): H
         invalidCount += 1;
         return [];
       }
-      return [value];
+      return [{value, datum}];
     });
     if (values.length > 0) {
-      const domain = props.xAxis.scale.domain ?? [Math.min(...values), Math.max(...values)];
+      const domain = props.xAxis.scale.domain ?? [
+        Math.min(...values.map((entry) => entry.value)),
+        Math.max(...values.map((entry) => entry.value)),
+      ];
       const expandedDomain: [number, number] =
         domain[0] === domain[1] ? [domain[0] - 0.5, domain[1] + 0.5] : [domain[0], domain[1]];
-      const generator = createBins<number, number>().domain(expandedDomain);
+      const generator = createBins<{value: number; datum: Datum}, number>()
+        .value((entry) => entry.value)
+        .domain(expandedDomain);
       const thresholds = distribution.thresholds ?? props.xAxis.tickCount ?? 6;
       if (typeof thresholds === 'number') generator.thresholds(thresholds);
-      else generator.thresholds([...thresholds]);
+      else
+        generator.thresholds(
+          thresholds.filter((value) => value > expandedDomain[0] && value < expandedDomain[1]),
+        );
       const generated = generator(values).filter(
         (bin) => bin.x0 !== undefined && bin.x1 !== undefined && bin.x1 > bin.x0,
       );
       generated.forEach((bin, sourceIndex) => {
         if (bin.x0 === undefined || bin.x1 === undefined) return;
         bins.push({
+          source: {kind: 'raw', data: bin.map((entry) => entry.datum)},
           final: sourceIndex === generated.length - 1,
           lower: bin.x0,
           ordinate: 'count',
@@ -406,6 +436,7 @@ function prepareHistogram<Datum extends object>(props: HistogramProps<Datum>): H
         return;
       }
       bins.push({
+        source: {kind: 'binned', datum},
         final: false,
         lower,
         ordinate: distribution.ordinate,
@@ -443,17 +474,21 @@ function prepareHistogram<Datum extends object>(props: HistogramProps<Datum>): H
   };
 }
 
-function rawBox(
-  values: readonly number[],
+function rawBox<Datum extends object>(
+  entries: readonly {readonly value: number; readonly datum: Datum}[],
   series: InternalSeries,
   whisker: BoxWhisker,
-): PreparedBox {
+): PreparedBox<Datum> {
+  const values = entries.map((entry) => entry.value);
+  const source = {kind: 'raw' as const, data: entries.map((entry) => entry.datum)};
   const sorted = [...values].sort((first, second) => first - second);
   const q1 = quantileSorted(sorted, 0.25)!;
   const median = quantileSorted(sorted, 0.5)!;
   const q3 = quantileSorted(sorted, 0.75)!;
   if (whisker === 'min-max') {
     return {
+      source,
+      outlierContexts: [],
       lowerWhisker: sorted[0]!,
       median,
       outliers: [],
@@ -468,7 +503,18 @@ function rawBox(
   const lowerFence = q1 - spread * 1.5;
   const upperFence = q3 + spread * 1.5;
   const regular = sorted.filter((value) => value >= lowerFence && value <= upperFence);
+  const outlierContexts = entries
+    .filter((entry) => entry.value < lowerFence || entry.value > upperFence)
+    .sort((a, b) => a.value - b.value)
+    .map((entry) => ({
+      kind: 'raw' as const,
+      datum: entry.datum,
+      groupId: series.id,
+      value: entry.value,
+    }));
   return {
+    source,
+    outlierContexts,
     lowerWhisker: regular[0]!,
     median,
     outliers: sorted.filter((value) => value < lowerFence || value > upperFence),
@@ -480,16 +526,18 @@ function rawBox(
   };
 }
 
-function prepareBoxes<Datum extends object>(props: BoxPlotProps<Datum>): BoxModel {
+function prepareBoxes<Datum extends object>(props: BoxPlotProps<Datum>): BoxModel<Datum> {
   validateScale(props.yAxis.scale, 'Box-plot Y axis');
   const series = normalizeSeries(props.groups);
   validateSeries(series, props.legend);
   const knownGroups = new Map(series.map((item) => [item.id, item]));
   const distribution: BoxPlotDistribution<Datum> = props.distribution;
-  const boxes: PreparedBox[] = [];
+  const boxes: PreparedBox<Datum>[] = [];
   let invalidCount = 0;
   if (distribution.kind === 'raw') {
-    const valuesByGroup = new Map(series.map((item) => [item.id, [] as number[]]));
+    const valuesByGroup = new Map(
+      series.map((item) => [item.id, [] as {value: number; datum: Datum}[]]),
+    );
     props.data.forEach((datum, sourceIndex) => {
       const groupId = readAccessor(props.groupAccessor, datum, sourceIndex);
       const value = readAccessor(distribution.valueAccessor, datum, sourceIndex);
@@ -501,7 +549,7 @@ function prepareBoxes<Datum extends object>(props: BoxPlotProps<Datum>): BoxMode
         invalidCount += 1;
         return;
       }
-      valuesByGroup.get(groupId)!.push(value);
+      valuesByGroup.get(groupId)!.push({value, datum});
     });
     for (const item of series) {
       const values = valuesByGroup.get(item.id) ?? [];
@@ -554,6 +602,14 @@ function prepareBoxes<Datum extends object>(props: BoxPlotProps<Datum>): BoxMode
       }
       validGroups.add(groupId);
       boxes.push({
+        source: {kind: 'summary', datum},
+        outlierContexts: outliers.map((value, outlierIndex) => ({
+          kind: 'summary',
+          datum,
+          groupId,
+          value,
+          outlierIndex,
+        })),
         lowerWhisker: lowerWhisker!,
         median: median!,
         outliers,
@@ -570,6 +626,23 @@ function prepareBoxes<Datum extends object>(props: BoxPlotProps<Datum>): BoxMode
       }
     }
     boxes.sort((first, second) => first.series.shape - second.series.shape);
+  }
+  if (props.interaction) {
+    if (typeof props.interaction.getOutlierId !== 'function')
+      throw new Error('Interactive box plots require getOutlierId.');
+    for (let i = 0; i < boxes.length; i++) {
+      const box = boxes[i]!,
+        ids = new Set<string>();
+      const outlierIds = box.outlierContexts.map((context) => {
+        const id = props.interaction!.getOutlierId(context);
+        assertText(id, 'Box-plot outlier ID');
+        if (ids.has(id))
+          throw new Error(`Box-plot outlier ID "${id}" is duplicated in group "${box.series.id}".`);
+        ids.add(id);
+        return id;
+      });
+      boxes[i] = {...box, outlierIds};
+    }
   }
   return {boxes, invalidCount, kind: 'box', series, xAxis: props.xAxis, yAxis: props.yAxis};
 }
@@ -718,7 +791,12 @@ function readingTargets<Datum extends object>(
       if (left === undefined || right === undefined || y === undefined) return [];
       return [
         {
-          id: `bin-${bin.lower}-${bin.upper}`,
+          id: distributionKey({
+            kind: 'bin',
+            lower: bin.lower,
+            upper: bin.upper,
+            upperInclusive: bin.final,
+          }),
           kind: 'bin' as const,
           label: `${formatAxisValue(bin.lower, model.xAxis)} to ${formatAxisValue(
             bin.upper,
@@ -769,7 +847,7 @@ function readingTargets<Datum extends object>(
       {label: 'Upper whisker', value: formatAxisValue(box.upperWhisker, model.yAxis)},
     ];
     const summary: ReadingTarget = {
-      id: `box-${box.series.id}`,
+      id: distributionKey({kind: 'summary', groupId: box.series.id}),
       kind: 'box',
       label: `${box.series.label} distribution`,
       rows: summaryRows,
@@ -783,7 +861,13 @@ function readingTargets<Datum extends object>(
       if (y === undefined) return [];
       return [
         {
-          id: `outlier-${box.series.id}-${value}-${outlierIndex}`,
+          id: box.outlierIds
+            ? distributionKey({
+                kind: 'outlier',
+                groupId: box.series.id,
+                outlierId: box.outlierIds[outlierIndex]!,
+              })
+            : `outlier-${box.series.id}-${value}-${outlierIndex}`,
           kind: 'outlier' as const,
           label: `${box.series.label} outlier`,
           rows: [summaryRows[0]!, {label: 'Outlier', value: formatAxisValue(value, model.yAxis)}],
@@ -1259,15 +1343,7 @@ function StatisticalMarks<Datum extends object>({
           .reduce((total, item) => total + 1 + item.outliers.length, 0);
         const outlierIndices = box.outliers.map((_, index) => summaryIndex + index + 1);
         const center = projections.xCategory?.position(box.series.id) ?? 0;
-        const bandwidth = Math.max(
-          44,
-          Math.min(
-            88,
-            plotWidth({bottom: 0, left: 60, right: 620, top: 0}) /
-              Math.max(3, model.series.length) /
-              2,
-          ),
-        );
+        const bandwidth = boxBandwidth(model.series.length);
         const q1 = projections.y.position(box.q1)!;
         const q3 = projections.y.position(box.q3)!;
         return (
@@ -1455,15 +1531,75 @@ function StatisticalTable<Datum extends object>({
   );
 }
 
+function boxBandwidth(groupCount: number): number {
+  return Math.max(44, Math.min(88, 560 / Math.max(3, groupCount) / 2));
+}
+function distributionPoints<Datum extends object>(
+  model: StatisticalModel<Datum>,
+  projections: StatisticalProjections,
+  readings: readonly ReadingTarget[],
+  presentation: PresentationMetrics,
+): DistributionPoint[] {
+  const point = (index: number, seriesId: string): Omit<DistributionPoint, 'kind'> => ({
+    index,
+    x: readings[index]!.x,
+    y: readings[index]!.y,
+    categoryPosition: readings[index]!.x,
+    seriesId,
+    item: {rowId: readings[index]!.id, seriesId: ''},
+    radius: 5 / presentation.viewScale,
+    shape: 0,
+  });
+  if (model.kind === 'histogram')
+    return model.bins.map((bin, index) => {
+      const x = projections.xNumber!.position(bin.lower)!,
+        right = projections.xNumber!.position(bin.upper)!,
+        y = projections.y.position(bin.value)!,
+        base = projections.y.position(0)!;
+      return {
+        ...point(index, ''),
+        kind: 'bin',
+        bounds: {x, y: Math.min(y, base), width: right - x, height: Math.abs(base - y)},
+      };
+    });
+  if (model.kind !== 'box') return [];
+  let index = 0;
+  return model.boxes.flatMap((box) => {
+    const summary = point(index++, box.series.id),
+      center = summary.x,
+      width = boxBandwidth(model.series.length),
+      q1 = projections.y.position(box.q1)!,
+      q3 = projections.y.position(box.q3)!,
+      upper = projections.y.position(box.upperWhisker)!,
+      lower = projections.y.position(box.lowerWhisker)!;
+    return [
+      {
+        ...summary,
+        kind: 'summary' as const,
+        bounds: {x: center - width / 2, y: q3, width, height: q1 - q3},
+        whiskers: [
+          {x1: center, x2: center, y1: upper, y2: q3},
+          {x1: center, x2: center, y1: q1, y2: lower},
+          {x1: center - width / 4, x2: center + width / 4, y1: upper, y2: upper},
+          {x1: center - width / 4, x2: center + width / 4, y1: lower, y2: lower},
+        ],
+      },
+      ...box.outliers.map(() => ({...point(index++, box.series.id), kind: 'outlier' as const})),
+    ];
+  });
+}
+
 function StatisticalFrame<Datum extends object>({
   common,
   legend,
   interaction,
+  distribution,
   model,
   rootAttribute,
 }: {
   readonly common: CommonProps<Datum>;
   readonly interaction?: PointChartInteraction<Datum>;
+  readonly distribution?: DistributionSetup;
   readonly legend?: ChartLegend;
   readonly model: StatisticalModel<Datum>;
   readonly rootAttribute: string;
@@ -1517,9 +1653,11 @@ function StatisticalFrame<Datum extends object>({
   );
   const projections = projectionsFor(model, plot);
   const readings = readingTargets(model, projections);
+  const distributionGeometry = distributionPoints(model, projections, readings, presentation);
   const readingIdentity = JSON.stringify(readings.map((reading) => reading.id));
   const readingGeometry = JSON.stringify({
     model: statisticalModelGeometry(model),
+    distribution: distributionGeometry.map((point) => [point.bounds, point.whiskers]),
     presentation: [
       aspectRatio,
       availableWidth,
@@ -1533,36 +1671,57 @@ function StatisticalFrame<Datum extends object>({
     readings: readings.map((reading) => [reading.id, reading.x, reading.y]),
   });
   const pointModel = model.kind === 'scatter' || model.kind === 'bubble' ? model : undefined;
-  const interactionRows = (pointModel?.points ?? []).map((point) => ({
-    id: point.id,
-    category: point.x,
-    datum: common.data[point.sourceIndex]!,
-    values: [{seriesId: point.series.id, label: point.series.label, value: point.y, hidden: false}],
-  }));
-  const configuration: ChartInteraction<Datum, number> | undefined = interaction
-    ? {
-        target: 'point',
-        getRowId: (datum) => interactionRows.find((row) => row.datum === datum)!.id,
-        ...(interaction.selection ? {selection: interaction.selection} : {}),
-        ...(interaction.onActivate
-          ? {
-              onActivate: (activation) => {
-                const point = pointModel?.points.find((item) => item.id === activation.item.rowId);
-                if (point)
-                  interaction.onActivate?.({
-                    item: activation.item,
-                    datum: activation.datum,
-                    input: activation.input,
-                    label: point.label,
-                    x: point.x,
-                    y: point.y,
-                    ...(point.magnitude === undefined ? {} : {magnitude: point.magnitude}),
-                  });
-              },
-            }
-          : {}),
-      }
-    : undefined;
+  const interactionRows = pointModel
+    ? pointModel.points.map((point) => ({
+        id: point.id,
+        category: point.x,
+        datum: common.data[point.sourceIndex]!,
+        values: [
+          {seriesId: point.series.id, label: point.series.label, value: point.y, hidden: false},
+        ],
+      }))
+    : readings.map((reading) => ({
+        id: reading.id,
+        category: reading.x,
+        datum: reading,
+        values: [{seriesId: '', label: reading.label, value: 0, hidden: false}],
+      }));
+  const configuration:
+    Pick<ChartInteraction<object, number>, 'target' | 'selection' | 'onActivate'> | undefined =
+    interaction
+      ? {
+          target: 'point',
+          ...(interaction.selection ? {selection: interaction.selection} : {}),
+          ...(interaction.onActivate
+            ? {
+                onActivate: (activation) => {
+                  const point = pointModel?.points.find(
+                    (item) => item.id === activation.item.rowId,
+                  );
+                  if (point)
+                    interaction.onActivate?.({
+                      item: activation.item,
+                      datum: common.data[point.sourceIndex]!,
+                      input: activation.input,
+                      label: point.label,
+                      x: point.x,
+                      y: point.y,
+                      ...(point.magnitude === undefined ? {} : {magnitude: point.magnitude}),
+                    });
+                },
+              }
+            : {}),
+        }
+      : distribution
+        ? {
+            target: 'point',
+            ...(distribution.selection ? {selection: distribution.selection} : {}),
+            ...(distribution.onActivate
+              ? {onActivate: (event) => distribution.onActivate?.(event.item.rowId, event.input)}
+              : {}),
+          }
+        : undefined;
+  const interactive = configuration !== undefined;
   const actions = useChartInteraction(
     configuration,
     interactionRows,
@@ -1573,16 +1732,19 @@ function StatisticalFrame<Datum extends object>({
     (max, point) => Math.max(max, point.magnitude ?? 1),
     0,
   );
-  const points = (pointModel?.points ?? []).map((point, index) => ({
-    index,
-    x: readings[index]!.x,
-    y: readings[index]!.y,
-    categoryPosition: readings[index]!.x,
-    seriesId: point.series.id,
-    item: {rowId: point.id, seriesId: point.series.id},
-    radius: pointRadius(pointModel!, point, presentation, maximumMagnitude),
-    shape: point.series.shape,
-  }));
+  const points: DistributionPoint[] = pointModel
+    ? pointModel.points.map((point, index) => ({
+        kind: 'point' as const,
+        index,
+        x: readings[index]!.x,
+        y: readings[index]!.y,
+        categoryPosition: readings[index]!.x,
+        seriesId: point.series.id,
+        item: {rowId: point.id, seriesId: point.series.id},
+        radius: pointRadius(pointModel, point, presentation, maximumMagnitude),
+        shape: point.series.shape,
+      }))
+    : distributionGeometry;
   const inPlot = (x: number, y: number) =>
     x >= plot.left && x <= plot.right && y >= plot.top && y <= plot.bottom;
   const selectablePoints = points.filter((point) => inPlot(point.x, point.y));
@@ -1666,7 +1828,9 @@ function StatisticalFrame<Datum extends object>({
     const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
     if (!inPlot(x, y)) return undefined;
     const hits = points.filter((point) =>
-      containsPointShape(point.shape, point.radius, x - point.x, y - point.y),
+      point.kind === 'point'
+        ? containsPointShape(point.shape, point.radius, x - point.x, y - point.y)
+        : hitsDistribution(point, x, y, 2 / presentation.viewScale),
     );
     const preferred =
       hits.length > 1 ? hits.find((point) => point.seriesId === legendSeriesId) : undefined;
@@ -1727,7 +1891,7 @@ function StatisticalFrame<Datum extends object>({
   };
   const focusChart = (event: FocusEvent<HTMLDivElement>): void => {
     if (
-      (!interaction || isFocusVisible) &&
+      (!interactive || isFocusVisible) &&
       event.currentTarget === event.target &&
       keyboardReadingId === null &&
       readings.length > 0
@@ -1750,7 +1914,7 @@ function StatisticalFrame<Datum extends object>({
       setKeyboardReadingId(null);
       return;
     }
-    if (interaction && (event.key === 'Enter' || event.key === ' ')) {
+    if (interactive && (event.key === 'Enter' || event.key === ' ')) {
       event.preventDefault();
       const point = points[indexForReadingId(keyboardReadingId) ?? activeIndex ?? -1];
       if (point && inPlot(point.x, point.y))
@@ -1762,12 +1926,18 @@ function StatisticalFrame<Datum extends object>({
     const current = indexForReadingId(keyboardReadingId) ?? activeIndex ?? 0;
     let next = current;
     if (model.kind === 'scatter' || model.kind === 'bubble') {
-      if (interaction && event.key === 'Home') next = 0;
-      else if (interaction && event.key === 'End') next = readings.length - 1;
-      else if (interaction && event.key === 'ArrowLeft') next = Math.max(0, current - 1);
-      else if (interaction && event.key === 'ArrowRight')
+      if (interactive && event.key === 'Home') next = 0;
+      else if (interactive && event.key === 'End') next = readings.length - 1;
+      else if (interactive && event.key === 'ArrowLeft') next = Math.max(0, current - 1);
+      else if (interactive && event.key === 'ArrowRight')
         next = Math.min(readings.length - 1, current + 1);
-      else next = spatialTarget(readings, current, event.key, interaction !== undefined);
+      else next = spatialTarget(readings, current, event.key, interactive);
+    } else if (model.kind === 'box' && interactive) {
+      if (event.key === 'Home') next = 0;
+      if (event.key === 'End') next = readings.length - 1;
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = Math.max(0, current - 1);
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown')
+        next = Math.min(readings.length - 1, current + 1);
     } else if (model.kind === 'box') {
       const summaries = readings
         .map((reading, index) => ({index, reading}))
@@ -1862,14 +2032,14 @@ function StatisticalFrame<Datum extends object>({
         >
           <div
             aria-keyshortcuts={
-              interaction
+              interactive
                 ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape Enter Space Control+Enter Meta+Enter Control+Space Meta+Space'
                 : 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape'
             }
             aria-describedby={
-              interaction?.selection ? `${descriptionId}-selection-instructions` : undefined
+              configuration?.selection ? `${descriptionId}-selection-instructions` : undefined
             }
-            data-item-interaction={interaction ? '' : undefined}
+            data-item-interaction={interactive ? '' : undefined}
             aria-labelledby={titleId}
             data-wcl-chart-canvas=""
             onBlur={blurChart}
@@ -1882,15 +2052,15 @@ function StatisticalFrame<Datum extends object>({
               aria-hidden="true"
               data-wcl-chart-svg=""
               focusable="false"
-              data-selection-enabled={interaction?.selection ? '' : undefined}
-              onPointerDown={interaction ? beginItem : readTouch}
+              data-selection-enabled={configuration?.selection ? '' : undefined}
+              onPointerDown={interactive ? beginItem : readTouch}
               onPointerUp={
-                interaction ? (event) => actions.end(event, pointFromPointer(event)) : undefined
+                interactive ? (event) => actions.end(event, pointFromPointer(event)) : undefined
               }
-              onPointerCancel={interaction ? () => actions.cancel() : undefined}
-              onLostPointerCapture={interaction ? () => actions.cancel() : undefined}
+              onPointerCancel={interactive ? () => actions.cancel() : undefined}
+              onLostPointerCapture={interactive ? () => actions.cancel() : undefined}
               onPointerLeave={clearPointer}
-              onPointerMove={interaction ? moveItem : readPointer}
+              onPointerMove={interactive ? moveItem : readPointer}
               ref={setSvgElement}
               viewBox={`0 0 ${viewWidth} ${viewHeight}`}
             >
@@ -1954,7 +2124,7 @@ function StatisticalFrame<Datum extends object>({
                   projections={projections}
                   readings={readings}
                 />
-                {interaction ? (
+                {interactive ? (
                   <g
                     clipPath={`url(#${clipId})`}
                     data-wcl-chart-interaction-overlay=""
@@ -1963,50 +2133,77 @@ function StatisticalFrame<Datum extends object>({
                     {points.map((point) => (
                       <g key={point.item.rowId}>
                         {selectedKeys.has(selectionKey(point.item)) ? (
-                          <PointShape
-                            cx={point.x}
-                            cy={point.y}
-                            radius={point.radius + 2 / presentation.viewScale}
-                            shape={point.shape}
-                            cue="selection"
-                          />
-                        ) : null}
-                        {activeIndex === point.index ? (
-                          <>
-                            {model.kind === 'bubble' ? (
-                              <PointShape
-                                cx={point.x}
-                                cy={point.y}
-                                radius={Math.max(0, point.radius - 2 / presentation.viewScale)}
-                                shape={point.shape}
-                                cue="reading"
-                              />
-                            ) : null}
+                          point.kind === 'bin' || point.kind === 'summary' ? (
+                            <DistributionCue
+                              point={point}
+                              points={points}
+                              cue="selection"
+                              scale={presentation.viewScale}
+                            />
+                          ) : (
                             <PointShape
                               cx={point.x}
                               cy={point.y}
-                              radius={Math.max(
-                                1 / presentation.viewScale,
-                                Math.min(
-                                  point.radius - 1 / presentation.viewScale,
-                                  3.5 / presentation.viewScale,
-                                ),
-                              )}
+                              radius={point.radius + 2 / presentation.viewScale}
                               shape={point.shape}
-                              cue="center"
+                              cue="selection"
                             />
-                          </>
+                          )
+                        ) : null}
+                        {activeIndex === point.index ? (
+                          point.kind === 'bin' || point.kind === 'summary' ? (
+                            <DistributionCue
+                              point={point}
+                              points={points}
+                              cue="reading"
+                              scale={presentation.viewScale}
+                            />
+                          ) : (
+                            <>
+                              {model.kind === 'bubble' ? (
+                                <PointShape
+                                  cx={point.x}
+                                  cy={point.y}
+                                  radius={Math.max(0, point.radius - 2 / presentation.viewScale)}
+                                  shape={point.shape}
+                                  cue="reading"
+                                />
+                              ) : null}
+                              <PointShape
+                                cx={point.x}
+                                cy={point.y}
+                                radius={Math.max(
+                                  1 / presentation.viewScale,
+                                  Math.min(
+                                    point.radius - 1 / presentation.viewScale,
+                                    3.5 / presentation.viewScale,
+                                  ),
+                                )}
+                                shape={point.shape}
+                                cue="center"
+                              />
+                            </>
+                          )
                         ) : null}
                         {actions.pulse &&
                         selectionKey(actions.pulse.item) === selectionKey(point.item) ? (
                           <g key={actions.pulse.sequence} data-wcl-point-activation="">
-                            <PointShape
-                              cx={point.x}
-                              cy={point.y}
-                              radius={point.radius + 5 / presentation.viewScale}
-                              shape={point.shape}
-                              cue="activation"
-                            />
+                            {point.kind === 'bin' || point.kind === 'summary' ? (
+                              <DistributionCue
+                                point={point}
+                                points={points}
+                                cue="activation"
+                                scale={presentation.viewScale}
+                              />
+                            ) : (
+                              <PointShape
+                                cx={point.x}
+                                cy={point.y}
+                                radius={point.radius + 5 / presentation.viewScale}
+                                shape={point.shape}
+                                cue="activation"
+                              />
+                            )}
                           </g>
                         ) : null}
                       </g>
@@ -2052,21 +2249,21 @@ function StatisticalFrame<Datum extends object>({
         <p id={descriptionId}>{common.description}</p>
       </figcaption>
       {content}
-      {interaction?.selection ? (
+      {configuration?.selection ? (
         <div data-wcl-chart-selection="">
           <p id={`${descriptionId}-selection-instructions`}>
-            {interaction.selection.labels.instructions}
+            {configuration.selection.labels.instructions}
           </p>
           <div aria-live="polite" aria-atomic="true">
             <span>
               {actions.selected.length
-                ? interaction.selection.labels.summary(actions.selected.length)
-                : interaction.selection.labels.empty}
+                ? configuration.selection.labels.summary(actions.selected.length)
+                : configuration.selection.labels.empty}
             </span>
             {actions.selected.length ? (
               <ul>
                 {actions.selected.map((item) => (
-                  <li key={selectionKey(item)}>{interaction.selection!.labels.item(item)}</li>
+                  <li key={selectionKey(item)}>{configuration.selection!.labels.item(item)}</li>
                 ))}
               </ul>
             ) : null}
@@ -2081,7 +2278,7 @@ function StatisticalFrame<Datum extends object>({
                 rootElement?.querySelector<HTMLElement>('[data-wcl-chart-canvas]')?.focus();
               }}
             >
-              {interaction.selection.labels.clear}
+              {configuration.selection.labels.clear}
             </button>
           ) : null}
         </div>
@@ -2119,6 +2316,7 @@ function statisticalModelGeometry<Datum extends object>(model: StatisticalModel<
       box.q3,
       box.upperWhisker,
       box.outliers,
+      box.outlierIds,
     ]),
     kind: model.kind,
     series: model.series.map((series) => series.id),
@@ -2156,18 +2354,103 @@ export function Histogram<Datum extends object>(props: HistogramProps<Datum>): R
   assertText(props.xAxis.label, 'Histogram X-axis label');
   assertText(props.yAxis.label, 'Histogram Y-axis label');
   const model = prepareHistogram(props);
-  return <StatisticalFrame common={props} model={model} rootAttribute="data-wcl-histogram" />;
+  const distribution = props.interaction
+    ? distributionSetup(
+        model.bins.map((bin) => ({
+          item: {
+            kind: 'bin' as const,
+            lower: bin.lower,
+            upper: bin.upper,
+            upperInclusive: bin.final,
+          },
+          activate: (input: 'pointer' | 'keyboard' | 'touch') =>
+            props.interaction?.onActivate?.({
+              item: {kind: 'bin', lower: bin.lower, upper: bin.upper, upperInclusive: bin.final},
+              value: bin.value,
+              ordinate: bin.ordinate,
+              source: bin.source,
+              input,
+            }),
+        })),
+        props.interaction.selection,
+        !!props.interaction.onActivate,
+      )
+    : undefined;
+  return (
+    <StatisticalFrame
+      common={props}
+      model={model}
+      {...(distribution ? {distribution} : {})}
+      rootAttribute="data-wcl-histogram"
+    />
+  );
 }
 
 export function BoxPlot<Datum extends object>(props: BoxPlotProps<Datum>): ReactElement {
   assertText(props.xAxis.label, 'Box-plot X-axis label');
   assertText(props.yAxis.label, 'Box-plot Y-axis label');
   const model = prepareBoxes(props);
+  const distribution = props.interaction
+    ? distributionSetup<BoxPlotSelectionItem>(
+        model.boxes.flatMap((box) => {
+          const item: BoxPlotSelectionItem = {kind: 'summary', groupId: box.series.id};
+          return [
+            {
+              item,
+              activate: (input: 'pointer' | 'keyboard' | 'touch') =>
+                props.interaction?.onActivate?.({
+                  kind: 'summary',
+                  item,
+                  summary: {
+                    lowerWhisker: box.lowerWhisker,
+                    q1: box.q1,
+                    median: box.median,
+                    q3: box.q3,
+                    upperWhisker: box.upperWhisker,
+                    whisker: box.whisker,
+                    outliers: box.outliers,
+                  },
+                  source: box.source,
+                  input,
+                }),
+            },
+            ...box.outlierContexts.map((context, index) => {
+              const item: Extract<BoxPlotSelectionItem, {kind: 'outlier'}> = {
+                kind: 'outlier',
+                groupId: box.series.id,
+                outlierId: box.outlierIds![index]!,
+              };
+              return {
+                item,
+                activate: (input: 'pointer' | 'keyboard' | 'touch') =>
+                  props.interaction?.onActivate?.({
+                    kind: 'outlier',
+                    item,
+                    value: context.value,
+                    source:
+                      context.kind === 'raw'
+                        ? {kind: 'raw', datum: context.datum}
+                        : {
+                            kind: 'summary',
+                            datum: context.datum,
+                            outlierIndex: context.outlierIndex,
+                          },
+                    input,
+                  }),
+              };
+            }),
+          ];
+        }),
+        props.interaction.selection,
+        !!props.interaction.onActivate,
+      )
+    : undefined;
   return (
     <StatisticalFrame
       common={props}
       {...(props.legend === undefined ? {} : {legend: props.legend})}
       model={model}
+      {...(distribution ? {distribution} : {})}
       rootAttribute="data-wcl-box-plot"
     />
   );

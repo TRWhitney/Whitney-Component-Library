@@ -18,11 +18,11 @@ Existing approvals and deliveries remain canonical in the [specification](spec.m
 - [Area and mixed selection](prototypes/area-mixed-selection.md#accepted-contract): Value marker and legend priority only among overlapping marks.
 
 The [scatter/bubble prototype](prototypes/scatter-bubble-selection.md) records approved Centers inside
-rectangle selection. Ticket 07 delivers scatter/bubble observation interaction. Histogram and box-plot interaction remains unplanned.
+rectangle selection. Ticket 07 delivers scatter/bubble observation interaction. The [histogram/box-plot prototype](prototypes/distribution-selection.md) records approved Box touched selection and the inner-outline-only summary reading cue. [Ticket 08](tickets/08-distribution-interaction.md) delivers the production callback boundary. Whitney chose stable application IDs for interactive outliers. Ticket 08 is complete with passing validation and independent production reviews.
 
 ## Not yet specified
 
-- Selection and visibility for the remaining statistical, radial, heatmap, and compact reading units.
+- Visibility for statistical families; selection and visibility for radial, heatmap, and compact reading units.
 - Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.

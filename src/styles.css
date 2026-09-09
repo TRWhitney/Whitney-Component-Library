@@ -9019,3 +9019,29 @@
     transform: scale(1.035);
   }
 }
+
+@layer wcl.components {
+  [data-wcl-distribution-cue] > :is(rect, line) {
+    fill: none;
+    stroke: var(--wcl-text);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+
+  [data-wcl-distribution-cue='reading'] > :is(rect, line) {
+    stroke-width: 1px;
+    stroke-dasharray: 3 2;
+  }
+
+  [data-wcl-distribution-cue='activation'] > :is(rect, line) {
+    stroke-width: 4px;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-wcl-distribution-cue] > :is(rect, line) {
+    stroke: CanvasText;
+  }
+}

@@ -394,25 +394,27 @@ export interface ChartActivation<Datum extends object, Category extends ChartDom
   }[];
 }
 
-export interface ChartSelectionLabels {
+export interface ChartSelectionLabels<Item = ChartSelectionItem> {
   readonly instructions: string;
   readonly clear: string;
   readonly empty: string;
   readonly summary: (count: number) => string;
-  readonly item: (item: ChartSelectionItem) => string;
+  readonly item: (item: Item) => string;
   readonly hidden: (label: string) => string;
 }
 
-export type ChartSelection = {readonly labels: ChartSelectionLabels} & (
+export type ChartSelection<Item = ChartSelectionItem> = {
+  readonly labels: ChartSelectionLabels<Item>;
+} & (
   | {
-      readonly selectedItems: readonly ChartSelectionItem[];
+      readonly selectedItems: readonly Item[];
       readonly defaultSelectedItems?: never;
-      readonly onSelectionChange: (items: readonly ChartSelectionItem[]) => void;
+      readonly onSelectionChange: (items: readonly Item[]) => void;
     }
   | {
       readonly selectedItems?: never;
-      readonly defaultSelectedItems?: readonly ChartSelectionItem[];
-      readonly onSelectionChange?: (items: readonly ChartSelectionItem[]) => void;
+      readonly defaultSelectedItems?: readonly Item[];
+      readonly onSelectionChange?: (items: readonly Item[]) => void;
     }
 );
 
@@ -606,7 +608,72 @@ export type HistogramDistribution<Datum extends object> =
       readonly upperAccessor: ChartAccessor<Datum, number>;
     };
 
+export interface HistogramSelectionItem {
+  readonly kind: 'bin';
+  readonly lower: number;
+  readonly upper: number;
+  readonly upperInclusive: boolean;
+}
+export interface HistogramActivation<Datum extends object> {
+  readonly item: HistogramSelectionItem;
+  readonly value: number;
+  readonly ordinate: HistogramOrdinate;
+  readonly source:
+    | {readonly kind: 'raw'; readonly data: readonly Datum[]}
+    | {readonly kind: 'binned'; readonly datum: Datum};
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+}
+export interface HistogramInteraction<Datum extends object> {
+  readonly onActivate?: (activation: HistogramActivation<Datum>) => void;
+  readonly selection?: ChartSelection<HistogramSelectionItem>;
+}
+export type BoxPlotSelectionItem =
+  | {readonly kind: 'summary'; readonly groupId: string}
+  | {readonly kind: 'outlier'; readonly groupId: string; readonly outlierId: string};
+export type BoxPlotOutlierContext<Datum extends object> = {
+  readonly groupId: string;
+  readonly value: number;
+} & (
+  | {readonly kind: 'raw'; readonly datum: Datum}
+  | {readonly kind: 'summary'; readonly datum: Datum; readonly outlierIndex: number}
+);
+export interface BoxPlotSummary {
+  readonly lowerWhisker: number;
+  readonly q1: number;
+  readonly median: number;
+  readonly q3: number;
+  readonly upperWhisker: number;
+  readonly whisker: BoxWhisker;
+  readonly outliers: readonly number[];
+}
+export type BoxPlotActivation<Datum extends object> = {
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+} & (
+  | {
+      readonly kind: 'summary';
+      readonly item: Extract<BoxPlotSelectionItem, {kind: 'summary'}>;
+      readonly summary: BoxPlotSummary;
+      readonly source:
+        | {readonly kind: 'raw'; readonly data: readonly Datum[]}
+        | {readonly kind: 'summary'; readonly datum: Datum};
+    }
+  | {
+      readonly kind: 'outlier';
+      readonly item: Extract<BoxPlotSelectionItem, {kind: 'outlier'}>;
+      readonly value: number;
+      readonly source:
+        | {readonly kind: 'raw'; readonly datum: Datum}
+        | {readonly kind: 'summary'; readonly datum: Datum; readonly outlierIndex: number};
+    }
+);
+export interface BoxPlotInteraction<Datum extends object> {
+  readonly getOutlierId: (context: BoxPlotOutlierContext<Datum>) => string;
+  readonly onActivate?: (activation: BoxPlotActivation<Datum>) => void;
+  readonly selection?: ChartSelection<BoxPlotSelectionItem>;
+}
+
 export interface HistogramProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly interaction?: HistogramInteraction<Datum>;
   readonly color?: ChartColor;
   readonly distribution: HistogramDistribution<Datum>;
   readonly xAxis: ChartValueAxis<LinearChartScale>;
@@ -633,6 +700,7 @@ export type BoxPlotDistribution<Datum extends object> =
     };
 
 export interface BoxPlotProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly interaction?: BoxPlotInteraction<Datum>;
   readonly distribution: BoxPlotDistribution<Datum>;
   readonly groupAccessor: ChartAccessor<Datum, string>;
   readonly groups: NonEmptyChartSeries<StatisticalChartSeries>;

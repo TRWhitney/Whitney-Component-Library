@@ -117,7 +117,8 @@ interface Gesture {
 }
 
 export function useChartInteraction<Datum extends object, Category extends ChartDomainValue>(
-  configuration: ChartInteraction<Datum, Category> | undefined,
+  configuration:
+    Pick<ChartInteraction<Datum, Category>, 'target' | 'selection' | 'onActivate'> | undefined,
   rows: readonly InteractionRow<Datum, Category>[],
   version: string,
   data: readonly Datum[],

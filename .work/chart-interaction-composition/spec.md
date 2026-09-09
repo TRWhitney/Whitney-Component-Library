@@ -181,6 +181,29 @@ reading units, and new compositions remain later portions of the parent ticket.
 The showcase separates each segmented radio control onto its own row, with ordinary switches and
 buttons on separate rows. Production examples demonstrate selection and independent details.
 
+### Histogram and box-plot production boundary
+
+The [accepted distribution prototype](prototypes/distribution-selection.md#accepted-contract) binds
+histogram/box-plot gestures and cues. [Ticket 08](tickets/08-distribution-interaction.md#callback-and-identity-boundary)
+defines callback payloads and stable identities. Interactive outliers require application-provided
+IDs, unique within their group, in both raw and summary modes. Equal-valued outliers remain distinct.
+The app preserves an ID across updates only when it still identifies the same outlier.
+
+Expose named bin, summary, and outlier selection items. Reuse controlled/uncontrolled ownership and
+localized labels with a generic item type while preserving existing selection type defaults.
+Histogram activation includes its interval item, raw ordinate and kind, source mode/records, and
+input method. Box activation distinguishes summary statistics from individual outlier values and
+includes their source records where supplied. Summary inputs cannot fabricate original observations.
+The outlier identity callback receives groupId, value, and original datum; summary mode also provides
+the outlier's index within that summary's list. Consumers use that context to return a stable ID.
+
+Preserve existing raw/precomputed statistics, scale validation, complete tables, and symbol meanings.
+Zero-count bins and zero-spread boxes remain reachable; use their rendered baseline/median segments
+for hits and drag inclusion. Duplicate outlier values remain keyboard reachable. Data or geometry
+changes cancel in-flight gestures. Histogram selection follows the full interval and inclusion rule;
+box summaries follow group IDs and outliers follow group plus supplied ID. A removed item is retired.
+Visibility for statistical families and further chart compositions remain later work.
+
 ## Testing Decisions
 
 - Exercise hiding, restoring, all-hidden recovery, focus, order, stable identity, and clear-pin

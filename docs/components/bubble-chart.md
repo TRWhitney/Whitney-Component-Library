@@ -23,7 +23,7 @@ Compare two quantitative coordinates while a third positive measure controls mar
 
 ## Preferred higher-level compositions
 
-- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same observations. Filtering and zooming remain application-owned.
+- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and zooming remain application-owned.
 
 ## Content
 
