@@ -289,6 +289,7 @@ export interface RadarInteraction<Datum extends object> {
 }
 
 export interface RadarChartProps<Datum extends object> {
+  readonly visibilityLabels?: ChartVisibilityLabels;
   readonly interaction?: RadarInteraction<Datum>;
   readonly aspectRatio?: number;
   readonly colorAccessor?: ChartAccessor<Datum, ChartColor>;

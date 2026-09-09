@@ -33,27 +33,28 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 
 ## Control, events, validation, and forms
 
-- Pointer and touch readings emphasize one profile on one axis. Point mode reports the chosen profile; dimension mode reports all valid profiles on that axis. Radial guides reach exact values. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them.
-- Legend hover and focus emphasize one series. Click, Enter, or Space pins it; another legend choice replaces it. A pinned series receives pointer priority where values are close or overlap. Repeat the pinned choice or press Escape to clear it. Emphasis never hides source data.
+- Hidden profiles stay in the complete table with a localized hidden label. All-hidden recovery keeps the caption, legend, table and selected summary; Show all restores profiles and focuses the first eye. Hidden profiles cannot be read, selected by a gesture, activated or traversed by keyboard. Removing a profile ID drops its visibility state; value updates retain it.
+- Pointer and touch readings emphasize one profile on one axis. Point mode reports the chosen profile; dimension mode reports all visible profiles on that axis. Radial guides reach exact values. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them.
+- Legend hover and focus emphasize one series. Click, Enter, or Space pins it; another legend choice replaces it. A pinned series receives pointer priority where values are close or overlap. Repeat the pinned choice or press Escape to clear it. Emphasis never hides source data. Optional visibilityLabels adds a separate eye after each legend name. Hiding clears its pin and keeps its legend position, color and pattern. Hidden names cannot gain emphasis.
 - Optional interaction targets one point or a whole dimension. Click or tap selects when selection is enabled; Control/Command-click activates independently. Touch press-and-hold activates without changing selection on release. Without selection, click or tap activates directly.
 - Drag a visible rectangle to select positive value centers inside. In dimension mode, one included center qualifies the dimension. A drag replaces selection, Shift or Control/Command adds, Alt removes, and Escape or pointer cancellation restores the prior selection. Dragging never activates.
 - Zero and missing-as-zero values remain keyboard targets and belong to whole-dimension selection. Pointer clicks target visible positive value dots. The shared center and visual shoulders are not pointer targets; rectangle selection uses positive centers only.
 - Selected points use rings joined to their colored borders. Selected dimensions underline their labels. Neutral filled centers preview the exact target while profile hover stays independent of target mode. Legend focus and pinning prioritize only profiles that overlap the pointer.
-- interaction.selection accepts ChartSelection<RadarSelectionItem>. Each item contains a stable dimensionId and, for point targets, seriesId. Omit selectedItems for internal selection or supply selectedItems with onSelectionChange for application ownership. Selection survives reordering, retains zero values, and retires removed or invalid targets. Changing target mode retires incompatible items.
-- interaction.onActivate receives RadarActivation<Datum> with item, dimension id and label, input, and values. Each value has seriesId, label, exact value, and the original datum record. A point activation includes one profile; a dimension activation includes all valid profiles, including zeros. Activation is independent of persistent selection.
-- Data, geometry, presentation, target, and enabled interaction changes cancel pending gestures and activation feedback. Replacing a callback alone preserves a pending gesture and uses the current callback. Readings and legend emphasis remain internal and never mutate consumer records.
+- interaction.selection accepts ChartSelection<RadarSelectionItem>. Each item contains a stable dimensionId and, for point targets, seriesId. Omit selectedItems for internal selection or supply selectedItems with onSelectionChange for application ownership. Selection survives reordering, retains zero values and hidden profiles, and retires removed or invalid targets. Hidden selections use selection.labels.hidden. A selected dimension keeps its identity when profiles are hidden. Changing target mode retires incompatible items.
+- interaction.onActivate receives RadarActivation<Datum> with item, dimension id and label, input, and values. Each value has seriesId, label, exact value, and the original datum record. A point activation includes one profile; a dimension activation includes all visible profiles, including zeros. Activation is independent of persistent selection.
+- Data, visibility, geometry, presentation, target, and enabled interaction changes cancel pending gestures and activation feedback. Replacing a callback alone preserves a pending gesture and uses the current callback. Readings and legend emphasis remain internal and never mutate consumer records.
 - TypeScript requires at least three dimensions and limits data to one through six series. Runtime preparation requires unique usable ids and labels. A missing dimension becomes zero. A negative or non-finite dimension value invalidates the entire series.
 - RadarChart is not a form control and does not submit, validate, or reset values. Place dataset controls beside it in consumer-owned composition.
 
 ## Accessibility
 
-- The visible title names one figure and the description explains the comparison. One title-named keyboard boundary announces the active dimension and every valid series value. The SVG is hidden from assistive technology, and a generated native table lists dimensions as rows and series as columns.
+- The visible title names one figure and the description explains the comparison. One title-named keyboard boundary announces the active dimension and every visible series value. The SVG is hidden from assistive technology, and a generated native table lists dimensions as rows and series as columns.
 
 ## Keyboard, labeling, localization, and direction
 
 - Tab reaches one title-named chart boundary. Left and Right traverse dimensions and stop at the ends. With interaction, Up and Down traverse profiles, including zero values, and Home and End reach the first and last dimension. Enter or Space selects; Control/Command plus Enter or Space activates independently. Without selection, Enter or Space activates directly. Escape cancels a drag or clears a reading. Focus appears at the current value without outlining the whole chart. Legend buttons retain their own focus, pin, replacement, and Escape behavior.
 - title, description, dataTableLabel, value label, dimension heading, legend label, and state copy are required. Dimension and series ids stay stable while their labels provide readable names.
-- Localize all visible and announced copy, dimension labels, series labels, and units. value.formatValue controls locale-specific number formatting.
+- Localize all visible and announced copy, dimension labels, series labels, and units. value.formatValue controls locale-specific number formatting. visibilityLabels supplies hideSeries, showSeries, hidden, showAll and allHidden copy.
 - Caption, legend, tooltip, and table content follow inherited writing direction. Declared dimension order remains fixed around the chart.
 
 ## Appearance and responsive behavior
@@ -67,7 +68,7 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 - Forced colors preserve guides, spokes, point boundaries, and polygon line patterns in system colors. The generated table remains the complete non-color representation.
 - Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
 - Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.
-- Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. Plot geometry does not animate.
+- Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. With visibility enabled, one interruptible 240ms animation fits the shared zero-based scale to visible profiles. Restored marks stay inside the outer radar edge while the scale expands. Reduced motion settles the scale immediately. Exact readings and table values do not change.
 
 ## Examples
 
@@ -93,6 +94,7 @@ export function RadarChartExample() {
         labelAccessor="label"
         labels={{dimension: "Quality"}}
         legend={{label: "Vehicles"}}
+        visibilityLabels={{hidden: "Hidden", hideSeries: (label) => `Hide ${label}`, showSeries: (label) => `Show ${label}`, showAll: "Show all profiles", allHidden: {title: "All profiles hidden", description: "Use an eye to restore a profile."}}}
         title="Vehicle profiles"
         value={{label: "Score", unit: "points"}}
       />

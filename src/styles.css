@@ -6860,6 +6860,19 @@
     max-block-size: 100%;
   }
 
+  [data-wcl-radar-layout] > [data-wcl-chart-all-hidden] {
+    min-inline-size: 0;
+    min-block-size: 0;
+    aspect-ratio: auto;
+  }
+
+  [data-wcl-radar-chart][data-visibility][data-layout='stacked'] [data-wcl-radar-canvas] {
+    min-block-size: max(
+      var(--wcl-chart-minimum-height),
+      calc(11rem + 2rem * var(--wcl-radar-legend-rows) + 0.5rem)
+    );
+  }
+
   [data-wcl-radar-guide] polygon,
   [data-wcl-radar-spoke] line {
     fill: none;

@@ -2964,7 +2964,13 @@ const radarCommon = {
   value: {label: 'Score', unit: 'points'},
 } as const;
 
-function RadarInteractionExample({sparse = false}: {readonly sparse?: boolean}) {
+function RadarInteractionExample({
+  sparse = false,
+  visibilityLabels,
+}: {
+  readonly sparse?: boolean;
+  readonly visibilityLabels: ChartVisibilityLabels;
+}) {
   const data = sparse ? sparseVehicleProfileData : vehicleProfileData;
   const [target, setTarget] = useState<'point' | 'dimension'>('point');
   const [selectionEnabled, setSelectionEnabled] = useState(true);
@@ -3036,6 +3042,7 @@ function RadarInteractionExample({sparse = false}: {readonly sparse?: boolean}) 
       <p>{instructions}</p>
       <RadarChart
         {...radarCommon}
+        visibilityLabels={visibilityLabels}
         data={data}
         description={
           sparse
@@ -3051,6 +3058,11 @@ function RadarInteractionExample({sparse = false}: {readonly sparse?: boolean}) 
         keyboard or include them by selecting a whole dimension. Center clicks and the small visual
         shoulders do not select zero values. A dimension qualifies for rectangle selection when any
         positive value center is inside.
+      </p>
+      <p className="showcase-muted">
+        Use the eyes beside profile names to hide or restore them. The shared scale fits the visible
+        profiles. Hidden selections stay listed, and Show all restores every profile. Dimension
+        details include only visible profiles.
       </p>
       <p className="showcase-muted">
         A ring marks a selected point; a label underline marks a selected dimension. Filled centers
@@ -3669,10 +3681,10 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         name="RadarChart"
       >
         <Example label="Comparable vehicle profiles with selection and details">
-          <RadarInteractionExample />
+          <RadarInteractionExample visibilityLabels={statisticalVisibilityLabels} />
         </Example>
         <Example label="Sparse profiles with keyboard access to zero values">
-          <RadarInteractionExample sparse />
+          <RadarInteractionExample sparse visibilityLabels={statisticalVisibilityLabels} />
         </Example>
       </Specimen>
 

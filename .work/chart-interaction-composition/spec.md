@@ -379,3 +379,30 @@ Histogram and Sparkline hide/show controls are excluded because each currently h
 Pie/donut percentage behavior remains a later decision. Heatmap visibility should use row/column
 labels rather than controls in cells; hover/focus reveal and touch discovery need a small later
 prototype. No heatmap prototype or radar implementation begins in this statistical slice.
+
+## Radar series visibility
+
+Extend the approved legend eyes to RadarChart through optional `visibilityLabels`. Each eye hides
+or restores one whole profile. Legend names keep their independent pin behavior; hidden names
+remain in their original order and retain their color and pattern, but cannot gain emphasis.
+Removing an ID clears its hidden state; value updates retain it. Hiding clears that profile's pin.
+
+Fit the existing shared, zero-based radial scale to visible profiles with the established 240ms
+interruptible animation and immediate reduced-motion settlement. Keep rendered marks within the
+radar during restoration. Preserve exact raw values, zero-center behavior and sparse-fill shoulders.
+No dimension normalization or new scale configuration is introduced.
+
+Keep hidden point selections, labeled through the existing selection hidden formatter. Dimension
+selection remains one dimension, applying its visible indicators to visible profiles. Its activation
+reports visible profiles; hidden points cannot be hovered, dragged, activated or reached by keyboard.
+All-zero dimensions remain reachable by keyboard and dimension selection. Visibility, data and
+geometry changes cancel active gestures and stale readings. Removed data still prunes selection.
+
+Keep the full table with hidden profile headers. All hidden retains the legend, selected summary,
+caption and table, with localized recovery and Show all returning focus to the first eye. Validate
+full input before filtering. Keep existing loading, error, partial and invalid feedback.
+
+Reuse the approved eye and radar layout without another prototype. Public component tests cover
+visibility, fitting, callbacks, selection, stable identities and recovery. Validate the rendered
+examples with keyboard, touch, compact widths, themes and interrupted animation. Update the public
+contract, generated guide and showcase in the same delivery.

@@ -32,6 +32,13 @@ const common = {
 export const radarChart = (
   <RadarChart
     {...common}
+    visibilityLabels={{
+      hidden: 'Hidden',
+      hideSeries: (label) => `Hide ${label}`,
+      showSeries: (label) => `Show ${label}`,
+      showAll: 'Show all',
+      allHidden: {title: 'All hidden', description: 'Restore a profile.'},
+    }}
     colorAccessor="color"
     data={[
       {id: 'courier', label: 'Courier', range: 4, reliability: 3, speed: 5},

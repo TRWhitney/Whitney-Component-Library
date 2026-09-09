@@ -34,7 +34,7 @@ The [Sparkline study](prototypes/sparkline-selection.md) is approved, including 
 
 ## Not yet specified
 
-- Statistical visibility is delivered for scatter, bubble and box groups in [Ticket 15](tickets/15-statistical-visibility.md). Radar follows. Pie/donut and heatmap require the remaining decisions. Histogram and Sparkline visibility are excluded.
+- Statistical visibility is delivered for scatter, bubble and box groups in [Ticket 15](tickets/15-statistical-visibility.md). Radar visibility is delivered in [Ticket 16](tickets/16-radar-visibility.md). Pie/donut and heatmap require the remaining decisions. Histogram and Sparkline visibility are excluded.
 - Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.

@@ -327,7 +327,7 @@ export const radarChartContract: ComponentContract = {
     'Application accent identifies the first series. Later series use the role-aware chart palette. Line patterns supplement color when polygons overlap.',
   ],
   accessibility: [
-    'The visible title names one figure and the description explains the comparison. One title-named keyboard boundary announces the active dimension and every valid series value. The SVG is hidden from assistive technology, and a generated native table lists dimensions as rows and series as columns.',
+    'The visible title names one figure and the description explains the comparison. One title-named keyboard boundary announces the active dimension and every visible series value. The SVG is hidden from assistive technology, and a generated native table lists dimensions as rows and series as columns.',
   ],
   appearance: [
     'Every series uses the same nonnegative scale. Exact source values place the points. Direct hover draws a center-to-point guide and mutes the other series. Its neutral reading fill reaches the inside of the point border at each rendered size. When an isolated positive point would collapse a fill into a line, small shoulders shape the neighboring corners. These shoulders are visual-only and never change exact points, readings, or table values.',
@@ -342,8 +342,9 @@ export const radarChartContract: ComponentContract = {
     'Keep dimension and series labels short. Use one unit and one shared interpretation for every value. Order dimensions deliberately because their adjacency shapes the polygon. Limit spokes and overlapping series to what remains readable.',
   ],
   controlBehavior: [
-    'Pointer and touch readings emphasize one profile on one axis. Point mode reports the chosen profile; dimension mode reports all valid profiles on that axis. Radial guides reach exact values. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them.',
-    'Legend hover and focus emphasize one series. Click, Enter, or Space pins it; another legend choice replaces it. A pinned series receives pointer priority where values are close or overlap. Repeat the pinned choice or press Escape to clear it. Emphasis never hides source data.',
+    'Hidden profiles stay in the complete table with a localized hidden label. All-hidden recovery keeps the caption, legend, table and selected summary; Show all restores profiles and focuses the first eye. Hidden profiles cannot be read, selected by a gesture, activated or traversed by keyboard. Removing a profile ID drops its visibility state; value updates retain it.',
+    'Pointer and touch readings emphasize one profile on one axis. Point mode reports the chosen profile; dimension mode reports all visible profiles on that axis. Radial guides reach exact values. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them.',
+    'Legend hover and focus emphasize one series. Click, Enter, or Space pins it; another legend choice replaces it. A pinned series receives pointer priority where values are close or overlap. Repeat the pinned choice or press Escape to clear it. Emphasis never hides source data. Optional visibilityLabels adds a separate eye after each legend name. Hiding clears its pin and keeps its legend position, color and pattern. Hidden names cannot gain emphasis.',
     'Optional interaction targets one point or a whole dimension. Click or tap selects when selection is enabled; Control/Command-click activates independently. Touch press-and-hold activates without changing selection on release. Without selection, click or tap activates directly.',
     'Drag a visible rectangle to select positive value centers inside. In dimension mode, one included center qualifies the dimension. A drag replaces selection, Shift or Control/Command adds, Alt removes, and Escape or pointer cancellation restores the prior selection. Dragging never activates.',
     'Zero and missing-as-zero values remain keyboard targets and belong to whole-dimension selection. Pointer clicks target visible positive value dots. The shared center and visual shoulders are not pointer targets; rectangle selection uses positive centers only.',
@@ -364,15 +365,15 @@ export const radarChartContract: ComponentContract = {
     'Caption, legend, tooltip, and table content follow inherited writing direction. Declared dimension order remains fixed around the chart.',
   ],
   events: [
-    'interaction.selection accepts ChartSelection<RadarSelectionItem>. Each item contains a stable dimensionId and, for point targets, seriesId. Omit selectedItems for internal selection or supply selectedItems with onSelectionChange for application ownership. Selection survives reordering, retains zero values, and retires removed or invalid targets. Changing target mode retires incompatible items.',
-    'interaction.onActivate receives RadarActivation<Datum> with item, dimension id and label, input, and values. Each value has seriesId, label, exact value, and the original datum record. A point activation includes one profile; a dimension activation includes all valid profiles, including zeros. Activation is independent of persistent selection.',
-    'Data, geometry, presentation, target, and enabled interaction changes cancel pending gestures and activation feedback. Replacing a callback alone preserves a pending gesture and uses the current callback. Readings and legend emphasis remain internal and never mutate consumer records.',
+    'interaction.selection accepts ChartSelection<RadarSelectionItem>. Each item contains a stable dimensionId and, for point targets, seriesId. Omit selectedItems for internal selection or supply selectedItems with onSelectionChange for application ownership. Selection survives reordering, retains zero values and hidden profiles, and retires removed or invalid targets. Hidden selections use selection.labels.hidden. A selected dimension keeps its identity when profiles are hidden. Changing target mode retires incompatible items.',
+    'interaction.onActivate receives RadarActivation<Datum> with item, dimension id and label, input, and values. Each value has seriesId, label, exact value, and the original datum record. A point activation includes one profile; a dimension activation includes all visible profiles, including zeros. Activation is independent of persistent selection.',
+    'Data, visibility, geometry, presentation, target, and enabled interaction changes cancel pending gestures and activation feedback. Replacing a callback alone preserves a pending gesture and uses the current callback. Readings and legend emphasis remain internal and never mutate consumer records.',
   ],
   examples: [
     {
       code: example(
         'RadarChartExample',
-        '<RadarChart\n  data={[{id: "courier", label: "Courier", speed: 5, range: 4, reliability: 3}, {id: "scout", label: "Scout", speed: 2, range: 5}]}\n  dataTableLabel="Vehicle profile data"\n  description="Courier and Scout scores across shared vehicle qualities."\n  dimensions={[{id: "speed", label: "Speed", accessor: "speed"}, {id: "range", label: "Range", accessor: "range"}, {id: "reliability", label: "Reliability", accessor: "reliability"}]}\n  emptyState={{title: "No scores", description: "Choose vehicles with recorded scores."}}\n  idAccessor="id"\n  invalidData={{title: "Invalid scores", description: "Correct negative or non-finite scores."}}\n  labelAccessor="label"\n  labels={{dimension: "Quality"}}\n  legend={{label: "Vehicles"}}\n  title="Vehicle profiles"\n  value={{label: "Score", unit: "points"}}\n/>',
+        '<RadarChart\n  data={[{id: "courier", label: "Courier", speed: 5, range: 4, reliability: 3}, {id: "scout", label: "Scout", speed: 2, range: 5}]}\n  dataTableLabel="Vehicle profile data"\n  description="Courier and Scout scores across shared vehicle qualities."\n  dimensions={[{id: "speed", label: "Speed", accessor: "speed"}, {id: "range", label: "Range", accessor: "range"}, {id: "reliability", label: "Reliability", accessor: "reliability"}]}\n  emptyState={{title: "No scores", description: "Choose vehicles with recorded scores."}}\n  idAccessor="id"\n  invalidData={{title: "Invalid scores", description: "Correct negative or non-finite scores."}}\n  labelAccessor="label"\n  labels={{dimension: "Quality"}}\n  legend={{label: "Vehicles"}}\n  visibilityLabels={{hidden: "Hidden", hideSeries: (label) => `Hide ${label}`, showSeries: (label) => `Show ${label}`, showAll: "Show all profiles", allHidden: {title: "All profiles hidden", description: "Use an eye to restore a profile."}}}\n  title="Vehicle profiles"\n  value={{label: "Score", unit: "points"}}\n/>',
       ),
       description:
         'Compare subjects across ordered dimensions on one shared, nonnegative score scale.',
@@ -407,7 +408,7 @@ export const radarChartContract: ComponentContract = {
     'title, description, dataTableLabel, value label, dimension heading, legend label, and state copy are required. Dimension and series ids stay stable while their labels provide readable names.',
   ],
   localization: [
-    'Localize all visible and announced copy, dimension labels, series labels, and units. value.formatValue controls locale-specific number formatting.',
+    'Localize all visible and announced copy, dimension labels, series labels, and units. value.formatValue controls locale-specific number formatting. visibilityLabels supplies hideSeries, showSeries, hidden, showAll and allHidden copy.',
   ],
   name: 'RadarChart',
   parts: [
@@ -423,7 +424,7 @@ export const radarChartContract: ComponentContract = {
   reducedMotionBehavior: [
     activationTiming,
     'Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.',
-    'Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. Plot geometry does not animate.',
+    'Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. With visibility enabled, one interruptible 240ms animation fits the shared zero-based scale to visible profiles. Restored marks stay inside the outer radar edge while the scale expands. Reduced motion settles the scale immediately. Exact readings and table values do not change.',
   ],
   relatedExports: ['AppearanceProvider', ...chartNames.filter((name) => name !== 'RadarChart')],
   responsiveBehavior: [

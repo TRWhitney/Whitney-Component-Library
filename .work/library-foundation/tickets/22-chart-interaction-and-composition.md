@@ -194,3 +194,9 @@ all-hidden recovery for ScatterChart, BubbleChart and BoxPlot. Its public contra
 examples are current, and all 708 tests and repository/build/package checks pass. Independent
 intent and engineering production reviews pass, including the restoration-animation correction. Radar visibility follows. Histogram and Sparkline visibility are
 excluded; pie/donut percentages and heatmap row/column controls need their remaining decisions.
+
+[Radar visibility ticket 16](../../chart-interaction-composition/tickets/16-radar-visibility.md)
+adds profile eyes, shared animated fitting, retained hidden selections and full-table recovery.
+Its contract, guide and showcase are current. All 716 tests and repository/package checks pass;
+independent intent and engineering production reviews pass with no findings. Pie/donut percentages and heatmap
+row/column visibility remain unresolved slices.
