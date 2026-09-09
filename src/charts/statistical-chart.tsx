@@ -13,6 +13,9 @@ import {
   type ReactNode,
 } from 'react';
 import {createPortal} from 'react-dom';
+import {useFocusVisible} from 'react-aria';
+import {selectionKey, useChartInteraction, type InteractionPoint} from './chart-interaction.js';
+import {containsPointShape} from './point-interaction-geometry.js';
 
 import {EmptyState} from '../feedback/empty-state.js';
 import {Spinner} from '../feedback/spinner.js';
@@ -24,6 +27,7 @@ import {
   axisTickLabel,
   clamp,
   clientPointFromViewBox,
+  viewBoxPointFromPointer,
   createProjection,
   defaultColors,
   inheritedDirection,
@@ -48,6 +52,8 @@ import type {
   BubbleChartProps,
   BubbleMagnitude,
   ChartColor,
+  ChartInteraction,
+  PointChartInteraction,
   ChartLegend,
   ChartStateCopy,
   ChartStatus,
@@ -885,6 +891,7 @@ function PointShape({
   shape,
   swatch = false,
   tooltip = false,
+  cue,
 }: {
   readonly cx: number;
   readonly cy: number;
@@ -892,14 +899,17 @@ function PointShape({
   readonly shape: number;
   readonly swatch?: boolean;
   readonly tooltip?: boolean;
+  readonly cue?: 'reading' | 'center' | 'selection' | 'activation';
 }): ReactElement {
   const attributes = {
     'data-shape': String(shape),
-    ...(tooltip
-      ? {'data-wcl-statistical-tooltip-mark': ''}
-      : swatch
-        ? {'data-wcl-statistical-legend-mark': ''}
-        : {'data-wcl-statistical-point': ''}),
+    ...(cue
+      ? {'data-wcl-point-cue': cue}
+      : tooltip
+        ? {'data-wcl-statistical-tooltip-mark': ''}
+        : swatch
+          ? {'data-wcl-statistical-legend-mark': ''}
+          : {'data-wcl-statistical-point': ''}),
   };
   if (shape % 6 === 1) {
     return (
@@ -1082,6 +1092,7 @@ function spatialTarget(
   readings: readonly ReadingTarget[],
   currentIndex: number,
   key: string,
+  skipCoincident = false,
 ): number {
   const current = readings[currentIndex] ?? readings[0];
   if (current === undefined) return currentIndex;
@@ -1104,7 +1115,7 @@ function spatialTarget(
         reading.yValue === current.yValue,
     )
     .sort((first, second) => first.reading.id.localeCompare(second.reading.id));
-  if (coincident.length > 0) {
+  if (!skipCoincident && coincident.length > 0) {
     return (
       (key === 'ArrowLeft' || key === 'ArrowDown' ? coincident.at(-1) : coincident[0])?.index ??
       currentIndex
@@ -1135,6 +1146,20 @@ function spatialTarget(
   return candidates[0]?.index ?? currentIndex;
 }
 
+function pointRadius<Datum extends object>(
+  model: PointModel<Datum, 'scatter' | 'bubble'>,
+  point: PreparedPoint,
+  presentation: PresentationMetrics,
+  maximum: number,
+): number {
+  if (model.kind === 'scatter')
+    return clamp(7.25, presentation.canvasWidth * 0.011, 11.25) / presentation.viewScale;
+  const radius =
+    (Math.sqrt((point.magnitude ?? 0) / maximum) * clamp(24, presentation.canvasWidth * 0.04, 42)) /
+    presentation.viewScale;
+  return radiusForEquivalentCircleArea(radius, point.series.shape);
+}
+
 function StatisticalMarks<Datum extends object>({
   activeIndex,
   directIndex,
@@ -1159,9 +1184,7 @@ function StatisticalMarks<Datum extends object>({
       ? index !== directIndex
       : legendSeriesId !== undefined && seriesId !== legendSeriesId;
   if (model.kind === 'scatter' || model.kind === 'bubble') {
-    const maximumMagnitude = Math.max(...model.points.map((point) => point.magnitude ?? 1));
-    const renderedScatterRadius = clamp(7.25, presentation.canvasWidth * 0.011, 11.25);
-    const renderedBubbleRadius = clamp(24, presentation.canvasWidth * 0.04, 42);
+    const maximum = model.points.reduce((max, point) => Math.max(max, point.magnitude ?? 1), 0);
     const pointRows = model.points.map((point, index) => ({
       index,
       point,
@@ -1175,13 +1198,7 @@ function StatisticalMarks<Datum extends object>({
     return (
       <g data-wcl-chart-marks="">
         {pointRows.map(({index, point, reading}) => {
-          const equivalentCircleRadius =
-            (Math.sqrt((point.magnitude ?? 0) / maximumMagnitude) * renderedBubbleRadius) /
-            presentation.viewScale;
-          const radius =
-            model.kind === 'bubble'
-              ? radiusForEquivalentCircleArea(equivalentCircleRadius, point.series.shape)
-              : renderedScatterRadius / presentation.viewScale;
+          const radius = pointRadius(model, point, presentation, maximum);
           return (
             <g
               data-active={activeIndex === index ? '' : undefined}
@@ -1441,10 +1458,12 @@ function StatisticalTable<Datum extends object>({
 function StatisticalFrame<Datum extends object>({
   common,
   legend,
+  interaction,
   model,
   rootAttribute,
 }: {
   readonly common: CommonProps<Datum>;
+  readonly interaction?: PointChartInteraction<Datum>;
   readonly legend?: ChartLegend;
   readonly model: StatisticalModel<Datum>;
   readonly rootAttribute: string;
@@ -1458,6 +1477,8 @@ function StatisticalFrame<Datum extends object>({
     model.kind === 'histogram' ? [] : model.series.map((series) => series.id);
   const seriesIdentity = JSON.stringify(availableSeriesIds);
   const titleId = useId();
+  const clipId = useId();
+  const {isFocusVisible} = useFocusVisible();
   const descriptionId = useId();
   const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
   const [frameElement, setFrameElement] = useState<HTMLDivElement | null>(null);
@@ -1511,6 +1532,61 @@ function StatisticalFrame<Datum extends object>({
     ],
     readings: readings.map((reading) => [reading.id, reading.x, reading.y]),
   });
+  const pointModel = model.kind === 'scatter' || model.kind === 'bubble' ? model : undefined;
+  const interactionRows = (pointModel?.points ?? []).map((point) => ({
+    id: point.id,
+    category: point.x,
+    datum: common.data[point.sourceIndex]!,
+    values: [{seriesId: point.series.id, label: point.series.label, value: point.y, hidden: false}],
+  }));
+  const configuration: ChartInteraction<Datum, number> | undefined = interaction
+    ? {
+        target: 'point',
+        getRowId: (datum) => interactionRows.find((row) => row.datum === datum)!.id,
+        ...(interaction.selection ? {selection: interaction.selection} : {}),
+        ...(interaction.onActivate
+          ? {
+              onActivate: (activation) => {
+                const point = pointModel?.points.find((item) => item.id === activation.item.rowId);
+                if (point)
+                  interaction.onActivate?.({
+                    item: activation.item,
+                    datum: activation.datum,
+                    input: activation.input,
+                    label: point.label,
+                    x: point.x,
+                    y: point.y,
+                    ...(point.magnitude === undefined ? {} : {magnitude: point.magnitude}),
+                  });
+              },
+            }
+          : {}),
+      }
+    : undefined;
+  const actions = useChartInteraction(
+    configuration,
+    interactionRows,
+    JSON.stringify([readingGeometry, status.kind]),
+    common.data,
+  );
+  const maximumMagnitude = (pointModel?.points ?? []).reduce(
+    (max, point) => Math.max(max, point.magnitude ?? 1),
+    0,
+  );
+  const points = (pointModel?.points ?? []).map((point, index) => ({
+    index,
+    x: readings[index]!.x,
+    y: readings[index]!.y,
+    categoryPosition: readings[index]!.x,
+    seriesId: point.series.id,
+    item: {rowId: point.id, seriesId: point.series.id},
+    radius: pointRadius(pointModel!, point, presentation, maximumMagnitude),
+    shape: point.series.shape,
+  }));
+  const inPlot = (x: number, y: number) =>
+    x >= plot.left && x <= plot.right && y >= plot.top && y <= plot.bottom;
+  const selectablePoints = points.filter((point) => inPlot(point.x, point.y));
+  const selectedKeys = new Set(actions.selected.map(selectionKey));
   const [retainedReadingIdentity, setRetainedReadingIdentity] = useState(readingIdentity);
   const [retainedReadingGeometry, setRetainedReadingGeometry] = useState(readingGeometry);
   const [keyboardReadingId, setKeyboardReadingId] = useState<string | null>(null);
@@ -1586,11 +1662,48 @@ function StatisticalFrame<Datum extends object>({
     setPointerReadingId(null);
     setPointerPosition(undefined);
   };
+  const pointFromPointer = (event: PointerEvent<SVGSVGElement>): InteractionPoint | undefined => {
+    const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+    if (!inPlot(x, y)) return undefined;
+    const hits = points.filter((point) =>
+      containsPointShape(point.shape, point.radius, x - point.x, y - point.y),
+    );
+    const preferred =
+      hits.length > 1 ? hits.find((point) => point.seriesId === legendSeriesId) : undefined;
+    return (
+      preferred ??
+      hits.sort((a, b) => Math.hypot(a.x - x, a.y - y) - Math.hypot(b.x - x, b.y - y))[0]
+    );
+  };
+  const readItem = (event: PointerEvent<SVGSVGElement>): void => {
+    const point = pointFromPointer(event);
+    setKeyboardReadingId(null);
+    if (event.pointerType === 'touch') {
+      clearPointer();
+      setTouchReadingId(point ? readings[point.index]!.id : null);
+    } else {
+      setTouchReadingId(null);
+      setPointerReadingId(point ? readings[point.index]!.id : null);
+      setPointerPosition(point ? {x: event.clientX, y: event.clientY} : undefined);
+    }
+  };
+  const beginItem = (event: PointerEvent<SVGSVGElement>): void => {
+    if (event.button !== 0 || event.isPrimary === false) return;
+    const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+    if (!inPlot(x, y)) return;
+    readItem(event);
+    actions.begin(event, pointFromPointer(event), x, y);
+  };
+  const moveItem = (event: PointerEvent<SVGSVGElement>): void => {
+    const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+    if (actions.move(event, x, y, selectablePoints, plot)) return;
+    readItem(event);
+  };
   const readPointer = (event: PointerEvent<SVGSVGElement>): void => {
     if (event.pointerType === 'touch') return;
     const target =
       event.target instanceof Element ? event.target.closest('[data-reading-index]') : null;
-    const index = Number(target?.getAttribute('data-reading-index'));
+    const index = target ? Number(target.getAttribute('data-reading-index')) : -1;
     const reading = readings[index];
     if (!Number.isInteger(index) || reading === undefined) {
       clearPointer();
@@ -1605,7 +1718,7 @@ function StatisticalFrame<Datum extends object>({
     if (event.pointerType !== 'touch') return;
     const target =
       event.target instanceof Element ? event.target.closest('[data-reading-index]') : null;
-    const index = Number(target?.getAttribute('data-reading-index'));
+    const index = target ? Number(target.getAttribute('data-reading-index')) : -1;
     const reading = readings[index];
     if (!Number.isInteger(index) || reading === undefined) return;
     clearPointer();
@@ -1613,7 +1726,12 @@ function StatisticalFrame<Datum extends object>({
     setTouchReadingId(reading.id);
   };
   const focusChart = (event: FocusEvent<HTMLDivElement>): void => {
-    if (event.currentTarget === event.target && keyboardReadingId === null && readings.length > 0) {
+    if (
+      (!interaction || isFocusVisible) &&
+      event.currentTarget === event.target &&
+      keyboardReadingId === null &&
+      readings.length > 0
+    ) {
       setKeyboardReadingId(readings[0]!.id);
     }
   };
@@ -1623,11 +1741,20 @@ function StatisticalFrame<Datum extends object>({
     setKeyboardReadingId(null);
   };
   const readKeyboard = (event: KeyboardEvent<HTMLDivElement>): void => {
+    if (event.target !== event.currentTarget) return;
     if (event.key === 'Escape') {
+      actions.cancel();
       event.preventDefault();
       clearPointer();
       setTouchReadingId(null);
       setKeyboardReadingId(null);
+      return;
+    }
+    if (interaction && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      const point = points[indexForReadingId(keyboardReadingId) ?? activeIndex ?? -1];
+      if (point && inPlot(point.x, point.y))
+        actions.activate(point.item, 'keyboard', event.ctrlKey || event.metaKey);
       return;
     }
     if (!['Home', 'End', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key))
@@ -1635,7 +1762,12 @@ function StatisticalFrame<Datum extends object>({
     const current = indexForReadingId(keyboardReadingId) ?? activeIndex ?? 0;
     let next = current;
     if (model.kind === 'scatter' || model.kind === 'bubble') {
-      next = spatialTarget(readings, current, event.key);
+      if (interaction && event.key === 'Home') next = 0;
+      else if (interaction && event.key === 'End') next = readings.length - 1;
+      else if (interaction && event.key === 'ArrowLeft') next = Math.max(0, current - 1);
+      else if (interaction && event.key === 'ArrowRight')
+        next = Math.min(readings.length - 1, current + 1);
+      else next = spatialTarget(readings, current, event.key, interaction !== undefined);
     } else if (model.kind === 'box') {
       const summaries = readings
         .map((reading, index) => ({index, reading}))
@@ -1729,7 +1861,15 @@ function StatisticalFrame<Datum extends object>({
           tabIndex={hasLocalOverflow ? 0 : undefined}
         >
           <div
-            aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape"
+            aria-keyshortcuts={
+              interaction
+                ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape Enter Space Control+Enter Meta+Enter Control+Space Meta+Space'
+                : 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Escape'
+            }
+            aria-describedby={
+              interaction?.selection ? `${descriptionId}-selection-instructions` : undefined
+            }
+            data-item-interaction={interaction ? '' : undefined}
             aria-labelledby={titleId}
             data-wcl-chart-canvas=""
             onBlur={blurChart}
@@ -1742,9 +1882,15 @@ function StatisticalFrame<Datum extends object>({
               aria-hidden="true"
               data-wcl-chart-svg=""
               focusable="false"
-              onPointerDown={readTouch}
+              data-selection-enabled={interaction?.selection ? '' : undefined}
+              onPointerDown={interaction ? beginItem : readTouch}
+              onPointerUp={
+                interaction ? (event) => actions.end(event, pointFromPointer(event)) : undefined
+              }
+              onPointerCancel={interaction ? () => actions.cancel() : undefined}
+              onLostPointerCapture={interaction ? () => actions.cancel() : undefined}
               onPointerLeave={clearPointer}
-              onPointerMove={readPointer}
+              onPointerMove={interaction ? moveItem : readPointer}
               ref={setSvgElement}
               viewBox={`0 0 ${viewWidth} ${viewHeight}`}
             >
@@ -1787,16 +1933,88 @@ function StatisticalFrame<Datum extends object>({
                 x={plot.left}
                 y={plot.top}
               />
-              <StatisticalMarks
-                activeIndex={activeIndex}
-                directIndex={directIndex}
-                legendSeriesId={legendSeriesId}
-                model={model}
-                pinnedSeriesId={validPinnedSeriesId}
-                presentation={presentation}
-                projections={projections}
-                readings={readings}
-              />
+              <defs>
+                <clipPath id={clipId}>
+                  <rect
+                    x={plot.left}
+                    y={plot.top}
+                    width={plotWidth(plot)}
+                    height={plotHeight(plot)}
+                  />
+                </clipPath>
+              </defs>
+              <>
+                <StatisticalMarks
+                  activeIndex={activeIndex}
+                  directIndex={directIndex}
+                  legendSeriesId={legendSeriesId}
+                  model={model}
+                  pinnedSeriesId={validPinnedSeriesId}
+                  presentation={presentation}
+                  projections={projections}
+                  readings={readings}
+                />
+                {interaction ? (
+                  <g
+                    clipPath={`url(#${clipId})`}
+                    data-wcl-chart-interaction-overlay=""
+                    pointerEvents="none"
+                  >
+                    {points.map((point) => (
+                      <g key={point.item.rowId}>
+                        {selectedKeys.has(selectionKey(point.item)) ? (
+                          <PointShape
+                            cx={point.x}
+                            cy={point.y}
+                            radius={point.radius + 2 / presentation.viewScale}
+                            shape={point.shape}
+                            cue="selection"
+                          />
+                        ) : null}
+                        {activeIndex === point.index ? (
+                          <>
+                            {model.kind === 'bubble' ? (
+                              <PointShape
+                                cx={point.x}
+                                cy={point.y}
+                                radius={Math.max(0, point.radius - 2 / presentation.viewScale)}
+                                shape={point.shape}
+                                cue="reading"
+                              />
+                            ) : null}
+                            <PointShape
+                              cx={point.x}
+                              cy={point.y}
+                              radius={Math.max(
+                                1 / presentation.viewScale,
+                                Math.min(
+                                  point.radius - 1 / presentation.viewScale,
+                                  3.5 / presentation.viewScale,
+                                ),
+                              )}
+                              shape={point.shape}
+                              cue="center"
+                            />
+                          </>
+                        ) : null}
+                        {actions.pulse &&
+                        selectionKey(actions.pulse.item) === selectionKey(point.item) ? (
+                          <g key={actions.pulse.sequence} data-wcl-point-activation="">
+                            <PointShape
+                              cx={point.x}
+                              cy={point.y}
+                              radius={point.radius + 5 / presentation.viewScale}
+                              shape={point.shape}
+                              cue="activation"
+                            />
+                          </g>
+                        ) : null}
+                      </g>
+                    ))}
+                    {actions.box ? <rect {...actions.box} data-wcl-chart-selection-box="" /> : null}
+                  </g>
+                ) : null}
+              </>
             </svg>
             {activeReading === undefined ? null : (
               <StatisticalTooltip
@@ -1834,6 +2052,40 @@ function StatisticalFrame<Datum extends object>({
         <p id={descriptionId}>{common.description}</p>
       </figcaption>
       {content}
+      {interaction?.selection ? (
+        <div data-wcl-chart-selection="">
+          <p id={`${descriptionId}-selection-instructions`}>
+            {interaction.selection.labels.instructions}
+          </p>
+          <div aria-live="polite" aria-atomic="true">
+            <span>
+              {actions.selected.length
+                ? interaction.selection.labels.summary(actions.selected.length)
+                : interaction.selection.labels.empty}
+            </span>
+            {actions.selected.length ? (
+              <ul>
+                {actions.selected.map((item) => (
+                  <li key={selectionKey(item)}>{interaction.selection!.labels.item(item)}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          {actions.selected.length ? (
+            <button
+              type="button"
+              data-wcl-chart-clear-selection=""
+              onClick={() => {
+                actions.cancel();
+                actions.change([]);
+                rootElement?.querySelector<HTMLElement>('[data-wcl-chart-canvas]')?.focus();
+              }}
+            >
+              {interaction.selection.labels.clear}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
     </figure>
   );
 }
@@ -1878,6 +2130,7 @@ export function ScatterChart<Datum extends object>(props: ScatterChartProps<Datu
   return (
     <StatisticalFrame
       common={props}
+      {...(props.interaction === undefined ? {} : {interaction: props.interaction})}
       {...(props.legend === undefined ? {} : {legend: props.legend})}
       model={model}
       rootAttribute="data-wcl-scatter-chart"
@@ -1891,6 +2144,7 @@ export function BubbleChart<Datum extends object>(props: BubbleChartProps<Datum>
   return (
     <StatisticalFrame
       common={props}
+      {...(props.interaction === undefined ? {} : {interaction: props.interaction})}
       {...(props.legend === undefined ? {} : {legend: props.legend})}
       model={model}
       rootAttribute="data-wcl-bubble-chart"

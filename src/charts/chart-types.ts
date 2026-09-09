@@ -551,7 +551,23 @@ export interface StatisticalChartSeries {
   readonly label: string;
 }
 
+export interface PointChartActivation<Datum extends object> {
+  readonly item: ChartSelectionItem;
+  readonly datum: Datum;
+  readonly label: string;
+  readonly x: number;
+  readonly y: number;
+  readonly magnitude?: number;
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+}
+
+export interface PointChartInteraction<Datum extends object> {
+  readonly onActivate?: (activation: PointChartActivation<Datum>) => void;
+  readonly selection?: ChartSelection;
+}
+
 interface PointChartProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly interaction?: PointChartInteraction<Datum>;
   readonly idAccessor: ChartAccessor<Datum, string>;
   readonly labelAccessor: ChartAccessor<Datum, string>;
   readonly legend?: ChartLegend;

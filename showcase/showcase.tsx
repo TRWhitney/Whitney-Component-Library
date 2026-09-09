@@ -103,6 +103,8 @@ import {
   type DrawerPlacement,
   type FieldControlProps,
   type FileAcquisitionResult,
+  type PointChartActivation,
+  type PointChartInteraction,
   type RadarChartDimensions,
   type TableSortDescriptor,
 } from '../src/index.js';
@@ -2437,6 +2439,143 @@ function AreaMixedInteractionExample({
   );
 }
 
+function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) {
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly ChartSelectionItem[]>([]);
+  const [details, setDetails] = useState<PointChartActivation<
+    (typeof statisticalPointData)[number]
+  > | null>(null);
+  const instructions = selectionEnabled
+    ? `Click or tap a mark to select its observation. Enter or Space selects the current reading. Drag from empty plot space to select observations whose centers are inside the rectangle. A drag replaces selection; Shift or Control/Command adds, Alt removes, and Escape cancels.${detailsEnabled ? ' Control/Command-click, Control/Command plus Enter or Space, or a touch press-and-hold opens details without changing selection.' : ''}`
+    : detailsEnabled
+      ? 'Click, tap, or press Enter or Space to open observation details.'
+      : 'Hover a mark or use the arrow keys to read its observation.';
+  const interaction: PointChartInteraction<(typeof statisticalPointData)[number]> = {
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              hidden: (label) => `${label} (hidden)`,
+              item: ({rowId}) =>
+                statisticalPointData.find((datum) => datum.id === rowId)?.label ?? rowId,
+              summary: (count) =>
+                `${count} ${count === 1 ? 'observation' : 'observations'} selected`,
+            },
+          },
+        }
+      : {}),
+  };
+  const common = {
+    data: statisticalPointData,
+    dataTableLabel: 'Operating observations',
+    emptyState: {
+      description: 'Choose a reporting interval with recorded observations.',
+      title: 'No observations',
+    },
+    invalidData: {
+      description: 'Correct records with missing, non-finite, or out-of-domain values.',
+      title: 'Some observations are invalid',
+    },
+    idAccessor: 'id',
+    interaction,
+    labelAccessor: 'label',
+    legend: {label: 'Turbine loops'},
+    series: statisticalSeries,
+    seriesAccessor: 'loop',
+    xAxis: {
+      accessor: 'temperature',
+      label: 'Temperature',
+      scale: {domain: [10, 90], type: 'linear'},
+      unit: '°F',
+    },
+    yAxis: {
+      accessor: 'demand',
+      label: 'Thermal demand',
+      scale: {domain: [20, 100], type: 'linear'},
+      showGrid: true,
+      unit: 'MWh',
+    },
+  } as const;
+
+  return (
+    <Stack gap="regular">
+      <InlineGroup align="start" gap="regular" wrap>
+        <Switch
+          isSelected={selectionEnabled}
+          label="Enable selection"
+          onChange={setSelectionEnabled}
+        />
+        <Switch
+          isSelected={detailsEnabled}
+          label="Open details on activation"
+          onChange={(enabled) => {
+            setDetailsEnabled(enabled);
+            if (!enabled) setDetails(null);
+          }}
+        />
+      </InlineGroup>
+      <p>{instructions}</p>
+      {kind === 'scatter' ? (
+        <ScatterChart
+          {...common}
+          description="Compare temperature and thermal demand for recorded operating periods."
+          title="Temperature and demand"
+        />
+      ) : (
+        <BubbleChart
+          {...common}
+          description="Compare temperature, demand, and stored energy for recorded operating periods."
+          magnitude={{accessor: 'stored', label: 'Stored energy', unit: 'MWh'}}
+          title="Thermal demand and stored energy"
+        />
+      )}
+      <p className="showcase-muted">
+        Left and Right visit observations in data order, including North Tuesday and South Wednesday
+        at the same coordinates. Up and Down move spatially. Home and End reach the first and last
+        observations. A filled center marks the reading; selected outlines follow each symbol.
+        Activation gives brief feedback and opens the details below. Pinning a legend group gives it
+        priority only where marks overlap. Bubble edges outside the rectangle do not count toward
+        selection, and interaction preserves the magnitude shown by each bubble's area. The table
+        retains every valid observation. These controls and details belong to this example.
+      </p>
+      {details ? (
+        <Stack gap="regular">
+          <DescriptionList
+            ariaLabel={`${details.label} observation details`}
+            emptyState={{
+              kind: 'no-data',
+              title: 'No observation',
+              description: 'Open a recorded observation.',
+            }}
+            items={[
+              {description: details.label, id: 'label', term: 'Observation'},
+              {description: details.item.rowId, id: 'row-id', term: 'Observation ID'},
+              {description: details.item.seriesId, id: 'series-id', term: 'Series ID'},
+              {description: `${details.x} °F`, id: 'temperature', term: 'Temperature'},
+              {description: `${details.y} MWh`, id: 'demand', term: 'Thermal demand'},
+              ...(details.magnitude === undefined
+                ? []
+                : [{description: `${details.magnitude} MWh`, id: 'stored', term: 'Stored energy'}]),
+              {description: details.input, id: 'input', term: 'Input method'},
+              {description: details.datum.loop, id: 'source-loop', term: 'Loop from source record'},
+            ]}
+          />
+          <Button onPress={() => setDetails(null)} variant="quiet">
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
 function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   const [lineTarget, setLineTarget] = useState<'category' | 'point'>('category');
   const [lineSelectionEnabled, setLineSelectionEnabled] = useState(true);
@@ -2802,31 +2941,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Hover or focus a legend item to emphasize its group, or press it to pin the group and give it priority where points overlap."
         name="ScatterChart"
       >
-        <Example label="Grouped ScatterChart with coincident points">
-          <ScatterChart
-            {...statisticalCommon}
-            data={statisticalPointData}
-            description="Compare temperature and thermal demand for recorded operating periods."
-            idAccessor="id"
-            labelAccessor="label"
-            legend={{label: 'Turbine loops'}}
-            series={statisticalSeries}
-            seriesAccessor="loop"
-            title="Temperature and demand"
-            xAxis={{
-              accessor: 'temperature',
-              label: 'Temperature',
-              scale: {domain: [10, 90], type: 'linear'},
-              unit: '°F',
-            }}
-            yAxis={{
-              accessor: 'demand',
-              label: 'Thermal demand',
-              scale: {domain: [20, 100], type: 'linear'},
-              showGrid: true,
-              unit: 'MWh',
-            }}
-          />
+        <Example label="ScatterChart with observation selection and details">
+          <PointInteractionExample kind="scatter" />
         </Example>
       </Specimen>
 
@@ -2834,32 +2950,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Add one positive measurement through proportional mark area. The tooltip and generated table report the source magnitude rather than the rendered radius."
         name="BubbleChart"
       >
-        <Example label="BubbleChart with stored-energy magnitude">
-          <BubbleChart
-            {...statisticalCommon}
-            data={statisticalPointData}
-            description="Compare temperature, demand, and stored energy for recorded operating periods."
-            idAccessor="id"
-            labelAccessor="label"
-            legend={{label: 'Turbine loops'}}
-            magnitude={{accessor: 'stored', label: 'Stored energy', unit: 'MWh'}}
-            series={statisticalSeries}
-            seriesAccessor="loop"
-            title="Thermal demand and stored energy"
-            xAxis={{
-              accessor: 'temperature',
-              label: 'Temperature',
-              scale: {domain: [10, 90], type: 'linear'},
-              unit: '°F',
-            }}
-            yAxis={{
-              accessor: 'demand',
-              label: 'Thermal demand',
-              scale: {domain: [20, 100], type: 'linear'},
-              showGrid: true,
-              unit: 'MWh',
-            }}
-          />
+        <Example label="BubbleChart with observation selection and details">
+          <PointInteractionExample kind="bubble" />
         </Example>
       </Specimen>
 

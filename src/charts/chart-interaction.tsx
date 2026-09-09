@@ -245,7 +245,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
       metaKey: boolean;
       altKey: boolean;
     },
-    point: InteractionPoint,
+    point: InteractionPoint | undefined,
     x: number,
     y: number,
   ) => {
@@ -264,7 +264,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
       activated: false,
     };
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    if (event.pointerType === 'touch' && selection && configuration?.onActivate) {
+    if (point && event.pointerType === 'touch' && selection && configuration?.onActivate) {
       holdTimer.current = setTimeout(() => {
         if (gesture.current === null || gesture.current.moved) return;
         gesture.current.activated = true;

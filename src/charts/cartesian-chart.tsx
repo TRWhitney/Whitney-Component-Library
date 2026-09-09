@@ -709,7 +709,7 @@ function svgViewport(svg: SVGSVGElement): {
   };
 }
 
-function viewBoxPointFromPointer(
+export function viewBoxPointFromPointer(
   svg: SVGSVGElement,
   clientX: number,
   clientY: number,

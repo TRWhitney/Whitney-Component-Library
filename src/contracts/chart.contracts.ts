@@ -902,7 +902,7 @@ const statisticalChartGuidance: Record<
     content:
       'Use stable point ids and labels that identify individual observations. Name both measurements and their units directly. Use groups only when they support comparison.',
     control: [
-      'Legend hover and focus temporarily emphasize one point group. Click, Enter, or Space pins it. A pinned group receives paint and hit-test priority where points overlap. Repeat the action or press Escape to clear the pin.',
+      'Legend hover and focus temporarily emphasize one point group. Click, Enter, or Space pins it. A pinned group receives paint and hit-test priority only among actual overlapping point shapes. Repeat the action or press Escape to clear the pin.',
     ],
     events:
       'ScatterChart manages point readings and group emphasis internally. Pointer, keyboard, touch, and legend interaction do not mutate consumer data.',
@@ -929,7 +929,7 @@ const statisticalChartGuidance: Record<
     content:
       'Use stable point ids and labels that identify individual observations. Name both coordinates, the magnitude, and their units directly. Use area only for a positive measure that supports proportional comparison.',
     control: [
-      'Legend hover and focus temporarily emphasize one bubble group. Click, Enter, or Space pins it. A pinned group receives paint and hit-test priority where bubbles overlap. Repeat the action or press Escape to clear the pin.',
+      'Legend hover and focus temporarily emphasize one bubble group. Click, Enter, or Space pins it. A pinned group receives paint and hit-test priority only among actual overlapping bubble shapes. Repeat the action or press Escape to clear the pin.',
     ],
     events:
       'BubbleChart manages bubble readings and group emphasis internally. Pointer, keyboard, touch, and legend interaction do not mutate consumer data.',
@@ -1000,6 +1000,45 @@ const statisticalChartGuidance: Record<
   },
 };
 
+function pointChartInteractionExample(name: 'ScatterChart' | 'BubbleChart'): string {
+  const bubble = name === 'BubbleChart';
+  return `export function Selectable${name}({onOpenDetails}: {readonly onOpenDetails: (message: string) => void}) {
+  return (
+    <AppearanceProvider appearance="dark" accent="#2878ff">
+      <${name}
+        data={[{id: "north-1", label: "North Monday", temperature: 18, demand: 28, stored: 42}, {id: "north-2", label: "North Tuesday", temperature: 56, demand: 68, stored: 88}]}
+        dataTableLabel="Operating observations"
+        description="Compare temperature and thermal demand across recorded observations."
+        emptyState={{title: "No observations", description: "Choose a populated interval."}}
+        invalidData={{title: "Invalid observations", description: "Correct invalid records."}}
+        idAccessor="id"
+        labelAccessor="label"
+${bubble ? '        magnitude={{accessor: "stored", label: "Stored energy", unit: "MWh"}}\n' : ''}
+        interaction={{
+          onActivate: ({item, label, x, y, input${bubble ? ', magnitude' : ''}}) =>
+            onOpenDetails(\`\${label} [\${item.rowId}, \${item.seriesId}]: \${x} °F, \${y} MWh${bubble ? ', ${magnitude} MWh stored' : ''} via \${input}\`),
+          selection: {
+            defaultSelectedItems: [],
+            labels: {
+              instructions: "Click or tap a mark to select. Drag from empty space to select centers inside the rectangle; Shift or Control/Command adds, Alt removes, and Escape cancels. Control/Command-click or touch press-and-hold opens details. Enter or Space selects; add Control/Command to open details.",
+              clear: "Clear selection",
+              empty: "Nothing selected",
+              summary: (count) => \`\${count} observations selected\`,
+              item: ({rowId, seriesId}) => \`\${rowId}, \${seriesId}\`,
+              hidden: (label) => \`\${label} (hidden)\`,
+            },
+          },
+        }}
+        series={[{id: "north", label: "North loop"}]}
+        title="${bubble ? 'Stored energy observations' : 'Temperature and demand observations'}"
+        xAxis={{accessor: "temperature", label: "Temperature", unit: "°F", scale: {type: "linear"}}}
+        yAxis={{accessor: "demand", label: "Thermal demand", unit: "MWh", scale: {type: "linear"}}}
+      />
+    </AppearanceProvider>
+  );
+}`;
+}
+
 function statisticalChartContract({
   alternative,
   counterExample,
@@ -1012,19 +1051,42 @@ function statisticalChartContract({
   validation,
 }: StatisticalChartContractOptions): ComponentContract {
   const guidance = statisticalChartGuidance[name];
+  const pointInteraction = name === 'ScatterChart' || name === 'BubbleChart';
   return {
     accentBehavior: [guidance.accent],
     accessibility: [
       'The visible title names one figure and the description explains the chart question. One keyboard boundary owns readings and announcements. The SVG is hidden from assistive technology; a generated native table exposes the valid chart data without interaction.',
     ],
-    appearance: [guidance.appearance],
+    appearance: [
+      guidance.appearance,
+      ...(pointInteraction
+        ? [
+            'Interactive reading uses a small filled center. Selection outlines follow the full symbol; activation gives finite feedback. All six symbol shapes and bubble magnitude remain unchanged, and interaction cues stay inside the plot.',
+          ]
+        : []),
+    ],
     appropriateUses: [use],
-    composition: [guidance.composition],
+    composition: [
+      guidance.composition,
+      ...(pointInteraction
+        ? [
+            'Supply optional PointChartInteraction<Datum> through interaction. selection and onActivate are independent. Existing idAccessor supplies stable observation IDs; each selection item has rowId and seriesId. There is no category target or second identity accessor. Consumers own details and may share controlled selection across charts with matching observation identities.',
+          ]
+        : []),
+    ],
     contentRules: [guidance.content],
     controlBehavior: [
       'Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.',
       ...guidance.control,
-      `${name} emits no consumer events and does not filter records, change domains, or own selection and coordinated chart state.`,
+      ...(pointInteraction
+        ? [
+            'With selection enabled, click or tap a mark toggles that observation. Control/Command-click activates without changing selection. Touch press-and-hold activates and suppresses selection on release. Without selection, click or tap activates when onActivate is supplied. Empty space has no click target.',
+            'Drag from empty plot space to select observations whose centers are inside the rectangle. A drag replaces selection; Shift or Control/Command adds and Alt removes. Bubble edges alone do not qualify. Escape, pointer cancellation, or a data or geometry change cancels the pending gesture without committing it.',
+            'Shared ChartSelection supports controlled selectedItems with onSelectionChange, or uncontrolled defaultSelectedItems. Supply labels for instructions, clear, empty, summary, item, and hidden. Selected state remains separate from the current reading and activation feedback. Neither selection nor activation changes records, scales, or domains.',
+          ]
+        : [
+            `${name} emits no consumer events and does not filter records, change domains, or own selection and coordinated chart state.`,
+          ]),
     ],
     counterExamples: [
       {
@@ -1036,13 +1098,29 @@ function statisticalChartContract({
     directionality: [
       'Visible prose and categorical labels follow inherited writing direction. Quantitative axes preserve low-to-high mathematical order.',
     ],
-    events: [guidance.events],
+    events: [
+      ...(pointInteraction
+        ? [
+            'interaction.onActivate receives PointChartActivation<Datum> with item containing rowId and seriesId, the original datum, label, raw numeric x and y, optional raw magnitude for bubbles, and input of pointer, keyboard, or touch. onSelectionChange receives the next selection items. Readings and legend emphasis remain internal; callbacks expose no renderer objects.',
+          ]
+        : [guidance.events]),
+    ],
     examples: [
       {
         code: example(`${name}Example`, exampleCode),
         description: purpose,
         title: `${name} with explicit statistical meaning`,
       },
+      ...(pointInteraction
+        ? [
+            {
+              code: pointChartInteractionExample(name),
+              description:
+                'Select individual observations and open application-owned details independently. The chart owns the uncontrolled selection in this example.',
+              title: `${name} with selection and activation`,
+            },
+          ]
+        : []),
     ],
     exportName: name,
     forcedColorBehavior: [guidance.forcedColors],
@@ -1052,19 +1130,47 @@ function statisticalChartContract({
     importPath: '.',
     inappropriateUses: [misuse],
     keyboardBehavior: [
-      `Tab reaches one title-named chart boundary. ${keyboard} Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.`,
+      `Tab reaches one title-named chart boundary. ${pointInteraction ? 'Without interaction, arrow keys move spatially between recorded observations with stable point id as the final tie-breaker.' : keyboard} Home and End reach the domain endpoints. Escape clears the reading. A separately labeled local scroll region remains keyboard reachable when minimumSize requires overflow.`,
+      ...(pointInteraction
+        ? [
+            'With interaction, Left/Right visit observations in data order, including coincident observations; Up/Down move spatially. Home/End reach the first and last observations. With selection enabled, Enter or Space toggles selection. Control/Command plus Enter or Space activates without changing selection. Without selection, Enter or Space activates. Escape cancels an active drag before clearing a reading. The reading marks keyboard focus without a whole-chart outline.',
+          ]
+        : []),
     ],
     kind: 'component',
     labeling: [guidance.labeling],
-    localization: [guidance.localization],
+    localization: [
+      guidance.localization,
+      ...(pointInteraction
+        ? [
+            'Localize every ChartSelection label and the instructions for the enabled selection and activation behavior.',
+          ]
+        : []),
+    ],
     name,
-    parts: [guidance.parts],
+    parts: [
+      guidance.parts,
+      ...(pointInteraction
+        ? [
+            'Optional interaction adds shape-following selection outlines, filled reading centers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
+          ]
+        : []),
+    ],
     preferredAlternatives: [alternative],
     preferredCompositions: [
-      'Compose charts with CollectionFilterBar or separate controls and application-owned layout. Keep cross-chart selection, filtering, zooming, and brushing outside this component.',
+      pointInteraction
+        ? 'Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same observations. Filtering and zooming remain application-owned.'
+        : 'Compose charts with CollectionFilterBar or separate controls and application-owned layout. Keep cross-chart selection, filtering, zooming, and brushing outside this component.',
     ],
     purpose,
-    reducedMotionBehavior: [guidance.reducedMotion],
+    reducedMotionBehavior: [
+      guidance.reducedMotion,
+      ...(pointInteraction
+        ? [
+            'Reduced motion replaces the activation pulse with a brief static acknowledgment. Selection and reading retain the same meanings.',
+          ]
+        : []),
+    ],
     relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
     responsiveBehavior: [guidance.responsive],
     states: [

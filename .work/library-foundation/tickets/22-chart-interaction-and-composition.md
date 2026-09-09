@@ -135,3 +135,10 @@ Whitney chose Value marker for areas after clarifying overlap-only legend priori
 is complete with 614 passing tests, repository/build/package checks, and passing independent
 intent and engineering production reviews. Statistical/radial/compact interaction, exploration, data-change animation,
 and the new scatter/range compositions remain open.
+
+Whitney approved Centers inside for scatter/bubble rectangle selection. The
+[observation interaction portion](../../chart-interaction-composition/tickets/07-scatter-bubble-interaction.md)
+is complete with 622 passing tests, repository/build/package checks, and passing independent
+intent and engineering production reviews after the recorded corrections. It also separates showcase segmented controls into their
+own rows. Visibility for non-Cartesian families, other reading units, exploration, data-change
+animation, and added compositions remain open.

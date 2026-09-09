@@ -161,6 +161,26 @@ wins even when another series is pinned; empty space falls back to nearest value
 line points have a small hit region so overlapping column bodies do not swallow their targets.
 Legend emphasis remains distinct from the item preview. No whole-chart focus outline is introduced.
 
+### Scatter and bubble production boundary
+
+The [accepted scatter/bubble contract](prototypes/scatter-bubble-selection.md#accepted-contract)
+binds observation activation and selection. Existing idAccessor provides stable observation IDs.
+Items use rowId plus seriesId, consistent with individual Cartesian items. Optional
+PointChartInteraction exposes shared controlled/uncontrolled ChartSelection and an activation
+callback with the source datum, item, input, label, raw x/y, and optional raw magnitude. There is no
+category target or second identity accessor. Consumers own details and controlled selection updates.
+
+All six existing symbols, existing numeric scales and explicit domains, invalid-row handling,
+complete data tables, and size encoding remain supported. Centers inside determines rectangle
+membership. Shape geometry determines hover/click hits; focused or pinned legend series only wins
+among actual hits. Clip interaction cues to the plot and cancel gestures on data/geometry changes.
+Keep noninteractive reading behavior compatible while interactive keyboard traversal reaches
+coincident observations and leaves them. Statistical visibility, zoom/pan, other statistical chart
+reading units, and new compositions remain later portions of the parent ticket.
+
+The showcase separates each segmented radio control onto its own row, with ordinary switches and
+buttons on separate rows. Production examples demonstrate selection and independent details.
+
 ## Testing Decisions
 
 - Exercise hiding, restoring, all-hidden recovery, focus, order, stable identity, and clear-pin

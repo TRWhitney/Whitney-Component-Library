@@ -6,10 +6,9 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-AreaChart and CartesianChart are delivered under [ticket 06](tickets/06-area-mixed-interaction.md).
-Whitney chose Value marker after accepting overlap-only legend priority. The
-[accepted contract](prototypes/area-mixed-selection.md#accepted-contract) is the design source.
-Validation and independent intent/engineering reviews pass. Parent Ticket 22 stays open.
+AreaChart and CartesianChart are delivered in `c0c09a6`. The
+[scatter and bubble prototype](prototypes/scatter-bubble-selection.md) is approved with Centers inside.
+[Ticket 07](tickets/07-scatter-bubble-interaction.md) is complete with passing production checks and independent reviews. Parent Ticket 22 stays open.
 
 ## Progress
 
@@ -28,8 +27,8 @@ Validation and independent intent/engineering reviews pass. Parent Ticket 22 sta
 ## Frontier
 
 The [decision map](map.md) indexes the remaining work. Frame for bars and Value marker for areas
-are settled. After ticket 06 delivery, plan interaction for the remaining statistical, radial,
-heatmap, and compact reading units. Exploration and the added compositions remain later work.
+are settled. Scatter/bubble Centers inside selection is delivered. Plan interaction for histogram,
+box plot, radial, heatmap, and compact reading units next. Exploration and the added compositions remain later work.
 
 ## Accepted sources
 
@@ -41,7 +40,7 @@ heatmap, and compact reading units. Exploration and the added compositions remai
 
 ## Verification
 
-[Ticket 06](tickets/06-area-mixed-interaction.md#completion-evidence) records the current 614 passing
+[Ticket 07](tickets/07-scatter-bubble-interaction.md#completion-evidence) records the current 622 passing
 tests, repository/build/package checks, and inspected production flows. Prototype acceptance remains
 separate from production verification.
 
@@ -53,10 +52,10 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; area/mixed delivery follows `0a517e9` as `[Feature] Add area and mixed chart interaction`.
-- Production showcase: `http://localhost:5174/#area-chart` and `/#cartesian-chart`.
-- No owned uncommitted paths remain after this delivery commit.
-- Next action: plan selection and activation for the remaining chart reading units.
-- Active prototype: `http://localhost:5177`, Vite session `87353`.
+- Branch: `main`; scatter/bubble delivery follows `c0c09a6` and the separate showcase radio-row commit as `[Feature] Add scatter and bubble interaction`.
+- Production showcase: `http://localhost:5174/#scatter-chart` and `http://localhost:5174/#bubble-chart`.
+- Owned uncommitted paths: none after delivery.
+- Next action: plan selection/activation for the remaining histogram and box-plot reading units; retain the broader frontier in the decision map.
+- Active prototype: `http://localhost:5178`, Vite session `78529`.
 - Accepted prototype observations and gestures are recorded in its linked contract. No prototype
   agents or automated suites were used. Production verification is recorded separately.

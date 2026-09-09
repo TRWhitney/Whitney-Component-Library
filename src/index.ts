@@ -53,6 +53,8 @@ export {
   type ChartLegend,
   type ChartLineSeries,
   type ChartInteraction,
+  type PointChartInteraction,
+  type PointChartActivation,
   type ChartActivation,
   type ChartSelectionItem,
   type ChartSelectionLabels,

@@ -26,6 +26,8 @@ export type {
   ChartLegend,
   ChartLineSeries,
   ChartInteraction,
+  PointChartInteraction,
+  PointChartActivation,
   ChartActivation,
   ChartSelectionItem,
   ChartSelectionLabels,

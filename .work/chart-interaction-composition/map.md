@@ -17,6 +17,9 @@ Existing approvals and deliveries remain canonical in the [specification](spec.m
 
 - [Area and mixed selection](prototypes/area-mixed-selection.md#accepted-contract): Value marker and legend priority only among overlapping marks.
 
+The [scatter/bubble prototype](prototypes/scatter-bubble-selection.md) records approved Centers inside
+rectangle selection. Ticket 07 delivers scatter/bubble observation interaction. Histogram and box-plot interaction remains unplanned.
+
 ## Not yet specified
 
 - Selection and visibility for the remaining statistical, radial, heatmap, and compact reading units.
