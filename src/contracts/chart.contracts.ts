@@ -324,7 +324,7 @@ export const radarChartContract: ComponentContract = {
     'The visible title names one figure and the description explains the comparison. One title-named keyboard boundary announces the active dimension and every valid series value. The SVG is hidden from assistive technology, and a generated native table lists dimensions as rows and series as columns.',
   ],
   appearance: [
-    'Every series uses the same nonnegative scale. Exact source values place the points. Direct hover draws a center-to-point guide and mutes the other series. When an isolated positive point would collapse a fill into a line, small shoulders shape the neighboring corners. These shoulders are visual-only and never change exact points, readings, or table values.',
+    'Every series uses the same nonnegative scale. Exact source values place the points. Direct hover draws a center-to-point guide and mutes the other series. Its neutral reading fill reaches the inside of the point border at each rendered size. When an isolated positive point would collapse a fill into a line, small shoulders shape the neighboring corners. These shoulders are visual-only and never change exact points, readings, or table values.',
   ],
   appropriateUses: [
     'comparing a few subjects across three or more ordered qualities that share one meaningful nonnegative scale',
@@ -1222,10 +1222,10 @@ function statisticalChartContract({
       guidance.parts,
       ...(pointInteraction
         ? [
-            'Optional interaction adds shape-following selection outlines, filled reading centers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
+            'Optional interaction adds shape-following selection outlines, circular rings joined to the current mark border, filled reading centers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
           ]
         : [
-            'Optional interaction adds selection frames for bins or summaries, rings for outliers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
+            'Optional interaction adds selection frames for bins or summaries, rings joined to the outlier border, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.',
           ]),
     ],
     preferredAlternatives: [alternative],

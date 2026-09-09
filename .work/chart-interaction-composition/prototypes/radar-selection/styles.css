@@ -1,0 +1,231 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+[data-wcl-provider] {
+  min-height: 100vh;
+  background: var(--wcl-canvas);
+  color: var(--wcl-text);
+  font-family: var(--wcl-font-body);
+}
+.study {
+  max-width: 64rem;
+  margin: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+.kicker {
+  font: 0.75rem/1.5 var(--wcl-font-utility);
+  color: var(--wcl-text-muted);
+}
+h1 {
+  font-size: 1.5rem;
+  margin: 0.3rem 0;
+}
+h2 {
+  font-size: 1.1rem;
+}
+header p {
+  margin-block: 0.4rem;
+}
+.controls {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  max-width: 44rem;
+}
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.hint {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--wcl-text-muted);
+}
+.example {
+  background: var(--wcl-surface);
+  padding: 1rem;
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-radius);
+}
+.example[data-compact] {
+  max-width: 26rem;
+  margin: auto;
+}
+.chart-adapter [data-wcl-chart-canvas]:focus-visible {
+  outline: none;
+}
+.chart-adapter [data-wcl-chart-svg] {
+  touch-action: none;
+}
+.study-overlay {
+  opacity: 1;
+}
+.study-overlay path {
+  fill: none;
+  stroke: var(--wcl-text);
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.study-overlay [data-study-cue='selected'] {
+  stroke-width: 2;
+}
+.study-overlay [data-study-cue='reading'] {
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+}
+.study-overlay [data-study-cue='pulse'] {
+  stroke-width: 4;
+}
+.pulse {
+  animation: pulse 620ms ease-out both;
+}
+.reading {
+  font: 0.875rem/1.5 var(--wcl-font-utility);
+  min-height: 2rem;
+  margin-top: 0.75rem;
+}
+.results {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.details {
+  padding: 1rem;
+  border-left: 2px solid var(--wcl-text);
+  margin-top: 1rem;
+}
+.identifier {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.65rem 1rem;
+  background: var(--wcl-surface);
+  border: 1px solid var(--wcl-border);
+  font: 0.875rem var(--wcl-font-utility);
+  z-index: 1000;
+}
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+@media (forced-colors: active) {
+  .study-overlay path {
+    stroke: CanvasText;
+  }
+}
+.chart-adapter [data-wcl-radar-reading-guide],
+.chart-adapter [data-wcl-radar-reading-dimension] {
+  display: none;
+}
+.radar-overlays {
+  pointer-events: none;
+}
+.radar-overlays circle,
+.radar-overlays line,
+.radar-overlays rect {
+  vector-effect: non-scaling-stroke;
+}
+.selected-point,
+.activation-point {
+  fill: none;
+  stroke: var(--wcl-text);
+  stroke-width: 2px;
+}
+.activation-point {
+  stroke-width: 3px;
+}
+.selected-dimension {
+  stroke: var(--wcl-text);
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+.reading-center {
+  fill: var(--wcl-text);
+  stroke: none;
+}
+.reading-spoke {
+  stroke: var(--wcl-text);
+  stroke-width: 2.5px;
+  stroke-dasharray: 1 4;
+  stroke-linecap: round;
+}
+.drag-box {
+  fill: color-mix(in oklch, var(--wcl-accent) 12%, transparent);
+  stroke: var(--wcl-text);
+  stroke-width: 1px;
+  stroke-dasharray: 4 3;
+}
+.chart-adapter [data-wcl-radar-chart] {
+  inline-size: 100%;
+}
+.chart-adapter [data-wcl-radar-layout] {
+  grid-template-columns: minmax(0, 1fr) 9rem;
+}
+.example[data-compact] [data-wcl-radar-layout] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+}
+.example[data-compact] [data-wcl-radar-legend] {
+  grid-template-columns: 1fr 1fr;
+}
+.drag-box {
+  fill: color-mix(in oklch, var(--wcl-text) 8%, transparent);
+}
+
+.dimension-pulse {
+  stroke: var(--wcl-text);
+  stroke-width: 4px;
+  stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 240px 240px;
+  animation: dimension-pulse 620ms ease-out both;
+}
+@keyframes dimension-pulse {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  45%,
+  75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dimension-pulse {
+    animation: none;
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+.selected-point,
+.reading-center {
+  transition: r 120ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .selected-point,
+  .reading-center {
+    transition: none;
+  }
+}

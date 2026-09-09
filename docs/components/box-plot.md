@@ -18,7 +18,7 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 
 - Render BoxPlot inside AppearanceProvider in consumer-owned layout. Choose raw observations with Tukey or min-max whiskers, or one explicit summary record per declared group with quartiles, median, whiskers, outliers, and whisker method. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel. Multiple distribution groups require a visible legend.
 - BoxPlot contains a named figure, visible caption, optional feedback, a group legend when multiple groups exist, interactive SVG plot, categorical and quantitative axes, quartile boxes, medians, split whisker tails, separate outlier marks, shared tooltip, polite announcement, and generated native data table.
-- Optional interaction adds selection frames for bins or summaries, rings for outliers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.
+- Optional interaction adds selection frames for bins or summaries, rings joined to the outlier border, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.
 
 ## Preferred higher-level compositions
 

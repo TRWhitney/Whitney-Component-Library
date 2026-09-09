@@ -417,6 +417,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   const legendScrollbarActivityProps = useScrollbarActivity<HTMLUListElement>();
   const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
   const [svgElement, setSvgElement] = useState<SVGSVGElement | null>(null);
+  const [viewScale, setViewScale] = useState(1);
   const [keyboardIndex, setKeyboardIndex] = useState<number | null>(null);
   const [pointerIndex, setPointerIndex] = useState<number | null>(null);
   const [pointerSeriesId, setPointerSeriesId] = useState<string | null>(null);
@@ -513,6 +514,21 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
     observer.observe(rootElement);
     return () => observer.disconnect();
   }, [rootElement]);
+
+  useLayoutEffect(() => {
+    if (svgElement === null) return;
+    const measure = () => {
+      const rect = svgElement.getBoundingClientRect();
+      const scale = Math.min(rect.width, rect.height) / viewSize;
+      if (Number.isFinite(scale) && scale > 0) setViewScale(scale);
+    };
+    measure();
+    const Observer = svgElement.ownerDocument.defaultView?.ResizeObserver;
+    if (!Observer) return;
+    const observer = new Observer(measure);
+    observer.observe(svgElement);
+    return () => observer.disconnect();
+  }, [svgElement]);
 
   useEffect(() => {
     if (touchIndex === null) return;
@@ -799,7 +815,11 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                       cx={directPoint[0]}
                       cy={directPoint[1]}
                       data-wcl-radar-reading-point=""
-                      r="2.5"
+                      r={
+                        directSeries.values[activeIndex] === 0
+                          ? 2.5
+                          : Math.max(0, 4 - 1.3 / viewScale)
+                      }
                     />
                   </g>
                 )}

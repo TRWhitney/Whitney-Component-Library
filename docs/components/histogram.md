@@ -18,7 +18,7 @@ Show a numeric distribution through contiguous intervals and an explicit ordinat
 
 - Render Histogram inside AppearanceProvider in consumer-owned layout. Choose raw observations with explicit or automatic thresholds, or pre-binned records with lower, upper, ordinate accessor, and count, proportion, or density meaning. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel.
 - Histogram contains a named figure, visible caption, optional feedback, interactive SVG plot, two quantitative axes, contiguous translucent bins, shared tooltip, polite announcement, and generated native data table.
-- Optional interaction adds selection frames for bins or summaries, rings for outliers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.
+- Optional interaction adds selection frames for bins or summaries, rings joined to the outlier border, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.
 
 ## Preferred higher-level compositions
 

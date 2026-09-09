@@ -652,3 +652,53 @@ describe('RadarChart', () => {
     );
   });
 });
+
+it('fills the radar point up to its border at enlarged and compact scales', () => {
+  let side = 720;
+  const resize: (() => void)[] = [];
+  const measure = vi
+    .spyOn(SVGElement.prototype, 'getBoundingClientRect')
+    .mockImplementation(() => new DOMRect(0, 0, side, side));
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      constructor(notify: () => void) {
+        resize.push(notify);
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    },
+  );
+  try {
+    const {container} = render(
+      <RadarChart
+        {...common}
+        data={[{id: 'courier', label: 'Courier', speed: 5, range: 4, reliability: 3}]}
+      />,
+    );
+    const read = () =>
+      fireEvent.pointerMove(container.querySelector('[data-dimension-index="0"]')!, {
+        clientX: side / 2,
+        clientY: (side * 90) / 480,
+        pointerType: 'mouse',
+      });
+    read();
+    const radius = () =>
+      Number(container.querySelector('[data-wcl-radar-reading-point]')!.getAttribute('r'));
+    // At 1.5x, the 4-unit point radius is 6px. Its emphasized 3px border starts at 4.5px.
+    expect(radius() * 1.5).toBeGreaterThanOrEqual(4.5);
+    expect(radius() * 1.5).toBeLessThanOrEqual(4.85);
+    side = 240;
+    act(() => {
+      for (const notify of resize) notify();
+    });
+    read();
+    // At half size, the inner edge is half a pixel from the center.
+    expect(radius() * 0.5).toBeGreaterThanOrEqual(0.5);
+    expect(radius() * 0.5).toBeLessThanOrEqual(0.85);
+  } finally {
+    measure.mockRestore();
+    vi.unstubAllGlobals();
+  }
+});

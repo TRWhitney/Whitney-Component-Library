@@ -232,3 +232,12 @@ already recorded in the [foundation decision](../library-foundation/decisions/13
 
 The [accepted radial study](prototypes/radial-selection.md#accepted-contract) governs Outer edge,
 expansion asterisks, reading cues, sweep selection and independent activation. [Ticket 09](tickets/09-pie-donut-interaction.md) records the production boundary and acceptance checks. Existing stable category IDs identify selectable positive categories. Paging preserves selected identities; aggregate navigation never becomes category activation. Zero values remain table-only.
+
+## Marker ring spacing
+
+Selection rings around circular markers meet the normal colored border at its current rendered
+width, including hover emphasis and compact layouts. Scale conversion must not create a gap or
+cover the normal border. Neutral radar reading fills reach the inner edge of that border. Bubble
+reading centers retain their intentional small size and magnitude encoding. Noncircular selection
+outlines retain their existing shapes. Existing Cartesian point spacing already satisfies this
+contract; separate pie/donut outer arcs and transient activation halos retain their accepted forms.

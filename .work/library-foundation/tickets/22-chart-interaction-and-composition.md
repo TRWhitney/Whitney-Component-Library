@@ -156,3 +156,7 @@ It delivers the approved outer-edge selection and expansion asterisk, a visible 
 independent activation, touch hold, and selection across pages. All 645 tests and repository,
 showcase, and package checks pass. Independent intent and engineering production reviews pass after the recorded corrections. Radar, heatmap,
 compact interaction, remaining visibility, exploration, animations and compositions stay open.
+
+[Ticket 10](../../chart-interaction-composition/tickets/10-marker-ring-spacing.md) corrects statistical
+circle selection spacing and scale-aware radar reading fills. All 649 tests, repository/package
+checks and independent intent/engineering review pass. Radar selection and activation remains next.

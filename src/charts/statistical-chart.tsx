@@ -2144,7 +2144,16 @@ function StatisticalFrame<Datum extends object>({
                             <PointShape
                               cx={point.x}
                               cy={point.y}
-                              radius={point.radius + 2 / presentation.viewScale}
+                              radius={
+                                point.radius +
+                                (point.shape % 6 === 0
+                                  ? (presentation.pointStrokeWidth *
+                                      (activeIndex === point.index ? 1.6 : 1)) /
+                                      2 +
+                                    1
+                                  : 2) /
+                                  presentation.viewScale
+                              }
                               shape={point.shape}
                               cue="selection"
                             />

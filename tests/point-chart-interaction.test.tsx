@@ -299,3 +299,36 @@ it('preserves the full data symbol at a domain boundary when interaction is enab
     container.querySelector('[data-wcl-point-cue="selection"]')!.closest('[clip-path]'),
   ).not.toBeNull();
 });
+it.each(['scatter', 'bubble'] as const)(
+  'joins %s selection rings to the normal and emphasized border',
+  (kind) => {
+    const interaction = {selection: {labels, defaultSelectedItems: [{rowId: 'a2', seriesId: 'a'}]}};
+    const {container} = render(
+      kind === 'scatter' ? (
+        <ScatterChart
+          {...common}
+          minimumSize={{width: 320, height: 180}}
+          interaction={interaction}
+        />
+      ) : (
+        <BubbleChart
+          {...common}
+          minimumSize={{width: 320, height: 180}}
+          magnitude={{accessor: 'size', label: 'Size'}}
+          interaction={interaction}
+        />
+      ),
+    );
+    const mark = container.querySelector('[data-point-id="a2"] circle')!;
+    const radius = Number(mark.getAttribute('r'));
+    const ringRadius = () =>
+      Number(container.querySelector('[data-wcl-point-cue="selection"]')!.getAttribute('r'));
+    // The 320px canvas uses half of the 640-unit view box. Its normal border is 1.75px;
+    // the selection border is 2px. Compare their rendered inner and outer edges.
+    expect((ringRadius() - radius) * 0.5 - 1).toBeCloseTo(0.875);
+    const {svg, at} = geometry(container);
+    fireEvent.pointerMove(svg, {...at, pointerType: 'mouse'});
+    expect((ringRadius() - radius) * 0.5 - 1).toBeCloseTo(1.4);
+    expect(Number(mark.getAttribute('r'))).toBe(radius);
+  },
+);

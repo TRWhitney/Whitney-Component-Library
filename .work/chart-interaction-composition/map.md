@@ -22,6 +22,10 @@ rectangle selection. Ticket 07 delivers scatter/bubble observation interaction. 
 
 The [pie/donut study](prototypes/radial-selection.md) is accepted. Whitney chose Outer edge and requested an asterisk on the expansion count when it contains a selected category. The revised prototype and sweep gesture are accepted; [Ticket 09](tickets/09-pie-donut-interaction.md) delivers this boundary with visible sweep feedback, passing validation, and independent production reviews.
 
+The [radar study](prototypes/radar-selection.md) uses the chosen Label underline, point rings and visible rectangle selection. Reading fills now match the existing neutral radial guide. Dimension activation animates that guide rather than circles; the revision is accepted.
+
+The radar record also documents a read-only marker-spacing audit: Cartesian point rings already account for border width; statistical circle selection rings leave a small gap at the rendered normal border width. Ticket 10 corrects that spacing. Zero radar values are keyboard/dimension targets, with no center-click target. Radar interaction is ready for a production ticket.
+
 ## Not yet specified
 
 - Visibility for statistical families; visibility for pie/donut, and selection and visibility for radar, heatmap, and compact reading units.

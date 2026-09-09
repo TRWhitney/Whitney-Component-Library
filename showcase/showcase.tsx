@@ -2572,10 +2572,11 @@ function PointInteractionExample({kind}: {readonly kind: 'scatter' | 'bubble'}) 
         Left and Right visit observations in data order, including North Tuesday and South Wednesday
         at the same coordinates. Up and Down move spatially. Home and End reach the first and last
         observations. A filled center marks the reading; selected outlines follow each symbol.
-        Activation gives brief feedback and opens the details below. Pinning a legend group gives it
-        priority only where marks overlap. Bubble edges outside the rectangle do not count toward
-        selection, and interaction preserves the magnitude shown by each bubble's area. The table
-        retains every valid observation. These controls and details belong to this example.
+        Circular selection rings meet the colored border as it changes with emphasis. Activation
+        gives brief feedback and opens the details below. Pinning a legend group gives it priority
+        only where marks overlap. Bubble edges outside the rectangle do not count toward selection,
+        and interaction preserves the magnitude shown by each bubble's area. The table retains every
+        valid observation. These controls and details belong to this example.
       </p>
       {details ? (
         <Stack gap="regular">
@@ -2836,12 +2837,12 @@ function BoxPlotInteractionExample() {
       <p className="showcase-muted">
         Arrow keys visit each group summary followed by its individual outliers. Home and End reach
         the first and last targets. A summary reading uses an inset outline and whisker cues. The
-        median remains a line. Outlier readings have filled centers; selection adds rings. Summary
-        selection frames the box and keeps outliers separate. A box with no spread remains reachable
-        at its median line. Each recovery record has a stable ID, so equal outlier values can
-        identify different observations. This example returns original records. Precomputed
-        summaries return the supplied summary record, with the outlier position when applicable.
-        These controls and details belong to this example.
+        median remains a line. Outlier readings have filled centers; selection adds rings that meet
+        the colored border. Summary selection frames the box and keeps outliers separate. A box with
+        no spread remains reachable at its median line. Each recovery record has a stable ID, so
+        equal outlier values can identify different observations. This example returns original
+        records. Precomputed summaries return the supplied summary record, with the outlier position
+        when applicable. These controls and details belong to this example.
       </p>
       {details ? (
         <Stack gap="regular">
@@ -3283,7 +3284,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Compare a few subjects across ordered qualities that share one nonnegative scale. A dimension is one spoke; a series is one subject and one polygon. Hover near a profile point to isolate it and trace its axis. Missing dimensions read as zero, while small visual shoulders keep isolated values legible without changing their readings."
+        description="Compare a few subjects across ordered qualities that share one nonnegative scale. A dimension is one spoke; a series is one subject and one polygon. Hover near a profile point to isolate it and trace its axis. Its neutral reading fill meets the colored point border at every chart size. Missing dimensions read as zero, while small visual shoulders keep isolated values legible without changing their readings."
         name="RadarChart"
       >
         <Example label="Comparable vehicle profiles">

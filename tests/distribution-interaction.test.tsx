@@ -222,6 +222,33 @@ it('rejects duplicate outlier IDs within a group', () => {
     render(<BoxPlot {...boxProps} interaction={{getOutlierId: () => 'duplicate'}} />),
   ).toThrow(/outlier.*duplicat/i);
 });
+it('joins an outlier selection ring to its normal and emphasized border', () => {
+  const {container} = render(
+    <BoxPlot
+      {...boxProps}
+      minimumSize={{width: 320, height: 180}}
+      interaction={{
+        getOutlierId: ({datum}) => datum.id,
+        selection: {
+          labels: labels<BoxPlotSelectionItem>(),
+          defaultSelectedItems: [{kind: 'outlier', groupId: 'north', outlierId: 'first'}],
+        },
+      }}
+    />,
+  );
+  const mark = container.querySelector('[data-wcl-box-outlier]')!;
+  const radius = Number(mark.getAttribute('r'));
+  const ringRadius = () =>
+    Number(container.querySelector('[data-wcl-point-cue="selection"]')!.getAttribute('r'));
+  // At half scale, the 2px selection ring meets the 1.75px normal border.
+  expect((ringRadius() - radius) * 0.5 - 1).toBeCloseTo(0.875);
+  const canvas = container.querySelector('[data-wcl-chart-canvas]')!;
+  fireEvent.keyDown(canvas, {key: 'Home'});
+  fireEvent.keyDown(canvas, {key: 'ArrowRight'});
+  expect(mark.hasAttribute('data-active')).toBe(true);
+  expect((ringRadius() - radius) * 0.5 - 1).toBeCloseTo(1.4);
+  expect(Number(mark.getAttribute('r'))).toBe(radius);
+});
 
 it('leaves controlled interval selection with the app and retires changed intervals', () => {
   const onSelectionChange = vi.fn();

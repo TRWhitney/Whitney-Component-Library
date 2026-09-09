@@ -8,7 +8,7 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 [Ticket 09](tickets/09-pie-donut-interaction.md) delivers pie/donut selection and independent
 activation, including the approved outer edge, expansion asterisk, and visible sweep trail.
-Validation and independent production reviews pass. Parent Ticket 22 stays open. Radar is next.
+Validation and independent production reviews pass. The [radar study](prototypes/radar-selection.md) is accepted. [Ticket 10](tickets/10-marker-ring-spacing.md) delivers the confirmed marker-gap fixes. Parent Ticket 22 stays open.
 
 ## Progress
 
@@ -51,6 +51,7 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; ticket 09 follows `9a6fe1d` as `[Feature] Select and activate pie slices`.
-- Production showcase: `http://localhost:5174/#pie-chart` and `http://localhost:5174/#donut-chart`.
-- Next action: settle radar interaction and its reading/selection targets. Keep any prototype pass short and without automated tests or agent reviews.
+- Branch: `main`; marker fixes follow `56bf6f5`.
+- Production showcase: `http://localhost:5174`.
+- Accepted radar study: `http://localhost:5181`, Vite session `68691`.
+- Next action: implement approved radar interaction. Zero values use keyboard or whole-dimension selection, without center-click targets. Keep any prototype revisions short, without tests or agent reviews.
