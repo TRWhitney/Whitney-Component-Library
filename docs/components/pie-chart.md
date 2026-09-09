@@ -40,11 +40,14 @@ Show category shares of one whole in a proportional pie with bounded paging.
 - With selection enabled, click or tap toggles an ordinary category. Control/Command-click activates without changing selection. Touch press-and-hold activates once and release does not also select. Movement and pointer cancellation cancel a pending hold. Without selection, click or tap activates when onActivate is supplied.
 - Sweep across ordinary slices to collect only the categories crossed. A temporary dashed trail shows the pointer path until release or cancellation. A new drag replaces selection; Shift or Control/Command adds and Alt removes. The donut hole, empty space, and aggregate select nothing. Escape or pointer cancellation restores the selection from before the drag. A sweep never activates a category.
 - Expansion and Back retain selection across pages. +N* appears exactly when the remaining aggregate group contains selected IDs; a selected visible category alone does not add the asterisk. Aggregate activation only navigates and never selects an aggregate ID or emits a category callback. Paging leaves the complete table intact.
-- Legend controls retain emphasis and pinning; they never select or activate categories. A directly hovered slice takes reading precedence over legend emphasis. Interaction does not filter or mutate records, change proportions, or add slices for zero values.
+- Ordinary legend names retain emphasis and pinning; they never select or activate categories. A directly hovered slice takes reading precedence over legend emphasis. Selection and activation do not mutate records, change proportions, or add slices for zero values.
+- Supply visibilityLabels to add an independent eye beside each ordinary category. Hidden names stay on their original ranked page for restoration. The expansion has no eye; its legend entry opens the next page even when every remaining category is hidden and its slice disappears. Hiding clears that category pin and current readings, cancels pending gestures, and excludes hidden slices from pointer, keyboard, activation, and sweep targets.
+- Visible slices refill the circle after hiding. For values 50/30/20, hiding 50 leaves shares of 60%/40% and a donut center total of 50. The table retains all valid raw records. Visible rows use the visible-total denominator; hidden rows use visibilityLabels.hidden in place of a percentage. Zero rows remain valid without a slice or eye.
+- When a page has no visible slices, visibilityLabels.allHidden replaces the plot while legend, paging, table, and selection remain available. Show all restores categories across all pages and focuses the first eye on the current page. Recovery copy should describe the current page, since earlier pages may still contain visible categories.
 - PieChart keeps readings, legend emphasis, and chart paging internal. Pointer, keyboard, touch, and Back interaction do not change consumer data.
-- interaction.onActivate receives PartToWholeActivation<Datum> with item containing id, the original datum, label, raw value, total, shareOfTotal, shareOnPage, and input of pointer, keyboard, or touch. Shares are fractions. shareOfTotal uses the full valid total; shareOnPage uses the sum of ordinary visible categories, excluding the aggregate, matching the existing reading denominator. No renderer objects or persistent inspected state are exposed.
+- interaction.onActivate receives PartToWholeActivation<Datum> with item containing id, the original datum, label, raw value, total, shareOfTotal, shareOnPage, and input of pointer, keyboard, or touch. Shares are fractions. total and shareOfTotal use the exact sum of visible valid categories across all pages; shareOnPage uses the sum of ordinary visible categories, excluding the aggregate, matching the existing reading denominator. No renderer objects or persistent inspected state are exposed.
 - selection combines ChartSelection<PartToWholeSelectionItem> with a required localized containsSelection string. Use controlled selectedItems with required onSelectionChange, or uncontrolled defaultSelectedItems with optional onSelectionChange. Do not combine ownership models. onSelectionChange receives category items with stable id values independently of activation.
-- Stable IDs preserve selection through value updates, reordering, and paging. Off-page positive categories remain available and selected. Internal selection retires removed, invalid, and zero-valued categories. Controlled state remains application-owned; unavailable IDs are omitted from rendering and commands. Data, geometry, page, or interaction-mode changes cancel pending gestures and activation feedback.
+- Stable IDs preserve selection through value updates, reordering, paging, and hiding. Hidden positive categories retain selection and count toward the expansion asterisk. Off-page positive categories remain available and selected. Internal selection retires removed, invalid, and zero-valued categories. Controlled state remains application-owned; unavailable IDs are omitted from rendering and commands. Data, geometry, page, or interaction-mode changes cancel pending gestures and activation feedback.
 - TypeScript limits accessors, aggregate sizing, labels, and state copy. Runtime preparation requires stable unique ids, nonempty labels, and finite nonnegative numbers. Zero is valid; negative and non-finite records are invalid. Positive categories rank by value with source order breaking ties.
 - Part-to-whole charts are not form controls and do not submit, validate, or reset values. Place dataset controls beside the chart in consumer-owned composition.
 
@@ -59,6 +62,7 @@ Show category shares of one whole in a proportional pie with bounded paging.
 - With selection enabled, Enter or Space toggles the current ordinary category; Control/Command plus Enter or Space activates without changing selection. Without selection, Enter or Space activates when onActivate is supplied. Escape cancels an active drag and restores its prior selection before clearing a reading. Every ordinary visible category and the aggregate remain keyboard reachable.
 - title, description, dataTableLabel, value label, legend label, state copy, page range, Back, aggregate count, and share labels are required. Category ids stay stable while labels provide human-readable names.
 - selection.labels supplies instructions, clear, empty, summary(count), item(item), and hidden(label). Use stable IDs to name categories and describe the enabled gestures. selection.containsSelection supplies the accessible equivalent of the aggregate asterisk.
+- visibilityLabels supplies hidden, hideSeries(label), showSeries(label), showAll, and allHidden title/description. Label shareOfTotal and the donut center as visible totals when enabling visibility. selection.labels.hidden should describe hidden or off-page categories.
 - Localize all visible and announced copy. categoryRange and moreCategories receive their numeric inputs, while value.formatValue controls locale-specific number formatting.
 - Caption, paging copy, legend labels, tooltip copy, and table content follow inherited writing direction. Slice order remains clockwise after ranking by value.
 
@@ -70,9 +74,10 @@ Show category shares of one whole in a proportional pie with bounded paging.
 
 ## Accent, forced colors, and reduced motion
 
-- Application accent identifies the largest visible category. Later categories use the role-aware chart palette. A repeated color also receives a stable dash treatment so color is never its only identity.
+- Application accent identifies the first ranked category on each page. Later categories use the role-aware chart palette. Hiding categories preserves page positions, colors, and patterns. A repeated color also receives a stable dash treatment so color is never its only identity.
 - Forced colors preserve slice boundaries and the aggregate dash in system colors. Repeated roles retain their dash treatment, and the generated table remains the complete non-color representation.
 - Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
+- Visibility animates slice boundaries over 240ms and can reverse from the current angles. Reduced motion settles immediately; paging and source-data changes reset directly. Readings, callbacks, table percentages, and the donut center always use exact current values, never interpolated values.
 - Reduced motion removes slice pop-out and scrollbar-fade transitions. Reading, focus, paging, emphasis, and native scrolling behavior stays the same.
 - Reduced motion replaces each activation pulse with brief static feedback. Callbacks and selection remain the same.
 
@@ -126,10 +131,11 @@ export function SelectablePieChart({onOpenDetails}: {readonly onOpenDetails: (me
         idAccessor="id"
         invalidData={{title: "Invalid energy use", description: "Correct negative or non-finite values."}}
         labelAccessor="label"
-        labels={{back: "Back", category: "Customer category", categoryRange: ({start, end, total}) => `Categories ${start} to ${end} of ${total}`, moreCategories: (count) => `More categories (${count})`, shareOfTotal: "Share of total", shareOnPage: "Share on this page"}}
-        legend={{label: "Visible categories"}}
+        labels={{back: "Back", category: "Customer category", categoryRange: ({start, end, total}) => `Categories ${start} to ${end} of ${total}`, moreCategories: (count) => `More categories (${count})`, shareOfTotal: "Share of visible total", shareOnPage: "Share on this page"}}
+        legend={{label: "Categories on this page"}}
         title="Community energy use"
         value={{accessor: "value", label: "Energy use", unit: "MWh"}}
+        visibilityLabels={{hidden: "Hidden", hideSeries: (label) => `Hide ${label}`, showSeries: (label) => `Show ${label}`, showAll: "Show all categories", allHidden: {title: "No visible slices on this page", description: "Restore a category, change page, or show all categories."}}}
         interaction={{
           onActivate: ({item, datum, value, total, shareOfTotal, shareOnPage, input}) => onOpenDetails(`${datum.label} [${item.id}]: ${value} of ${total} MWh, ${(shareOfTotal * 100).toFixed(1)}% of total, ${(shareOnPage * 100).toFixed(1)}% of this page, opened by ${input}`),
           selection: {
@@ -141,7 +147,7 @@ export function SelectablePieChart({onOpenDetails}: {readonly onOpenDetails: (me
               empty: "Nothing selected",
               summary: (count) => `${count} categories selected`,
               item: ({id}) => id === "residential" ? "Residential" : "Offices",
-              hidden: (label) => `${label} (on another page)`,
+              hidden: (label) => `${label} (hidden or on another page)`,
             },
           },
         }}

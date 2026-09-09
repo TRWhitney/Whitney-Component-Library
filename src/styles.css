@@ -6622,6 +6622,20 @@
     max-block-size: 100%;
   }
 
+  [data-wcl-radial-layout] > [data-wcl-chart-all-hidden] {
+    min-inline-size: 0;
+    min-block-size: 0;
+    aspect-ratio: auto;
+  }
+
+  [data-wcl-part-to-whole-chart][data-visibility][data-layout='stacked']
+    [data-wcl-part-to-whole-canvas] {
+    min-block-size: max(
+      var(--wcl-chart-minimum-height),
+      calc(9rem + 2rem * var(--wcl-radial-legend-rows) + 0.5rem)
+    );
+  }
+
   [data-wcl-radial-segment] {
     transform-box: fill-box;
     transform-origin: center;

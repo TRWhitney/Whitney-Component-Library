@@ -3123,7 +3123,7 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
               instructions,
               clear: 'Clear selection',
               empty: 'Nothing selected',
-              hidden: (label) => `${label} (on another page)`,
+              hidden: (label) => `${label} (hidden or on another page)`,
               item: ({id}) => energyCategoryData.find((datum) => datum.id === id)?.label ?? id,
               summary: (count) => `${count} ${count === 1 ? 'category' : 'categories'} selected`,
             },
@@ -3132,6 +3132,16 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
       : {}),
   };
   const partToWholeCommon = {
+    visibilityLabels: {
+      hidden: 'Hidden',
+      hideSeries: (label: string) => `Hide ${label}`,
+      showSeries: (label: string) => `Show ${label}`,
+      showAll: 'Show all categories',
+      allHidden: {
+        title: 'No visible slices on this page',
+        description: 'Use an eye to restore a category, change page, or show all categories.',
+      },
+    },
     data: energyCategoryData,
     dataTableLabel: 'Annual energy use by customer category',
     description: 'Annual metered use by customer category, ranked by megawatt-hours.',
@@ -3151,10 +3161,10 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
       categoryRange: ({end, start, total}: {end: number; start: number; total: number}) =>
         `Categories ${start} to ${end} of ${total}`,
       moreCategories: (count: number) => `More categories (${count})`,
-      shareOfTotal: 'Share of total',
+      shareOfTotal: 'Share of visible total',
       shareOnPage: 'Share on this page',
     },
-    legend: {label: 'Visible categories'},
+    legend: {label: 'Categories on this page'},
     value: {accessor: 'value', label: 'Energy use', unit: 'MWh'},
   } as const;
   return (
@@ -3182,9 +3192,15 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
           {...partToWholeCommon}
           interaction={interaction}
           title="Community energy use by category"
-          totalLabel="MWh total"
+          totalLabel="Visible MWh"
         />
       )}
+      <p className="showcase-muted">
+        Use an eye to hide or restore a category. Remaining slices animate to fill the circle;
+        percentages and the donut total use visible values. Hidden entries stay on the same legend
+        page with their colors unchanged. The expansion entry has no eye; click it to open the next
+        page, even when its slice is hidden. The table retains all records and labels hidden rows.
+      </p>
       <p className="showcase-muted">
         Left and Right read each visible slice, including the aggregate. Home and End reach the page
         endpoints. Enter or Space on +N opens the next page. Select a category there and return with

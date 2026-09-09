@@ -33,6 +33,13 @@ const common = {
   labels,
   legend: {label: 'Visible categories'},
   title: 'Community energy use',
+  visibilityLabels: {
+    hidden: 'Hidden',
+    hideSeries: (label: string) => `Hide ${label}`,
+    showSeries: (label: string) => `Show ${label}`,
+    showAll: 'Show all',
+    allHidden: {title: 'No visible slices on this page', description: 'Restore a category.'},
+  },
   value: {accessor: 'value', formatValue: (value: number) => value.toFixed(1), label: 'Energy'},
 } as const;
 

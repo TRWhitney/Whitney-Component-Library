@@ -1,3 +1,5 @@
+import {ChartVisibilityButton} from './chart-visibility-button.js';
+import {useAnimatedRadialAngles} from './use-animated-radial-angles.js';
 import {arc} from 'd3-shape';
 import {useFocusVisible} from 'react-aria';
 import {selectionKey, useChartInteraction, type InteractionPoint} from './chart-interaction.js';
@@ -55,6 +57,7 @@ const pageSize = 8;
 type PartToWholeKind = 'donut' | 'pie';
 
 type PartToWholeFrameStyles = CSSProperties & {
+  '--wcl-radial-legend-rows': number;
   '--wcl-chart-aspect-ratio': number;
   '--wcl-chart-minimum-height': string;
   '--wcl-chart-minimum-width': string;
@@ -205,24 +208,30 @@ function makeSegments<Datum extends object>(
   records: readonly PreparedCategory<Datum>[],
   page: Page,
   aggregateSizing: PartToWholeAggregateSizing,
+  hiddenIds: readonly string[] = [],
 ): readonly Segment<Datum>[] {
-  const ordinary = records.slice(page.start, page.start + page.count);
-  const remaining = records.slice(page.start + page.count);
+  const pageRecords = records.slice(page.start, page.start + page.count);
+  const ordinary = pageRecords.filter((category) => !hiddenIds.includes(category.id));
+  const remainingRecords = records.slice(page.start + page.count);
+  const remaining = remainingRecords.filter((category) => !hiddenIds.includes(category.id));
   const ordinaryTotal = ordinary.reduce((sum, category) => sum + category.value, 0);
   const remainingTotal = remaining.reduce((sum, category) => sum + category.value, 0);
+  if (ordinaryTotal + remainingTotal === 0) return [];
+  const hasAggregate = page.hasMore && remainingTotal > 0;
   const smallestRatio =
     ordinary.length === 0
       ? 0
       : Math.min(...ordinary.map((category) => category.value)) / ordinaryTotal;
   const aggregateLimit = (Math.PI * 2 * smallestRatio) / (1 + smallestRatio);
-  const aggregateAngle = page.hasMore
+  const aggregateAngle = hasAggregate
     ? aggregateSizing === 'proportional'
       ? (remainingTotal / (ordinaryTotal + remainingTotal)) * Math.PI * 2
       : Math.min(Math.PI / 12, aggregateLimit * 0.55)
     : 0;
   const ordinaryAngle = Math.PI * 2 - aggregateAngle;
   let cursor = -Math.PI / 2;
-  const segments: Segment<Datum>[] = ordinary.map((category, index) => {
+  const segments: Segment<Datum>[] = ordinary.map((category) => {
+    const index = pageRecords.findIndex((record) => record.id === category.id);
     const startAngle = cursor;
     cursor += (category.value / ordinaryTotal) * ordinaryAngle;
     return {
@@ -237,15 +246,15 @@ function makeSegments<Datum extends object>(
       value: category.value,
     };
   });
-  if (page.hasMore) {
+  if (hasAggregate) {
     segments.push({
-      color: defaultColors[ordinary.length % defaultColors.length]!,
+      color: defaultColors[page.count % defaultColors.length]!,
       endAngle: Math.PI * 1.5,
       id: 'aggregate',
       identity: 'aggregate',
-      index: ordinary.length,
+      index: page.count,
       isAggregate: true,
-      remaining,
+      remaining: remainingRecords,
       startAngle: cursor,
       value: remainingTotal,
     });
@@ -409,11 +418,17 @@ function RadialTooltip<Datum extends object>({
 }
 
 function PartToWholeTable<Datum extends object>({
+  hiddenIds,
+  hiddenLabel,
+  visibleTotal,
   dataTableLabel,
   labels,
   model,
   value,
 }: {
+  readonly hiddenIds: readonly string[];
+  readonly hiddenLabel: string | undefined;
+  readonly visibleTotal: number;
   readonly dataTableLabel: string;
   readonly labels: PartToWholeChartLabels;
   readonly model: PartToWholeModel<Datum>;
@@ -431,10 +446,17 @@ function PartToWholeTable<Datum extends object>({
       <tbody>
         {model.categories.map((category) => (
           <tr key={category.id}>
-            <th scope="row">{category.label}</th>
+            <th scope="row">
+              {category.label}
+              {hiddenIds.includes(category.id) ? ` (${hiddenLabel})` : ''}
+            </th>
             <td>{formatChartValue(category.value, value)}</td>
             <td>
-              {model.total === 0 ? formatPercent(0) : formatPercent(category.value / model.total)}
+              {hiddenIds.includes(category.id)
+                ? hiddenLabel
+                : visibleTotal === 0
+                  ? formatPercent(0)
+                  : formatPercent(category.value / visibleTotal)}
             </td>
           </tr>
         ))}
@@ -450,7 +472,36 @@ function PartToWholeFrame<Datum extends object>({
   readonly kind: PartToWholeKind;
   readonly props: PartToWholeProps<Datum>;
 }): ReactElement {
-  const model = prepareModel(props);
+  const fullModel = prepareModel(props);
+  const visibilityLabels = props.visibilityLabels;
+  const firstEye = useRef<HTMLButtonElement>(null);
+  const [hiddenCategoryIds, setHiddenCategoryIds] = useState<readonly string[]>([]);
+  const categoryIdentity = JSON.stringify(fullModel.categories.map((category) => category.id));
+  const [retainedCategoryIdentity, setRetainedCategoryIdentity] = useState(categoryIdentity);
+  if (retainedCategoryIdentity !== categoryIdentity) {
+    setRetainedCategoryIdentity(categoryIdentity);
+    setHiddenCategoryIds((ids) =>
+      ids.filter((id) => fullModel.categories.some((category) => category.id === id)),
+    );
+  }
+  const hiddenIds = visibilityLabels ? hiddenCategoryIds : [];
+  if (visibilityLabels) {
+    assertText(visibilityLabels.hidden, 'Hidden-category label');
+    assertText(visibilityLabels.showAll, 'Show-all label');
+    assertText(visibilityLabels.allHidden.title, 'No-visible-slices title');
+    assertText(visibilityLabels.allHidden.description, 'No-visible-slices description');
+    for (const category of fullModel.positiveCategories) {
+      assertText(visibilityLabels.hideSeries(category.label), 'Hide-category label');
+      assertText(visibilityLabels.showSeries(category.label), 'Show-category label');
+    }
+  }
+  const model = {
+    ...fullModel,
+    total: fullModel.categories.reduce(
+      (sum, category) => sum + (hiddenIds.includes(category.id) ? 0 : category.value),
+      0,
+    ),
+  };
   const interaction = props.interaction;
   if (interaction?.selection)
     assertText(interaction.selection.containsSelection, 'Expansion selection label');
@@ -500,7 +551,21 @@ function PartToWholeFrame<Datum extends object>({
   }
   const safePageIndex = Math.min(pageIndex, pages.length - 1);
   const page = pages[safePageIndex]!;
-  const segments = makeSegments(model.positiveCategories, page, aggregateSizing);
+  const legendSegments = makeSegments(model.positiveCategories, page, aggregateSizing);
+  const targetSegments = makeSegments(model.positiveCategories, page, aggregateSizing, hiddenIds);
+  const angles = useAnimatedRadialAngles(
+    targetSegments,
+    JSON.stringify([modelIdentity, safePageIndex, kind]),
+    !!visibilityLabels &&
+      targetSegments.length > 0 &&
+      props.status?.kind !== 'loading' &&
+      props.status?.kind !== 'error',
+  );
+  const segments = targetSegments.map((segment) => ({
+    ...segment,
+    startAngle: angles.get(segment.identity)?.startAngle ?? segment.startAngle,
+    endAngle: angles.get(segment.identity)?.endAngle ?? segment.startAngle,
+  }));
   const pathBuilder = radialArc<Segment<Datum>>(kind === 'donut' ? donutInnerRadius : 0);
   const activeIndex = pointerIndex ?? touchIndex ?? keyboardIndex ?? 0;
   const isReading = pointerIndex !== null || touchIndex !== null || keyboardIndex !== null;
@@ -559,12 +624,21 @@ function PartToWholeFrame<Datum extends object>({
       id: category.id,
       category: category.label,
       datum: category.datum,
-      values: [{seriesId: '', label: category.label, value: category.value, hidden: false}],
+      values: [
+        {
+          seriesId: '',
+          label: category.label,
+          value: category.value,
+          hidden: hiddenIds.includes(category.id),
+        },
+      ],
     })),
     JSON.stringify([
       kind,
       safePageIndex,
       modelIdentity,
+      hiddenIds,
+      segments.map((segment) => [segment.identity, segment.startAngle, segment.endAngle]),
       svgViewScale,
       svgGeometry,
       props.minimumSize,
@@ -894,6 +968,7 @@ function PartToWholeFrame<Datum extends object>({
       : `M${x},${y} A${radius},${radius} 0 ${b - a > Math.PI ? 1 : 0} 1 ${Math.cos(b) * radius},${Math.sin(b) * radius}`;
   };
   const frameStyle: PartToWholeFrameStyles = {
+    '--wcl-radial-legend-rows': Math.ceil(legendSegments.length / 2),
     '--wcl-chart-aspect-ratio': props.aspectRatio ?? 1.72,
     '--wcl-chart-minimum-height': `${minimumSize.height}px`,
     '--wcl-chart-minimum-width': `${minimumSize.width}px`,
@@ -972,171 +1047,204 @@ function PartToWholeFrame<Datum extends object>({
             onKeyDown={handleKeyDown}
             ref={canvasRef}
             role="group"
-            tabIndex={0}
+            tabIndex={segments.length ? 0 : -1}
           >
             <div data-wcl-radial-layout="">
-              <svg
-                aria-hidden="true"
-                data-wcl-chart-svg=""
-                focusable="false"
-                data-selection-enabled={interaction?.selection ? '' : undefined}
-                onPointerDown={interaction ? beginInteractive : handlePointerDown}
-                onPointerUp={interaction ? endInteractive : undefined}
-                onPointerCancel={interaction ? cancelInteractive : undefined}
-                onLostPointerCapture={interaction ? cancelInteractive : undefined}
-                onPointerLeave={() => {
-                  setPointerIndex(null);
-                  setPointerPosition(undefined);
-                }}
-                onPointerMove={interaction ? moveInteractive : handlePointerMove}
-                ref={setSvgElement}
-                viewBox={`0 0 ${radialViewSize} ${radialViewSize}`}
-              >
-                <g transform={`translate(${radialCenter} ${radialCenter})`}>
-                  {segments.map((segment, index) => {
-                    const centroid = pathBuilder.centroid(segment);
-                    const angle = (segment.startAngle + segment.endAngle) / 2;
-                    const countLabelPoint =
-                      kind === 'pie' && segment.isAggregate ? pieSectorCentroid(segment) : centroid;
-                    const isEmphasized = emphasizedSegmentId === segment.identity;
-                    const popDistance = isEmphasized ? 9 : 0;
-                    const popX = Math.cos(angle - Math.PI / 2) * popDistance;
-                    const popY = Math.sin(angle - Math.PI / 2) * popDistance;
-                    return (
-                      <g
-                        data-active={isEmphasized ? '' : undefined}
-                        data-aggregate={segment.isAggregate ? '' : undefined}
-                        data-angle-size={(segment.endAngle - segment.startAngle).toFixed(6)}
-                        data-color={segment.color}
-                        data-emphasized={isEmphasized ? '' : undefined}
-                        data-muted={emphasizedSegmentId !== null && !isEmphasized ? '' : undefined}
-                        data-pattern-index={Math.floor(segment.index / defaultColors.length)}
-                        data-segment-id={segment.id}
-                        data-segment-index={index}
-                        data-wcl-radial-segment=""
-                        key={segment.identity}
-                        style={{transform: `translate(${popX}px, ${popY}px)`}}
-                      >
-                        <path
-                          d={pathBuilder(segment) ?? undefined}
-                          data-wcl-radial-slice=""
-                          onClick={() => {
-                            if (!interaction && segment.isAggregate) openNextPage(false);
-                          }}
-                        />
-                        {segment.isAggregate ? (
-                          <text
-                            data-wcl-radial-aggregate-label=""
-                            x={countLabelPoint[0]}
-                            y={countLabelPoint[1]}
-                          >
-                            +{segment.remaining?.length ?? 0}
-                            {containsSelected(segment) ? '*' : ''}
-                          </text>
-                        ) : null}
-                      </g>
-                    );
-                  })}
-                  {interaction ? (
-                    <g data-wcl-radial-interaction-overlay="" pointerEvents="none">
-                      {segments.map((segment, index) => {
-                        const selected =
-                            selectedIds.has(segment.id) &&
-                            !!interaction.selection &&
-                            !segment.isAggregate,
-                          reading = isReading && activeIndex === index,
-                          pulsing =
-                            actions.pulse?.item.rowId === segment.id && !segment.isAggregate;
-                        if (!selected && !reading && !pulsing) return null;
-                        const angle = (segment.startAngle + segment.endAngle) / 2 - Math.PI / 2,
-                          pop = segment.identity === emphasizedSegmentId ? 9 : 0,
-                          pad = 3 / svgViewScale,
-                          inner = kind === 'donut' ? donutInnerRadius : 0;
-                        const readingPath =
-                          arc<Segment<Datum>>()
-                            .innerRadius(inner ? inner + pad : pad * 1.5)
-                            .outerRadius(outerRadius - pad)
-                            .padAngle(
-                              Math.min(
-                                (segment.endAngle - segment.startAngle) / 4,
-                                pad / outerRadius,
-                              ),
-                            )(segment) ?? undefined;
-                        return (
-                          <g
-                            key={segment.identity}
-                            data-wcl-radial-cue-group=""
-                            style={{
-                              transform: `translate(${Math.cos(angle) * pop}px,${Math.sin(angle) * pop}px)`,
+              {segments.length ? (
+                <svg
+                  aria-hidden="true"
+                  data-wcl-chart-svg=""
+                  focusable="false"
+                  data-selection-enabled={interaction?.selection ? '' : undefined}
+                  onPointerDown={interaction ? beginInteractive : handlePointerDown}
+                  onPointerUp={interaction ? endInteractive : undefined}
+                  onPointerCancel={interaction ? cancelInteractive : undefined}
+                  onLostPointerCapture={interaction ? cancelInteractive : undefined}
+                  onPointerLeave={() => {
+                    setPointerIndex(null);
+                    setPointerPosition(undefined);
+                  }}
+                  onPointerMove={interaction ? moveInteractive : handlePointerMove}
+                  ref={setSvgElement}
+                  viewBox={`0 0 ${radialViewSize} ${radialViewSize}`}
+                >
+                  <g transform={`translate(${radialCenter} ${radialCenter})`}>
+                    {segments.map((segment, index) => {
+                      const centroid = pathBuilder.centroid(segment);
+                      const angle = (segment.startAngle + segment.endAngle) / 2;
+                      const countLabelPoint =
+                        kind === 'pie' && segment.isAggregate
+                          ? pieSectorCentroid(segment)
+                          : centroid;
+                      const isEmphasized = emphasizedSegmentId === segment.identity;
+                      const popDistance = isEmphasized ? 9 : 0;
+                      const popX = Math.cos(angle - Math.PI / 2) * popDistance;
+                      const popY = Math.sin(angle - Math.PI / 2) * popDistance;
+                      return (
+                        <g
+                          data-active={isEmphasized ? '' : undefined}
+                          data-aggregate={segment.isAggregate ? '' : undefined}
+                          data-angle-size={(segment.endAngle - segment.startAngle).toFixed(6)}
+                          data-color={segment.color}
+                          data-emphasized={isEmphasized ? '' : undefined}
+                          data-muted={
+                            emphasizedSegmentId !== null && !isEmphasized ? '' : undefined
+                          }
+                          data-pattern-index={Math.floor(segment.index / defaultColors.length)}
+                          data-segment-id={segment.id}
+                          data-segment-index={index}
+                          data-wcl-radial-segment=""
+                          key={segment.identity}
+                          style={{transform: `translate(${popX}px, ${popY}px)`}}
+                        >
+                          <path
+                            d={pathBuilder(segment) ?? undefined}
+                            data-wcl-radial-slice=""
+                            onClick={() => {
+                              if (!interaction && segment.isAggregate) openNextPage(false);
                             }}
-                          >
-                            {selected ? (
-                              <path
-                                data-wcl-radial-cue="selection"
-                                d={outerEdge(segment, outerRadius + 5 / svgViewScale)}
-                              />
-                            ) : null}
-                            {reading ? (
-                              <path data-wcl-radial-cue="reading" d={readingPath} />
-                            ) : null}
-                            {pulsing ? (
-                              <g key={actions.pulse!.sequence} data-wcl-radial-activation="">
+                          />
+                          {segment.isAggregate ? (
+                            <text
+                              data-wcl-radial-aggregate-label=""
+                              x={countLabelPoint[0]}
+                              y={countLabelPoint[1]}
+                            >
+                              +{segment.remaining?.length ?? 0}
+                              {containsSelected(segment) ? '*' : ''}
+                            </text>
+                          ) : null}
+                        </g>
+                      );
+                    })}
+                    {interaction ? (
+                      <g data-wcl-radial-interaction-overlay="" pointerEvents="none">
+                        {segments.map((segment, index) => {
+                          const selected =
+                              selectedIds.has(segment.id) &&
+                              !!interaction.selection &&
+                              !segment.isAggregate,
+                            reading = isReading && activeIndex === index,
+                            pulsing =
+                              actions.pulse?.item.rowId === segment.id && !segment.isAggregate;
+                          if (!selected && !reading && !pulsing) return null;
+                          const angle = (segment.startAngle + segment.endAngle) / 2 - Math.PI / 2,
+                            pop = segment.identity === emphasizedSegmentId ? 9 : 0,
+                            pad = 3 / svgViewScale,
+                            inner = kind === 'donut' ? donutInnerRadius : 0;
+                          const readingPath =
+                            arc<Segment<Datum>>()
+                              .innerRadius(inner ? inner + pad : pad * 1.5)
+                              .outerRadius(outerRadius - pad)
+                              .padAngle(
+                                Math.min(
+                                  (segment.endAngle - segment.startAngle) / 4,
+                                  pad / outerRadius,
+                                ),
+                              )(segment) ?? undefined;
+                          return (
+                            <g
+                              key={segment.identity}
+                              data-wcl-radial-cue-group=""
+                              style={{
+                                transform: `translate(${Math.cos(angle) * pop}px,${Math.sin(angle) * pop}px)`,
+                              }}
+                            >
+                              {selected ? (
                                 <path
-                                  data-wcl-radial-cue="activation"
-                                  d={pathBuilder(segment) ?? undefined}
+                                  data-wcl-radial-cue="selection"
+                                  d={outerEdge(segment, outerRadius + 5 / svgViewScale)}
                                 />
-                              </g>
-                            ) : null}
-                          </g>
-                        );
-                      })}
-                    </g>
-                  ) : null}
-                  {kind === 'donut' && 'totalLabel' in props ? (
-                    <g data-wcl-radial-total="">
-                      <text data-wcl-radial-total-value="" y={donutUnitFontSize * -0.45}>
-                        {formatChartNumber(model.total, props.value)}
-                      </text>
-                      <text data-wcl-radial-total-label="" y={donutUnitFontSize * 0.9}>
-                        {props.totalLabel}
-                      </text>
-                    </g>
-                  ) : null}
-                </g>
-                {actions.sweepTrail.length > 0 ? (
-                  <g
-                    data-wcl-radial-sweep=""
-                    pointerEvents="none"
-                    clipPath={`url(#${titleId}-sweep-clip)`}
-                  >
-                    <defs>
-                      <clipPath id={`${titleId}-sweep-clip`}>
-                        <circle cx={radialCenter} cy={radialCenter} r={160} />
-                      </clipPath>
-                    </defs>
-                    <polyline points={actions.sweepTrail.map(({x, y}) => `${x},${y}`).join(' ')} />
-                    <polyline points={actions.sweepTrail.map(({x, y}) => `${x},${y}`).join(' ')} />
+                              ) : null}
+                              {reading ? (
+                                <path data-wcl-radial-cue="reading" d={readingPath} />
+                              ) : null}
+                              {pulsing ? (
+                                <g key={actions.pulse!.sequence} data-wcl-radial-activation="">
+                                  <path
+                                    data-wcl-radial-cue="activation"
+                                    d={pathBuilder(segment) ?? undefined}
+                                  />
+                                </g>
+                              ) : null}
+                            </g>
+                          );
+                        })}
+                      </g>
+                    ) : null}
+                    {kind === 'donut' && 'totalLabel' in props ? (
+                      <g data-wcl-radial-total="">
+                        <text data-wcl-radial-total-value="" y={donutUnitFontSize * -0.45}>
+                          {formatChartNumber(model.total, props.value)}
+                        </text>
+                        <text data-wcl-radial-total-label="" y={donutUnitFontSize * 0.9}>
+                          {props.totalLabel}
+                        </text>
+                      </g>
+                    ) : null}
                   </g>
-                ) : null}
-              </svg>
+                  {actions.sweepTrail.length > 0 ? (
+                    <g
+                      data-wcl-radial-sweep=""
+                      pointerEvents="none"
+                      clipPath={`url(#${titleId}-sweep-clip)`}
+                    >
+                      <defs>
+                        <clipPath id={`${titleId}-sweep-clip`}>
+                          <circle cx={radialCenter} cy={radialCenter} r={160} />
+                        </clipPath>
+                      </defs>
+                      <polyline
+                        points={actions.sweepTrail.map(({x, y}) => `${x},${y}`).join(' ')}
+                      />
+                      <polyline
+                        points={actions.sweepTrail.map(({x, y}) => `${x},${y}`).join(' ')}
+                      />
+                    </g>
+                  ) : null}
+                </svg>
+              ) : visibilityLabels ? (
+                <div data-wcl-chart-all-hidden="" role="status">
+                  <strong>{visibilityLabels.allHidden.title}</strong>
+                  <p>{visibilityLabels.allHidden.description}</p>
+                  <button
+                    type="button"
+                    data-wcl-chart-show-all=""
+                    onClick={() => {
+                      setHiddenCategoryIds([]);
+                      firstEye.current?.focus();
+                    }}
+                  >
+                    {visibilityLabels.showAll}
+                  </button>
+                </div>
+              ) : null}
 
               <ul
                 {...legendScrollbarActivityProps}
                 aria-label={props.legend.label}
                 data-wcl-chart-legend=""
                 data-wcl-radial-legend=""
+                data-visibility={visibilityLabels ? '' : undefined}
               >
-                {segments.map((segment) => {
+                {legendSegments.map((segment, index) => {
+                  const hidden = hiddenIds.includes(segment.id) && !segment.isAggregate;
                   const isEmphasized = emphasizedSegmentId === segment.identity;
                   return (
                     <li
                       data-color={segment.color}
+                      data-hidden={hidden ? '' : undefined}
                       data-emphasized={isEmphasized ? '' : undefined}
                       data-muted={emphasizedSegmentId !== null && !isEmphasized ? '' : undefined}
                       key={segment.identity}
                     >
                       <button
-                        aria-pressed={validPinnedLegendId === segment.identity}
+                        aria-pressed={
+                          visibilityLabels && segment.isAggregate
+                            ? undefined
+                            : validPinnedLegendId === segment.identity
+                        }
+                        aria-disabled={hidden || undefined}
                         aria-label={
                           containsSelected(segment)
                             ? `${props.labels.moreCategories(segment.remaining?.length ?? 0)}. ${interaction!.selection!.containsSelection}`
@@ -1145,6 +1253,11 @@ function PartToWholeFrame<Datum extends object>({
                         data-wcl-chart-legend-button=""
                         onBlur={() => setTransientLegendId(null)}
                         onClick={() => {
+                          if (hidden) return;
+                          if (visibilityLabels && segment.isAggregate) {
+                            openNextPage(false);
+                            return;
+                          }
                           clearReading();
                           setTransientLegendId(null);
                           setPinnedLegendId((current) =>
@@ -1152,6 +1265,7 @@ function PartToWholeFrame<Datum extends object>({
                           );
                         }}
                         onFocus={() => {
+                          if (hidden) return;
                           clearReading();
                           setTransientLegendId(segment.identity);
                         }}
@@ -1162,6 +1276,7 @@ function PartToWholeFrame<Datum extends object>({
                           setPinnedLegendId(null);
                         }}
                         onMouseEnter={() => {
+                          if (hidden) return;
                           clearReading();
                           setTransientLegendId(segment.identity);
                         }}
@@ -1187,6 +1302,32 @@ function PartToWholeFrame<Datum extends object>({
                             : `${segment.category?.label} ${formatChartValue(segment.value, props.value)}`}
                         </span>
                       </button>
+                      {visibilityLabels && !segment.isAggregate ? (
+                        <ChartVisibilityButton
+                          buttonRef={index === 0 ? firstEye : undefined}
+                          hidden={hidden}
+                          label={
+                            hidden
+                              ? visibilityLabels.showSeries(segment.category!.label)
+                              : visibilityLabels.hideSeries(segment.category!.label)
+                          }
+                          onClear={() => {
+                            clearReading();
+                            setTransientLegendId(null);
+                            setPinnedLegendId(null);
+                          }}
+                          onToggle={() => {
+                            actions.cancel();
+                            clearReading();
+                            pressedSegment.current = null;
+                            setHiddenCategoryIds((ids) =>
+                              hidden ? ids.filter((id) => id !== segment.id) : [...ids, segment.id],
+                            );
+                            if (pinnedLegendId === segment.identity) setPinnedLegendId(null);
+                            if (transientLegendId === segment.identity) setTransientLegendId(null);
+                          }}
+                        />
+                      ) : null}
                     </li>
                   );
                 })}
@@ -1220,6 +1361,7 @@ function PartToWholeFrame<Datum extends object>({
       data-layout={isStacked ? 'stacked' : 'side-by-side'}
       data-wcl-chart=""
       data-wcl-part-to-whole-chart={kind}
+      data-visibility={visibilityLabels ? '' : undefined}
       ref={setRootElement}
       style={rootStyle}
     >
@@ -1264,7 +1406,10 @@ function PartToWholeFrame<Datum extends object>({
         <PartToWholeTable
           dataTableLabel={props.dataTableLabel}
           labels={props.labels}
-          model={model}
+          model={fullModel}
+          hiddenIds={hiddenIds}
+          hiddenLabel={visibilityLabels?.hidden}
+          visibleTotal={model.total}
           value={props.value}
         />
       ) : null}

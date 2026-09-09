@@ -218,6 +218,7 @@ export interface PartToWholeInteraction<Datum extends object> {
   };
 }
 interface PartToWholeChartCommonProps<Datum extends object> {
+  readonly visibilityLabels?: ChartVisibilityLabels;
   readonly interaction?: PartToWholeInteraction<Datum>;
   readonly aggregateSizing?: PartToWholeAggregateSizing;
   readonly aspectRatio?: number;

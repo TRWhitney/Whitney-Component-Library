@@ -414,3 +414,33 @@ remains over the entry or keyboard focus remains on it. Clear temporary legend e
 with toggling the pin, without moving focus. A subsequent hover or focus can preview it again.
 Apply this existing toggle contract consistently to Cartesian, statistical, radar and pie/donut
 legends. No visibility, reading, data-selection or activation callback behavior changes.
+
+## Pie and donut visibility: accepted totals
+
+Whitney approved recalculating around visible categories. Hiding a 50% category from values
+50, 30 and 20 makes the remaining shares 60% and 40%, filling the circle. The donut center total
+reflects visible values. Full source records remain available in the table, and hiding retains
+selection as in the other chart families. Preserve the approved animated fitting and eye controls.
+
+Eyes apply only to individual categories. Expansion remains navigation and receives no bulk eye.
+Keep existing ranked pages and legend positions when categories are hidden, including their colors
+and patterns. A hidden entry remains on its page for restoration. When hiding removes the expansion
+slice, keep a labeled next-page action available so hidden categories on later pages remain reachable.
+
+Add optional `visibilityLabels` using the existing chart copy contract. Hiding clears that category's
+pin and reading, cancels gestures, and excludes it from pointer, keyboard, activation and sweep
+selection. Full positive-category IDs still preserve hidden selections, including the selected
+asterisk on expansion entries. Removed or invalid items retain existing selection-pruning behavior.
+
+Animate visible slice boundaries together over 240ms, retargeting interrupted visibility changes.
+Reduced motion settles immediately. Paging and source-data replacement retain their current reset
+behavior. Readings and callbacks report exact visible totals/shares, never interpolated geometry.
+`shareOfTotal` uses all visible categories across pages; `shareOnPage` uses visible ordinary categories
+on the current page. The donut center reports the visible total across all pages.
+
+The full table keeps raw records, marks hidden categories, and reports visible shares for visible
+rows; hidden rows use the localized hidden label instead of a percentage. Zero records remain in
+the table without slices or visibility eyes. Full-source validation and loading/error feedback remain.
+When the current page has no visible slices, retain its legend, paging, caption, table and selection,
+and show recovery. Use copy appropriate to a page with no visible slices; Show all restores all
+categories and focuses the first eye on the current page. Update both public guides and showcase.

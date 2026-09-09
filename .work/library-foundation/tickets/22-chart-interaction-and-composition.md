@@ -205,3 +205,5 @@ row/column visibility remain unresolved slices.
 corrects repeated tap/click/keyboard activation so the legend entry and chart visibly release.
 The fix applies to all four legend renderers, with current guides and rendered examples. All 724
 tests and repository checks pass. Independent production review passes on intent and engineering axes with no findings.
+
+Pie/donut visibility is implemented in [Ticket 18](../../chart-interaction-composition/tickets/18-pie-donut-visibility.md), with passing repository/package/browser checks and independent intent and engineering reviews. Individual category eyes preserve ranked pages and colors. Visible categories refill the chart and determine percentages and donut totals; expansion remains navigation without a bulk eye. Heatmap visibility remains the next decision.
