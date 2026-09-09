@@ -124,3 +124,8 @@ repository checks, showcase build, and packed React 18/19 verification pass. Ind
 engineering reviews pass after two focused rendering/announcement corrections. Activation and
 selection for other chart families remain open; the accepted LineChart behavior is the convention
 for their planning.
+
+Whitney chose Frame for individual bars after accepting continuous category contours and corrected
+shared edges. The [bar/column production portion](../../chart-interaction-composition/tickets/05-bar-column-interaction.md)
+is complete with 607 passing tests, repository/build/package checks, and independent intent and
+engineering reviews. Other chart families and compositions stay open.

@@ -96,6 +96,7 @@ import {
   type Appearance,
   type BreadcrumbItems,
   type ChartActivation,
+  type ChartInteraction,
   type ChartSelectionItem,
   type ChartVisibilityLabels,
   type CollectionQueryFor,
@@ -2058,6 +2059,191 @@ function FeedbackSpecimens() {
   );
 }
 
+const barEnergyData = [
+  {month: 'Jan', heating: 42, cooling: 16},
+  {month: 'Feb', heating: 38, cooling: 22},
+  {month: 'Mar', heating: 29, cooling: 34},
+  {month: 'Apr', heating: 18, cooling: 40},
+] as const;
+const barEnergyRowId = (datum: (typeof barEnergyData)[number]) => datum.month;
+
+function BarInteractionExample({
+  orientation,
+  visibilityLabels,
+}: {
+  readonly orientation: 'horizontal' | 'vertical';
+  readonly visibilityLabels: ChartVisibilityLabels;
+}) {
+  const horizontal = orientation === 'horizontal';
+  const name = horizontal ? 'BarChart' : 'ColumnChart';
+  const [layout, setLayout] = useState<'grouped' | 'stacked' | 'normalized'>(
+    horizontal ? 'stacked' : 'grouped',
+  );
+  const [target, setTarget] = useState<'category' | 'point'>(horizontal ? 'category' : 'point');
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly ChartSelectionItem[]>([]);
+  const [details, setDetails] = useState<ChartActivation<
+    (typeof barEnergyData)[number],
+    (typeof barEnergyData)[number]['month']
+  > | null>(null);
+  const instructions = selectionEnabled
+    ? `Click or tap to select ${target === 'category' ? 'a month' : 'a bar'}. Drag ${target === 'category' ? (horizontal ? 'vertically' : 'horizontally') + ' to select a month range' : 'a rectangle to select every bar it touches'}. A drag replaces selection; Shift or Control/Command adds, and Alt removes. Escape cancels a drag. Enter or Space selects.${detailsEnabled ? ' Control/Command-click, Control/Command plus Enter or Space, or a touch press-and-hold opens details without changing selection.' : ''}`
+    : detailsEnabled
+      ? 'Click, tap, or press Enter or Space to open details.'
+      : 'Move across the chart or use the arrow keys to read its values.';
+  const interaction: ChartInteraction<
+    (typeof barEnergyData)[number],
+    (typeof barEnergyData)[number]['month']
+  > = {
+    getRowId: barEnergyRowId,
+    target,
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              hidden: (label) => `${label} (hidden)`,
+              item: ({rowId, seriesId}) =>
+                seriesId ? `${rowId}, ${seriesId === 'heating' ? 'Heating' : 'Cooling'}` : rowId,
+              summary: (count) =>
+                `${count} ${target === 'category' ? (count === 1 ? 'month' : 'months') : count === 1 ? 'bar' : 'bars'} selected`,
+            },
+          },
+        }
+      : {}),
+  };
+  const common = {
+    ...chartStateCopy,
+    data: barEnergyData,
+    dataTableLabel: 'Monthly heating and cooling data',
+    description:
+      layout === 'grouped'
+        ? 'Compare heating and cooling energy in each month.'
+        : layout === 'stacked'
+          ? "Heating and cooling contribute to each month's total energy use."
+          : "Compare heating and cooling shares of each month's visible energy use.",
+    interaction,
+    legend: {label: 'Energy uses'},
+    series: [
+      {accessor: 'heating', id: 'heating', label: 'Heating'},
+      {accessor: 'cooling', color: 'series-2', id: 'cooling', label: 'Cooling'},
+    ],
+    title: horizontal ? 'Energy use by month' : 'Monthly energy comparison',
+    visibilityLabels,
+  } as const;
+  const categoryAxis = {accessor: 'month', label: 'Month', scale: {type: 'categorical'}} as const;
+  const valueAxis = {
+    label: 'Energy',
+    scale: {type: 'linear'},
+    showGrid: true,
+    unit: 'MWh',
+  } as const;
+
+  return (
+    <Stack gap="regular">
+      <InlineGroup align="start" gap="regular" wrap>
+        <SegmentedControl
+          label={`${name} layout`}
+          onChange={setLayout}
+          options={[
+            {label: 'Grouped', value: 'grouped'},
+            {label: 'Stacked', value: 'stacked'},
+            {label: 'Normalized', value: 'normalized'},
+          ]}
+          value={layout}
+        />
+        <SegmentedControl
+          label={`${name} click target`}
+          onChange={(nextTarget) => {
+            setTarget(nextTarget);
+            setSelectedItems([]);
+            setDetails(null);
+          }}
+          options={[
+            {label: 'Month', value: 'category'},
+            {label: 'Bar', value: 'point'},
+          ]}
+          value={target}
+        />
+        <Switch
+          isSelected={selectionEnabled}
+          label="Enable selection"
+          onChange={setSelectionEnabled}
+        />
+        <Switch
+          isSelected={detailsEnabled}
+          label="Open details on activation"
+          onChange={(enabled) => {
+            setDetailsEnabled(enabled);
+            if (!enabled) setDetails(null);
+          }}
+        />
+      </InlineGroup>
+      <p>{instructions}</p>
+      {horizontal ? (
+        layout === 'normalized' ? (
+          <BarChart
+            {...common}
+            layout={layout}
+            xAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
+            yAxis={categoryAxis}
+          />
+        ) : (
+          <BarChart {...common} layout={layout} xAxis={valueAxis} yAxis={categoryAxis} />
+        )
+      ) : layout === 'normalized' ? (
+        <ColumnChart
+          {...common}
+          layout={layout}
+          xAxis={categoryAxis}
+          yAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
+        />
+      ) : (
+        <ColumnChart {...common} layout={layout} xAxis={categoryAxis} yAxis={valueAxis} />
+      )}
+      <p className="showcase-muted">
+        {horizontal ? 'Up and Down' : 'Left and Right'} move between months;{' '}
+        {horizontal ? 'Left and Right' : 'Up and Down'} move between series in Bar mode. Home and
+        End reach the first and last months. The inset dashed outline previews the target. Selected
+        bars have outer frames; selected months have underlined labels. In Month mode, the outline
+        follows the combined bars, including the outside of a stack. Reading outlines remain visible
+        inside selected frames. Activation gives brief feedback and opens the details below. Hidden
+        bars remain selected and return when shown. Normalized readings use visible shares; details
+        retain the original MWh values. These controls and details belong to this example.
+      </p>
+      {details ? (
+        <Stack gap="regular">
+          <DescriptionList
+            ariaLabel={`${details.category} energy details`}
+            emptyState={{
+              kind: 'no-data',
+              title: 'No readings',
+              description: 'Choose a month with recorded values.',
+            }}
+            items={[
+              {description: details.category, id: 'month', term: 'Month'},
+              ...details.values.map(({hidden, label, seriesId, value}) => ({
+                description: `${value} MWh${hidden ? ' (hidden on chart)' : ''}`,
+                id: seriesId,
+                term: label,
+              })),
+            ]}
+          />
+          <Button onPress={() => setDetails(null)} variant="quiet">
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
 function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   const [lineTarget, setLineTarget] = useState<'category' | 'point'>('category');
   const [lineSelectionEnabled, setLineSelectionEnabled] = useState(true);
@@ -2302,18 +2488,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare discrete categories with grouped, stacked, or normalized vertical columns. Columns retain a zero baseline as visibility changes. A touch reading stays open until another category or an outside press replaces it. ${visibilityGuidance}`}
         name="ColumnChart"
       >
-        <Example label="Grouped ColumnChart">
-          <ColumnChart
-            {...common}
-            {...verticalAxes}
-            layout="grouped"
-            legend={{label: 'Energy series'}}
-            series={[
-              {accessor: 'demand', id: 'demand', label: 'Demand'},
-              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
-            ]}
-            title="Monthly comparison"
-          />
+        <Example label="ColumnChart with selection and details">
+          <BarInteractionExample orientation="vertical" visibilityLabels={visibilityLabels} />
         </Example>
       </Specimen>
 
@@ -2321,19 +2497,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare discrete categories on a horizontal plot. Up and Down move through its vertical category axis when the plot has keyboard focus. Bars retain a zero baseline as visibility changes. ${visibilityGuidance}`}
         name="BarChart"
       >
-        <Example label="Horizontal BarChart">
-          <BarChart
-            {...common}
-            layout="grouped"
-            legend={{label: 'Energy series'}}
-            series={[
-              {accessor: 'demand', id: 'demand', label: 'Demand'},
-              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
-            ]}
-            title="Demand and capacity by month"
-            xAxis={{label: 'Energy', scale: {type: 'linear'}, showGrid: true, unit: 'MWh'}}
-            yAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
-          />
+        <Example label="BarChart with selection and details">
+          <BarInteractionExample orientation="horizontal" visibilityLabels={visibilityLabels} />
         </Example>
       </Specimen>
 

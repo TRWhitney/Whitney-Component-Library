@@ -86,7 +86,7 @@ function chartContract({
       'Legend hover and focus emphasize one series. Click, Enter, or Space pins that emphasis; repeat the action or press Escape to clear it. Emphasis never hides data, changes a domain, or filters records.',
       'Optional visibilityLabels enables unboxed open/closed eye buttons alongside series names. Each eye hides or restores its series without changing name-based emphasis. Hidden entries keep their order, color, and pattern. Hiding clears that series pin; restoring it does not repin it.',
       'Automatic numeric bounds fit visible series with brief, interruptible animation. Explicit consumer domains stay fixed, filled marks keep their zero baseline, and logarithmic bounds remain positive. Stacks recompute from visible series. Normalized plots and readings recompute visible shares on a 0-to-1 scale; the complete table retains shares of the full supplied data.',
-      name === 'LineChart'
+      name === 'LineChart' || name === 'BarChart' || name === 'ColumnChart'
         ? 'Optional interaction enables application activation and selection independently. The chart does not mutate supplied data or own application workflow.'
         : `${name} emits no consumer events and does not coordinate selection, mutate data, or own application workflow.`,
     ],
@@ -101,7 +101,7 @@ function chartContract({
       'Titles, descriptions, legends, and category labels follow inherited writing direction. Numeric axes preserve their mathematical order and horizontal plots retain low-to-high value progression.',
     ],
     events: [
-      `${name} manages reading, legend emphasis, and optional series visibility internally${name === 'LineChart' ? '' : ' without emitting consumer callbacks'}. Hiding or restoring series changes automatic bounds and visible readings without changing the supplied records. Stable series ids preserve visibility across value changes; removed series lose their hidden and pinned state, and new series start visible.`,
+      `${name} manages reading, legend emphasis, and optional series visibility internally${name === 'LineChart' || name === 'BarChart' || name === 'ColumnChart' ? '' : ' without emitting consumer callbacks'}. Hiding or restoring series changes automatic bounds and visible readings without changing the supplied records. Stable series ids preserve visibility across value changes; removed series lose their hidden and pinned state, and new series start visible.`,
     ],
     examples: [
       {
@@ -677,7 +677,75 @@ export const areaChartContract = chartContract({
   use: 'magnitude or contribution across an ordered domain benefits from a filled baseline and any stacking relationship is explicit',
 });
 
-export const columnChartContract = chartContract({
+function interactiveBarContract(
+  base: ComponentContract,
+  name: 'BarChart' | 'ColumnChart',
+): ComponentContract {
+  const horizontal = name === 'BarChart';
+  const categoryArrows = horizontal ? 'Up/Down' : 'Left/Right';
+  const seriesArrows = horizontal ? 'Left/Right' : 'Up/Down';
+  const rangeDirection = horizontal ? 'vertically' : 'horizontally';
+  const categoryAxis = '{accessor: "month", label: "Month", scale: {type: "categorical"}}';
+  const valueAxis = '{label: "Energy", unit: "MWh", scale: {type: "linear"}}';
+  return {
+    ...base,
+    accessibility: [
+      ...base.accessibility,
+      'Selection instructions, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the current bar or category without adding a whole-chart focus outline.',
+    ],
+    appearance: [
+      ...base.appearance,
+      'Persistent individual-bar selection uses an outer frame. Shared borders meet without covering the separate inset dashed reading outline. Category reading and activation follow the combined silhouette of visible bars without internal seams, including grouped and stacked layouts. Category selection underlines the category-axis label in either orientation. Bars do not gain circular point markers. Reading and selection remain distinct in light and dark appearances.',
+    ],
+    composition: [
+      ...base.composition,
+      'Optional interaction uses ChartInteraction<Datum, Category>, shared with LineChart. LineChartInteraction remains an exported compatibility alias. Supply target="category" or target="point", getRowId, and independently optional onActivate and selection. Here point means one bar identified by row and series. Share controlled selection between charts whose item IDs refer to the same records; application details and navigation remain consumer-owned. AreaChart and CartesianChart do not expose this interaction API.',
+    ],
+    controlBehavior: [
+      ...base.controlBehavior,
+      'With selection enabled, ordinary click or touch tap toggles the targeted item. Control/Command-click activates without changing selection. A touch press-and-hold activates once; release does not also select. Movement into a drag or pointer cancellation cancels a pending hold. Without selection, ordinary click or tap activates. Enabling both capabilities does not make both callbacks fire for one action.',
+      `Drag ${rangeDirection} to select an inclusive category range, or draw a rectangle to select every bar rectangle it intersects in point mode. A new drag replaces selection; Shift or Control/Command adds, and Alt removes. Escape or pointer cancellation restores the selection from before the drag. Dragging never activates or changes chart domains.`,
+      'Reading and activation choose the nearest visible category along its axis, then the nearest actual visible bar rectangle for point targeting. This applies to grouped, stacked, normalized, negative, and zero values within the existing input boundary. Hidden bars are not targets. Category activation remains one source-row action, without implicit aggregation.',
+    ],
+    events: [
+      ...base.events,
+      'interaction.onActivate receives ChartActivation with item, category, original datum, input method, and associated raw values. An item has rowId and, for an individual bar, seriesId. Each associated value has seriesId, label, value, and hidden. Category activation includes all source series values, including hidden ones; individual activation includes its own series value. Normalized callbacks retain raw source values while readings and positions use visible shares. No renderer objects or persistent inspected state are exposed.',
+      'selection accepts controlled selectedItems with required onSelectionChange, or uncontrolled defaultSelectedItems with optional onSelectionChange. These ownership models cannot be combined. onSelectionChange receives stable item identities independently of activation.',
+      'Stable row and series IDs preserve selection across value updates and reorderings. Internal selection drops deleted rows and series; controlled state remains consumer-owned, with unavailable items omitted from rendering and commands. Hidden items remain selected and named in the summary so restoring a series restores its frames. Data replacement or visibility changes cancel active gestures. Changing target kinds discards incompatible selection.',
+    ],
+    examples: [
+      ...base.examples,
+      {
+        code: `export function Selectable${name}({onOpenDetails}: {readonly onOpenDetails: (message: string) => void}) {\n  return (\n    <AppearanceProvider appearance="dark" accent="#2878ff">\n      <${name}\n        ${commonProps.replaceAll('\n  ', '\n        ')}\n        ${visibilityProps}\n        layout="grouped"\n        legend={{label: "Energy series"}}\n        interaction={{\n          target: "point",\n          getRowId: (datum) => datum.month,\n          onActivate: ({category, values}) => onOpenDetails(\`\${category}: \${values.map(({label, value}) => \`\${label} \${value} MWh\`).join(", ")}\`),\n          selection: {\n            defaultSelectedItems: [],\n            labels: {\n              instructions: "Click or tap to select a bar. Drag a rectangle to select bars it touches; Shift or Control/Command adds, Alt removes, and Escape cancels. Control/Command-click or press and hold to open details. Enter or Space selects; add Control/Command to open details.",\n              clear: "Clear selection",\n              empty: "Nothing selected",\n              summary: (count) => \`\${count} bars selected\`,\n              item: ({rowId, seriesId}) => \`\${rowId}, \${seriesId === "demand" ? "Demand" : "Capacity"}\`,\n              hidden: (label) => \`\${label} (hidden)\`,\n            },\n          },\n        }}\n        series={[{id: "demand", label: "Demand", accessor: "demand"}, {id: "capacity", label: "Capacity", accessor: "capacity", color: "series-2"}]}\n        title="Demand and capacity"\n        xAxis={${horizontal ? valueAxis : categoryAxis}}\n        yAxis={${horizontal ? categoryAxis : valueAxis}}\n      />\n    </AppearanceProvider>\n  );\n}`,
+        description:
+          'Clicking selects a bar and draws its frame. Modified activation or a touch hold opens application details independently. Use target="category" for one month action and a category-label underline. The rendered example also offers stacked and normalized layouts with heating and cooling contributions.',
+        title: 'Independent bar selection and activation',
+      },
+    ],
+    keyboardBehavior: [
+      ...base.keyboardBehavior,
+      `${categoryArrows} move between categories; in point mode ${seriesArrows} move between visible series. Home/End reach category endpoints. Point readings announce the targeted series and value first and retain the complete category reading. Enter or Space toggles selection when enabled; Control/Command plus Enter or Space activates without changing selection. Without selection, Enter or Space activates. Escape cancels an active drag before clearing a reading.`,
+    ],
+    localization: [
+      ...base.localization,
+      'selection.labels supplies instructions, clear, empty, summary(count), item(item), and hidden(label). Name selected items using stable IDs and application labels. Describe the enabled gestures, including orientation-specific category dragging, modified activation, and touch press-and-hold when both selection and activation are present.',
+    ],
+    parts: [
+      ...base.parts,
+      'Optional interaction adds bar selection frames, inset reading outlines, category-label underlines, finite activation feedback, and a localized selection summary with Clear selection. Application details and controls remain outside the chart.',
+    ],
+    reducedMotionBehavior: [
+      ...base.reducedMotionBehavior,
+      'Each activation restarts finite feedback. Reduced motion uses a brief static acknowledgment without changing callbacks or selection. Selection and reading geometry follow the same visible-data scale as the bars.',
+    ],
+    validation: [
+      ...base.validation,
+      'interaction.getRowId must return a unique nonempty stable string for each datum, including repeated category labels. Preserve IDs across sorting and refreshes; change an ID when the underlying identity changes. Category items have rowId; individual bars also have seriesId. All interaction geometry stays inside explicit plot domains. Existing grouped, stacked, and normalized input constraints remain in force.',
+    ],
+  };
+}
+
+const columnChartBaseContract = chartContract({
   alternative:
     'Use BarChart for long category labels, LineChart for continuous change, or AreaChart for accumulated magnitude.',
   counterExample: `<ColumnChart\n  data={[{second: 0, temperature: 18}, {second: 1, temperature: 18.2}, {second: 2, temperature: 18.4}]}\n  description="Dense temperature samples over time."\n  ${counterState}\n  series={[{id: "temperature", label: "Temperature", accessor: "temperature"}]}\n  title="Temperature samples"\n  xAxis={{accessor: "second", label: "Second", scale: {type: "linear"}}}\n  yAxis={{label: "Temperature", unit: "°C", scale: {type: "linear"}}}\n/>`,
@@ -689,7 +757,7 @@ export const columnChartContract = chartContract({
   use: 'numeric values must be compared across a modest set of discrete categories on a vertical plot',
 });
 
-export const barChartContract = chartContract({
+const barChartBaseContract = chartContract({
   alternative:
     'Use ColumnChart when category order reads naturally across the horizontal axis, or LineChart for trends over a continuous domain.',
   counterExample: `<BarChart\n  data={[{month: "Jan", temperature: 18}, {month: "Feb", temperature: 22}]}\n  description="Temperature change over consecutive months."\n  ${counterState}\n  series={[{id: "temperature", label: "Temperature", accessor: "temperature"}]}\n  title="Temperature trend"\n  xAxis={{label: "Temperature", unit: "°C", scale: {type: "linear"}}}\n  yAxis={{accessor: "month", label: "Month", scale: {type: "categorical"}}}\n/>`,
@@ -700,6 +768,9 @@ export const barChartContract = chartContract({
   purpose: 'Compare discrete categories with grouped, stacked, or normalized horizontal bars.',
   use: 'numeric values must be compared across discrete categories whose labels benefit from a horizontal layout',
 });
+
+export const columnChartContract = interactiveBarContract(columnChartBaseContract, 'ColumnChart');
+export const barChartContract = interactiveBarContract(barChartBaseContract, 'BarChart');
 
 export const cartesianChartContract = chartContract({
   alternative:

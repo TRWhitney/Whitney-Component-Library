@@ -122,6 +122,26 @@ acceptance, not production completion. The public identity and data-replacement 
 - The approved pointer-focus correction is included as a prerequisite in this delivery and will be
   reviewed alongside production code. Prototype adaptation and experiment switches remain isolated.
 
+### Bar and column production boundary
+
+The [accepted bar contract](prototypes/bar-selection.md#accepted-contract) binds BarChart and
+ColumnChart. Use the same activation/selection configuration and stable identity semantics as
+LineChart, with a shared public interaction type; preserve the existing LineChartInteraction type.
+Individual items are identified by row and series, regardless of the rectangular mark geometry.
+
+Category targeting resolves the nearest category along its axis. Individual targeting then picks
+the nearest visible bar rectangle. Drag rectangles select intersecting bars; category ranges follow
+the category axis in either orientation. Keyboard category navigation follows that orientation,
+and the other axis's arrows traverse visible series. Grouped, stacked, normalized, negative, and
+zero source values stay within the existing input boundary. Callbacks report raw source values;
+normalized readings and positions retain their existing displayed-share meaning.
+
+Use Frame for persistent bar selection, keeping shared borders from covering adjacent inner cues.
+Month reading and activation follow the union of the visible bars, without an internal seam.
+Category selections underline the axis label in either orientation. Retain keyboard reading cues
+on the target instead of adding a whole-chart outline. Keep all interaction geometry inside explicit
+plot domains. Consumers keep ownership of controlled selections as in LineChart.
+
 ## Testing Decisions
 
 - Exercise hiding, restoring, all-hidden recovery, focus, order, stable identity, and clear-pin

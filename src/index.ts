@@ -52,6 +52,7 @@ export {
   type ChartDomainValue,
   type ChartLegend,
   type ChartLineSeries,
+  type ChartInteraction,
   type ChartActivation,
   type ChartSelectionItem,
   type ChartSelectionLabels,

@@ -25,6 +25,7 @@ export type {
   ChartDomainValue,
   ChartLegend,
   ChartLineSeries,
+  ChartInteraction,
   ChartActivation,
   ChartSelectionItem,
   ChartSelectionLabels,

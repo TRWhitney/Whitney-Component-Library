@@ -8889,3 +8889,65 @@
     stroke: Highlight;
   }
 }
+
+@layer wcl.components {
+  [data-wcl-chart-canvas][data-bar-interaction]:focus-visible {
+    outline: none;
+  }
+
+  [data-wcl-chart-selected-bar],
+  [data-wcl-chart-reading-bar],
+  [data-wcl-chart-activation-bar] {
+    fill: none;
+    stroke: var(--wcl-text);
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-chart-selected-bar] {
+    stroke-width: 2.5px;
+  }
+
+  [data-wcl-chart-reading-bar] {
+    stroke-width: 1.25px;
+    stroke-dasharray: 3 2;
+  }
+
+  [data-wcl-chart-activation-bar] {
+    stroke-width: 4px;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: wcl-chart-bar-activation 620ms ease-out both;
+  }
+}
+
+@keyframes wcl-chart-bar-activation {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  70% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wcl-chart-activation-bar] {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-wcl-chart-selected-bar],
+  [data-wcl-chart-reading-bar],
+  [data-wcl-chart-activation-bar] {
+    stroke: CanvasText;
+  }
+}

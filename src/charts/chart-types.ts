@@ -416,12 +416,17 @@ export type ChartSelection = {readonly labels: ChartSelectionLabels} & (
     }
 );
 
-export interface LineChartInteraction<Datum extends object, Category extends ChartDomainValue> {
+export interface ChartInteraction<Datum extends object, Category extends ChartDomainValue> {
   readonly target: 'category' | 'point';
   readonly getRowId: (datum: Datum) => string;
   readonly onActivate?: (activation: ChartActivation<Datum, Category>) => void;
   readonly selection?: ChartSelection;
 }
+
+export type LineChartInteraction<
+  Datum extends object,
+  Category extends ChartDomainValue,
+> = ChartInteraction<Datum, Category>;
 
 export interface LineChartProps<
   Datum extends object,
@@ -462,6 +467,7 @@ type ColumnChartSharedProps<
   Datum extends object,
   XValue extends ChartDomainValue,
 > = ChartCommonProps<Datum> & {
+  readonly interaction?: ChartInteraction<Datum, XValue>;
   readonly annotations?: readonly ChartAnnotation<NoInfer<XValue>, number>[];
   readonly series: NonEmptyChartSeries<ChartBarSeries<Datum>>;
   readonly xAxis: ChartDataAxis<Datum, XValue>;
@@ -486,6 +492,7 @@ type BarChartSharedProps<
   Datum extends object,
   YValue extends ChartDomainValue,
 > = ChartCommonProps<Datum> & {
+  readonly interaction?: ChartInteraction<Datum, YValue>;
   readonly annotations?: readonly ChartAnnotation<number, NoInfer<YValue>>[];
   readonly series: NonEmptyChartSeries<ChartBarSeries<Datum>>;
   readonly yAxis: ChartDataAxis<Datum, YValue>;

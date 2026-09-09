@@ -27,6 +27,7 @@ import {
 import {createPortal} from 'react-dom';
 import {useFocusVisible} from 'react-aria';
 
+import {barRectangle, clipBar, frameBar, barContour} from './bar-interaction-geometry.js';
 import {EmptyState} from '../feedback/empty-state.js';
 import {InlineAlert} from '../feedback/alerts.js';
 import {Spinner} from '../feedback/spinner.js';
@@ -34,9 +35,9 @@ import {useScrollbarActivity} from '../scrollbar-activity.js';
 import {
   nearestInteraction,
   selectionKey,
-  useLineChartInteraction,
+  useChartInteraction,
   type InteractionPoint,
-} from './line-chart-interaction.js';
+} from './chart-interaction.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import type {
   AreaChartProps,
@@ -62,7 +63,7 @@ import type {
   ChartVisibilityLabels,
   ColumnChartProps,
   LineChartProps,
-  LineChartInteraction,
+  ChartInteraction,
   NonEmptyChartSeries,
 } from './chart-types.js';
 
@@ -179,7 +180,7 @@ interface ChartFrameProps<
   Category extends ChartDomainValue,
 > extends RenderModel<Datum, Category> {
   readonly aspectRatio?: number;
-  readonly interaction?: LineChartInteraction<Datum, Category>;
+  readonly interaction?: ChartInteraction<Datum, Category>;
   readonly visibilityLabels?: ChartVisibilityLabels;
   readonly description: string;
   readonly emptyState: ChartStateCopy;
@@ -1107,7 +1108,7 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
             : Math.min(48, (availableLength / Math.max(rows.length, 1)) * 0.7);
         const grouped = layout === 'grouped';
         const barIndex = barSeries.findIndex((bar) => bar.id === item.id);
-        const barWidth = grouped ? groupWidth / Math.max(barSeries.length, 1) : groupWidth;
+
         return (
           <g
             data-color={color}
@@ -1125,18 +1126,23 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
               const {end, start} = coordinates(row, seriesIndex, layout);
               const startPosition = valueProjection.position(start) ?? 0;
               const endPosition = valueProjection.position(end) ?? 0;
-              const categoryStart =
-                category - groupWidth / 2 + (grouped ? Math.max(barIndex, 0) * barWidth : 0);
+              const rect = barRectangle({
+                category,
+                start: startPosition,
+                end: endPosition,
+                groupWidth,
+                seriesIndex: barIndex,
+                seriesCount: barSeries.length,
+                grouped,
+                horizontal: isHorizontal,
+              });
               return (
                 <rect
                   data-row-index={rowIndex}
                   data-series={item.id}
                   data-wcl-chart-bar=""
-                  height={isHorizontal ? barWidth : Math.abs(startPosition - endPosition)}
+                  {...rect}
                   key={`${item.id}-${row.index}`}
-                  width={isHorizontal ? Math.abs(endPosition - startPosition) : barWidth}
-                  x={isHorizontal ? Math.min(startPosition, endPosition) : categoryStart}
-                  y={isHorizontal ? categoryStart : Math.min(startPosition, endPosition)}
                 />
               );
             })}
@@ -1721,14 +1727,14 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       new Set(rowIds).size !== rowIds.length)
   ) {
     throw new Error(
-      'LineChart interaction getRowId must return a unique nonempty string for every row.',
+      'Chart interaction getRowId must return a unique nonempty string for every row.',
     );
   }
   if (
     interaction?.selection?.selectedItems !== undefined &&
     interaction.selection.defaultSelectedItems !== undefined
   ) {
-    throw new Error('LineChart selection cannot combine selectedItems and defaultSelectedItems.');
+    throw new Error('Chart selection cannot combine selectedItems and defaultSelectedItems.');
   }
   const interactionRows = (interaction ? allPrepared.rows : []).map((row) => ({
     id: rowIds[row.index] ?? '',
@@ -1744,10 +1750,18 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   const interactionVersion = JSON.stringify([
     interactionRows.map((row) => [row.id, domainValueKey(row.category), row.values]),
     status.kind,
+    layout,
+    categoryPlacement,
     categoryAxis.scale,
     valueAxis.scale,
   ]);
-  const actions = useLineChartInteraction(interaction, interactionRows, interactionVersion, data);
+  const actions = useChartInteraction(
+    interaction,
+    interactionRows,
+    interactionVersion,
+    data,
+    categoryPlacement,
+  );
   const activeReading =
     actions.box !== null ? null : (pointerReading ?? touchReading ?? keyboardReading);
   const availableSeriesId = (id: string | null | undefined): string | undefined =>
@@ -1940,20 +1954,61 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 `${reference.label}: ${formatReadingValue(reference.value, valueAxis)}`,
             ),
           ].join('. ');
+    const isBarInteraction =
+      interaction !== undefined &&
+      (rootAttribute === 'data-wcl-bar-chart' || rootAttribute === 'data-wcl-column-chart');
     const interactionPoints: InteractionPoint[] =
       interaction === undefined
         ? []
         : prepared.rows.flatMap((row, index) =>
             series.flatMap((item, seriesIndex) => {
-              const x = categoryProjection.position(row.category),
-                y = valueProjection.position(row.values[seriesIndex]!);
+              const category = categoryProjection.position(row.category);
+              const {start, end} = coordinates(row, seriesIndex, layout);
+              const value = valueProjection.position(end);
+              if (category === undefined || value === undefined) return [];
+              if (isBarInteraction) {
+                const from = valueProjection.position(start);
+                if (from === undefined) return [];
+                const horizontal = categoryPlacement === 'y';
+                const extent = horizontal ? plotHeight(plot) : plotWidth(plot);
+                const groupWidth =
+                  categoryProjection.bandwidth > 0
+                    ? categoryProjection.bandwidth
+                    : Math.min(48, (extent / Math.max(prepared.rows.length, 1)) * 0.7);
+                const bounds = clipBar(
+                  barRectangle({
+                    category,
+                    start: from,
+                    end: value,
+                    groupWidth,
+                    seriesIndex,
+                    seriesCount: series.length,
+                    grouped: layout === 'grouped',
+                    horizontal,
+                  }),
+                  plot,
+                );
+                if (!bounds) return [];
+                return [
+                  {
+                    item: {
+                      rowId: rowIds[row.index]!,
+                      ...(interaction.target === 'point' ? {seriesId: item.id} : {}),
+                    },
+                    index,
+                    seriesId: item.id,
+                    categoryPosition: category,
+                    x: bounds.x + bounds.width / 2,
+                    y: bounds.y + bounds.height / 2,
+                    bounds,
+                  },
+                ];
+              }
               if (
-                x === undefined ||
-                y === undefined ||
-                x < plot.left - 1e-8 ||
-                x > plot.right + 1e-8 ||
-                y < plot.top - 1e-8 ||
-                y > plot.bottom + 1e-8
+                category < plot.left - 1e-8 ||
+                category > plot.right + 1e-8 ||
+                value < plot.top - 1e-8 ||
+                value > plot.bottom + 1e-8
               )
                 return [];
               return [
@@ -1964,12 +2019,14 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   },
                   index,
                   seriesId: item.id,
-                  x,
-                  y,
+                  categoryPosition: category,
+                  x: category,
+                  y: value,
                 },
               ];
             }),
           );
+    const barRectangles = interactionPoints.flatMap((p) => (p.bounds ? [p.bounds] : []));
     const interactionPointFromPointer = (event: PointerEvent<SVGSVGElement>) => {
       const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
       const padding =
@@ -1981,7 +2038,13 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         y > plot.bottom + padding
       )
         return undefined;
-      return nearestInteraction(interactionPoints, x, y, interaction?.target ?? 'category');
+      return nearestInteraction(
+        interactionPoints,
+        x,
+        y,
+        interaction?.target ?? 'category',
+        categoryPlacement,
+      );
     };
     const readingFromPointer = (
       event: PointerEvent<SVGSVGElement>,
@@ -1992,7 +2055,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         const point = interactionPointFromPointer(event);
         const hoveredPoint =
           interaction.target === 'category'
-            ? nearestInteraction(interactionPoints, x, y, 'point')
+            ? nearestInteraction(interactionPoints, x, y, 'point', categoryPlacement)
             : point;
         return point
           ? {
@@ -2088,7 +2151,9 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       }
       if (
         interaction?.target === 'point' &&
-        (event.key === 'ArrowUp' || event.key === 'ArrowDown')
+        (categoryPlacement === 'x'
+          ? event.key === 'ArrowUp' || event.key === 'ArrowDown'
+          : event.key === 'ArrowLeft' || event.key === 'ArrowRight')
       ) {
         event.preventDefault();
         const at = Math.max(
@@ -2096,7 +2161,12 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
           series.findIndex((item) => item.id === currentSeriesId),
         );
         const next =
-          series[(at + (event.key === 'ArrowUp' ? -1 : 1) + series.length) % series.length]!;
+          series[
+            (at +
+              (event.key === (categoryPlacement === 'x' ? 'ArrowUp' : 'ArrowLeft') ? -1 : 1) +
+              series.length) %
+              series.length
+          ]!;
         setKeyboardReading({index: previousIndex, seriesId: next.id});
         setPointerReading(null);
         setTouchReading(null);
@@ -2166,6 +2236,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             }
             data-stagger={presentation.staggerLabels ? '' : undefined}
             data-wcl-chart-canvas=""
+            data-bar-interaction={isBarInteraction ? '' : undefined}
             onBlur={blurChart}
             onFocus={focusChart}
             onKeyDown={readWithKeyboard}
@@ -2286,7 +2357,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 plot={plot}
                 valueProjection={valueProjection}
               />
-              {interaction?.target === 'point' ? (
+              {interaction?.target === 'point' && !isBarInteraction ? (
                 <g pointerEvents="none">
                   {actions.selected.map((item) => {
                     const point = interactionPoints.find(
@@ -2312,7 +2383,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 </g>
               ) : null}
               <g clipPath={hasVisibilityControls ? `url(#${plotClipId})` : undefined}>
-                {activeReading === null ? null : (
+                {activeReading === null || isBarInteraction ? null : (
                   <ReadingOverlay
                     pointTarget={interaction?.target === 'point'}
                     {...(rootAttribute === 'data-wcl-line-chart'
@@ -2348,19 +2419,39 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                           : 1.75
                         : 1.125;
                       const y =
-                        plot.bottom +
-                        (presentation.fontSize * labelOffset + 5) / presentation.viewScale;
+                        categoryPlacement === 'x'
+                          ? plot.bottom +
+                            (presentation.fontSize * labelOffset + 5) / presentation.viewScale
+                          : point.categoryPosition +
+                            (presentation.fontSize / 2 + 5) / presentation.viewScale;
                       return (
                         <line
                           key={selectionKey(item)}
                           data-wcl-chart-selected-category=""
-                          x1={point.x - 12 / presentation.viewScale}
-                          x2={point.x + 12 / presentation.viewScale}
+                          x1={
+                            categoryPlacement === 'x'
+                              ? point.categoryPosition - 12 / presentation.viewScale
+                              : plot.left - 33 / presentation.viewScale
+                          }
+                          x2={
+                            categoryPlacement === 'x'
+                              ? point.categoryPosition + 12 / presentation.viewScale
+                              : plot.left - 9 / presentation.viewScale
+                          }
                           y1={y}
                           y2={y}
                         />
                       );
                     }
+                    if (point.bounds)
+                      return (
+                        <rect
+                          key={selectionKey(item)}
+                          data-wcl-chart-selected-bar=""
+                          clipPath={`url(#${plotClipId})`}
+                          {...frameBar(point.bounds, barRectangles, 2 / presentation.viewScale)}
+                        />
+                      );
                     const selectedSeries = series.find((s) => s.id === item.seriesId)!;
                     const stroke =
                       presentation.pointStrokeWidth *
@@ -2379,18 +2470,33 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   {actions.box ? <rect data-wcl-chart-selection-box="" {...actions.box} /> : null}
                   {actions.pulse ? (
                     <g key={actions.pulse.sequence} data-wcl-chart-activation="">
-                      {interactionPoints
-                        .filter((p) => selectionKey(p.item) === selectionKey(actions.pulse!.item))
-                        .map((point, index) => (
-                          <circle
-                            key={index}
-                            data-wcl-chart-activation-dot=""
-                            cx={point.x}
-                            cy={point.y}
-                            r={10 / presentation.viewScale}
-                          />
-                        ))}
-                      {interaction.target === 'category'
+                      {isBarInteraction ? (
+                        <path
+                          data-wcl-chart-activation-bar=""
+                          clipPath={`url(#${plotClipId})`}
+                          d={barContour(
+                            interactionPoints
+                              .filter(
+                                (p) => selectionKey(p.item) === selectionKey(actions.pulse!.item),
+                              )
+                              .flatMap((p) => (p.bounds ? [p.bounds] : [])),
+                            -2 / presentation.viewScale,
+                          )}
+                        />
+                      ) : (
+                        interactionPoints
+                          .filter((p) => selectionKey(p.item) === selectionKey(actions.pulse!.item))
+                          .map((point, index) => (
+                            <circle
+                              key={index}
+                              data-wcl-chart-activation-dot=""
+                              cx={point.x}
+                              cy={point.y}
+                              r={10 / presentation.viewScale}
+                            />
+                          ))
+                      )}
+                      {interaction.target === 'category' && !isBarInteraction
                         ? (() => {
                             const point = interactionPoints.find(
                               (p) => p.item.rowId === actions.pulse!.item.rowId,
@@ -2407,6 +2513,23 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                           })()
                         : null}
                     </g>
+                  ) : null}
+                  {isBarInteraction && activeReading ? (
+                    <path
+                      data-wcl-chart-reading-bar=""
+                      clipPath={`url(#${plotClipId})`}
+                      d={barContour(
+                        interactionPoints
+                          .filter(
+                            (p) =>
+                              p.index === activeReading.index &&
+                              (interaction.target === 'category' ||
+                                p.seriesId === activeReading.seriesId),
+                          )
+                          .flatMap((p) => (p.bounds ? [p.bounds] : [])),
+                        3 / presentation.viewScale,
+                      )}
+                    />
                   ) : null}
                 </g>
               ) : null}

@@ -3,7 +3,7 @@ import type {
   ChartActivation,
   ChartDomainValue,
   ChartSelectionItem,
-  LineChartInteraction,
+  ChartInteraction,
 } from './chart-types.js';
 
 export interface InteractionRow<Datum extends object, Category extends ChartDomainValue> {
@@ -14,6 +14,8 @@ export interface InteractionRow<Datum extends object, Category extends ChartDoma
 }
 export interface InteractionPoint {
   readonly seriesId: string;
+  readonly categoryPosition: number;
+  readonly bounds?: SelectionBox;
   readonly item: ChartSelectionItem;
   readonly index: number;
   readonly x: number;
@@ -33,15 +35,32 @@ export function nearestInteraction(
   x: number,
   y: number,
   target: 'category' | 'point',
+  categoryPlacement: 'x' | 'y' = 'x',
 ): InteractionPoint | undefined {
+  const categoryCoordinate = categoryPlacement === 'x' ? x : y;
+  const distance = (point: InteractionPoint) => {
+    const rect = point.bounds;
+    return rect
+      ? Math.hypot(
+          Math.max(rect.x - x, 0, x - rect.x - rect.width),
+          Math.max(rect.y - y, 0, y - rect.y - rect.height),
+        )
+      : Math.abs(point.y - y);
+  };
   let column: InteractionPoint | undefined;
   for (const point of points) {
-    if (column === undefined || Math.abs(point.x - x) < Math.abs(column.x - x)) column = point;
+    if (
+      column === undefined ||
+      Math.abs(point.categoryPosition - categoryCoordinate) <
+        Math.abs(column.categoryPosition - categoryCoordinate)
+    )
+      column = point;
   }
   if (target === 'category' || column === undefined) return column;
   let nearest = column;
   for (const point of points) {
-    if (point.x === column.x && Math.abs(point.y - y) < Math.abs(nearest.y - y)) nearest = point;
+    if (point.categoryPosition === column.categoryPosition && distance(point) < distance(nearest))
+      nearest = point;
   }
   return nearest;
 }
@@ -60,11 +79,12 @@ interface Gesture {
   activated: boolean;
 }
 
-export function useLineChartInteraction<Datum extends object, Category extends ChartDomainValue>(
-  configuration: LineChartInteraction<Datum, Category> | undefined,
+export function useChartInteraction<Datum extends object, Category extends ChartDomainValue>(
+  configuration: ChartInteraction<Datum, Category> | undefined,
   rows: readonly InteractionRow<Datum, Category>[],
   version: string,
   data: readonly Datum[],
+  categoryPlacement: 'x' | 'y' = 'x',
 ) {
   const selection = configuration?.selection;
   const [internal, setInternal] = useState<readonly ChartSelectionItem[]>(
@@ -243,24 +263,37 @@ export function useLineChartInteraction<Datum extends object, Category extends C
     };
     let chosen: readonly ChartSelectionItem[];
     if (configuration?.target === 'category') {
-      const first = nearestInteraction(points, start.x, start.y, 'category');
-      const last = nearestInteraction(points, endX, endY, 'category');
+      const first = nearestInteraction(points, start.x, start.y, 'category', categoryPlacement);
+      const last = nearestInteraction(points, endX, endY, 'category', categoryPlacement);
       chosen =
         first && last
           ? points
-              .filter((p) => p.x >= Math.min(first.x, last.x) && p.x <= Math.max(first.x, last.x))
+              .filter(
+                (p) =>
+                  p.categoryPosition >= Math.min(first.categoryPosition, last.categoryPosition) &&
+                  p.categoryPosition <= Math.max(first.categoryPosition, last.categoryPosition),
+              )
               .map((p) => p.item)
           : [];
-      rect.y = bounds.top;
-      rect.height = bounds.bottom - bounds.top;
+      if (categoryPlacement === 'x') {
+        rect.y = bounds.top;
+        rect.height = bounds.bottom - bounds.top;
+      } else {
+        rect.x = bounds.left;
+        rect.width = bounds.right - bounds.left;
+      }
     } else {
       chosen = points
-        .filter(
-          (p) =>
-            p.x >= rect.x &&
-            p.x <= rect.x + rect.width &&
-            p.y >= rect.y &&
-            p.y <= rect.y + rect.height,
+        .filter((p) =>
+          p.bounds
+            ? p.bounds.x <= rect.x + rect.width &&
+              p.bounds.x + p.bounds.width >= rect.x &&
+              p.bounds.y <= rect.y + rect.height &&
+              p.bounds.y + p.bounds.height >= rect.y
+            : p.x >= rect.x &&
+              p.x <= rect.x + rect.width &&
+              p.y >= rect.y &&
+              p.y <= rect.y + rect.height,
         )
         .map((p) => p.item);
     }
