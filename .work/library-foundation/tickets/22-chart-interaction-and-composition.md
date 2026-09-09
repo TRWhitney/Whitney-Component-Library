@@ -170,5 +170,13 @@ data-change animation and compositions stay open.
 
 [Shared activation ticket 12](../../chart-interaction-composition/tickets/12-shared-activation-motion.md)
 standardizes pulse timing and screen-space sizes across the implemented chart families. The
-heatmap study uses the same animation and the accepted Cell frames. Its hover convention remains
-under discussion, and public heatmap selection and activation remain open.
+heatmap study uses the same animation and the accepted Cell frames. Dashed inner hover is approved. Public heatmap selection and activation is tracked in
+[Ticket 13](../../chart-interaction-composition/tickets/13-heatmap-interaction.md).
+
+[Heatmap ticket 13](../../chart-interaction-composition/tickets/13-heatmap-interaction.md) implements
+cell selection, independent activation, Box touched dragging, stable row/column identity for missing
+cells, dashed hover and solid selection frames. Its public examples, contracts and guide are current.
+All 686 tests and repository/build/package checks pass. Independent intent and engineering reviews
+pass after correcting keyboard tooltip continuity when the grid scrolls.
+Compact chart interaction, remaining visibility, exploration, data-change animation and compositions
+remain open.

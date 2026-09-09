@@ -169,7 +169,10 @@ function App() {
         <header>
           <div className="kicker">CHART INTERACTION STUDY</div>
           <h1>Heatmap selection</h1>
-          <p>Cell frames mark selection. Activate a cell to see its outlined pulse.</p>
+          <p>
+            Dashed inner outlines mark hover. Solid cell frames mark selection. Activate a cell to
+            see its outlined pulse.
+          </p>
         </header>
         <div className="controls">
           <div className="toggles" data-study-name="Display and interaction controls">

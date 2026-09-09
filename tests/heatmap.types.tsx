@@ -102,3 +102,62 @@ export const rendererProp = (
     renderer={() => null}
   />
 );
+
+export const interactiveHeatmap = (
+  <Heatmap
+    {...common}
+    data={[]}
+    interaction={{
+      onActivate(activation) {
+        const original: Reading | undefined = activation.datum;
+        const value: number | undefined = activation.value;
+        const row: string = activation.item.rowId;
+        const column: string = activation.item.columnId;
+        void [original, value, row, column];
+        // @ts-expect-error Missing cells do not guarantee a record.
+        const required: Reading = activation.datum;
+        void required;
+      },
+    }}
+  />
+);
+export const invalidControlledHeatmap = (
+  <Heatmap
+    {...common}
+    data={[]}
+    interaction={{
+      // @ts-expect-error Controlled selection requires its change callback.
+      selection: {
+        selectedItems: [],
+        labels: {
+          instructions: 'Select',
+          clear: 'Clear',
+          empty: 'None',
+          summary: String,
+          item: (item) => item.rowId,
+          hidden: String,
+        },
+      },
+    }}
+  />
+);
+export const invalidHeatmapCoordinate = (
+  <Heatmap
+    {...common}
+    data={[]}
+    interaction={{
+      selection: {
+        labels: {
+          instructions: 'Select',
+          clear: 'Clear',
+          empty: 'None',
+          summary: String,
+          item: (item) => item.columnId,
+          hidden: String,
+        },
+        // @ts-expect-error Heatmap selection requires both row and column identifiers.
+        defaultSelectedItems: [{rowId: 'north'}],
+      },
+    }}
+  />
+);

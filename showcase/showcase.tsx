@@ -47,6 +47,9 @@ import {
   IconButton,
   Histogram,
   Heatmap,
+  type HeatmapActivation,
+  type HeatmapInteraction,
+  type HeatmapSelectionItem,
   InlineAlert,
   InlineGroup,
   Link,
@@ -3197,6 +3200,130 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
   );
 }
 
+type RoomReading = (typeof roomTemperatureData)[number] | (typeof roomDeviationData)[number];
+
+function HeatmapInteractionExample({
+  accent,
+  deviation = false,
+}: {
+  readonly accent: AccentColor;
+  readonly deviation?: boolean;
+}) {
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly HeatmapSelectionItem[]>([]);
+  const [details, setDetails] = useState<HeatmapActivation<RoomReading> | null>(null);
+  const instructions = distributionInstructions(
+    selectionEnabled,
+    detailsEnabled,
+    'cells touched by the rectangle',
+  );
+  const itemLabel = (item: HeatmapSelectionItem) =>
+    `${heatmapRows.find((row) => row.id === item.rowId)?.label ?? item.rowId}, ${heatmapColumns.find((column) => column.id === item.columnId)?.label ?? item.columnId}`;
+  const interaction: HeatmapInteraction<RoomReading> = {
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              summary: (count) => `${count} ${count === 1 ? 'cell' : 'cells'} selected`,
+              item: itemLabel,
+              hidden: (label) => label,
+            },
+          },
+        }
+      : {}),
+  };
+  const heatmapCommon = {
+    columnAccessor: 'period',
+    columns: heatmapColumns,
+    dataTableLabel: 'Room readings by time of day',
+    emptyState: {
+      description: 'Declare rooms and times to begin.',
+      title: 'No reading grid',
+    },
+    invalidData: {
+      description: 'Correct non-finite room readings.',
+      title: 'Invalid room readings',
+    },
+    labels: {
+      colorKey: 'Reading scale',
+      column: 'Time of day',
+      missing: 'No reading',
+      row: 'Room',
+      scrollRegion: 'Room reading grid',
+    },
+    rowAccessor: 'room',
+    rows: heatmapRows,
+  } as const;
+  return (
+    <Stack gap="regular">
+      <DistributionInteractionControls
+        selectionEnabled={selectionEnabled}
+        setSelectionEnabled={setSelectionEnabled}
+        detailsEnabled={detailsEnabled}
+        setDetailsEnabled={(enabled) => {
+          setDetailsEnabled(enabled);
+          if (!enabled) setDetails(null);
+        }}
+      />
+      <p>
+        {instructions} Dashed inner outlines show the current reading. Solid frames show selected
+        cells, including missing readings.
+      </p>
+      <Heatmap
+        {...heatmapCommon}
+        data={deviation ? roomDeviationData : roomTemperatureData}
+        description={
+          deviation
+            ? 'Degrees below or above the target; zero means the room met its target.'
+            : 'Temperature by room and time; patterned cells have no recorded reading.'
+        }
+        scale={
+          deviation
+            ? {colors: [accent, '#d14f00'], domain: [-6, 6], midpoint: 0, type: 'two-sided'}
+            : {color: accent, type: 'sequential'}
+        }
+        title={deviation ? 'Temperature deviation' : 'Room temperature'}
+        value={{accessor: 'value', label: deviation ? 'Deviation' : 'Temperature', unit: '°C'}}
+        interaction={interaction}
+      />
+      {details ? (
+        <Stack gap="tight">
+          <DescriptionList
+            ariaLabel="Room reading details"
+            emptyState={{kind: 'no-data', title: 'No cell', description: 'Open a room reading.'}}
+            items={[
+              {id: 'cell', term: 'Cell', description: itemLabel(details.item)},
+              {
+                id: 'value',
+                term: 'Recorded value',
+                description: details.value === undefined ? 'No reading' : `${details.value} °C`,
+              },
+              {
+                id: 'record',
+                term: 'Original record',
+                description: details.datum
+                  ? `${details.datum.room}, ${details.datum.period}: ${details.datum.value}`
+                  : 'No source record',
+              },
+              {id: 'input', term: 'Input method', description: details.input},
+            ]}
+          />
+          <Button variant="quiet" onPress={() => setDetails(null)}>
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
 function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   const [lineTarget, setLineTarget] = useState<'category' | 'point'>('category');
   const [lineSelectionEnabled, setLineSelectionEnabled] = useState(true);
@@ -3233,28 +3360,6 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
     dataTableLabel: 'Monthly energy data',
     description: 'Monthly demand remains within available thermal capacity.',
     visibilityLabels,
-  } as const;
-  const heatmapCommon = {
-    columnAccessor: 'period',
-    columns: heatmapColumns,
-    dataTableLabel: 'Room readings by time of day',
-    emptyState: {
-      description: 'Declare rooms and times to begin.',
-      title: 'No reading grid',
-    },
-    invalidData: {
-      description: 'Correct non-finite room readings.',
-      title: 'Invalid room readings',
-    },
-    labels: {
-      colorKey: 'Reading scale',
-      column: 'Time of day',
-      missing: 'No reading',
-      row: 'Room',
-      scrollRegion: 'Room reading grid',
-    },
-    rowAccessor: 'room',
-    rows: heatmapRows,
   } as const;
 
   return (
@@ -3432,29 +3537,10 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         name="Heatmap"
       >
         <Example label="Sequential Heatmap with zero and missing cells">
-          <Heatmap
-            {...heatmapCommon}
-            data={roomTemperatureData}
-            description="Temperature by room and time; patterned cells have no recorded reading."
-            scale={{color: accent, type: 'sequential'}}
-            title="Room temperature"
-            value={{accessor: 'value', label: 'Temperature', unit: '°C'}}
-          />
+          <HeatmapInteractionExample accent={accent} />
         </Example>
         <Example label="Two-sided Heatmap around target">
-          <Heatmap
-            {...heatmapCommon}
-            data={roomDeviationData}
-            description="Degrees below or above the target; zero means the room met its target."
-            scale={{
-              colors: [accent, '#d14f00'],
-              domain: [-6, 6],
-              midpoint: 0,
-              type: 'two-sided',
-            }}
-            title="Temperature deviation"
-            value={{accessor: 'value', label: 'Deviation', unit: '°C'}}
-          />
+          <HeatmapInteractionExample accent={accent} deviation />
         </Example>
       </Specimen>
 

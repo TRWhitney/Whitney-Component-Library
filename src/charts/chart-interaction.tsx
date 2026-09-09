@@ -105,7 +105,7 @@ export function nearestInteraction(
 
 interface Gesture {
   readonly pointerId: number;
-  readonly element: SVGSVGElement;
+  readonly element: SVGSVGElement | HTMLElement;
   readonly x: number;
   readonly y: number;
   readonly clientX: number;
@@ -125,7 +125,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     Pick<ChartInteraction<Datum, Category>, 'target' | 'selection' | 'onActivate'> | undefined,
   rows: readonly InteractionRow<Datum, Category>[],
   version: string,
-  data: readonly Datum[],
+  data: readonly object[],
   categoryPlacement: 'x' | 'y' = 'x',
 ) {
   const selection = configuration?.selection;
@@ -244,7 +244,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
   const begin = (
     event: {
       pointerId: number;
-      currentTarget: SVGSVGElement;
+      currentTarget: SVGSVGElement | HTMLElement;
       clientX: number;
       clientY: number;
       pointerType: string;

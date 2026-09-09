@@ -107,7 +107,9 @@ describe('static appearance styles', () => {
 
   it('keeps a heatmap reading inside its cell bounds', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
-    const activeCell = styles.match(/\[data-wcl-heatmap-cell\]\[data-active\]\s*\{([^}]*)\}/)?.[1];
+    const activeCell = styles.match(
+      /\[data-wcl-heatmap-cell\]\[data-active\]::after\s*\{([^}]*)\}/,
+    )?.[1];
 
     expect(activeCell).toContain('inset');
     expect(activeCell).not.toContain('transform:');

@@ -26,13 +26,13 @@ The [radar study](prototypes/radar-selection.md) uses the chosen Label underline
 
 The radar record also documents a read-only marker-spacing audit: Cartesian point rings already account for border width; statistical circle selection rings leave a small gap at the rendered normal border width. Ticket 10 corrects that spacing. Zero radar values are keyboard/dimension targets, with no center-click target. [Ticket 11](tickets/11-radar-interaction.md) delivers the approved radar interaction with passing validation and independent production reviews.
 
-The [heatmap study](prototypes/heatmap-selection.md) uses the chosen Cell frames. Missing cells are accepted selection/activation targets identified by row and column; their absent value remains distinct from zero.
+The [heatmap study](prototypes/heatmap-selection.md) uses the chosen Cell frames. Missing cells are accepted selection/activation targets identified by row and column; their absent value remains distinct from zero. [Ticket 13](tickets/13-heatmap-interaction.md) delivers this interaction with dashed inner hover, passing production checks and independent reviews.
 
-[Ticket 12](tickets/12-shared-activation-motion.md) standardizes production activation motion and applies it to the heatmap study. The existing solid heatmap hover outline remains under discussion.
+[Ticket 12](tickets/12-shared-activation-motion.md) standardizes production activation motion and applies it to the heatmap study. Dashed inner heatmap hover is approved and applied in the study; solid Cell frames remain selection.
 
 ## Not yet specified
 
-- Visibility for statistical families; visibility for pie/donut, and visibility for radar, and selection and visibility for heatmap and compact reading units.
+- Visibility for statistical families; visibility for pie/donut, and visibility for radar, and visibility for heatmap, and selection and visibility for compact reading units.
 - Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.

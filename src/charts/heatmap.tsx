@@ -12,6 +12,13 @@ import {
   type ReactNode,
 } from 'react';
 import {createPortal} from 'react-dom';
+import {
+  heatmapKey,
+  useHeatmapInteraction,
+  HeatmapInteractionFeedback,
+  HeatmapSelectionSummary,
+  type HeatmapCell,
+} from './heatmap-interaction.js';
 
 import {EmptyState} from '../feedback/empty-state.js';
 import {Spinner} from '../feedback/spinner.js';
@@ -48,7 +55,7 @@ type HeatmapRootStyles = BoundedChartStyles & {
   '--wcl-heatmap-low-color': string;
 };
 
-interface PreparedCell {
+interface PreparedCell extends HeatmapCell {
   readonly columnIndex: number;
   readonly index: number;
   readonly rowIndex: number;
@@ -221,7 +228,7 @@ function valueEncoding(
 
 function prepareModel<Datum extends object>(props: HeatmapProps<Datum>): HeatmapModel {
   const {columnIds, rowIds} = validateCommon(props);
-  const records = new Map<string, Map<string, number | null>>();
+  const records = new Map<string, Map<string, {value: number | undefined; sourceIndex: number}>>();
   let invalidCount = 0;
   props.data.forEach((datum, sourceIndex) => {
     const rowId = readAccessor(props.rowAccessor, datum, sourceIndex);
@@ -240,16 +247,18 @@ function prepareModel<Datum extends object>(props: HeatmapProps<Datum>): Heatmap
     if (rowRecords.has(columnId)) {
       throw new Error(`Heatmap cell for row "${rowId}" and column "${columnId}" is duplicated.`);
     }
-    rowRecords.set(columnId, null);
+    rowRecords.set(columnId, {value: undefined, sourceIndex});
     const value = readAccessor(props.value.accessor, datum, sourceIndex);
     if (typeof value !== 'number' || !Number.isFinite(value)) {
       invalidCount += 1;
       return;
     }
-    rowRecords.set(columnId, value);
+    rowRecords.set(columnId, {value, sourceIndex});
   });
   const values = [...records.values()].flatMap((row) =>
-    [...row.values()].filter((value): value is number => value !== null),
+    [...row.values()]
+      .map((record) => record.value)
+      .filter((value): value is number => value !== undefined),
   );
   const domain = derivedDomain(values, props.scale);
   const midpoint = props.scale.type === 'two-sided' ? props.scale.midpoint : domain[0];
@@ -257,12 +266,14 @@ function prepareModel<Datum extends object>(props: HeatmapProps<Datum>): Heatmap
     domain[0] === domain[1] ? 0.5 : relativePosition(midpoint, domain[0], domain[1]);
   const cells = props.rows.flatMap((row, rowIndex) =>
     props.columns.map((column, columnIndex): PreparedCell => {
-      const value = records.get(row.id)?.get(column.id) ?? undefined;
+      const record = records.get(row.id)?.get(column.id);
+      const value = record?.value;
       const encoding =
         value === undefined
           ? {range: 'high' as const, ratio: 0}
           : valueEncoding(value, domain, props.scale);
       return {
+        sourceIndex: record?.sourceIndex,
         columnIndex,
         index: rowIndex * props.columns.length + columnIndex,
         ratio: encoding.ratio,
@@ -388,6 +399,8 @@ function HeatmapTable<Datum extends object>({
 
 export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): ReactElement {
   const model = prepareModel(props);
+  const [canvasElement, setCanvasElement] = useState<HTMLDivElement | null>(null);
+  const pointerFocus = useRef(false);
   const status = props.status ?? {kind: 'ready'};
   const minimumSize = props.minimumSize ?? {height: 180, width: 320};
   const titleId = useId();
@@ -442,10 +455,29 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
   const activeCell = activeIndex === null ? undefined : model.cells[activeIndex];
   const modelIdentity = JSON.stringify([
     status.kind,
-    props.rows.map((item) => item.id),
-    props.columns.map((item) => item.id),
+    props.rows.map((item) => [item.id, item.label]),
+    props.columns.map((item) => [item.id, item.label]),
     model.cells.map((cell) => cell.value ?? null),
   ]);
+  const interactionState = useHeatmapInteraction(
+    props,
+    model.cells,
+    canvasElement,
+    JSON.stringify([
+      modelIdentity,
+      availableSize,
+      props.minimumSize,
+      props.aspectRatio,
+      props.scale,
+      props.labels,
+      model.cells.map((cell) =>
+        cell.value === undefined ? null : formatHeatmapValue(cell.value, props.value),
+      ),
+    ]),
+  );
+  const {actions, points, selected} = interactionState;
+  const interactive = props.interaction !== undefined;
+  const selectionInstructionsId = `${descriptionId}-selection-instructions`;
   const [retainedModelIdentity, setRetainedModelIdentity] = useState(modelIdentity);
   if (modelIdentity !== retainedModelIdentity) {
     setRetainedModelIdentity(modelIdentity);
@@ -532,6 +564,21 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
     if (model.cells.length === 0) return;
+    if (interactive && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      const index = keyboardIndex ?? activeIndex ?? 0;
+      const entry = interactionState.entries[index];
+      if (entry) {
+        selectKeyboardCell(index, event.currentTarget);
+        actions.activate(
+          {rowId: heatmapKey(entry.item), seriesId: ''},
+          'keyboard',
+          event.ctrlKey || event.metaKey,
+        );
+      }
+      return;
+    }
+    if (event.key === 'Escape') actions.cancel();
     const current = keyboardIndex ?? 0;
     let next: number | undefined;
     if (event.key === 'Escape') {
@@ -548,11 +595,12 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
     } else if (event.key === 'ArrowUp') {
       next = Math.floor(current / columnCount) === 0 ? current : current - columnCount;
     } else if (event.key === 'Home') {
-      next = event.ctrlKey ? 0 : Math.floor(current / columnCount) * columnCount;
+      next = event.ctrlKey || event.metaKey ? 0 : Math.floor(current / columnCount) * columnCount;
     } else if (event.key === 'End') {
-      next = event.ctrlKey
-        ? model.cells.length - 1
-        : Math.floor(current / columnCount) * columnCount + columnCount - 1;
+      next =
+        event.ctrlKey || event.metaKey
+          ? model.cells.length - 1
+          : Math.floor(current / columnCount) * columnCount + columnCount - 1;
     }
     if (next === undefined) return;
     event.preventDefault();
@@ -565,8 +613,20 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
   function cellFromEvent(event: PointerEvent<HTMLDivElement>): number | null {
     const target =
       event.target instanceof Element ? event.target.closest('[data-cell-index]') : null;
-    const index = Number(target?.getAttribute('data-cell-index'));
+    if (!target || !event.currentTarget.contains(target)) return null;
+    const index = Number(target.getAttribute('data-cell-index'));
     return Number.isInteger(index) && model.cells[index] !== undefined ? index : null;
+  }
+
+  function pointerLocation(event: PointerEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left,
+      y = event.clientY - rect.top;
+    const point = points.find((point) => {
+      const b = point.bounds!;
+      return x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height;
+    });
+    return {x, y, point, bounds: {left: 0, top: 0, right: rect.width, bottom: rect.height}};
   }
 
   const readingAnnouncement =
@@ -612,13 +672,29 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
             data-scrollable={hasLocalOverflow ? '' : undefined}
             data-wcl-chart-frame=""
             data-wcl-heatmap-frame=""
+            onScroll={(event) => {
+              if (hasLocalOverflow) scrollbarActivityProps.onScroll?.(event);
+              actions.cancel();
+              clearDirectReading();
+              if (keyboardIndex !== null && canvasElement) {
+                setPointerPosition(cellAnchor(canvasElement, keyboardIndex));
+              }
+            }}
             ref={setFrameElement}
             role={hasLocalOverflow ? 'region' : undefined}
             style={frameStyle}
             tabIndex={hasLocalOverflow ? 0 : undefined}
           >
             <div
-              aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home End Control+Home Control+End Escape"
+              aria-keyshortcuts={
+                interactive
+                  ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Control+Home Control+End Meta+Home Meta+End Enter Space Control+Enter Control+Space Meta+Enter Meta+Space Escape'
+                  : 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Control+Home Control+End Escape'
+              }
+              aria-describedby={props.interaction?.selection ? selectionInstructionsId : undefined}
+              ref={setCanvasElement}
+              data-interactive={interactive ? '' : undefined}
+              data-selectable={props.interaction?.selection ? '' : undefined}
               aria-labelledby={titleId}
               data-show-values={showCellValues ? '' : undefined}
               data-wcl-chart-canvas=""
@@ -628,11 +704,13 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
                   event.relatedTarget instanceof Node &&
                   event.currentTarget.contains(event.relatedTarget)
                 )) {
+                  actions.cancel();
                   setKeyboardIndex(null);
                   if (pointerIndex === null && touchIndex === null) setPointerPosition(undefined);
                 }
               }}
               onFocus={(event) => {
+                if (pointerFocus.current) return;
                 if (
                   event.currentTarget === event.target &&
                   activeIndex === null &&
@@ -643,6 +721,14 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
               }}
               onKeyDown={handleKeyDown}
               onPointerDown={(event) => {
+                pointerFocus.current = true;
+                if (interactive && event.button === 0 && event.isPrimary !== false) {
+                  event.preventDefault();
+                  setKeyboardIndex(null);
+                  event.currentTarget.focus({preventScroll: true});
+                  const location = pointerLocation(event);
+                  actions.begin(event, location.point, location.x, location.y);
+                }
                 if (event.pointerType !== 'touch') return;
                 const index = cellFromEvent(event);
                 if (index === null) return;
@@ -651,7 +737,23 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
                 setTouchIndex(index);
                 setPointerPosition(cellAnchor(event.currentTarget, index));
               }}
+              onPointerUp={(event) => {
+                if (interactive) actions.end(event, pointerLocation(event).point);
+                pointerFocus.current = false;
+              }}
+              onPointerCancel={() => {
+                actions.cancel();
+                pointerFocus.current = false;
+              }}
+              onLostPointerCapture={() => {
+                actions.cancel();
+                pointerFocus.current = false;
+              }}
+              onContextMenu={(event) => {
+                if (actions.isHolding() || actions.isDragging()) event.preventDefault();
+              }}
               onPointerLeave={(event) => {
+                pointerFocus.current = false;
                 if (event.pointerType === 'touch') return;
                 setPointerIndex(null);
                 setPointerPosition(
@@ -659,8 +761,16 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
                 );
               }}
               onPointerMove={(event) => {
+                const location = interactive ? pointerLocation(event) : undefined;
+                if (
+                  location &&
+                  actions.move(event, location.x, location.y, points, location.bounds)
+                ) {
+                  clearDirectReading();
+                  return;
+                }
                 if (event.pointerType === 'touch') return;
-                const index = cellFromEvent(event);
+                const index = location ? (location.point?.index ?? null) : cellFromEvent(event);
                 if (index === null) {
                   setPointerIndex(null);
                   setPointerPosition(
@@ -692,6 +802,12 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
                       return (
                         <span
                           data-active={activeIndex === cell.index ? '' : undefined}
+                          data-selected={
+                            props.interaction?.selection &&
+                            selected.has(heatmapKey({rowId: row.id, columnId: column.id}))
+                              ? ''
+                              : undefined
+                          }
                           data-cell-index={cell.index}
                           data-range={cell.value === undefined ? undefined : cell.range}
                           data-missing={cell.value === undefined ? '' : undefined}
@@ -713,6 +829,7 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
                   </div>
                 ))}
               </div>
+              {interactive ? <HeatmapInteractionFeedback state={interactionState} /> : null}
               {activeCell === undefined || pointerPosition === undefined ? null : (
                 <HeatmapTooltip
                   anchor={pointerPosition}
@@ -770,6 +887,7 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
         <p id={descriptionId}>{props.description}</p>
       </figcaption>
       {content}
+      <HeatmapSelectionSummary state={interactionState} id={selectionInstructionsId} />
     </figure>
   );
 }

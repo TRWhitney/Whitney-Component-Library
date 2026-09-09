@@ -290,3 +290,30 @@ the heatmap prototype's stationary fade. Cell frames are the accepted heatmap se
 - Reduced motion supplies static feedback for the same lifetime. Preserve zero-dimension feedback.
 - The isolated heatmap study uses the same production outline animation, Cell frames only, and
   the accepted missing-cell targets. This portion does not implement public heatmap interaction.
+
+### Heatmap cell interaction
+
+The [accepted study](prototypes/heatmap-selection.md) binds the interaction and visual behavior.
+Optional `HeatmapInteraction` uses `HeatmapSelectionItem` with stable `rowId` and `columnId` and
+the existing controlled/uncontrolled `ChartSelection` convention. Applications provide localized
+selection instructions, summaries and item names. Unknown or removed coordinate IDs are pruned;
+selection follows IDs across domain order and value updates.
+
+`HeatmapActivation` identifies the cell and labeled row/column, input method, recorded numeric
+value or `undefined`, and original datum or `undefined`. An omitted cell has no invented record;
+an invalid source value remains missing while its actual source record is available. Numeric zero
+is an ordinary value. All rendered missing cells participate. Existing empty/error/loading and
+entirely invalid dataset presentation remains unchanged.
+
+Click/tap toggles selection. Control/Command-click and touch hold activate independently; without
+selection, ordinary click/tap activates. Box touched dragging shows its region, replaces by default,
+adds with Shift or Control/Command, removes with Alt, and cancels without committing a preview.
+Keyboard Enter/Space selects; Control/Command plus Enter/Space activates. Arrow keys and row/grid
+Home/End navigation preserve existing order and scrolling. Pointer focus must not create a first-cell
+reading. Pending gestures cancel after data, layout, status or interaction changes.
+
+Hover and keyboard reading use a dashed inner outline; selection uses solid individual cell frames.
+Colors, cell gaps, native tooltip placement and complete data table remain intact. Activation uses
+the shared outline pulse and static reduced-motion treatment. No whole-chart focus outline is added.
+Production coverage uses the public Heatmap component and browser layout boundaries, including sparse
+records, controlled ownership, drag cancellation, touch hold, keyboard operation and callback identity.

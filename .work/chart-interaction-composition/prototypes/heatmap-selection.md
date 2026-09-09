@@ -1,7 +1,7 @@
 # Heatmap selection study
 
 Status: Cell frames and missing-cell interaction accepted. Shared production activation motion is
-applied. The existing solid hover outline remains under discussion. This isolated prototype does
+applied. Dashed inner hover outlines are approved and applied to this study. This isolated prototype does
 not implement public Heatmap interaction.
 
 ## Accepted choices
@@ -14,8 +14,8 @@ the study now imports the production outline pulse and its lifetime directly.
 Whitney accepted selection and activation of missing cells using their row and column IDs.
 Their value remains absent, not zero, and an absent source record is not invented. Zero remains
 an ordinary numeric value. The rejected read-only option has been removed from the prototype.
-The solid hover outline is inherited from production. Whitney asked about its difference from
-the dashed reading outline used on other rectangular marks; no hover change is approved yet.
+Whitney approved a dashed inner reading outline for hover, matching other rectangular marks.
+Solid cell frames remain the persistent selection indicator. The production implementation carries over the same dashed outline.
 
 ## Design plan
 
@@ -25,7 +25,7 @@ blue `#2878ff`. Body headings are 1.5rem; utility readings and labels use the es
 face at 0.875rem. Controls occupy their own rows above the grid. Readings, selection summary and
 application-owned details sit below it. Activation uses the shared 620ms production outline pulse, a five-pixel outset, and three pixels
 of outward edge travel, with static feedback for reduced motion. Individual cell frames are the
-chosen selection treatment.
+chosen selection treatment. Hover uses a two-pixel dashed inner outline in `--wcl-text`.
 
 Critique: a selection tint would change the apparent value, and circular markers would introduce
 an unrelated shape. Keep the chosen outline neutral and preserve the cell gaps and inner reading
@@ -55,6 +55,7 @@ activated details without changing the layout.
 
 Direct browser operation exercised both indicators, a visible drag box, cancellation, independent
 activation on zero, keyboard navigation/selection, compact light rendering and missing values.
+The dashed hover revision was directly inspected on a selected numeric cell in dark mode and a
+missing cell in compact light mode. Hover stays dashed while selection stays solid.
 Screenshot states were inspected and removed. No prototype tests or agent reviews were run.
-Production hardening, ownership rules and callback types remain for the implementation ticket
-after the hover discussion is resolved.
+The public interaction implementation is tracked in [Ticket 13](../tickets/13-heatmap-interaction.md).

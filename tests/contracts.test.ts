@@ -182,7 +182,9 @@ describe('canonical component contracts', () => {
     );
     expect(heatmap.appearance.join(' ')).toMatch(/sequential.*two-sided.*midpoint/i);
     expect(heatmap.validation.join(' ')).toMatch(/zero.*negative.*missing.*non-finite/i);
-    expect(heatmap.keyboardBehavior.join(' ')).toMatch(/Left.*Right.*Up.*Down.*Control Home/i);
+    expect(heatmap.keyboardBehavior.join(' ')).toMatch(
+      /Left.*Right.*Up.*Down.*Control(?:\/Command)? Home/i,
+    );
     expect(heatmap.responsiveBehavior.join(' ')).toMatch(/text.*scroll.*table/i);
     expect(heatmap.responsiveBehavior.join(' ')).toMatch(/fitted.*not.*scroll.*surrounding page/i);
     expect(heatmap.preferredAlternatives.join(' ')).toMatch(/Table.*large/i);

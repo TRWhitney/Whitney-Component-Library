@@ -342,7 +342,27 @@ export interface HeatmapLabels {
   readonly scrollRegion: string;
 }
 
+export interface HeatmapSelectionItem {
+  readonly rowId: string;
+  readonly columnId: string;
+}
+
+export interface HeatmapActivation<Datum extends object> {
+  readonly item: HeatmapSelectionItem;
+  readonly row: HeatmapDomainItem;
+  readonly column: HeatmapDomainItem;
+  readonly value: number | undefined;
+  readonly datum: Datum | undefined;
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+}
+
+export interface HeatmapInteraction<Datum extends object> {
+  readonly selection?: ChartSelection<HeatmapSelectionItem>;
+  readonly onActivate?: (activation: HeatmapActivation<Datum>) => void;
+}
+
 export interface HeatmapProps<Datum extends object> {
+  readonly interaction?: HeatmapInteraction<Datum>;
   readonly aspectRatio?: number;
   readonly columnAccessor: ChartAccessor<Datum, string>;
   readonly columns: readonly HeatmapDomainItem[];

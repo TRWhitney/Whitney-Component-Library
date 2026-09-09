@@ -447,7 +447,7 @@ export const heatmapContract: ComponentContract = {
     'The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. The visual grid is hidden from assistive technology, and a generated native table preserves every declared row and column intersection.',
   ],
   appearance: [
-    'Every numeric cell uses one visible continuous color key. Sequential color represents low-to-high magnitude. Two-sided color meets at the declared midpoint. Missing cells use a neutral dashed crosshatch that cannot be mistaken for zero or a numeric extreme.',
+    'Every numeric cell uses one visible continuous color key. Sequential color represents low-to-high magnitude. Two-sided color meets at the declared midpoint. Missing cells use a neutral dashed crosshatch that cannot be mistaken for zero or a numeric extreme. Dashed inner outlines mark hover and keyboard reading. Solid cell frames mark persistent selection. Selection preserves numeric colors and uses no whole-chart focus border.',
   ],
   appropriateUses: [
     'showing one shared numeric measure across the intersections of two ordered categorical domains',
@@ -459,8 +459,9 @@ export const heatmapContract: ComponentContract = {
     'Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. Choose colors that match the measure, state what they mean in the description, and use a two-sided scale only when its midpoint has a real interpretation.',
   ],
   controlBehavior: [
+    'Selection follows the shared ChartSelection ownership model: selectedItems plus onSelectionChange is controlled; defaultSelectedItems initializes local state. Items retain row/column identity across reordering and value changes; unknown or removed coordinates are pruned. Localized instructions, count, item descriptions and a Clear selection action accompany selection.',
     'Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.',
-    'Heatmap emits no consumer events and does not select, filter, reorder, or mutate records.',
+    'Optional interaction selects cells by stable rowId and columnId. Click/tap toggles selection; Control/Command-click or touch hold activates without changing it. Without selection, ordinary click/tap activates. Rectangle dragging selects boxes it touches, replacing by default, adding with Shift or Control/Command, and removing with Alt. Escape, pointer cancellation, scrolling, data or geometry changes cancel the preview.',
   ],
   counterExamples: [
     {
@@ -477,13 +478,13 @@ export const heatmapContract: ComponentContract = {
     'Caption, labels, tooltip, key, and table follow inherited writing direction. Declared row and column order remains the source order.',
   ],
   events: [
-    'Heatmap manages cell readings and local scrolling internally. Pointer, keyboard, and touch interaction do not change consumer data.',
+    'interaction.onActivate receives the cell item, labeled row and column, input method, value and original datum. Missing values are undefined; omitted records have undefined datum. An invalid source value remains missing while its original record is available. Zero remains numeric zero. Selection onSelectionChange returns coordinate items and never mutates source data.',
   ],
   examples: [
     {
       code: example(
         'HeatmapExample',
-        '<Heatmap\n  columnAccessor="hour"\n  columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}\n  data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}\n  dataTableLabel="Room temperature data"\n  description="Temperature by room and time; patterned cells have no reading."\n  emptyState={{title: "No grid", description: "Declare rooms and times to begin."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}\n  rowAccessor="location"\n  rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}\n  scale={{color: "#d14f00", type: "sequential"}}\n  title="Room temperature"\n  value={{accessor: "value", label: "Temperature", unit: "°C"}}\n/>',
+        '<Heatmap\n  interaction={{selection: {labels: {instructions: "Click or tap to select. Drag to select touched cells. Shift adds; Alt removes.", clear: "Clear selection", empty: "Nothing selected", summary: count => `${count} cells selected`, item: item => `${item.rowId}, ${item.columnId}`, hidden: label => label}}}}\n  columnAccessor="hour"\n  columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}\n  data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}\n  dataTableLabel="Room temperature data"\n  description="Temperature by room and time; patterned cells have no reading."\n  emptyState={{title: "No grid", description: "Declare rooms and times to begin."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}\n  rowAccessor="location"\n  rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}\n  scale={{color: "#d14f00", type: "sequential"}}\n  title="Room temperature"\n  value={{accessor: "value", label: "Temperature", unit: "°C"}}\n/>',
       ),
       description:
         'Show sparse values across a complete declared grid while keeping zero separate from missing.',
@@ -502,14 +503,14 @@ export const heatmapContract: ComponentContract = {
     'unrelated units, area-proportional comparison, precise scanning of a very large matrix, arbitrary two-sided midpoints, or datasets that need aggregation to answer the question',
   ],
   keyboardBehavior: [
-    'Tab reaches one title-named grid boundary. Left and Right move across columns; Up and Down move across rows. Home and End reach row endpoints. Control Home and Control End reach the first and last cell in the complete grid. Navigation stops at boundaries, and Escape clears the reading.',
+    'Tab reaches one title-named grid boundary. Left and Right move across columns; Up and Down move across rows. Home and End reach row endpoints. Control/Command Home and Control/Command End reach the first and last cell in the complete grid. Enter/Space selects when selection is enabled; Control/Command plus Enter/Space activates. With selection disabled, Enter/Space activates. Navigation stops at boundaries, and Escape clears the reading.',
   ],
   kind: 'component',
   labeling: [
     'title, description, dataTableLabel, value label, row and column headings, color-key label, localized missing copy, scroll-region label, and state copy are required. Row and column ids stay stable while labels provide readable names.',
   ],
   localization: [
-    'Localize all visible and announced copy, domain labels, missing copy, and units. value.formatValue controls locale-specific number formatting.',
+    'Localize all visible and announced copy, domain labels, missing copy, and units. value.formatValue controls locale-specific number formatting. Selection labels provide localized instructions, clearing, empty and count summaries, and cell names.',
   ],
   name: 'Heatmap',
   parts: [
@@ -523,6 +524,8 @@ export const heatmapContract: ComponentContract = {
   ],
   purpose: 'Show one numeric measure across the complete intersections of two ordered domains.',
   reducedMotionBehavior: [
+    activationTiming,
+    outlineMotion,
     'Reduced motion removes active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same. Grid geometry does not animate.',
   ],
   relatedExports: ['AppearanceProvider', ...chartNames.filter((name) => name !== 'Heatmap')],

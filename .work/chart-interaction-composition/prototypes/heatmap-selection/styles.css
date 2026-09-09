@@ -61,6 +61,21 @@ header p {
   position: relative;
   touch-action: none;
 }
+.chart-adapter [data-wcl-heatmap-cell][data-active] {
+  border-color: color-mix(in oklch, var(--wcl-heatmap-cell-color) 72%, var(--wcl-border));
+  box-shadow: none;
+}
+.chart-adapter [data-wcl-heatmap-cell][data-active][data-missing] {
+  border-color: var(--wcl-border);
+}
+.chart-adapter [data-wcl-heatmap-cell][data-active]::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 2px dashed var(--wcl-text);
+  border-radius: inherit;
+  pointer-events: none;
+}
 .chart-adapter [data-wcl-chart-canvas]:focus-visible {
   outline: none;
 }
