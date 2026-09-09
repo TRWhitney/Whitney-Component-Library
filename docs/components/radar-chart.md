@@ -65,6 +65,8 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 
 - Application accent identifies the first series. Later series use the role-aware chart palette. Line patterns supplement color when polygons overlap.
 - Forced colors preserve guides, spokes, point boundaries, and polygon line patterns in system colors. The generated table remains the complete non-color representation.
+- Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
+- Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.
 - Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. Plot geometry does not animate.
 
 ## Examples

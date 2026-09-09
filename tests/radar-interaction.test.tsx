@@ -459,3 +459,14 @@ it('keeps the last pointer target available to the keyboard after pointer exit',
     expect.objectContaining({item: {dimensionId: 'range', seriesId: 'b'}}),
   );
 });
+
+it('uses the shared screen-space point pulse size for radar activation', () => {
+  const {container} = render(
+    <RadarChart<Profile> {...common} interaction={{target: 'point', onActivate: () => {}}} />,
+  );
+  const svg = svgOf(container);
+  click(svg, at());
+  expect(
+    Number(container.querySelector('[data-wcl-chart-activation-dot]')?.getAttribute('r')),
+  ).toBe(10);
+});

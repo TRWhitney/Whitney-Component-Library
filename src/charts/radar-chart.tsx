@@ -1,3 +1,4 @@
+import {chartActivationPointRadius} from './chart-activation.js';
 import {arc} from 'd3-shape';
 import {
   useEffect,
@@ -1152,7 +1153,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                             data-wcl-chart-activation-dot=""
                             cx={x}
                             cy={y}
-                            r={value === 0 ? 2.5 : 4}
+                            r={chartActivationPointRadius / viewScale}
                           />
                         );
                       })()

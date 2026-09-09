@@ -1,3 +1,4 @@
+import {chartActivationLifetime} from './chart-activation.js';
 import {useEffect, useRef, useState} from 'react';
 import type {
   ChartActivation,
@@ -229,7 +230,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     if (!row) return;
     clearTimeout(pulseTimer.current);
     setPulse({item, sequence: ++sequence.current});
-    pulseTimer.current = setTimeout(() => setPulse(null), 650);
+    pulseTimer.current = setTimeout(() => setPulse(null), chartActivationLifetime);
     callback({
       item,
       category: row.category,

@@ -1,3 +1,4 @@
+import {chartActivationOutset} from './chart-activation.js';
 import type {ReactElement} from 'react';
 import {
   itemInteractionSetup,
@@ -68,7 +69,7 @@ export function DistributionCue({
   readonly cue: 'reading' | 'selection' | 'activation';
   readonly scale: number;
 }): ReactElement {
-  const pad = (cue === 'reading' ? -2 : cue === 'selection' ? 2 : 5) / scale;
+  const pad = (cue === 'reading' ? -2 : cue === 'selection' ? 2 : chartActivationOutset) / scale;
   const r = point.bounds!;
   const frame: BarRectangle =
     cue === 'reading'

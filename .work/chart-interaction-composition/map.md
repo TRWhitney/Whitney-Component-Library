@@ -26,6 +26,10 @@ The [radar study](prototypes/radar-selection.md) uses the chosen Label underline
 
 The radar record also documents a read-only marker-spacing audit: Cartesian point rings already account for border width; statistical circle selection rings leave a small gap at the rendered normal border width. Ticket 10 corrects that spacing. Zero radar values are keyboard/dimension targets, with no center-click target. [Ticket 11](tickets/11-radar-interaction.md) delivers the approved radar interaction with passing validation and independent production reviews.
 
+The [heatmap study](prototypes/heatmap-selection.md) uses the chosen Cell frames. Missing cells are accepted selection/activation targets identified by row and column; their absent value remains distinct from zero.
+
+[Ticket 12](tickets/12-shared-activation-motion.md) standardizes production activation motion and applies it to the heatmap study. The existing solid heatmap hover outline remains under discussion.
+
 ## Not yet specified
 
 - Visibility for statistical families; visibility for pie/donut, and visibility for radar, and selection and visibility for heatmap and compact reading units.

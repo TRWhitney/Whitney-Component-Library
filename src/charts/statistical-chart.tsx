@@ -1,3 +1,4 @@
+import {ChartActivationOutline, chartActivationOutset} from './chart-activation.js';
 import {bin as createBins, quantileSorted} from 'd3-array';
 import {
   useEffect,
@@ -2197,22 +2198,30 @@ function StatisticalFrame<Datum extends object>({
                         {actions.pulse &&
                         selectionKey(actions.pulse.item) === selectionKey(point.item) ? (
                           <g key={actions.pulse.sequence} data-wcl-point-activation="">
-                            {point.kind === 'bin' || point.kind === 'summary' ? (
-                              <DistributionCue
-                                point={point}
-                                points={points}
-                                cue="activation"
-                                scale={presentation.viewScale}
-                              />
-                            ) : (
-                              <PointShape
-                                cx={point.x}
-                                cy={point.y}
-                                radius={point.radius + 5 / presentation.viewScale}
-                                shape={point.shape}
-                                cue="activation"
-                              />
-                            )}
+                            <ChartActivationOutline
+                              outset={
+                                point.kind === 'bin' || point.kind === 'summary'
+                                  ? 0
+                                  : chartActivationOutset
+                              }
+                            >
+                              {point.kind === 'bin' || point.kind === 'summary' ? (
+                                <DistributionCue
+                                  point={point}
+                                  points={points}
+                                  cue="activation"
+                                  scale={presentation.viewScale}
+                                />
+                              ) : (
+                                <PointShape
+                                  cx={point.x}
+                                  cy={point.y}
+                                  radius={point.radius}
+                                  shape={point.shape}
+                                  cue="activation"
+                                />
+                              )}
+                            </ChartActivationOutline>
                           </g>
                         ) : null}
                       </g>

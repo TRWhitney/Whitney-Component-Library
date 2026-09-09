@@ -167,3 +167,8 @@ access to zero values. Public contracts and regular/sparse examples are current.
 repository/build/package checks and native production inspection pass. Independent production
 reviews pass after the recorded keyboard continuity correction. Heatmap and compact interaction, remaining visibility, exploration,
 data-change animation and compositions stay open.
+
+[Shared activation ticket 12](../../chart-interaction-composition/tickets/12-shared-activation-motion.md)
+standardizes pulse timing and screen-space sizes across the implemented chart families. The
+heatmap study uses the same animation and the accepted Cell frames. Its hover convention remains
+under discussion, and public heatmap selection and activation remain open.

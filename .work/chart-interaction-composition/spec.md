@@ -273,3 +273,20 @@ pointer selection target. Missing values retain the existing zero interpretation
 series stay unavailable. Internal selection survives reorder and retires removed/invalid IDs;
 controlled selection remains application-owned. Complete tables and original reading semantics
 remain available. No visibility or normalization controls are added in this portion.
+
+### Shared activation motion
+
+Whitney requested standardization while retaining the general production pulse style, rejecting
+the heatmap prototype's stationary fade. Cell frames are the accepted heatmap selection indicator.
+
+- Use shared 620ms timing and easing, with feedback removed at 650ms. Repeated activations restart.
+- Filled point pulses retain the existing expansion/fade shape and a consistent 10-screen-pixel
+  base radius, including radar points. Outline pulses retain the production stroke and fade
+  treatment, with a consistent five-pixel outset and three-pixel outward travel on each edge.
+- Share outline animation geometry across bars, statistical marks and heatmap cells rather than
+  scaling by a fixed percentage of their size. Preserve value-bearing mark geometry and selection.
+- Pie/donut retain their slice-outline fade with the shared outline opacity envelope. Radar
+  dimensions retain the accepted center-to-furthest-value draw, hold and fade.
+- Reduced motion supplies static feedback for the same lifetime. Preserve zero-dimension feedback.
+- The isolated heatmap study uses the same production outline animation, Cell frames only, and
+  the accepted missing-cell targets. This portion does not implement public heatmap interaction.

@@ -72,6 +72,7 @@ Show category shares of one whole in a proportional pie with bounded paging.
 
 - Application accent identifies the largest visible category. Later categories use the role-aware chart palette. A repeated color also receives a stable dash treatment so color is never its only identity.
 - Forced colors preserve slice boundaries and the aggregate dash in system colors. Repeated roles retain their dash treatment, and the generated table remains the complete non-color representation.
+- Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
 - Reduced motion removes slice pop-out and scrollbar-fade transitions. Reading, focus, paging, emphasis, and native scrolling behavior stays the same.
 - Reduced motion replaces each activation pulse with brief static feedback. Callbacks and selection remain the same.
 

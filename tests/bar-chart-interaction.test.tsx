@@ -371,3 +371,31 @@ it('retains controlled hidden items and cancels a hold after data replacement', 
   expect(onActivate).not.toHaveBeenCalled();
   expect(change).not.toHaveBeenCalled();
 });
+
+it.each([
+  [120, 40],
+  [360, 160],
+])('keeps outline travel at three screen pixels for a %s by %s pulse', (width, height) => {
+  const measure = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: Element,
+  ) {
+    return this.hasAttribute('data-wcl-chart-activation-outline')
+      ? new DOMRect(0, 0, width, height)
+      : new DOMRect(0, 0, 640, 360);
+  });
+  try {
+    const {container} = render(chart(false, config({onActivate: () => {}})));
+    const svg = geometry(container);
+    click(svg, center(rect(container, 0)));
+    const pulse = container.querySelector<SVGGElement>('[data-wcl-chart-activation-outline]');
+    expect(pulse).not.toBeNull();
+    expect(
+      ((Number(pulse!.style.getPropertyValue('--wcl-chart-activation-scale-x')) - 1) * width) / 2,
+    ).toBeCloseTo(3);
+    expect(
+      ((Number(pulse!.style.getPropertyValue('--wcl-chart-activation-scale-y')) - 1) * height) / 2,
+    ).toBeCloseTo(3);
+  } finally {
+    measure.mockRestore();
+  }
+});

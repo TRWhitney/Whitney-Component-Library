@@ -63,6 +63,35 @@ afterEach(() => {
   cleanup();
   vi.useRealTimers();
 });
+it('keeps a diamond activation five screen pixels outside the mark before traveling three more', () => {
+  const width = 24;
+  const measure = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: Element,
+  ) {
+    return this.hasAttribute('data-wcl-chart-activation-outline')
+      ? new DOMRect(0, 0, width, width)
+      : new DOMRect(0, 0, 640, 360);
+  });
+  try {
+    const {container} = render(<ScatterChart {...common} interaction={{onActivate: () => {}}} />);
+    const canvas = container.querySelector('[data-wcl-chart-canvas]')!;
+    fireEvent.keyDown(canvas, {key: 'Home'});
+    fireEvent.keyDown(canvas, {key: 'ArrowRight'});
+    fireEvent.keyDown(canvas, {key: 'Enter', ctrlKey: true});
+    const mark = container.querySelector('[data-point-id="b1"] rect')!;
+    const cue = container.querySelector('[data-wcl-point-cue="activation"]')!;
+    expect(cue.getAttribute('width')).toBe(mark.getAttribute('width'));
+    const pulse = container.querySelector<SVGGElement>('[data-wcl-chart-activation-outline]')!;
+    for (const axis of ['x', 'y']) {
+      const start = Number(pulse.style.getPropertyValue(`--wcl-chart-activation-start-${axis}`));
+      const end = Number(pulse.style.getPropertyValue(`--wcl-chart-activation-scale-${axis}`));
+      expect(((start - 1) * width) / 2).toBeCloseTo(5);
+      expect(((end - start) * width) / 2).toBeCloseTo(3);
+    }
+  } finally {
+    measure.mockRestore();
+  }
+});
 it('selects an observation and activates raw bubble details independently', () => {
   const onActivate = vi.fn<NonNullable<PointChartInteraction<Row>['onActivate']>>();
   const onSelectionChange = vi.fn();

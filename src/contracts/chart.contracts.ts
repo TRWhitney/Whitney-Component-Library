@@ -26,6 +26,11 @@ interface ChartContractOptions {
   readonly use: string;
 }
 
+const activationTiming =
+  'Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.';
+const outlineMotion =
+  'Outline pulses use a four-pixel stroke, a five-pixel outset, and three pixels of outward travel per edge at every rendered size. Degenerate lines retain their zero dimension. Selection and value-bearing geometry do not move.';
+
 const chartNames = [
   'AreaChart',
   'BarChart',
@@ -280,6 +285,7 @@ function partToWholeContract({
     ],
     purpose,
     reducedMotionBehavior: [
+      activationTiming,
       'Reduced motion removes slice pop-out and scrollbar-fade transitions. Reading, focus, paging, emphasis, and native scrolling behavior stays the same.',
       'Reduced motion replaces each activation pulse with brief static feedback. Callbacks and selection remain the same.',
     ],
@@ -415,6 +421,8 @@ export const radarChartContract: ComponentContract = {
   ],
   purpose: 'Compare a few subjects across ordered qualities on one shared radial scale.',
   reducedMotionBehavior: [
+    activationTiming,
+    'Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.',
     'Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. Plot geometry does not animate.',
   ],
   relatedExports: ['AppearanceProvider', ...chartNames.filter((name) => name !== 'RadarChart')],
@@ -691,6 +699,8 @@ export const lineChartContract: ComponentContract = {
     'Optional interaction adds category underlines, point selection rings, temporary activation feedback, and a localized selection summary with Clear selection. Application details and experiment controls are consumer-owned composition.',
   ],
   reducedMotionBehavior: [
+    activationTiming,
+    'Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.',
     ...lineChartBaseContract.reducedMotionBehavior,
     'Repeated activation restarts finite feedback. Reduced motion replaces the activation pulse with a brief static acknowledgment while preserving callback and selection behavior.',
   ],
@@ -770,6 +780,8 @@ function interactiveBarContract(
       'Optional interaction adds bar selection frames, inset reading outlines, category-label underlines, finite activation feedback, and a localized selection summary with Clear selection. Application details and controls remain outside the chart.',
     ],
     reducedMotionBehavior: [
+      activationTiming,
+      outlineMotion,
       ...base.reducedMotionBehavior,
       'Each activation restarts finite feedback. Reduced motion uses a brief static acknowledgment without changing callbacks or selection. Selection and reading geometry follow the same visible-data scale as the bars.',
     ],
@@ -880,6 +892,9 @@ function interactiveAreaMixedContract(
       `Optional interaction adds ${area ? 'area value markers and selection rings' : 'per-mark reading cues, selection rings, and column frames'}, category-label underlines, finite activation feedback, and a localized selection summary with Clear selection. Application details and controls remain outside the chart.`,
     ],
     reducedMotionBehavior: [
+      activationTiming,
+      outlineMotion,
+      'Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.',
       ...base.reducedMotionBehavior,
       'Each activation restarts finite feedback. Reduced motion uses a brief static acknowledgment without changing callbacks or selection. Reading and selection geometry follow the same visible-data scale as the marks.',
     ],
@@ -1248,6 +1263,8 @@ function statisticalChartContract({
     ],
     purpose,
     reducedMotionBehavior: [
+      activationTiming,
+      outlineMotion,
       guidance.reducedMotion,
       'Reduced motion replaces the activation pulse with a brief static acknowledgment. Selection and reading retain the same meanings.',
     ],

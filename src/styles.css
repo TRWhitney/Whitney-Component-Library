@@ -42,6 +42,8 @@
     --wcl-shadow: 0 18px 48px rgb(23 32 39 / 11%);
     --wcl-font-body: 'IBM Plex Sans', inter, ui-sans-serif, system-ui, sans-serif;
     --wcl-font-utility: 'IBM Plex Mono', 'SFMono-Regular', consolas, monospace;
+    --wcl-chart-activation-duration: 620ms;
+    --wcl-chart-activation-easing: ease-out;
     --wcl-motion-duration: 150ms;
     --wcl-motion-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
 
@@ -8783,14 +8785,16 @@
     fill: var(--wcl-text);
     transform-box: fill-box;
     transform-origin: center;
-    animation: wcl-chart-activation 620ms ease-out both;
+    animation: wcl-chart-activation var(--wcl-chart-activation-duration)
+      var(--wcl-chart-activation-easing) both;
   }
 
   [data-wcl-chart-activation-guide] {
     stroke: var(--wcl-text);
     stroke-width: 2.5px;
     vector-effect: non-scaling-stroke;
-    animation: wcl-chart-activation-guide 620ms ease-out both;
+    animation: wcl-chart-activation-guide var(--wcl-chart-activation-duration)
+      var(--wcl-chart-activation-easing) both;
   }
 
   [data-wcl-chart-selection] {
@@ -8916,32 +8920,6 @@
 
   [data-wcl-chart-activation-bar] {
     stroke-width: 4px;
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: wcl-chart-bar-activation 620ms ease-out both;
-  }
-}
-
-@keyframes wcl-chart-bar-activation {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  70% {
-    opacity: 0.7;
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(1.035);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-wcl-chart-activation-bar] {
-    animation: none;
-    opacity: 0.85;
   }
 }
 
@@ -8979,19 +8957,6 @@
   [data-wcl-point-cue='activation'] {
     stroke-width: 4px;
   }
-
-  [data-wcl-point-activation] {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: wcl-point-activation 620ms ease-out both;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-wcl-point-activation] {
-    animation: none;
-    opacity: 0.8;
-  }
 }
 
 @media (forced-colors: active) {
@@ -9002,22 +8967,6 @@
   [data-wcl-point-cue='center'] {
     fill: CanvasText;
     stroke: none;
-  }
-}
-
-@keyframes wcl-point-activation {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  70% {
-    opacity: 0.7;
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(1.035);
   }
 }
 
@@ -9074,13 +9023,18 @@
   }
 
   [data-wcl-radial-activation] {
-    animation: wcl-radial-activation 620ms ease-out both;
+    animation: wcl-radial-activation var(--wcl-chart-activation-duration)
+      var(--wcl-chart-activation-easing) both;
   }
 }
 
 @keyframes wcl-radial-activation {
   0% {
     opacity: 1;
+  }
+
+  70% {
+    opacity: 0.7;
   }
 
   100% {
@@ -9154,7 +9108,8 @@
     stroke-width: 2.5px;
     vector-effect: non-scaling-stroke;
     transform-origin: 0 0;
-    animation: wcl-radar-dimension-activation 620ms ease-out both;
+    animation: wcl-radar-dimension-activation var(--wcl-chart-activation-duration)
+      var(--wcl-chart-activation-easing) both;
   }
 }
 
@@ -9179,5 +9134,39 @@
 @media (prefers-reduced-motion: reduce) {
   [data-wcl-radar-dimension-activation] {
     animation: none;
+    opacity: 0.8;
+  }
+}
+
+@layer wcl.components {
+  [data-wcl-chart-activation-outline] {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(var(--wcl-chart-activation-start-x), var(--wcl-chart-activation-start-y));
+    animation: wcl-chart-outline-activation var(--wcl-chart-activation-duration)
+      var(--wcl-chart-activation-easing) both;
+  }
+}
+
+@keyframes wcl-chart-outline-activation {
+  0% {
+    opacity: 1;
+    transform: scale(var(--wcl-chart-activation-start-x), var(--wcl-chart-activation-start-y));
+  }
+
+  70% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(var(--wcl-chart-activation-scale-x), var(--wcl-chart-activation-scale-y));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wcl-chart-activation-outline] {
+    animation: none;
+    opacity: 0.8;
   }
 }

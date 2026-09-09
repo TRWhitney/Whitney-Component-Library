@@ -8,7 +8,7 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 [Ticket 09](tickets/09-pie-donut-interaction.md) delivers pie/donut selection and independent
 activation, including the approved outer edge, expansion asterisk, and visible sweep trail.
-Validation and independent production reviews pass. The [radar study](prototypes/radar-selection.md) is accepted. [Ticket 10](tickets/10-marker-ring-spacing.md) delivers the confirmed marker-gap fixes. [Ticket 11](tickets/11-radar-interaction.md) delivers radar selection and independent activation; validation and independent production reviews pass. Parent Ticket 22 stays open.
+Validation and independent production reviews pass. The [radar study](prototypes/radar-selection.md) is accepted. [Ticket 10](tickets/10-marker-ring-spacing.md) delivers the confirmed marker-gap fixes. [Ticket 11](tickets/11-radar-interaction.md) delivers radar selection and independent activation; validation and independent production reviews pass. The [heatmap study](prototypes/heatmap-selection.md) uses the accepted Cell frames and missing-cell interaction. [Ticket 12](tickets/12-shared-activation-motion.md) standardizes activation motion; 675 tests, production checks and independent intent/engineering reviews pass. Parent Ticket 22 stays open.
 
 ## Progress
 
@@ -39,9 +39,9 @@ are settled. Scatter/bubble Centers inside selection is delivered. Radar interac
 
 ## Verification
 
-[Ticket 11](tickets/11-radar-interaction.md#completion-evidence) records 671 passing tests,
+[Ticket 12](tickets/12-shared-activation-motion.md#completion-evidence) records 675 passing tests,
 repository/build/package checks, direct production operation and visual inspection. Independent
-intent and engineering reviews pass after the recorded keyboard continuity correction.
+intent and engineering reviews pass after the recorded statistical symbol outset correction.
 
 ## Out of scope
 
@@ -51,7 +51,8 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; marker fixes committed as `e0eac43`.
+- Branch: `main`; radar interaction committed as `df6d702`, marker fixes as `e0eac43`.
 - Production showcase: `http://localhost:5174`.
 - Accepted radar study: `http://localhost:5181`, Vite session `68691`.
-- Next action: plan heatmap interaction from its existing reading units and the accepted selection/activation conventions. Radar zero values use keyboard or whole-dimension selection, without center-click targets. Keep prototypes short, without tests or agent reviews.
+- Heatmap study: `http://localhost:5182`, Vite session `20034`.
+- Next action: resolve the heatmap hover convention, then specify its production interaction ticket. Shared activation motion is delivered in the commit containing this record. No hover change is approved. Keep prototype revisions short, without tests or agent reviews.

@@ -3259,6 +3259,12 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
 
   return (
     <>
+      <p className="showcase-muted">
+        Chart activation uses the same 620 ms timing throughout these examples. Point pulses retain
+        their size on compact charts. Outlined pulses travel three screen pixels outward on each
+        edge; pie slices keep their outline fade, and radar dimensions draw along the spoke. Reduced
+        motion uses static feedback.
+      </p>
       <Specimen
         description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference. Tab into the plot and use the arrow keys for keyboard readings; mouse readings clear when the pointer leaves the plot. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
         name="LineChart"

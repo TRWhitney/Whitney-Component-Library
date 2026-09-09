@@ -1,3 +1,8 @@
+import {
+  ChartActivationOutline,
+  chartActivationOutset,
+  chartActivationPointRadius,
+} from './chart-activation.js';
 import {extent} from 'd3-array';
 import {
   scaleBand,
@@ -2559,11 +2564,16 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   {actions.pulse ? (
                     <g key={actions.pulse.sequence} data-wcl-chart-activation="">
                       {pulseBarRectangles.length ? (
-                        <path
-                          data-wcl-chart-activation-bar=""
-                          clipPath={`url(#${plotClipId})`}
-                          d={barContour(pulseBarRectangles, -2 / presentation.viewScale)}
-                        />
+                        <ChartActivationOutline>
+                          <path
+                            data-wcl-chart-activation-bar=""
+                            clipPath={`url(#${plotClipId})`}
+                            d={barContour(
+                              pulseBarRectangles,
+                              -chartActivationOutset / presentation.viewScale,
+                            )}
+                          />
+                        </ChartActivationOutline>
                       ) : null}
                       {interactionPoints
                         .filter(
@@ -2577,7 +2587,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                             clipPath={isShapeInteraction ? `url(#${plotClipId})` : undefined}
                             cx={point.x}
                             cy={point.y}
-                            r={10 / presentation.viewScale}
+                            r={chartActivationPointRadius / presentation.viewScale}
                           />
                         ))}
                       {interaction.target === 'category' && rootAttribute === 'data-wcl-line-chart'
