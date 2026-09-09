@@ -98,3 +98,47 @@ export const rendererInjection = (
     position={{accessor: 'label', label: 'Month', scale: {type: 'categorical'}}}
   />
 );
+
+export const interactiveSparkline = (
+  <Sparkline
+    {...common}
+    position={{accessor: 'at', label: 'Date', scale: timeScale}}
+    interaction={{
+      getRowId: (item) => item.label,
+      onActivate: (event) => {
+        const position: Date = event.position;
+        const value: number = event.value;
+        const record: Reading = event.datum;
+        const rowId: string = event.item.rowId;
+        void [position, value, record, rowId];
+        // @ts-expect-error The activation position retains its declared type.
+        const wrong: string = event.position;
+        void wrong;
+      },
+      selection: {
+        selectedItems: [{rowId: 'Jan'}],
+        onSelectionChange: (items) => {
+          const rowId: string | undefined = items[0]?.rowId;
+          void rowId;
+        },
+        labels: {
+          instructions: 'Select readings.',
+          clear: 'Clear',
+          empty: 'None',
+          item: (item) => item.rowId,
+          summary: String,
+          hidden: (label) => label,
+        },
+      },
+    }}
+  />
+);
+
+export const missingInteractionIdentity = (
+  <Sparkline
+    {...common}
+    position={{accessor: 'at', label: 'Date', scale: timeScale}}
+    // @ts-expect-error Interactive readings require stable application IDs.
+    interaction={{onActivate: () => {}}}
+  />
+);

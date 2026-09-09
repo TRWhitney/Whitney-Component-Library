@@ -180,3 +180,10 @@ All 686 tests and repository/build/package checks pass. Independent intent and e
 pass after correcting keyboard tooltip continuity when the grid scrolls.
 Compact chart interaction, remaining visibility, exploration, data-change animation and compositions
 remain open.
+
+[Sparkline ticket 14](../../chart-interaction-composition/tickets/14-sparkline-interaction.md) implements
+the approved compact selection rings, horizontal range dragging, independent activation and touch
+hold. Missing readings remain readable gaps; stable application IDs preserve record identity.
+Public types, contracts, guide and rendered showcase are updated. All 697 tests and repository,
+build and package checks pass. Independent intent and engineering production reviews pass with no findings. Remaining visibility,
+exploration, data-change animation and the accepted added compositions keep this parent open.

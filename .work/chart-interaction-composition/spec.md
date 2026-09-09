@@ -317,3 +317,31 @@ Colors, cell gaps, native tooltip placement and complete data table remain intac
 the shared outline pulse and static reduced-motion treatment. No whole-chart focus outline is added.
 Production coverage uses the public Heatmap component and browser layout boundaries, including sparse
 records, controlled ownership, drag cancellation, touch hold, keyboard operation and callback identity.
+
+## Sparkline recorded-value interaction
+
+The [accepted Sparkline study](prototypes/sparkline-selection.md) defines compact selection rings,
+visible horizontal range dragging and independent activation. Existing current and directional
+low/high cues retain their meaning and fills; neutral selection rings meet their outlines with no
+gap. Ordinary selected readings receive a base circle. Activation uses shared point motion.
+
+Optional `SparklineInteraction` requires a stable application `getRowId`, uses `SparklineSelectionItem`
+with `rowId`, and supports the existing controlled/uncontrolled localized selection contract.
+Activation exposes the stable item, original datum, typed position, finite value and input method.
+IDs must be nonempty and unique among prepared records. Missing readings remain readable gaps and
+are not selected or activated; zero remains a normal recorded value. Removed or missing IDs are
+pruned without transferring selection to replacement readings. Source order and scale behavior stay
+unchanged, including duplicate positions with distinct IDs and keyboard access to those readings.
+
+Click/tap selects, Control/Command-click or touch hold activates independently. Without selection,
+ordinary activation works. Horizontal range dragging replaces selection, Shift/Control/Command adds
+and Alt removes; Escape and pointer cancellation restore the prior selection. Data, geometry,
+status and interaction changes cancel gestures. Keyboard arrows and Home/End retain reading order;
+Enter/Space selects and Control/Command-Enter/Space activates. Pointer focus must not start a reading
+at the first record. No whole-chart focus border is introduced. Production retains its existing
+tooltip, summary and table; the study's external reading is only a comparison aid.
+
+Production tests exercise public selection/callback ownership and identity, gaps, zero, keyboard,
+dragging, cancellation and touch hold. Direct browser inspection covers compact dark/light, dense
+readings, forced colors and reduced motion. Public contracts, generated guides and the showcase
+must demonstrate optional interaction. Independent reviews apply to production only.

@@ -409,7 +409,26 @@ export interface SparklineLabels {
   readonly missing: string;
 }
 
+export interface SparklineSelectionItem {
+  readonly rowId: string;
+}
+
+export interface SparklineActivation<Datum extends object, Position extends ChartDomainValue> {
+  readonly item: SparklineSelectionItem;
+  readonly datum: Datum;
+  readonly position: Position;
+  readonly value: number;
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+}
+
+export interface SparklineInteraction<Datum extends object, Position extends ChartDomainValue> {
+  readonly getRowId: (datum: Datum) => string;
+  readonly selection?: ChartSelection<SparklineSelectionItem>;
+  readonly onActivate?: (activation: SparklineActivation<Datum, Position>) => void;
+}
+
 export interface SparklineProps<Datum extends object, Position extends ChartDomainValue> {
+  readonly interaction?: SparklineInteraction<Datum, Position>;
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];
   readonly dataTableLabel: string;

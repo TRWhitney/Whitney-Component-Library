@@ -30,9 +30,11 @@ The [heatmap study](prototypes/heatmap-selection.md) uses the chosen Cell frames
 
 [Ticket 12](tickets/12-shared-activation-motion.md) standardizes production activation motion and applies it to the heatmap study. Dashed inner heatmap hover is approved and applied in the study; solid Cell frames remain selection.
 
+The [Sparkline study](prototypes/sparkline-selection.md) is approved, including point rings around existing compact cues, range dragging and recorded-value-only targeting. [Ticket 14](tickets/14-sparkline-interaction.md) delivers the public interaction with passing repository/package checks and independent production reviews.
+
 ## Not yet specified
 
-- Visibility for statistical families; visibility for pie/donut, and visibility for radar, and visibility for heatmap, and selection and visibility for compact reading units.
+- Visibility for statistical families; visibility for pie/donut, and visibility for radar, and visibility for heatmap, and visibility for compact reading units.
 - Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.

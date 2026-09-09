@@ -14,6 +14,9 @@ import {
 } from 'react';
 import {createPortal} from 'react-dom';
 
+import {Button} from '../actions/button.js';
+import {chartActivationPointRadius} from './chart-activation.js';
+import {useChartInteraction, type InteractionPoint} from './chart-interaction.js';
 import {EmptyState} from '../feedback/empty-state.js';
 import {Spinner} from '../feedback/spinner.js';
 import {
@@ -454,6 +457,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
   const status = props.status ?? {kind: 'ready'};
   const minimumSize = props.minimumSize ?? {height: 48, width: 240};
   const aspectRatio = props.aspectRatio ?? 6;
+  const pointerFocus = useRef(false);
   const titleId = useId();
   const descriptionId = useId();
   const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
@@ -466,6 +470,8 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
   const modelIdentity = JSON.stringify([
     status.kind,
     model.invalidCount,
+    props.position.scale,
+    props.valueRange,
     model.rows.map((row) => [positionKey(row.position), row.value ?? null]),
   ]);
   const [retainedModelIdentity, setRetainedModelIdentity] = useState(modelIdentity);
@@ -483,6 +489,66 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
     Math.min(renderedWidth / sparklineViewWidth, renderedHeight / sparklineViewHeight),
     Number.EPSILON,
   );
+  const interaction = props.interaction;
+  const rowIds = interaction
+    ? model.rows.map((row) => interaction.getRowId(props.data[row.index]!))
+    : [];
+  if (
+    rowIds.some((id) => typeof id !== 'string' || !id.trim()) ||
+    new Set(rowIds).size !== rowIds.length
+  ) {
+    throw new Error(
+      'Sparkline interaction getRowId must return a unique nonempty string for every prepared record.',
+    );
+  }
+  const actions = useChartInteraction(
+    interaction
+      ? {
+          target: 'category',
+          ...(interaction.selection ? {selection: interaction.selection} : {}),
+          ...(interaction.onActivate
+            ? {
+                onActivate: (event: {
+                  item: {rowId: string};
+                  datum: Datum;
+                  category: Position;
+                  values: readonly {value: number}[];
+                  input: 'pointer' | 'keyboard' | 'touch';
+                }) => {
+                  interaction.onActivate?.({
+                    item: {rowId: event.item.rowId},
+                    datum: event.datum,
+                    position: event.category,
+                    value: event.values[0]!.value,
+                    input: event.input,
+                  });
+                },
+              }
+            : {}),
+        }
+      : undefined,
+    model.rows.flatMap((row, index) =>
+      row.value === undefined || !interaction
+        ? []
+        : [
+            {
+              id: rowIds[index]!,
+              category: row.position,
+              datum: props.data[row.index]!,
+              values: [{seriesId: '', label: props.value.label, value: row.value, hidden: false}],
+            },
+          ],
+    ),
+    JSON.stringify([
+      modelIdentity,
+      rowIds,
+      renderedWidth,
+      renderedHeight,
+      !!interaction?.onActivate,
+    ]),
+    props.data,
+  );
+  const selectedIds = new Set(actions.selected.map((item) => item.rowId));
   const frameStyle: SparklineStyles = {
     '--wcl-chart-aspect-ratio': aspectRatio,
     '--wcl-chart-line-width': '2.25px',
@@ -629,6 +695,22 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
       if (isHighest) return 'highest';
       return undefined;
     };
+    const points: InteractionPoint[] = model.rows.flatMap((row, index) =>
+      row.value === undefined || !interaction
+        ? []
+        : [
+            {
+              index,
+              item: {rowId: rowIds[index]!},
+              seriesId: '',
+              categoryPosition: projectPosition(row),
+              x: projectPosition(row),
+              y: projectValue(row.value)!,
+            },
+          ],
+    );
+    const pointForReading = (reading: Reading | null) =>
+      reading === null ? undefined : points.find((point) => point.index === reading.index);
     const anchorFor = (reading: Reading): {readonly x: number; readonly y: number} => {
       const row = model.rows[reading.index]!;
       return (
@@ -671,11 +753,22 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
       };
     };
     const focusChart = (event: FocusEvent<HTMLDivElement>): void => {
-      if (event.currentTarget === event.target && keyboardReading === null) {
+      if (
+        !pointerFocus.current &&
+        event.currentTarget === event.target &&
+        keyboardReading === null
+      ) {
         setKeyboardReading({index: 0});
       }
     };
     const readWithKeyboard = (event: KeyboardEvent<HTMLDivElement>): void => {
+      if (event.target !== event.currentTarget) return;
+      if (interaction && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        const point = pointForReading(activeReading);
+        if (point) actions.activate(point.item, 'keyboard', event.ctrlKey || event.metaKey);
+        return;
+      }
       const previous = keyboardReading?.index ?? activeReading?.index ?? 0;
       let next: number | null = null;
       if (event.key === 'Home') next = 0;
@@ -683,6 +776,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
       if (event.key === 'ArrowLeft') next = Math.max(0, previous - 1);
       if (event.key === 'ArrowRight') next = Math.min(model.rows.length - 1, previous + 1);
       if (event.key === 'Escape') {
+        actions.cancel();
         event.preventDefault();
         setKeyboardReading(null);
         setPointerReading(null);
@@ -706,7 +800,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
               : formatValue(activeRow.value, props.value)
           }`;
     const renderReadingNode = (): ReactNode => {
-      if (activeReading === null || activeRow?.value === undefined) return null;
+      if (actions.box || activeReading === null || activeRow?.value === undefined) return null;
       const activeCue = cueFor(activeRow, activeReading.index);
       if (activeCue === 'range') return null;
       const centerX = projectPosition(activeRow);
@@ -745,15 +839,22 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
           ref={setFrameElement}
         >
           <div
-            aria-keyshortcuts="ArrowLeft ArrowRight Home End Escape"
+            aria-describedby={interaction?.selection ? `${descriptionId}-selection` : undefined}
+            aria-keyshortcuts={
+              interaction
+                ? 'ArrowLeft ArrowRight Home End Escape Enter Space Control+Enter Meta+Enter Control+Space Meta+Space'
+                : 'ArrowLeft ArrowRight Home End Escape'
+            }
             aria-labelledby={titleId}
             data-wcl-chart-canvas=""
             data-wcl-sparkline-canvas=""
+            data-interactive={interaction ? '' : undefined}
             onBlur={(event) => {
               if (!(
                 event.relatedTarget instanceof Node &&
                 event.currentTarget.contains(event.relatedTarget)
               )) {
+                actions.cancel();
                 setKeyboardReading(null);
               }
             }}
@@ -768,20 +869,55 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
               data-wcl-chart-svg=""
               data-wcl-sparkline-svg=""
               focusable="false"
+              data-selectable={interaction?.selection ? '' : undefined}
               onPointerDown={(event) => {
-                if (event.pointerType !== 'touch') return;
-                const reading = readingFromPointer(event, false);
+                if (interaction && (event.button > 0 || event.isPrimary === false)) return;
+                if (!interaction && event.pointerType !== 'touch') return;
+                const reading = readingFromPointer(event, event.pointerType !== 'touch');
                 if (reading === null) return;
+                if (interaction) {
+                  event.preventDefault();
+                  pointerFocus.current = true;
+                  event.currentTarget.parentElement?.focus({preventScroll: true});
+                  pointerFocus.current = false;
+                  const p = viewPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+                  actions.begin(event, pointForReading(reading), p.x, p.y);
+                }
                 setKeyboardReading(null);
+                if (event.pointerType === 'touch') {
+                  setPointerReading(null);
+                  setTouchReading(reading);
+                } else {
+                  setTouchReading(null);
+                  setPointerReading(reading);
+                }
+              }}
+              onPointerUp={(event) =>
+                actions.end(event, pointForReading(readingFromPointer(event, false)))
+              }
+              onPointerCancel={() => {
+                actions.cancel();
+                setTouchReading(null);
                 setPointerReading(null);
-                setTouchReading(reading);
+              }}
+              onLostPointerCapture={() => actions.cancel()}
+              onContextMenu={(event) => {
+                if (actions.isHolding() || actions.isDragging()) event.preventDefault();
               }}
               onPointerLeave={(event) => {
                 if (event.pointerType !== 'touch') setPointerReading(null);
               }}
               onPointerMove={(event) => {
+                const p = viewPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+                if (actions.move(event, p.x, p.y, points, sparklinePlot)) {
+                  setKeyboardReading(null);
+                  setPointerReading(null);
+                  setTouchReading(null);
+                  return;
+                }
                 if (event.pointerType === 'touch') return;
                 setKeyboardReading(null);
+                if (interaction) setTouchReading(null);
                 setPointerReading(readingFromPointer(event, true));
               }}
               ref={setSvgElement}
@@ -859,7 +995,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
                   );
                 })}
               </g>
-              {activeReading === null || activeRow === undefined ? null : (
+              {actions.box || activeReading === null || activeRow === undefined ? null : (
                 <g data-wcl-chart-reading="" data-wcl-sparkline-reading="">
                   <line
                     data-wcl-chart-reading-needle=""
@@ -871,8 +1007,61 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
                   {renderReadingNode()}
                 </g>
               )}
+              <g data-wcl-sparkline-interaction="">
+                {interaction?.selection
+                  ? points
+                      .filter((point) => selectedIds.has(point.item.rowId))
+                      .map((point) => {
+                        const cue = cueFor(model.rows[point.index]!, point.index);
+                        const radius = cue ? cueRadius : 4.5 / viewScale;
+                        return (
+                          <g key={point.item.rowId} data-row-id={point.item.rowId}>
+                            {cue ? null : (
+                              <circle
+                                cx={point.x}
+                                cy={point.y}
+                                r={radius}
+                                data-wcl-sparkline-selected-base=""
+                                data-active={
+                                  activeReading?.index === point.index && !actions.box
+                                    ? ''
+                                    : undefined
+                                }
+                              />
+                            )}
+                            <circle
+                              cx={point.x}
+                              cy={point.y}
+                              r={radius + 2.125 / viewScale}
+                              data-wcl-sparkline-selection-ring=""
+                            />
+                          </g>
+                        );
+                      })
+                  : null}
+                {actions.pulse
+                  ? points
+                      .filter((point) => point.item.rowId === actions.pulse!.item.rowId)
+                      .map((point) => (
+                        <circle
+                          key={actions.pulse!.sequence}
+                          cx={point.x}
+                          cy={point.y}
+                          r={chartActivationPointRadius / viewScale}
+                          data-wcl-chart-activation-dot=""
+                        />
+                      ))
+                  : null}
+                {actions.box ? (
+                  <rect
+                    {...actions.box}
+                    data-wcl-chart-selection-box=""
+                    data-wcl-sparkline-selection-box=""
+                  />
+                ) : null}
+              </g>
             </svg>
-            {activeReading === null || activeRow === undefined ? null : (
+            {actions.box || activeReading === null || activeRow === undefined ? null : (
               <SparklineTooltip
                 anchor={anchorFor(activeReading)}
                 highest={model.highest!}
@@ -916,6 +1105,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
       aria-labelledby={titleId}
       data-wcl-chart=""
       data-wcl-sparkline=""
+      data-interactive={interaction ? '' : undefined}
       ref={setRootElement}
       style={rootStyle}
     >
@@ -924,6 +1114,35 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
         <p id={descriptionId}>{props.description}</p>
       </figcaption>
       {content}
+      {interaction?.selection ? (
+        <div data-wcl-chart-selection="">
+          <p id={`${descriptionId}-selection`}>{interaction.selection.labels.instructions}</p>
+          <div role="status" aria-atomic="true">
+            <p>
+              {actions.selected.length
+                ? interaction.selection.labels.summary(actions.selected.length)
+                : interaction.selection.labels.empty}
+            </p>
+            {actions.selected.length ? (
+              <ul>
+                {actions.selected.map((item) => (
+                  <li key={item.rowId}>{interaction.selection!.labels.item(item)}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          <Button
+            variant="quiet"
+            isDisabled={!actions.selected.length}
+            onPress={() => {
+              actions.cancel();
+              actions.change([]);
+            }}
+          >
+            {interaction.selection.labels.clear}
+          </Button>
+        </div>
+      ) : null}
     </figure>
   );
 }

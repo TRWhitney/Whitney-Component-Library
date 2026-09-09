@@ -121,6 +121,9 @@ import {
   type RadarActivation,
   type RadarInteraction,
   type RadarSelectionItem,
+  type SparklineActivation,
+  type SparklineInteraction,
+  type SparklineSelectionItem,
   type TableSortDescriptor,
 } from '../src/index.js';
 import {useScrollbarActivity} from '../src/scrollbar-activity.js';
@@ -230,13 +233,13 @@ const roomDeviationData = [
   {period: 'evening', room: 'west', value: -3},
 ] as const;
 const compactDemandData = [
-  {day: 'Mon', demand: 42},
-  {day: 'Tue', demand: null},
-  {day: 'Wed', demand: 38},
-  {day: 'Thu', demand: 52},
-  {day: 'Fri', demand: 38},
-  {day: 'Sat', demand: 65},
-  {day: 'Sun', demand: 65},
+  {id: 'demand-mon', day: 'Mon', demand: 42},
+  {id: 'demand-tue', day: 'Tue', demand: null},
+  {id: 'demand-wed', day: 'Wed', demand: 38},
+  {id: 'demand-thu', day: 'Thu', demand: 52},
+  {id: 'demand-fri', day: 'Fri', demand: 38},
+  {id: 'demand-sat', day: 'Sat', demand: 65},
+  {id: 'demand-sun', day: 'Sun', demand: 65},
 ] as const;
 const statisticalPointData = [
   {demand: 28, id: 'north-1', label: 'North Monday', loop: 'north', stored: 42, temperature: 18},
@@ -3200,6 +3203,116 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
   );
 }
 
+type DemandReading = (typeof compactDemandData)[number];
+
+function SparklineInteractionExample() {
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly SparklineSelectionItem[]>([]);
+  const [details, setDetails] = useState<SparklineActivation<DemandReading, string> | null>(null);
+  const instructions = distributionInstructions(
+    selectionEnabled,
+    detailsEnabled,
+    'recorded values between the starting and ending positions',
+  );
+  const interaction: SparklineInteraction<DemandReading, string> = {
+    getRowId: (datum) => datum.id,
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              summary: (count) => `${count} ${count === 1 ? 'reading' : 'readings'} selected`,
+              item: ({rowId}) =>
+                compactDemandData.find((datum) => datum.id === rowId)?.day ?? rowId,
+              hidden: (label) => label,
+            },
+          },
+        }
+      : {}),
+  };
+  return (
+    <Stack gap="regular">
+      <Switch
+        isSelected={selectionEnabled}
+        label="Enable selection"
+        onChange={setSelectionEnabled}
+      />
+      <Switch
+        isSelected={detailsEnabled}
+        label="Open details on activation"
+        onChange={(enabled) => {
+          setDetailsEnabled(enabled);
+          if (!enabled) setDetails(null);
+        }}
+      />
+      <p>{instructions}</p>
+      <Sparkline
+        interaction={interaction}
+        data={compactDemandData}
+        dataTableLabel="Daily thermal demand history"
+        description="Daily demand; Tuesday has no reading, current demand is 65 MWh, and the observed range is 38 to 65 MWh."
+        emptyState={{description: 'Record daily demand to begin.', title: 'No demand history'}}
+        invalidData={{
+          description: 'Correct non-finite demand readings.',
+          title: 'Invalid demand history',
+        }}
+        labels={{
+          first: 'First',
+          highest: 'Highest',
+          last: 'Last',
+          lowest: 'Lowest',
+          missing: 'No reading',
+        }}
+        position={{accessor: 'day', label: 'Day', scale: {type: 'categorical'}}}
+        title="Thermal demand this week"
+        value={{accessor: 'demand', label: 'Demand', unit: 'MWh'}}
+        valueRange={[0, 80]}
+      />
+      <p className="showcase-muted">
+        Left and Right read each day; Home and End reach the first and last day. Tuesday remains
+        readable as a gap, and cannot be selected or opened. Zero would be a recorded value.
+        Selection rings surround the existing hollow current cue and half-filled low and high cues
+        without replacing their meaning. Opening details gives a brief pulse, with static feedback
+        for reduced motion. The tooltip, summary and table retain the exact readings.
+      </p>
+      <p className="showcase-muted">
+        This example owns selection and the details below. Stable record IDs keep selections
+        attached to the same readings after data updates. The activation includes the original
+        record, day, value and input method. The fixed range keeps this chart comparable with other
+        demand charts.
+      </p>
+      {details ? (
+        <Stack gap="tight">
+          <DescriptionList
+            ariaLabel="Daily demand details"
+            emptyState={{kind: 'no-data', title: 'No reading', description: 'Open a recorded day.'}}
+            items={[
+              {id: 'position', term: 'Day', description: details.position},
+              {id: 'value', term: 'Demand', description: `${details.value} MWh`},
+              {id: 'identity', term: 'Reading ID', description: details.item.rowId},
+              {
+                id: 'record',
+                term: 'Original record',
+                description: `${details.datum.id}: ${details.datum.day}, ${details.datum.demand} MWh`,
+              },
+              {id: 'input', term: 'Input method', description: details.input},
+            ]}
+          />
+          <Button onPress={() => setDetails(null)} variant="quiet">
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
 type RoomReading = (typeof roomTemperatureData)[number] | (typeof roomDeviationData)[number];
 
 function HeatmapInteractionExample({
@@ -3548,28 +3661,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show one compact ordered trend with a standard caption, honest gaps, exact current and observed-range cues, and a complete reading that names lows and highs. Use LineChart when visible axes or multiple series matter."
         name="Sparkline"
       >
-        <Example label="Fixed-range Sparkline with a gap and tied extremes">
-          <Sparkline
-            data={compactDemandData}
-            dataTableLabel="Daily thermal demand history"
-            description="Daily demand; Tuesday has no reading, current demand is 65 MWh, and the observed range is 38 to 65 MWh."
-            emptyState={{description: 'Record daily demand to begin.', title: 'No demand history'}}
-            invalidData={{
-              description: 'Correct non-finite demand readings.',
-              title: 'Invalid demand history',
-            }}
-            labels={{
-              first: 'First',
-              highest: 'Highest',
-              last: 'Last',
-              lowest: 'Lowest',
-              missing: 'No reading',
-            }}
-            position={{accessor: 'day', label: 'Day', scale: {type: 'categorical'}}}
-            title="Thermal demand this week"
-            value={{accessor: 'demand', label: 'Demand', unit: 'MWh'}}
-            valueRange={[0, 80]}
-          />
+        <Example label="Fixed-range Sparkline with selection, details, a gap and tied extremes">
+          <SparklineInteractionExample />
         </Example>
       </Specimen>
 

@@ -1,0 +1,108 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+[data-wcl-provider] {
+  min-height: 100vh;
+  background: var(--wcl-canvas);
+  color: var(--wcl-text);
+  font-family: var(--wcl-font-body);
+}
+.study {
+  max-width: 60rem;
+  margin: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+.kicker {
+  font: 0.75rem/1.5 var(--wcl-font-utility);
+  color: var(--wcl-text-muted);
+}
+h1 {
+  font-size: 1.5rem;
+  margin: 0.3rem 0;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+.hint {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--wcl-text-muted);
+}
+.example {
+  background: var(--wcl-surface);
+  padding: 1rem;
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-radius);
+  width: min(100%, 34rem);
+}
+.example[data-compact] {
+  width: min(100%, 19rem);
+}
+.chart-adapter [data-wcl-sparkline] {
+  inline-size: 100%;
+}
+.chart-adapter [data-wcl-sparkline-canvas]:focus-visible {
+  outline: none;
+}
+.chart-adapter [data-wcl-sparkline-svg] {
+  touch-action: none;
+  overflow: visible;
+}
+.study-overlay {
+  pointer-events: none;
+}
+.selection-ring {
+  fill: none;
+  stroke: var(--wcl-text);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+.selected-point {
+  fill: var(--wcl-surface);
+  stroke: #2878ff;
+  stroke-width: 2.25px;
+  vector-effect: non-scaling-stroke;
+}
+.selected-point[data-active] {
+  fill: var(--wcl-text);
+}
+.chart-adapter[data-dragging] :is([data-wcl-sparkline-reading], [data-wcl-chart-tooltip-layer]) {
+  display: none;
+}
+.reading {
+  font: 0.875rem/1.5 var(--wcl-font-utility);
+  min-height: 1.5rem;
+}
+.results {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.results p {
+  overflow-wrap: anywhere;
+}
+.details {
+  border-left: 2px solid var(--wcl-text);
+  padding: 0.1rem 1rem;
+  margin-top: 1rem;
+}
+.identifier {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  background: var(--wcl-surface);
+  border: 1px solid var(--wcl-border);
+  font: 0.875rem var(--wcl-font-utility);
+}
+/* Keep readings below the miniature plot while comparing its markers. */
+[data-wcl-chart-tooltip-layer] {
+  display: none;
+}

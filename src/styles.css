@@ -7441,6 +7441,48 @@
     overflow: hidden;
   }
 
+  [data-wcl-sparkline][data-interactive],
+  [data-wcl-sparkline][data-interactive] [data-wcl-sparkline-frame],
+  [data-wcl-sparkline][data-interactive] [data-wcl-sparkline-svg] {
+    overflow: visible;
+  }
+
+  [data-wcl-sparkline][data-interactive] [data-wcl-sparkline-frame],
+  [data-wcl-sparkline-canvas][data-interactive] {
+    outline: none;
+  }
+
+  [data-wcl-sparkline-svg][data-selectable] {
+    touch-action: none;
+    user-select: none;
+  }
+
+  [data-wcl-sparkline-interaction] {
+    pointer-events: none;
+  }
+
+  [data-wcl-sparkline-selection-box],
+  [data-wcl-sparkline-selection-ring],
+  [data-wcl-sparkline-selected-base] {
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-sparkline-selection-ring] {
+    fill: none;
+    stroke: var(--wcl-text);
+    stroke-width: 2px;
+  }
+
+  [data-wcl-sparkline-selected-base] {
+    fill: var(--wcl-surface);
+    stroke: var(--wcl-accent);
+    stroke-width: 2.25px;
+  }
+
+  [data-wcl-sparkline-selected-base][data-active] {
+    fill: var(--wcl-text);
+  }
+
   [data-wcl-sparkline-cue-base] {
     fill: var(--wcl-surface);
   }
@@ -9205,5 +9247,20 @@
   [data-wcl-chart-activation-outline] {
     animation: none;
     opacity: 0.8;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-wcl-sparkline-selection-ring] {
+    stroke: CanvasText;
+  }
+
+  [data-wcl-sparkline-selected-base] {
+    fill: Canvas;
+    stroke: Highlight;
+  }
+
+  [data-wcl-sparkline-selected-base][data-active] {
+    fill: CanvasText;
   }
 }
