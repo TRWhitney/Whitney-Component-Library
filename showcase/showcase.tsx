@@ -2147,30 +2147,30 @@ function BarInteractionExample({
 
   return (
     <Stack gap="regular">
+      <SegmentedControl
+        label={`${name} layout`}
+        onChange={setLayout}
+        options={[
+          {label: 'Grouped', value: 'grouped'},
+          {label: 'Stacked', value: 'stacked'},
+          {label: 'Normalized', value: 'normalized'},
+        ]}
+        value={layout}
+      />
+      <SegmentedControl
+        label={`${name} click target`}
+        onChange={(nextTarget) => {
+          setTarget(nextTarget);
+          setSelectedItems([]);
+          setDetails(null);
+        }}
+        options={[
+          {label: 'Month', value: 'category'},
+          {label: 'Bar', value: 'point'},
+        ]}
+        value={target}
+      />
       <InlineGroup align="start" gap="regular" wrap>
-        <SegmentedControl
-          label={`${name} layout`}
-          onChange={setLayout}
-          options={[
-            {label: 'Grouped', value: 'grouped'},
-            {label: 'Stacked', value: 'stacked'},
-            {label: 'Normalized', value: 'normalized'},
-          ]}
-          value={layout}
-        />
-        <SegmentedControl
-          label={`${name} click target`}
-          onChange={(nextTarget) => {
-            setTarget(nextTarget);
-            setSelectedItems([]);
-            setDetails(null);
-          }}
-          options={[
-            {label: 'Month', value: 'category'},
-            {label: 'Bar', value: 'point'},
-          ]}
-          value={target}
-        />
         <Switch
           isSelected={selectionEnabled}
           label="Enable selection"
@@ -2322,42 +2322,42 @@ function AreaMixedInteractionExample({
 
   return (
     <Stack gap="regular">
-      <InlineGroup align="start" gap="regular" wrap>
-        {kind === 'area' ? (
-          <SegmentedControl
-            label="AreaChart stacking"
-            onChange={setStacking}
-            options={[
-              {label: 'Overlapping', value: 'overlap'},
-              {label: 'Stacked', value: 'stacked'},
-              {label: 'Normalized', value: 'normalized'},
-            ]}
-            value={stacking}
-          />
-        ) : (
-          <SegmentedControl
-            label="CartesianChart marks"
-            onChange={setMixedKind}
-            options={[
-              {label: 'Columns and line', value: 'line'},
-              {label: 'Columns and area', value: 'area'},
-            ]}
-            value={mixedKind}
-          />
-        )}
+      {kind === 'area' ? (
         <SegmentedControl
-          label={`${name} click target`}
-          onChange={(nextTarget) => {
-            setTarget(nextTarget);
-            setSelectedItems([]);
-            setDetails(null);
-          }}
+          label="AreaChart stacking"
+          onChange={setStacking}
           options={[
-            {label: 'Month', value: 'category'},
-            {label: 'Value', value: 'point'},
+            {label: 'Overlapping', value: 'overlap'},
+            {label: 'Stacked', value: 'stacked'},
+            {label: 'Normalized', value: 'normalized'},
           ]}
-          value={target}
+          value={stacking}
         />
+      ) : (
+        <SegmentedControl
+          label="CartesianChart marks"
+          onChange={setMixedKind}
+          options={[
+            {label: 'Columns and line', value: 'line'},
+            {label: 'Columns and area', value: 'area'},
+          ]}
+          value={mixedKind}
+        />
+      )}
+      <SegmentedControl
+        label={`${name} click target`}
+        onChange={(nextTarget) => {
+          setTarget(nextTarget);
+          setSelectedItems([]);
+          setDetails(null);
+        }}
+        options={[
+          {label: 'Month', value: 'category'},
+          {label: 'Value', value: 'point'},
+        ]}
+        value={target}
+      />
+      <InlineGroup align="start" gap="regular" wrap>
         <Switch
           isSelected={selectionEnabled}
           label="Enable selection"
@@ -2559,20 +2559,20 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       >
         <Example label="Two-series LineChart with selection and details">
           <Stack gap="regular">
+            <SegmentedControl
+              label="Click target"
+              onChange={(target) => {
+                setLineTarget(target);
+                setLineSelection([]);
+                setLineDetails(null);
+              }}
+              options={[
+                {label: 'Month', value: 'category'},
+                {label: 'Point', value: 'point'},
+              ]}
+              value={lineTarget}
+            />
             <InlineGroup align="start" gap="regular" wrap>
-              <SegmentedControl
-                label="Click target"
-                onChange={(target) => {
-                  setLineTarget(target);
-                  setLineSelection([]);
-                  setLineDetails(null);
-                }}
-                options={[
-                  {label: 'Month', value: 'category'},
-                  {label: 'Point', value: 'point'},
-                ]}
-                value={lineTarget}
-              />
               <Switch
                 isSelected={lineSelectionEnabled}
                 label="Enable selection"
@@ -3080,20 +3080,18 @@ function DrawerShowcase() {
 
   return (
     <Stack gap="relaxed">
-      <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
-        <SegmentedControl
-          label="Drawer placement"
-          onChange={setPlacement}
-          options={drawerPlacementOptions}
-          value={placement}
-        />
-        <SegmentedControl
-          label="Dock behavior"
-          onChange={setDock}
-          options={drawerDockOptions}
-          value={dock}
-        />
-      </ResponsiveGrid>
+      <SegmentedControl
+        label="Drawer placement"
+        onChange={setPlacement}
+        options={drawerPlacementOptions}
+        value={placement}
+      />
+      <SegmentedControl
+        label="Dock behavior"
+        onChange={setDock}
+        options={drawerDockOptions}
+        value={dock}
+      />
       <InlineGroup align="start" gap="regular" wrap>
         {dock === 'preview' ? (
           <Switch isSelected={hasHandle} label="Show drag handle" onChange={setHasHandle} />
