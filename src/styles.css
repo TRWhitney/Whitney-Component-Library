@@ -9045,3 +9045,88 @@
     stroke: CanvasText;
   }
 }
+
+@layer wcl.components {
+  [data-wcl-radial-cue] {
+    fill: none;
+    stroke: var(--wcl-text);
+    vector-effect: non-scaling-stroke;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+
+  [data-wcl-radial-cue='selection'] {
+    stroke-width: 2px;
+  }
+
+  [data-wcl-radial-cue='reading'] {
+    stroke-width: 1px;
+    stroke-dasharray: 3 2;
+  }
+
+  [data-wcl-radial-cue='activation'] {
+    stroke-width: 4px;
+  }
+
+  [data-wcl-radial-cue-group] {
+    transition: transform 120ms ease;
+  }
+
+  [data-wcl-radial-activation] {
+    animation: wcl-radial-activation 620ms ease-out both;
+  }
+}
+
+@keyframes wcl-radial-activation {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wcl-radial-cue-group] {
+    transition: none;
+  }
+
+  [data-wcl-radial-activation] {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-wcl-radial-cue] {
+    stroke: CanvasText;
+  }
+}
+
+@layer wcl.components {
+  [data-wcl-radial-sweep] polyline {
+    fill: none;
+    stroke: var(--wcl-surface);
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-radial-sweep] polyline:last-child {
+    stroke: var(--wcl-text);
+    stroke-width: 1.5px;
+    stroke-dasharray: 4 3;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-wcl-radial-sweep] polyline {
+    stroke: Canvas;
+  }
+
+  [data-wcl-radial-sweep] polyline:last-child {
+    stroke: CanvasText;
+  }
+}

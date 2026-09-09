@@ -20,9 +20,11 @@ Existing approvals and deliveries remain canonical in the [specification](spec.m
 The [scatter/bubble prototype](prototypes/scatter-bubble-selection.md) records approved Centers inside
 rectangle selection. Ticket 07 delivers scatter/bubble observation interaction. The [histogram/box-plot prototype](prototypes/distribution-selection.md) records approved Box touched selection and the inner-outline-only summary reading cue. [Ticket 08](tickets/08-distribution-interaction.md) delivers the production callback boundary. Whitney chose stable application IDs for interactive outliers. Ticket 08 is complete with passing validation and independent production reviews.
 
+The [pie/donut study](prototypes/radial-selection.md) is accepted. Whitney chose Outer edge and requested an asterisk on the expansion count when it contains a selected category. The revised prototype and sweep gesture are accepted; [Ticket 09](tickets/09-pie-donut-interaction.md) delivers this boundary with visible sweep feedback, passing validation, and independent production reviews.
+
 ## Not yet specified
 
-- Visibility for statistical families; selection and visibility for radial, heatmap, and compact reading units.
+- Visibility for statistical families; visibility for pie/donut, and selection and visibility for radar, heatmap, and compact reading units.
 - Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.

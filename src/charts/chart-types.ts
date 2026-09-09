@@ -198,7 +198,27 @@ export interface PartToWholeChartLabels {
   readonly shareOnPage: string;
 }
 
+export interface PartToWholeSelectionItem {
+  readonly id: string;
+}
+export interface PartToWholeActivation<Datum extends object> {
+  readonly item: PartToWholeSelectionItem;
+  readonly datum: Datum;
+  readonly label: string;
+  readonly value: number;
+  readonly total: number;
+  readonly shareOfTotal: number;
+  readonly shareOnPage: number;
+  readonly input: 'pointer' | 'keyboard' | 'touch';
+}
+export interface PartToWholeInteraction<Datum extends object> {
+  readonly onActivate?: (activation: PartToWholeActivation<Datum>) => void;
+  readonly selection?: ChartSelection<PartToWholeSelectionItem> & {
+    readonly containsSelection: string;
+  };
+}
 interface PartToWholeChartCommonProps<Datum extends object> {
+  readonly interaction?: PartToWholeInteraction<Datum>;
   readonly aggregateSizing?: PartToWholeAggregateSizing;
   readonly aspectRatio?: number;
   readonly data: readonly Datum[];

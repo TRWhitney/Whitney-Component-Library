@@ -1,59 +1,25 @@
 import type {ReactElement} from 'react';
+import {
+  itemInteractionSetup,
+  type ItemInteractionSetup,
+  type ActivationInput,
+} from './item-interaction.js';
 import {frameBar, type BarRectangle} from './bar-interaction-geometry.js';
 import type {InteractionPoint} from './chart-interaction.js';
 import type {BoxPlotSelectionItem, ChartSelection, HistogramSelectionItem} from './chart-types.js';
 export type DistributionItem = HistogramSelectionItem | BoxPlotSelectionItem;
-export type ActivationInput = 'pointer' | 'keyboard' | 'touch';
 export const distributionKey = (item: DistributionItem): string =>
   item.kind === 'bin'
     ? JSON.stringify(['bin', item.lower, item.upper, item.upperInclusive])
     : item.kind === 'summary'
       ? JSON.stringify(['summary', item.groupId])
       : JSON.stringify(['outlier', item.groupId, item.outlierId]);
-export interface DistributionSetup {
-  readonly selection?: ChartSelection;
-  readonly onActivate?: (id: string, input: ActivationInput) => void;
-}
-export function distributionSetup<Item extends DistributionItem>(
+export const distributionSetup = <Item extends DistributionItem>(
   entries: readonly {readonly item: Item; readonly activate: (input: ActivationInput) => void}[],
   selection: ChartSelection<Item> | undefined,
   activates: boolean,
-): DistributionSetup {
-  const byId = new Map(entries.map((entry) => [distributionKey(entry.item), entry]));
-  const encode = (items: readonly Item[]) =>
-    items.map((item) => ({rowId: distributionKey(item), seriesId: ''}));
-  const decode = (items: readonly {readonly rowId: string}[]) =>
-    items.flatMap((item) => {
-      const entry = byId.get(item.rowId);
-      return entry ? [entry.item] : [];
-    });
-  return {
-    ...(activates
-      ? {onActivate: (id: string, input: ActivationInput) => byId.get(id)?.activate(input)}
-      : {}),
-    ...(selection
-      ? {
-          selection: {
-            labels: {
-              ...selection.labels,
-              item: (item) => selection.labels.item(byId.get(item.rowId)!.item),
-            },
-            ...(selection.selectedItems === undefined
-              ? {
-                  defaultSelectedItems: encode(selection.defaultSelectedItems ?? []),
-                  ...(selection.onSelectionChange
-                    ? {onSelectionChange: (items) => selection.onSelectionChange?.(decode(items))}
-                    : {}),
-                }
-              : {
-                  selectedItems: encode(selection.selectedItems),
-                  onSelectionChange: (items) => selection.onSelectionChange(decode(items)),
-                }),
-          } satisfies ChartSelection,
-        }
-      : {}),
-  };
-}
+): ItemInteractionSetup => itemInteractionSetup(entries, selection, activates, distributionKey);
+export type {ItemInteractionSetup as DistributionSetup} from './item-interaction.js';
 export interface DistributionPoint extends InteractionPoint {
   readonly kind: 'point' | 'bin' | 'summary' | 'outlier';
   readonly radius: number;

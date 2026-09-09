@@ -6,9 +6,9 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-[Ticket 08](tickets/08-distribution-interaction.md) implements the approved histogram and box-plot
-interaction, including stable application IDs for interactive outliers. Production validation
-and independent reviews pass; this delivery is complete. Parent Ticket 22 stays open.
+[Ticket 09](tickets/09-pie-donut-interaction.md) delivers pie/donut selection and independent
+activation, including the approved outer edge, expansion asterisk, and visible sweep trail.
+Validation and independent production reviews pass. Parent Ticket 22 stays open. Radar is next.
 
 ## Progress
 
@@ -27,7 +27,7 @@ and independent reviews pass; this delivery is complete. Parent Ticket 22 stays 
 ## Frontier
 
 The [decision map](map.md) indexes the remaining work. Frame for bars and Value marker for areas
-are settled. Scatter/bubble Centers inside selection is delivered. Plan interaction for radial, heatmap, and compact reading units next. Exploration and the added compositions remain later work.
+are settled. Scatter/bubble Centers inside selection is delivered. Plan interaction for radar, heatmap, and compact reading units next. Exploration and the added compositions remain later work.
 
 ## Accepted sources
 
@@ -39,9 +39,9 @@ are settled. Scatter/bubble Centers inside selection is delivered. Plan interact
 
 ## Verification
 
-[Ticket 08](tickets/08-distribution-interaction.md#validation) records 634 passing tests,
-repository/build/package checks, and inspected production flows. Prototype acceptance remains
-separate from production verification.
+[Ticket 09](tickets/09-pie-donut-interaction.md#completion-evidence) records 645 passing tests,
+repository/build/package checks, direct production operation, and passing independent intent and
+engineering reviews after the two recorded corrections.
 
 ## Out of scope
 
@@ -51,7 +51,6 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; distribution interaction follows `118b856` as `[Feature] Select and activate distributions`.
-- Production showcase: `http://localhost:5174/#histogram` and `http://localhost:5174/#box-plot`.
-- Next action: plan the next radial reading unit and its interaction prototype. Keep statistical
-  visibility, heatmap/compact interaction, exploration and the approved compositions in the frontier.
+- Branch: `main`; ticket 09 follows `9a6fe1d` as `[Feature] Select and activate pie slices`.
+- Production showcase: `http://localhost:5174/#pie-chart` and `http://localhost:5174/#donut-chart`.
+- Next action: settle radar interaction and its reading/selection targets. Keep any prototype pass short and without automated tests or agent reviews.

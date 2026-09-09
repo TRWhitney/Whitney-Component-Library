@@ -112,6 +112,9 @@ interface Gesture {
   readonly before: readonly ChartSelectionItem[];
   readonly add: boolean;
   readonly remove: boolean;
+  sweepItems: ChartSelectionItem[];
+  lastX: number;
+  lastY: number;
   moved: boolean;
   activated: boolean;
 }
@@ -128,6 +131,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
   const [internal, setInternal] = useState<readonly ChartSelectionItem[]>(
     selection?.defaultSelectedItems ?? [],
   );
+  const [sweepTrail, setSweepTrail] = useState<readonly {x: number; y: number}[]>([]);
   const [box, setBox] = useState<SelectionBox | null>(null);
   const [preview, setPreview] = useState<readonly ChartSelectionItem[] | null>(null);
   const [pulse, setPulse] = useState<{item: ChartSelectionItem; sequence: number} | null>(null);
@@ -174,6 +178,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
   const cancel = () => {
     release();
     setBox(null);
+    setSweepTrail([]);
     setPreview(null);
   };
   const gestureVersion = JSON.stringify([version, configuration?.target, selection !== undefined]);
@@ -183,6 +188,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     setPreviousData(data);
     setPreviousGestureVersion(gestureVersion);
     setBox(null);
+    setSweepTrail([]);
     setPreview(null);
     setPulse(null);
   }
@@ -261,6 +267,9 @@ export function useChartInteraction<Datum extends object, Category extends Chart
       before: selected,
       add: event.shiftKey || event.ctrlKey || event.metaKey,
       remove: event.altKey,
+      sweepItems: point ? [point.item] : [],
+      lastX: x,
+      lastY: y,
       moved: false,
       activated: false,
     };
@@ -279,6 +288,10 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     y: number,
     points: readonly InteractionPoint[],
     bounds: {left: number; right: number; top: number; bottom: number},
+    sweep?: (
+      from: {x: number; y: number},
+      to: {x: number; y: number},
+    ) => readonly InteractionPoint[],
   ) => {
     const start = gesture.current;
     if (!start || start.pointerId !== event.pointerId) return false;
@@ -300,7 +313,13 @@ export function useChartInteraction<Datum extends object, Category extends Chart
       height: Math.abs(start.y - endY),
     };
     let chosen: readonly ChartSelectionItem[];
-    if (configuration?.target === 'category') {
+    if (sweep) {
+      setSweepTrail((trail) => [...(trail.length ? trail : [{x: start.x, y: start.y}]), {x, y}]);
+      start.sweepItems.push(...sweep({x: start.lastX, y: start.lastY}, {x, y}).map((p) => p.item));
+      start.lastX = x;
+      start.lastY = y;
+      chosen = start.sweepItems;
+    } else if (configuration?.target === 'category') {
       const first = nearestInteraction(points, start.x, start.y, 'category', categoryPlacement);
       const last = nearestInteraction(points, endX, endY, 'category', categoryPlacement);
       chosen =
@@ -342,7 +361,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
         ? [...start.before, ...chosen]
         : chosen;
     setPreview(normalized(next));
-    setBox(rect);
+    setBox(sweep ? null : rect);
     return true;
   };
   const end = (
@@ -362,10 +381,12 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     release();
     setPreview(null);
     setBox(null);
+    setSweepTrail([]);
   };
   return {
     selected: preview ?? selected,
     box,
+    sweepTrail,
     pulse,
     activate,
     change,
@@ -373,6 +394,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     move,
     end,
     cancel,
+    isDragging: () => gesture.current?.moved === true,
     isHolding: () => gesture.current?.activated === true || holdTimer.current !== undefined,
   };
 }

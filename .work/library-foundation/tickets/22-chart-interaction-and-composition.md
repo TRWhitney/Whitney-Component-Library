@@ -149,3 +149,10 @@ It preserves approved frames and Box touched selection, separate outlier targets
 activation and touch hold, and requires stable application IDs for interactive outliers. All 634 tests, repository/build/package checks and independent production reviews pass after the
 recorded geometry-cancellation correction. This parent stays open for the remaining families,
 exploration and compositions.
+
+Pie and donut selection and activation is delivered in
+[radial ticket 09](../../chart-interaction-composition/tickets/09-pie-donut-interaction.md).
+It delivers the approved outer-edge selection and expansion asterisk, a visible sweep trail,
+independent activation, touch hold, and selection across pages. All 645 tests and repository,
+showcase, and package checks pass. Independent intent and engineering production reviews pass after the recorded corrections. Radar, heatmap,
+compact interaction, remaining visibility, exploration, animations and compositions stay open.

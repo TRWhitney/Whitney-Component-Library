@@ -109,6 +109,9 @@ import {
   type HistogramActivation,
   type HistogramInteraction,
   type HistogramSelectionItem,
+  type PartToWholeActivation,
+  type PartToWholeInteraction,
+  type PartToWholeSelectionItem,
   type PointChartActivation,
   type PointChartInteraction,
   type RadarChartDimensions,
@@ -2912,6 +2915,144 @@ function BoxPlotInteractionExample() {
   );
 }
 
+function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'}) {
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly PartToWholeSelectionItem[]>([]);
+  const [details, setDetails] = useState<PartToWholeActivation<
+    (typeof energyCategoryData)[number]
+  > | null>(null);
+  const instructions = selectionEnabled
+    ? `Click or tap to select a category. Sweep across slices to select those crossed; a dashed trail shows your path. A drag replaces selection; Shift or Control/Command adds and Alt removes. Escape restores the selection from before the drag. Enter or Space selects.${detailsEnabled ? ' Control/Command-click, Control/Command plus Enter or Space, or touch press-and-hold opens details without changing selection.' : ''}`
+    : detailsEnabled
+      ? 'Click, tap, or press Enter or Space to open category details.'
+      : 'Hover a slice or use the arrow keys to read its values.';
+  const interaction: PartToWholeInteraction<(typeof energyCategoryData)[number]> = {
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            containsSelection: 'Contains selected categories',
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              hidden: (label) => `${label} (on another page)`,
+              item: ({id}) => energyCategoryData.find((datum) => datum.id === id)?.label ?? id,
+              summary: (count) => `${count} ${count === 1 ? 'category' : 'categories'} selected`,
+            },
+          },
+        }
+      : {}),
+  };
+  const partToWholeCommon = {
+    data: energyCategoryData,
+    dataTableLabel: 'Annual energy use by customer category',
+    description: 'Annual metered use by customer category, ranked by megawatt-hours.',
+    emptyState: {
+      description: 'Choose a year with recorded use.',
+      title: 'No energy use',
+    },
+    idAccessor: 'id',
+    invalidData: {
+      description: 'Correct negative or non-finite category values.',
+      title: 'Invalid energy use',
+    },
+    labelAccessor: 'label',
+    labels: {
+      back: 'Back',
+      category: 'Customer category',
+      categoryRange: ({end, start, total}: {end: number; start: number; total: number}) =>
+        `Categories ${start} to ${end} of ${total}`,
+      moreCategories: (count: number) => `More categories (${count})`,
+      shareOfTotal: 'Share of total',
+      shareOnPage: 'Share on this page',
+    },
+    legend: {label: 'Visible categories'},
+    value: {accessor: 'value', label: 'Energy use', unit: 'MWh'},
+  } as const;
+  return (
+    <Stack gap="regular">
+      <InlineGroup align="start" gap="regular" wrap>
+        <Switch
+          isSelected={selectionEnabled}
+          label="Enable selection"
+          onChange={setSelectionEnabled}
+        />
+        <Switch
+          isSelected={detailsEnabled}
+          label="Open details on activation"
+          onChange={(enabled) => {
+            setDetailsEnabled(enabled);
+            if (!enabled) setDetails(null);
+          }}
+        />
+      </InlineGroup>
+      <p>{instructions}</p>
+      {kind === 'pie' ? (
+        <PieChart {...partToWholeCommon} interaction={interaction} title="Community energy use" />
+      ) : (
+        <DonutChart
+          {...partToWholeCommon}
+          interaction={interaction}
+          title="Community energy use by category"
+          totalLabel="MWh total"
+        />
+      )}
+      <p className="showcase-muted">
+        Left and Right read each visible slice, including the aggregate. Home and End reach the page
+        endpoints. Enter or Space on +N opens the next page. Select a category there and return with
+        Back to see +N*. The asterisk means that the remaining categories include a selection.
+        Selecting only a visible category leaves +N unchanged. Selection survives paging. Sweeping
+        across the aggregate or donut hole selects nothing there.
+      </p>
+      <p className="showcase-muted">
+        Outer arcs mark selected categories. The inset dashed outline and slice pop-out mark the
+        current reading. Activation gives brief pulse feedback, or static feedback with reduced
+        motion. Legend clicks pin emphasis; directly hovering a slice reads that slice. Zero values
+        remain in the complete table without a slice. This example owns controlled selection and the
+        details below. Details retain the original category record and report shares as percentages
+        converted from callback fractions. Page shares exclude the aggregate.
+      </p>
+      {details ? (
+        <Stack gap="regular">
+          <DescriptionList
+            ariaLabel="Energy category details"
+            emptyState={{kind: 'no-data', title: 'No category', description: 'Open a category.'}}
+            items={[
+              {id: 'category', term: 'Category', description: details.label},
+              {id: 'identity', term: 'Category ID', description: details.item.id},
+              {id: 'value', term: 'Energy use', description: `${details.value} MWh`},
+              {id: 'total', term: 'Total energy use', description: `${details.total} MWh`},
+              {
+                id: 'total-share',
+                term: 'Share of total',
+                description: `${(details.shareOfTotal * 100).toFixed(1)}%`,
+              },
+              {
+                id: 'page-share',
+                term: 'Share on activation page',
+                description: `${(details.shareOnPage * 100).toFixed(1)}%`,
+              },
+              {
+                id: 'record',
+                term: 'Original category record',
+                description: `${details.datum.id}: ${details.datum.label}, ${details.datum.value} MWh`,
+              },
+              {id: 'input', term: 'Input method', description: details.input},
+            ]}
+          />
+          <Button onPress={() => setDetails(null)} variant="quiet">
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
 function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   const [lineTarget, setLineTarget] = useState<'category' | 'point'>('category');
   const [lineSelectionEnabled, setLineSelectionEnabled] = useState(true);
@@ -2948,32 +3089,6 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
     dataTableLabel: 'Monthly energy data',
     description: 'Monthly demand remains within available thermal capacity.',
     visibilityLabels,
-  } as const;
-  const partToWholeCommon = {
-    data: energyCategoryData,
-    dataTableLabel: 'Annual energy use by customer category',
-    description: 'Annual metered use by customer category, ranked by megawatt-hours.',
-    emptyState: {
-      description: 'Choose a year with recorded use.',
-      title: 'No energy use',
-    },
-    idAccessor: 'id',
-    invalidData: {
-      description: 'Correct negative or non-finite category values.',
-      title: 'Invalid energy use',
-    },
-    labelAccessor: 'label',
-    labels: {
-      back: 'Back',
-      category: 'Customer category',
-      categoryRange: ({end, start, total}: {end: number; start: number; total: number}) =>
-        `Categories ${start}–${end} of ${total}`,
-      moreCategories: (count: number) => `More categories (${count})`,
-      shareOfTotal: 'Share of total',
-      shareOnPage: 'Share on this page',
-    },
-    legend: {label: 'Visible categories'},
-    value: {accessor: 'value', label: 'Energy use', unit: 'MWh'},
   } as const;
   const radarCommon = {
     dataTableLabel: 'Vehicle profile scores',
@@ -3153,8 +3268,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show how categories make up one whole. More than eight positive categories use a proportional aggregate that opens the next page. Hover slices for readings, or use the legend to emphasize and pin a category without opening a tooltip."
         name="PieChart"
       >
-        <Example label="Paged proportional PieChart">
-          <PieChart {...partToWholeCommon} title="Community energy use" />
+        <Example label="Paged PieChart with category selection and details">
+          <PartToWholeInteractionExample kind="pie" />
         </Example>
       </Specimen>
 
@@ -3162,12 +3277,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Use the same part-to-whole and paging behavior with a derived total in the center. Zero values remain in the generated table but do not create slices."
         name="DonutChart"
       >
-        <Example label="Paged DonutChart with center total">
-          <DonutChart
-            {...partToWholeCommon}
-            title="Community energy use by category"
-            totalLabel="MWh total"
-          />
+        <Example label="Paged DonutChart with category selection and details">
+          <PartToWholeInteractionExample kind="donut" />
         </Example>
       </Specimen>
 

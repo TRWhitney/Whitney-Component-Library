@@ -1,4 +1,14 @@
 import {arc} from 'd3-shape';
+import {useFocusVisible} from 'react-aria';
+import {selectionKey, useChartInteraction, type InteractionPoint} from './chart-interaction.js';
+import {itemInteractionSetup} from './item-interaction.js';
+import {
+  radialArc,
+  radialPolygon,
+  radialContains,
+  radialCrossing,
+  type RadialPoint,
+} from './radial-interaction-geometry.js';
 import {
   useEffect,
   useId,
@@ -441,6 +451,11 @@ function PartToWholeFrame<Datum extends object>({
   readonly props: PartToWholeProps<Datum>;
 }): ReactElement {
   const model = prepareModel(props);
+  const interaction = props.interaction;
+  if (interaction?.selection)
+    assertText(interaction.selection.containsSelection, 'Expansion selection label');
+  const {isFocusVisible} = useFocusVisible();
+  const pressedSegment = useRef<string | null>(null);
   const pages = makePages(model.positiveCategories.length);
   const aggregateSizing = props.aggregateSizing ?? 'proportional';
   const titleId = useId();
@@ -461,6 +476,7 @@ function PartToWholeFrame<Datum extends object>({
   const [transientLegendId, setTransientLegendId] = useState<string | null>(null);
   const [pinnedLegendId, setPinnedLegendId] = useState<string | null>(null);
   const [svgViewScale, setSvgViewScale] = useState(1);
+  const [svgGeometry, setSvgGeometry] = useState<readonly number[]>([]);
   const [availableSize, setAvailableSize] = useState<{
     readonly height: number;
     readonly width: number;
@@ -485,11 +501,7 @@ function PartToWholeFrame<Datum extends object>({
   const safePageIndex = Math.min(pageIndex, pages.length - 1);
   const page = pages[safePageIndex]!;
   const segments = makeSegments(model.positiveCategories, page, aggregateSizing);
-  const pathBuilder = arc<Segment<Datum>>()
-    .innerRadius(kind === 'donut' ? donutInnerRadius : 0)
-    .outerRadius(outerRadius)
-    .padAngle(0.012)
-    .cornerRadius(3);
+  const pathBuilder = radialArc<Segment<Datum>>(kind === 'donut' ? donutInnerRadius : 0);
   const activeIndex = pointerIndex ?? touchIndex ?? keyboardIndex ?? 0;
   const isReading = pointerIndex !== null || touchIndex !== null || keyboardIndex !== null;
   const activeSegment = segments[activeIndex] ?? segments[0];
@@ -500,16 +512,134 @@ function PartToWholeFrame<Datum extends object>({
   const validTransientLegendId = segments.some((segment) => segment.identity === transientLegendId)
     ? transientLegendId
     : null;
-  const emphasizedSegmentId = validPinnedLegendId ?? validTransientLegendId ?? readingEmphasisId;
+  const emphasizedSegmentId = interaction
+    ? (readingEmphasisId ?? validPinnedLegendId ?? validTransientLegendId)
+    : (validPinnedLegendId ?? validTransientLegendId ?? readingEmphasisId);
   const ordinaryTotal = segments
     .filter((segment) => !segment.isAggregate)
     .reduce((sum, segment) => sum + segment.value, 0);
+  const setup = interaction
+    ? itemInteractionSetup(
+        model.positiveCategories.map((category) => ({
+          item: {id: category.id},
+          activate: (input: 'pointer' | 'keyboard' | 'touch') =>
+            interaction.onActivate?.({
+              item: {id: category.id},
+              datum: category.datum,
+              label: category.label,
+              value: category.value,
+              total: model.total,
+              shareOfTotal: category.value / model.total,
+              shareOnPage: category.value / ordinaryTotal,
+              input,
+            }),
+        })),
+        interaction.selection,
+        !!interaction.onActivate,
+        (item) => item.id,
+      )
+    : undefined;
+  const configuration = setup
+    ? {
+        target: 'point' as const,
+        ...(setup.selection ? {selection: setup.selection} : {}),
+        ...(setup.onActivate
+          ? {
+              onActivate: (event: {
+                item: {rowId: string};
+                input: 'pointer' | 'keyboard' | 'touch';
+              }) => setup.onActivate?.(event.item.rowId, event.input),
+            }
+          : {}),
+      }
+    : undefined;
+  const actions = useChartInteraction(
+    configuration,
+    model.positiveCategories.map((category) => ({
+      id: category.id,
+      category: category.label,
+      datum: category.datum,
+      values: [{seriesId: '', label: category.label, value: category.value, hidden: false}],
+    })),
+    JSON.stringify([
+      kind,
+      safePageIndex,
+      modelIdentity,
+      svgViewScale,
+      svgGeometry,
+      props.minimumSize,
+      props.aspectRatio,
+      props.status?.kind,
+      !!interaction?.onActivate,
+    ]),
+    props.data,
+  );
+  const selectedIds = new Set(actions.selected.map((item) => item.rowId));
+  const containsSelected = (segment: Segment<Datum>) =>
+    !!interaction?.selection &&
+    !!segment.remaining?.some((category) => selectedIds.has(category.id));
+  const interactionPoints: InteractionPoint[] = segments.map((segment, index) => {
+    const [x, y] = pathBuilder.centroid(segment);
+    return {
+      index,
+      x: x + radialCenter,
+      y: y + radialCenter,
+      categoryPosition: index,
+      seriesId: '',
+      item: {rowId: segment.id, seriesId: ''},
+    };
+  });
+  const polygons = interaction
+    ? segments.map((segment) => radialPolygon(segment, kind === 'donut' ? donutInnerRadius : 0))
+    : [];
+  const clientPoint = (x: number, y: number): RadialPoint => {
+    const rect = svgElement?.getBoundingClientRect();
+    if (!rect) return {x, y};
+    const scale = Math.min(rect.width, rect.height) / radialViewSize || 1;
+    return {
+      x: (x - rect.left - (rect.width - radialViewSize * scale) / 2) / scale,
+      y: (y - rect.top - (rect.height - radialViewSize * scale) / 2) / scale,
+    };
+  };
+  const positionedPolygon = (index: number): RadialPoint[] => {
+    const segment = segments[index]!,
+      path = svgElement?.querySelectorAll<SVGPathElement>('[data-wcl-radial-slice]')[index],
+      matrix = path?.getScreenCTM?.();
+    const angle = (segment.startAngle + segment.endAngle) / 2 - Math.PI / 2,
+      pop = segment.identity === emphasizedSegmentId ? 9 : 0;
+    return polygons[index]!.map((p) =>
+      matrix
+        ? clientPoint(
+            matrix.a * p.x + matrix.c * p.y + matrix.e,
+            matrix.b * p.x + matrix.d * p.y + matrix.f,
+          )
+        : {
+            x: p.x + radialCenter + Math.cos(angle) * pop,
+            y: p.y + radialCenter + Math.sin(angle) * pop,
+          },
+    );
+  };
+  const segmentAt = (p: RadialPoint) => {
+    const hits = segments
+      .map((segment, index) => ({segment, index}))
+      .filter(({index}) => radialContains(positionedPolygon(index), p));
+    return hits.find(({segment}) => segment.identity === emphasizedSegmentId) ?? hits.at(-1);
+  };
+  const sweep = (from: RadialPoint, to: RadialPoint) =>
+    segments
+      .flatMap((segment, index) => {
+        if (segment.isAggregate) return [];
+        const crossing = radialCrossing(positionedPolygon(index), from, to);
+        return crossing === undefined ? [] : [{crossing, point: interactionPoints[index]!}];
+      })
+      .sort((a, b) => a.crossing - b.crossing)
+      .map((hit) => hit.point);
   const readingAnnouncement =
     !isReading || activeSegment === undefined
       ? ''
       : [
           activeSegment.isAggregate
-            ? props.labels.moreCategories(activeSegment.remaining?.length ?? 0)
+            ? `${props.labels.moreCategories(activeSegment.remaining?.length ?? 0)}${containsSelected(activeSegment) ? `. ${interaction!.selection!.containsSelection}` : ''}`
             : (activeSegment.category?.label ?? ''),
           `${props.value.label}: ${formatChartValue(activeSegment.value, props.value)}`,
           ...(activeSegment.isAggregate
@@ -558,6 +688,7 @@ function PartToWholeFrame<Datum extends object>({
     if (svgElement === null) return;
     const update = () => {
       const rectangle = svgElement.getBoundingClientRect();
+      setSvgGeometry([rectangle.width, rectangle.height]);
       const nextScale = Math.min(
         rectangle.width / radialViewSize,
         rectangle.height / radialViewSize,
@@ -570,7 +701,7 @@ function PartToWholeFrame<Datum extends object>({
     const observer = new ResizeObserverConstructor(update);
     observer.observe(svgElement);
     return () => observer.disconnect();
-  }, [svgElement]);
+  }, [svgElement, availableSize]);
 
   useEffect(() => {
     if (touchIndex === null) return;
@@ -597,6 +728,8 @@ function PartToWholeFrame<Datum extends object>({
 
   function showPage(nextPageIndex: number, readFirstSlice: boolean): void {
     const nextPage = pages[nextPageIndex]!;
+    actions.cancel();
+    pressedSegment.current = null;
     setPageIndex(nextPageIndex);
     setPointerIndex(null);
     setPointerPosition(undefined);
@@ -617,8 +750,11 @@ function PartToWholeFrame<Datum extends object>({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
+    if (event.target !== event.currentTarget) return;
     if (event.key === 'Escape') {
       event.preventDefault();
+      actions.cancel();
+      pressedSegment.current = null;
       clearReading();
       return;
     }
@@ -631,6 +767,19 @@ function PartToWholeFrame<Datum extends object>({
     else if ((event.key === 'Enter' || event.key === ' ') && activeSegment?.isAggregate) {
       event.preventDefault();
       openNextPage(true);
+      return;
+    } else if (
+      interaction &&
+      (event.key === 'Enter' || event.key === ' ') &&
+      activeSegment &&
+      !activeSegment.isAggregate
+    ) {
+      event.preventDefault();
+      actions.activate(
+        {rowId: activeSegment.id, seriesId: ''},
+        'keyboard',
+        event.ctrlKey || event.metaKey,
+      );
       return;
     } else return;
     event.preventDefault();
@@ -677,6 +826,73 @@ function PartToWholeFrame<Datum extends object>({
     setAnnouncement('');
   }
 
+  const readInteractive = (event: PointerEvent<SVGSVGElement>) => {
+    const p = clientPoint(event.clientX, event.clientY),
+      hit = segmentAt(p);
+    setKeyboardIndex(null);
+    setAnnouncement('');
+    if (event.pointerType === 'touch') {
+      setPointerIndex(null);
+      setPointerPosition(undefined);
+      setTouchIndex(hit?.index ?? null);
+    } else {
+      setTouchIndex(null);
+      setPointerIndex(hit?.index ?? null);
+      setPointerPosition(hit ? {x: event.clientX, y: event.clientY} : undefined);
+    }
+    return {p, hit};
+  };
+  const beginInteractive = (event: PointerEvent<SVGSVGElement>) => {
+    if (event.button !== 0 || event.isPrimary === false) return;
+    const {p, hit} = readInteractive(event);
+    pressedSegment.current = hit?.segment.identity ?? null;
+    actions.begin(
+      event,
+      hit && !hit.segment.isAggregate ? interactionPoints[hit.index] : undefined,
+      p.x,
+      p.y,
+    );
+  };
+  const moveInteractive = (event: PointerEvent<SVGSVGElement>) => {
+    const p = clientPoint(event.clientX, event.clientY);
+    actions.move(
+      event,
+      p.x,
+      p.y,
+      interactionPoints,
+      {left: 0, right: radialViewSize, top: 0, bottom: radialViewSize},
+      sweep,
+    );
+    if (!actions.isHolding()) readInteractive(event);
+  };
+  const endInteractive = (event: PointerEvent<SVGSVGElement>) => {
+    const hit = segmentAt(clientPoint(event.clientX, event.clientY));
+    const expand =
+      hit?.segment.isAggregate &&
+      hit.segment.identity === pressedSegment.current &&
+      !actions.isDragging() &&
+      !actions.isHolding();
+    const same = hit?.segment.identity === pressedSegment.current;
+    actions.end(
+      event,
+      hit && !hit.segment.isAggregate && same ? interactionPoints[hit.index] : undefined,
+    );
+    pressedSegment.current = null;
+    if (expand) openNextPage(false);
+  };
+  const cancelInteractive = () => {
+    actions.cancel();
+    pressedSegment.current = null;
+  };
+  const outerEdge = (segment: Segment<Datum>, radius: number) => {
+    const a = segment.startAngle - Math.PI / 2,
+      b = segment.endAngle - Math.PI / 2,
+      x = Math.cos(a) * radius,
+      y = Math.sin(a) * radius;
+    return b - a >= Math.PI * 2 - 1e-6
+      ? `M${x},${y} A${radius},${radius} 0 1 1 ${-x},${-y} A${radius},${radius} 0 1 1 ${x},${y}`
+      : `M${x},${y} A${radius},${radius} 0 ${b - a > Math.PI ? 1 : 0} 1 ${Math.cos(b) * radius},${Math.sin(b) * radius}`;
+  };
   const frameStyle: PartToWholeFrameStyles = {
     '--wcl-chart-aspect-ratio': props.aspectRatio ?? 1.72,
     '--wcl-chart-minimum-height': `${minimumSize.height}px`,
@@ -725,10 +941,18 @@ function PartToWholeFrame<Datum extends object>({
         </div>
         <div data-overflow="clip" data-wcl-chart-frame="" style={frameStyle}>
           <div
-            aria-keyshortcuts="ArrowLeft ArrowRight Home End Enter Space Escape"
+            aria-keyshortcuts={
+              interaction
+                ? 'ArrowLeft ArrowRight Home End Enter Space Escape Control+Enter Meta+Enter Control+Space Meta+Space'
+                : 'ArrowLeft ArrowRight Home End Enter Space Escape'
+            }
             aria-labelledby={titleId}
             data-wcl-chart-canvas=""
             data-wcl-part-to-whole-canvas=""
+            data-item-interaction={interaction ? '' : undefined}
+            aria-describedby={
+              interaction?.selection ? `${descriptionId}-selection-instructions` : undefined
+            }
             onBlur={handleBlur}
             onFocus={(event) => {
               if (suppressFocusReadingRef.current) {
@@ -736,6 +960,7 @@ function PartToWholeFrame<Datum extends object>({
                 return;
               }
               if (
+                (!interaction || isFocusVisible) &&
                 event.currentTarget === event.target &&
                 keyboardIndex === null &&
                 pointerIndex === null &&
@@ -754,12 +979,16 @@ function PartToWholeFrame<Datum extends object>({
                 aria-hidden="true"
                 data-wcl-chart-svg=""
                 focusable="false"
-                onPointerDown={handlePointerDown}
+                data-selection-enabled={interaction?.selection ? '' : undefined}
+                onPointerDown={interaction ? beginInteractive : handlePointerDown}
+                onPointerUp={interaction ? endInteractive : undefined}
+                onPointerCancel={interaction ? cancelInteractive : undefined}
+                onLostPointerCapture={interaction ? cancelInteractive : undefined}
                 onPointerLeave={() => {
                   setPointerIndex(null);
                   setPointerPosition(undefined);
                 }}
-                onPointerMove={handlePointerMove}
+                onPointerMove={interaction ? moveInteractive : handlePointerMove}
                 ref={setSvgElement}
                 viewBox={`0 0 ${radialViewSize} ${radialViewSize}`}
               >
@@ -792,7 +1021,7 @@ function PartToWholeFrame<Datum extends object>({
                           d={pathBuilder(segment) ?? undefined}
                           data-wcl-radial-slice=""
                           onClick={() => {
-                            if (segment.isAggregate) openNextPage(false);
+                            if (!interaction && segment.isAggregate) openNextPage(false);
                           }}
                         />
                         {segment.isAggregate ? (
@@ -802,11 +1031,67 @@ function PartToWholeFrame<Datum extends object>({
                             y={countLabelPoint[1]}
                           >
                             +{segment.remaining?.length ?? 0}
+                            {containsSelected(segment) ? '*' : ''}
                           </text>
                         ) : null}
                       </g>
                     );
                   })}
+                  {interaction ? (
+                    <g data-wcl-radial-interaction-overlay="" pointerEvents="none">
+                      {segments.map((segment, index) => {
+                        const selected =
+                            selectedIds.has(segment.id) &&
+                            !!interaction.selection &&
+                            !segment.isAggregate,
+                          reading = isReading && activeIndex === index,
+                          pulsing =
+                            actions.pulse?.item.rowId === segment.id && !segment.isAggregate;
+                        if (!selected && !reading && !pulsing) return null;
+                        const angle = (segment.startAngle + segment.endAngle) / 2 - Math.PI / 2,
+                          pop = segment.identity === emphasizedSegmentId ? 9 : 0,
+                          pad = 3 / svgViewScale,
+                          inner = kind === 'donut' ? donutInnerRadius : 0;
+                        const readingPath =
+                          arc<Segment<Datum>>()
+                            .innerRadius(inner ? inner + pad : pad * 1.5)
+                            .outerRadius(outerRadius - pad)
+                            .padAngle(
+                              Math.min(
+                                (segment.endAngle - segment.startAngle) / 4,
+                                pad / outerRadius,
+                              ),
+                            )(segment) ?? undefined;
+                        return (
+                          <g
+                            key={segment.identity}
+                            data-wcl-radial-cue-group=""
+                            style={{
+                              transform: `translate(${Math.cos(angle) * pop}px,${Math.sin(angle) * pop}px)`,
+                            }}
+                          >
+                            {selected ? (
+                              <path
+                                data-wcl-radial-cue="selection"
+                                d={outerEdge(segment, outerRadius + 5 / svgViewScale)}
+                              />
+                            ) : null}
+                            {reading ? (
+                              <path data-wcl-radial-cue="reading" d={readingPath} />
+                            ) : null}
+                            {pulsing ? (
+                              <g key={actions.pulse!.sequence} data-wcl-radial-activation="">
+                                <path
+                                  data-wcl-radial-cue="activation"
+                                  d={pathBuilder(segment) ?? undefined}
+                                />
+                              </g>
+                            ) : null}
+                          </g>
+                        );
+                      })}
+                    </g>
+                  ) : null}
                   {kind === 'donut' && 'totalLabel' in props ? (
                     <g data-wcl-radial-total="">
                       <text data-wcl-radial-total-value="" y={donutUnitFontSize * -0.45}>
@@ -818,6 +1103,21 @@ function PartToWholeFrame<Datum extends object>({
                     </g>
                   ) : null}
                 </g>
+                {actions.sweepTrail.length > 0 ? (
+                  <g
+                    data-wcl-radial-sweep=""
+                    pointerEvents="none"
+                    clipPath={`url(#${titleId}-sweep-clip)`}
+                  >
+                    <defs>
+                      <clipPath id={`${titleId}-sweep-clip`}>
+                        <circle cx={radialCenter} cy={radialCenter} r={160} />
+                      </clipPath>
+                    </defs>
+                    <polyline points={actions.sweepTrail.map(({x, y}) => `${x},${y}`).join(' ')} />
+                    <polyline points={actions.sweepTrail.map(({x, y}) => `${x},${y}`).join(' ')} />
+                  </g>
+                ) : null}
               </svg>
 
               <ul
@@ -837,6 +1137,11 @@ function PartToWholeFrame<Datum extends object>({
                     >
                       <button
                         aria-pressed={validPinnedLegendId === segment.identity}
+                        aria-label={
+                          containsSelected(segment)
+                            ? `${props.labels.moreCategories(segment.remaining?.length ?? 0)}. ${interaction!.selection!.containsSelection}`
+                            : undefined
+                        }
                         data-wcl-chart-legend-button=""
                         onBlur={() => setTransientLegendId(null)}
                         onClick={() => {
@@ -922,6 +1227,38 @@ function PartToWholeFrame<Datum extends object>({
         <p id={descriptionId}>{props.description}</p>
       </figcaption>
       {content}
+      {setup?.selection ? (
+        <div data-wcl-chart-selection="">
+          <p id={`${descriptionId}-selection-instructions`}>
+            {setup.selection.labels.instructions}
+          </p>
+          <div role="status" aria-atomic="true">
+            <p>
+              {actions.selected.length
+                ? setup.selection.labels.summary(actions.selected.length)
+                : setup.selection.labels.empty}
+            </p>
+            {actions.selected.length ? (
+              <ul>
+                {actions.selected.map((item) => (
+                  <li key={selectionKey(item)}>
+                    {segments.some((segment) => !segment.isAggregate && segment.id === item.rowId)
+                      ? setup.selection!.labels.item(item)
+                      : setup.selection!.labels.hidden(setup.selection!.labels.item(item))}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          <Button
+            variant="quiet"
+            isDisabled={!actions.selected.length}
+            onPress={() => actions.change([])}
+          >
+            {setup.selection.labels.clear}
+          </Button>
+        </div>
+      ) : null}
       {model.categories.length > 0 && status.kind !== 'loading' && status.kind !== 'error' ? (
         <PartToWholeTable
           dataTableLabel={props.dataTableLabel}

@@ -227,3 +227,8 @@ remain outside the overall effort.
 
 No new glossary or architecture decision is needed for the first portion. Accepted chart scope is
 already recorded in the [foundation decision](../library-foundation/decisions/13-charting-scope.md).
+
+## Pie and donut interaction
+
+The [accepted radial study](prototypes/radial-selection.md#accepted-contract) governs Outer edge,
+expansion asterisks, reading cues, sweep selection and independent activation. [Ticket 09](tickets/09-pie-donut-interaction.md) records the production boundary and acceptance checks. Existing stable category IDs identify selectable positive categories. Paging preserves selected identities; aggregate navigation never becomes category activation. Zero values remain table-only.
