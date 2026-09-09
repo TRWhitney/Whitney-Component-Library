@@ -2244,6 +2244,199 @@ function BarInteractionExample({
   );
 }
 
+function AreaMixedInteractionExample({
+  kind,
+  visibilityLabels,
+}: {
+  readonly kind: 'area' | 'mixed';
+  readonly visibilityLabels: ChartVisibilityLabels;
+}) {
+  const name = kind === 'area' ? 'AreaChart' : 'CartesianChart';
+  const [stacking, setStacking] = useState<'overlap' | 'stacked' | 'normalized'>('overlap');
+  const [mixedKind, setMixedKind] = useState<'line' | 'area'>('line');
+  const [target, setTarget] = useState<'category' | 'point'>('point');
+  const [selectionEnabled, setSelectionEnabled] = useState(true);
+  const [detailsEnabled, setDetailsEnabled] = useState(true);
+  const [selectedItems, setSelectedItems] = useState<readonly ChartSelectionItem[]>([]);
+  const [details, setDetails] = useState<ChartActivation<
+    (typeof barEnergyData)[number],
+    (typeof barEnergyData)[number]['month']
+  > | null>(null);
+  const instructions = selectionEnabled
+    ? `Click or tap to select ${target === 'category' ? 'a month' : 'a value'}. Drag ${target === 'category' ? 'horizontally to select a month range' : kind === 'area' ? 'a rectangle around value markers to select them' : 'a rectangle to select enclosed value markers and intersected bars'}. A drag replaces selection; Shift or Control/Command adds, and Alt removes. Escape cancels a drag. Enter or Space selects.${detailsEnabled ? ' Control/Command-click, Control/Command plus Enter or Space, or a touch press-and-hold opens details without changing selection.' : ''}`
+    : detailsEnabled
+      ? 'Click, tap, or press Enter or Space to open details.'
+      : 'Move across the chart or use the arrow keys to read its values.';
+  const interaction: ChartInteraction<
+    (typeof barEnergyData)[number],
+    (typeof barEnergyData)[number]['month']
+  > = {
+    getRowId: barEnergyRowId,
+    target,
+    ...(detailsEnabled ? {onActivate: setDetails} : {}),
+    ...(selectionEnabled
+      ? {
+          selection: {
+            selectedItems,
+            onSelectionChange: setSelectedItems,
+            labels: {
+              instructions,
+              clear: 'Clear selection',
+              empty: 'Nothing selected',
+              hidden: (label) => `${label} (hidden)`,
+              item: ({rowId, seriesId}) =>
+                seriesId ? `${rowId}, ${seriesId === 'heating' ? 'Heating' : 'Cooling'}` : rowId,
+              summary: (count) =>
+                `${count} ${target === 'category' ? (count === 1 ? 'month' : 'months') : count === 1 ? 'value' : 'values'} selected`,
+            },
+          },
+        }
+      : {}),
+  };
+  const common = {
+    ...chartStateCopy,
+    data: barEnergyData,
+    dataTableLabel: 'Monthly heating and cooling data',
+    description:
+      kind === 'mixed' || stacking === 'overlap'
+        ? 'Heating demand falls as cooling demand rises across these months.'
+        : stacking === 'stacked'
+          ? "Heating and cooling contribute to each month's total energy use."
+          : "Compare heating and cooling shares of each month's visible energy use.",
+    interaction,
+    legend: {label: 'Energy uses'},
+    title: kind === 'area' ? 'Heating and cooling magnitude' : 'Heating and cooling comparison',
+    visibilityLabels,
+    xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
+  } as const;
+  const areaSeries = [
+    {accessor: 'heating', id: 'heating', label: 'Heating'},
+    {accessor: 'cooling', color: 'series-2', id: 'cooling', label: 'Cooling'},
+  ] as const;
+  const valueAxis = {
+    label: 'Energy',
+    scale: {type: 'linear'},
+    showGrid: true,
+    unit: 'MWh',
+  } as const;
+
+  return (
+    <Stack gap="regular">
+      <InlineGroup align="start" gap="regular" wrap>
+        {kind === 'area' ? (
+          <SegmentedControl
+            label="AreaChart stacking"
+            onChange={setStacking}
+            options={[
+              {label: 'Overlapping', value: 'overlap'},
+              {label: 'Stacked', value: 'stacked'},
+              {label: 'Normalized', value: 'normalized'},
+            ]}
+            value={stacking}
+          />
+        ) : (
+          <SegmentedControl
+            label="CartesianChart marks"
+            onChange={setMixedKind}
+            options={[
+              {label: 'Columns and line', value: 'line'},
+              {label: 'Columns and area', value: 'area'},
+            ]}
+            value={mixedKind}
+          />
+        )}
+        <SegmentedControl
+          label={`${name} click target`}
+          onChange={(nextTarget) => {
+            setTarget(nextTarget);
+            setSelectedItems([]);
+            setDetails(null);
+          }}
+          options={[
+            {label: 'Month', value: 'category'},
+            {label: 'Value', value: 'point'},
+          ]}
+          value={target}
+        />
+        <Switch
+          isSelected={selectionEnabled}
+          label="Enable selection"
+          onChange={setSelectionEnabled}
+        />
+        <Switch
+          isSelected={detailsEnabled}
+          label="Open details on activation"
+          onChange={(enabled) => {
+            setDetailsEnabled(enabled);
+            if (!enabled) setDetails(null);
+          }}
+        />
+      </InlineGroup>
+      <p>{instructions}</p>
+      {kind === 'mixed' ? (
+        <CartesianChart
+          {...common}
+          series={[
+            {...areaSeries[0], kind: 'column'},
+            {
+              ...areaSeries[1],
+              ...(mixedKind === 'line' ? {kind: 'line', showPoints: true} : {kind: 'area'}),
+            },
+          ]}
+          yAxis={valueAxis}
+        />
+      ) : stacking === 'normalized' ? (
+        <AreaChart
+          {...common}
+          series={areaSeries}
+          stacking="normalized"
+          yAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
+        />
+      ) : (
+        <AreaChart {...common} series={areaSeries} stacking={stacking} yAxis={valueAxis} />
+      )}
+      <p className="showcase-muted">
+        Left and Right move between months; Up and Down move between visible series in Value mode.
+        Home and End reach the first and last months.{' '}
+        {kind === 'area'
+          ? "Filled markers preview values at each area's upper boundary. Outer rings mark selected values, including in stacked and normalized areas. Drag selection follows these markers."
+          : "Columns use inset reading outlines and selected outer frames. Lines and areas use filled reading markers and selected outer rings. Try January's cooling marker inside the heating column, then the column body."}{' '}
+        Month mode previews every visible series, underlines selected months, and opens one set of
+        details. Pin a legend name to prioritize that series where shapes overlap; a shape alone
+        under the pointer remains the target. Hidden values remain selected and return when shown.
+        Activation gives brief feedback and opens the details below.{' '}
+        {kind === 'area'
+          ? 'Normalized readings use visible shares; details retain raw MWh values. '
+          : ''}
+        These controls and details belong to this example.
+      </p>
+      {details ? (
+        <Stack gap="regular">
+          <DescriptionList
+            ariaLabel={`${details.category} energy details`}
+            emptyState={{
+              kind: 'no-data',
+              title: 'No readings',
+              description: 'Choose a month with recorded values.',
+            }}
+            items={[
+              {description: details.category, id: 'month', term: 'Month'},
+              ...details.values.map(({hidden, label, seriesId, value}) => ({
+                description: `${value} MWh${hidden ? ' (hidden on chart)' : ''}`,
+                id: seriesId,
+                term: label,
+              })),
+            ]}
+          />
+          <Button onPress={() => setDetails(null)} variant="quiet">
+            Close details
+          </Button>
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+}
+
 function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
   const [lineTarget, setLineTarget] = useState<'category' | 'point'>('category');
   const [lineSelectionEnabled, setLineSelectionEnabled] = useState(true);
@@ -2469,18 +2662,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Show magnitude or contribution across an ordered domain. Hiding a series recomputes the stack. Normalized areas and readings use visible shares, while the complete table retains shares of all supplied data. ${visibilityGuidance}`}
         name="AreaChart"
       >
-        <Example label="Stacked AreaChart">
-          <AreaChart
-            {...common}
-            {...verticalAxes}
-            legend={{label: 'Energy series'}}
-            series={[
-              {accessor: 'demand', id: 'demand', label: 'Demand'},
-              {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
-            ]}
-            stacking="stacked"
-            title="Energy magnitude"
-          />
+        <Example label="AreaChart with selection and details">
+          <AreaMixedInteractionExample kind="area" visibilityLabels={visibilityLabels} />
         </Example>
       </Specimen>
 
@@ -2610,28 +2793,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Restored series keep their original colors and patterns. ${visibilityGuidance}`}
         name="CartesianChart"
       >
-        <Example label="Mixed CartesianChart">
-          <CartesianChart
-            {...common}
-            {...verticalAxes}
-            legend={{label: 'Energy series'}}
-            series={[
-              {
-                accessor: 'capacity',
-                id: 'capacity',
-                kind: 'column',
-                label: 'Capacity',
-              },
-              {
-                accessor: 'demand',
-                id: 'demand',
-                kind: 'line',
-                label: 'Demand',
-                showPoints: true,
-              },
-            ]}
-            title="Demand within capacity"
-          />
+        <Example label="Mixed CartesianChart with selection and details">
+          <AreaMixedInteractionExample kind="mixed" visibilityLabels={visibilityLabels} />
         </Example>
       </Specimen>
 

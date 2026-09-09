@@ -6,9 +6,10 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-BarChart and ColumnChart now implement the accepted Frame contract under
-[ticket 05](tickets/05-bar-column-interaction.md). Production validation and independent intent and engineering reviews pass.
-The bar/column portion is delivered; Parent Ticket 22 stays open.
+AreaChart and CartesianChart are delivered under [ticket 06](tickets/06-area-mixed-interaction.md).
+Whitney chose Value marker after accepting overlap-only legend priority. The
+[accepted contract](prototypes/area-mixed-selection.md#accepted-contract) is the design source.
+Validation and independent intent/engineering reviews pass. Parent Ticket 22 stays open.
 
 ## Progress
 
@@ -26,9 +27,9 @@ The bar/column portion is delivered; Parent Ticket 22 stays open.
 
 ## Frontier
 
-The [decision map](map.md) indexes the remaining decisions and unspecified work. The
-[bar selection decision](decisions/01-bar-selection.md) is settled as Frame. After this delivery,
-plan area and mixed-chart interaction before moving to other reading units and exploration.
+The [decision map](map.md) indexes the remaining work. Frame for bars and Value marker for areas
+are settled. After ticket 06 delivery, plan interaction for the remaining statistical, radial,
+heatmap, and compact reading units. Exploration and the added compositions remain later work.
 
 ## Accepted sources
 
@@ -40,9 +41,9 @@ plan area and mixed-chart interaction before moving to other reading units and e
 
 ## Verification
 
-[Ticket 05](tickets/05-bar-column-interaction.md#completion-evidence) records production regression,
-repository, package, and browser checks. Full tests now total 607 in 36 files. The accepted
-prototype is the design source; its approval is separate from production verification.
+[Ticket 06](tickets/06-area-mixed-interaction.md#completion-evidence) records the current 614 passing
+tests, repository/build/package checks, and inspected production flows. Prototype acceptance remains
+separate from production verification.
 
 ## Out of scope
 
@@ -52,11 +53,10 @@ and any change to the accepted chart palette or existing reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch: `main`; bar delivery follows `4d934cc` as `[Feature] Add bar selection and activation`.
-- Current prototype: `http://localhost:5176`, Vite session `53932`.
-- Production showcase: `http://localhost:5174/#column-chart` and `/#bar-chart`, Vite session `57087`.
+- Branch: `main`; area/mixed delivery follows `0a517e9` as `[Feature] Add area and mixed chart interaction`.
+- Production showcase: `http://localhost:5174/#area-chart` and `/#cartesian-chart`.
 - No owned uncommitted paths remain after this delivery commit.
-- Next action: plan area and mixed-chart interaction from the remaining decisions in the map.
-- Direct prototype operation covered both styles, light/dark, grouped/stacked, horizontal bars,
-  bar/category drag, modified activation, touch hold, compact layout, and element identification.
-  No prototype agents or prototype automated suites were run. Production verification is recorded separately.
+- Next action: plan selection and activation for the remaining chart reading units.
+- Active prototype: `http://localhost:5177`, Vite session `87353`.
+- Accepted prototype observations and gestures are recorded in its linked contract. No prototype
+  agents or automated suites were used. Production verification is recorded separately.

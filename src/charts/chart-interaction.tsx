@@ -16,6 +16,7 @@ export interface InteractionPoint {
   readonly seriesId: string;
   readonly categoryPosition: number;
   readonly bounds?: SelectionBox;
+  readonly area?: readonly {readonly x: number; readonly y: number}[];
   readonly item: ChartSelectionItem;
   readonly index: number;
   readonly x: number;
@@ -30,12 +31,32 @@ export interface SelectionBox {
 export const selectionKey = (item: ChartSelectionItem): string =>
   JSON.stringify([item.rowId, item.seriesId ?? null]);
 
+function insideArea(area: NonNullable<InteractionPoint['area']>, x: number, y: number): boolean {
+  let inside = false;
+  for (let i = 0; i < area.length; i++) {
+    const a = area[i]!,
+      b = area[(i + 1) % area.length]!;
+    const cross = (x - a.x) * (b.y - a.y) - (y - a.y) * (b.x - a.x);
+    if (
+      Math.abs(cross) < 1e-6 &&
+      x >= Math.min(a.x, b.x) - 1e-8 &&
+      x <= Math.max(a.x, b.x) + 1e-8 &&
+      y >= Math.min(a.y, b.y) - 1e-8 &&
+      y <= Math.max(a.y, b.y) + 1e-8
+    )
+      return true;
+    if (a.y > y !== b.y > y && x < a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y)) inside = !inside;
+  }
+  return inside;
+}
+
 export function nearestInteraction(
   points: readonly InteractionPoint[],
   x: number,
   y: number,
   target: 'category' | 'point',
   categoryPlacement: 'x' | 'y' = 'x',
+  shapes?: {readonly preferredSeriesId: string | undefined; readonly pointRadius: number},
 ): InteractionPoint | undefined {
   const categoryCoordinate = categoryPlacement === 'x' ? x : y;
   const distance = (point: InteractionPoint) => {
@@ -57,10 +78,26 @@ export function nearestInteraction(
       column = point;
   }
   if (target === 'category' || column === undefined) return column;
+  const candidates = points.filter((point) => point.categoryPosition === column.categoryPosition);
+  if (shapes) {
+    const hits = candidates.filter((point) => {
+      if (point.area) return insideArea(point.area, x, y);
+      if (point.bounds) return distance(point) === 0;
+      return Math.hypot(point.x - x, point.y - y) <= shapes.pointRadius;
+    });
+    const preferred =
+      hits.length > 1
+        ? hits.find((point) => point.seriesId === shapes.preferredSeriesId)
+        : undefined;
+    if (preferred) return preferred;
+    // A nearby line point remains reachable over a column body or area fill.
+    const line = hits.find((point) => !point.bounds && !point.area);
+    if (line) return line;
+    if (hits.length) return hits.reduce((a, b) => (distance(a) <= distance(b) ? a : b));
+  }
   let nearest = column;
-  for (const point of points) {
-    if (point.categoryPosition === column.categoryPosition && distance(point) < distance(nearest))
-      nearest = point;
+  for (const point of candidates) {
+    if (distance(point) < distance(nearest)) nearest = point;
   }
   return nearest;
 }

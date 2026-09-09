@@ -129,3 +129,9 @@ Whitney chose Frame for individual bars after accepting continuous category cont
 shared edges. The [bar/column production portion](../../chart-interaction-composition/tickets/05-bar-column-interaction.md)
 is complete with 607 passing tests, repository/build/package checks, and independent intent and
 engineering reviews. Other chart families and compositions stay open.
+
+Whitney chose Value marker for areas after clarifying overlap-only legend priority. The
+[area/mixed production portion](../../chart-interaction-composition/tickets/06-area-mixed-interaction.md)
+is complete with 614 passing tests, repository/build/package checks, and passing independent
+intent and engineering production reviews. Statistical/radial/compact interaction, exploration, data-change animation,
+and the new scatter/range compositions remain open.

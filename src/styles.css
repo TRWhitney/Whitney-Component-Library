@@ -8891,7 +8891,7 @@
 }
 
 @layer wcl.components {
-  [data-wcl-chart-canvas][data-bar-interaction]:focus-visible {
+  [data-wcl-chart-canvas][data-item-interaction]:focus-visible {
     outline: none;
   }
 

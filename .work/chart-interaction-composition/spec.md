@@ -142,6 +142,25 @@ Category selections underline the axis label in either orientation. Retain keybo
 on the target instead of adding a whole-chart outline. Keep all interaction geometry inside explicit
 plot domains. Consumers keep ownership of controlled selections as in LineChart.
 
+### Area and existing mixed-chart production boundary
+
+The [accepted area/mixed contract](prototypes/area-mixed-selection.md#accepted-contract) binds
+AreaChart and CartesianChart. Both expose the existing optional ChartInteraction configuration.
+Keep stable identities, consumer-owned callbacks and controlled selection, hidden-selection retention,
+gesture cancellation, and raw source payloads as in LineChart and BarChart. Existing supported
+area stacking, normalization, scales, and mixed-series combinations remain the input boundary.
+
+An area's marker sits at the plotted upper boundary; stacked/normalized positions do not change
+its raw callback value. Individual drag selection uses value markers for areas/lines and intersected
+bar rectangles for columns. Month targeting previews all visible values but emits one category
+callback. Mixed charts render each mark's approved reading, selection, and activation treatment.
+
+Resolve the nearest category, then the actual shapes under the pointer, including the area boundary
+between categories. Legend emphasis breaks ties among overlapping shapes only. A sole hovered shape
+wins even when another series is pinned; empty space falls back to nearest value/rectangle. Nearby
+line points have a small hit region so overlapping column bodies do not swallow their targets.
+Legend emphasis remains distinct from the item preview. No whole-chart focus outline is introduced.
+
 ## Testing Decisions
 
 - Exercise hiding, restoring, all-hidden recovery, focus, order, stable identity, and clear-pin
