@@ -446,13 +446,40 @@ export function plotForPresentation(presentation: PresentationMetrics): PlotBoun
   };
 }
 
+function axisTitle(axis: {readonly label: string; readonly unit?: string}): string {
+  return `${axis.label}${axis.unit === undefined ? '' : ` (${axis.unit})`}`;
+}
+
+function verticalTitleLines(title: string, fontSize: number, bounds: PlotBounds): string[] {
+  const center = bounds.top + plotHeight(bounds) / 2;
+  const available = Math.min(center, viewHeight - center) * 2 - fontSize;
+  const lines: string[] = [];
+  let line = '';
+  for (const word of title.split(' ')) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (line && (estimatedUtilityTextWidth(candidate) * fontSize) / 16 > available) {
+      lines.push(line);
+      line = word;
+    } else line = candidate;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
 export function plotForYAxisLabels(
   labels: readonly string[],
   fontScale: number,
   bounds: PlotBounds,
+  title = '',
 ): PlotBounds {
   const widestLabel = Math.max(0, ...labels.map(estimatedUtilityTextWidth)) * fontScale;
-  const left = Math.max(compactPlot.left, Math.min(140, Math.ceil(widestLabel + 39)));
+  const fontSize = fontScale * 16;
+  const lines = verticalTitleLines(title, fontSize, bounds);
+  const titleSpace = fontSize * Math.max(1, lines.length) * 1.25 + 14;
+  const left = Math.max(
+    compactPlot.left,
+    Math.min(viewWidth / 3, Math.ceil(widestLabel + titleSpace)),
+  );
   return {...bounds, left};
 }
 
@@ -557,6 +584,10 @@ export function Axis<Value extends ChartDomainValue>({
   readonly staggerLabels?: boolean;
 }): ReactElement {
   const horizontal = placement === 'x';
+  const titleFontSize = presentation.fontSize / presentation.viewScale;
+  const titleX = titleFontSize + 4;
+  const title = axisTitle(axis);
+  const titleLines = horizontal ? [title] : verticalTitleLines(title, titleFontSize, plot);
   const centerCategoricalLabels = horizontal && axis.scale.type === 'categorical';
   const renderedTicks = projection.ticks.flatMap((tick, sourceIndex) => {
     const position = projection.position(tick);
@@ -642,12 +673,24 @@ export function Axis<Value extends ChartDomainValue>({
       <text
         data-wcl-chart-axis-label=""
         textAnchor="middle"
-        transform={horizontal ? undefined : `rotate(-90 14 ${plot.top + plotHeight(plot) / 2})`}
-        x={horizontal ? plot.left + plotWidth(plot) / 2 : 14}
+        transform={
+          horizontal ? undefined : `rotate(-90 ${titleX} ${plot.top + plotHeight(plot) / 2})`
+        }
+        x={horizontal ? plot.left + plotWidth(plot) / 2 : titleX}
         y={horizontal ? viewHeight - 7 : plot.top + plotHeight(plot) / 2}
       >
-        {axis.label}
-        {axis.unit === undefined ? '' : ` (${axis.unit})`}
+        {titleLines.length === 1
+          ? title
+          : titleLines.map((line, index) => (
+              <tspan
+                key={index}
+                x={titleX}
+                y={plot.top + plotHeight(plot) / 2 + index * titleFontSize * 1.25}
+              >
+                {line}
+                {index < titleLines.length - 1 ? ' ' : ''}
+              </tspan>
+            ))}
       </text>
     </g>
   );
@@ -1930,6 +1973,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       yAxisLabels,
       presentation.fontSize / presentation.viewScale / 16,
       presentationPlot,
+      axisTitle(categoryPlacement === 'x' ? valueAxis : categoryAxis),
     );
     const {categoryProjection, valueProjection} = createPlotProjections(plot);
     const references = readingReferences(annotations, categoryPlacement);

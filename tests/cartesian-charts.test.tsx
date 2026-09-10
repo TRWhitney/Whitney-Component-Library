@@ -1135,7 +1135,8 @@ describe('Cartesian charts', () => {
     expect(shortBarMargin).toBeLessThan(110);
     expect(Math.abs(shortBarMargin - lineMargin)).toBeLessThan(40);
     expect(longBarMargin).toBeGreaterThan(shortBarMargin);
-    expect(longBarMargin).toBeLessThanOrEqual(140);
+    // Reserve room for readable titles while retaining most of the plot width.
+    expect(longBarMargin).toBeLessThanOrEqual(640 / 3);
   });
 
   it('uses content-aware label rows before exposing a native local scroll region', () => {
@@ -1502,3 +1503,43 @@ it('fits all formatted time ticks using staggered rows without changing their da
   );
 });
 
+it('keeps the rotated value-axis title inside the drawable left edge at compact width', () => {
+  const {container} = render(
+    <LineChart
+      data={data}
+      title="Values"
+      description="Monthly values"
+      dataTableLabel="Values"
+      emptyState={emptyState}
+      invalidData={invalidData}
+      series={[{id: 'demand', label: 'Demand', accessor: 'demand'}]}
+      xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+      yAxis={{label: 'Energy', unit: 'MWh', scale: {type: 'linear'}}}
+    />,
+  );
+  const title = container.querySelector('[data-axis="y"] [data-wcl-chart-axis-label]')!;
+  const frame = container.querySelector<HTMLElement>('[data-wcl-chart-frame]')!;
+  const fontSize = parseFloat(frame.style.getPropertyValue('--wcl-chart-axis-font-size'));
+  // The full glyph height must fit to the left of the rotated baseline.
+  expect(Number(title.getAttribute('x')) - fontSize).toBeGreaterThanOrEqual(0);
+});
+
+it('wraps a long vertical title while retaining its complete wording', () => {
+  const title = 'Mean duration for completed recovery operations';
+  const {container} = render(
+    <LineChart
+      data={data}
+      title="Recovery"
+      description="Durations"
+      dataTableLabel="Durations"
+      emptyState={emptyState}
+      invalidData={invalidData}
+      series={[{id: 'demand', label: 'Demand', accessor: 'demand'}]}
+      xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+      yAxis={{label: title, unit: 'minutes', scale: {type: 'linear'}}}
+    />,
+  );
+  const label = container.querySelector('[data-axis="y"] [data-wcl-chart-axis-label]')!;
+  expect(label.textContent).toBe(`${title} (minutes)`);
+  expect(label.querySelectorAll('tspan').length).toBeGreaterThan(1);
+});

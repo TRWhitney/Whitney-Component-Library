@@ -1778,6 +1778,7 @@ function StatisticalFrame<Datum extends object>({
     yLabels,
     presentation.fontSize / presentation.viewScale / 16,
     initialPlot,
+    `${yAxis.label}${yAxis.unit === undefined ? '' : ` (${yAxis.unit})`}`,
   );
   const projections = projectionsFor(model, plot);
   const readings = readingTargets(model, projections);

@@ -253,7 +253,8 @@ it('targets the visible area fill when its value marker is outside an explicit d
     points = areaVertices(container);
   const zero = points[points.length - 1]!.y;
   const at = {
-    clientX: (points[0]!.x + points[1]!.x) / 2,
+    // Stay inside January's region, away from the rounded SVG midpoint tie.
+    clientX: (points[0]!.x * 3 + points[1]!.x) / 4,
     clientY: zero - (zero - points[0]!.y) / 2,
   };
   fireEvent.click(screen.getByRole('button', {name: 'B'}));
