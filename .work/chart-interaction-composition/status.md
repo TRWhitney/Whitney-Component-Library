@@ -6,12 +6,13 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-[Ticket 21](tickets/21-heatmap-visibility.md) implements the approved public Heatmap visibility
-controls and corner restore list. The showcase and canonical/generated guides are current.
-Repository checks pass 752 tests, type matrices and chart isolation. Desktop/touch hide,
-restore and first-hold activation flows pass. Independent intent and engineering reviews pass. The long-label clipping finding was corrected
-and revalidated; the bounded correction review passed. This slice is delivered in the commit
-containing this record.
+Heatmap visibility is delivered in `3600497`. Whitney approved pan and zoom for the continuous-time
+LineChart in the [exploration study](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract).
+The [compact-layout audit](research/compact-layout-audit.md) led to production fixes in tickets
+22–24: shared axis fitting, visible vertical titles and readable radar text. Validation and
+independent intent and engineering reviews pass. Next is one exploration prototype covering several
+chart types together, as Whitney requested. Other chart exploration and public range contracts
+remain planning work.
 
 ## Progress
 
@@ -36,6 +37,7 @@ are settled. Scatter/bubble Centers inside selection is delivered. Radar, heatma
 
 - [Reconciled Ticket 22](../library-foundation/tickets/22-chart-interaction-and-composition.md)
 - [Specification](spec.md)
+- [Approved line-chart pan and zoom](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract)
 - [Approved activation and selection contract](prototypes/activation-selection.md#accepted-convention)
 - [Chart scope](../library-foundation/decisions/13-charting-scope.md#ticket-22-reconciliation)
 - [Existing Cartesian interaction](../chart-interactivity/spec.md)
@@ -52,8 +54,9 @@ and any change to the accepted chart palette or existing reading semantics.
 
 ## Continuation
 
-- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
+- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
 - Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is `3e6a391`. Radar visibility is `5c51e05`. Legend release is delivered in the commit containing this record.
 - Production showcase: `http://localhost:5174`, Vite session `54846`.
-- Next action: settle exploration controls and their interaction with selection, automatic fitting and explicit domains, then plan the next implementation slice. All planned visibility controls are delivered; the map retains remaining animation/composition decisions.
-- Ticket 21 component/types/styles/tests, showcase/contracts/generated guides and accepted prototype/spec/map/status records are committed together. No intentionally uncommitted work remains.
+- Next action: return to planning and build one combined exploration study for multiple chart types. Do not use agents or production testing for that prototype. Pause only for consequential choices that need Whitney's input.
+- Tickets 22–24, accepted exploration source, audit evidence and work records are delivered with the compact-layout fixes. Axis fitting is `813f5c6`; title fitting is `ed596b0`; radar text is delivered in the commit containing this record.
+- Ticket 21 component/types/styles/tests, showcase/contracts/generated guides and accepted prototype/spec/map/status records are committed together.

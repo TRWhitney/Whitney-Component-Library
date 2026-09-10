@@ -13,6 +13,8 @@ Existing approvals and deliveries remain canonical in the [specification](spec.m
 
 ## Decisions so far
 
+- [Line-chart pan and zoom](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract): approved for the demonstrated continuous-time LineChart. Other chart families and production contracts remain pending.
+
 - [Bar selection indicators](decisions/01-bar-selection.md): Frame, adjoining shared edges, and a continuous inner month contour.
 
 - [Area and mixed selection](prototypes/area-mixed-selection.md#accepted-contract): Value marker and legend priority only among overlapping marks.
@@ -36,7 +38,9 @@ Statistical visibility is delivered for scatter, bubble and box groups in [Ticke
 
 ## Not yet specified
 
-- Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
+- Extend exploration beyond the approved LineChart behavior. Cross-chart overview applicability, fixed application bounds, wheel behavior and public range callbacks remain unspecified. Preserve the [accepted line-chart pan/zoom contract](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract).
+- The [initial compact-layout audit](research/compact-layout-audit.md) is complete across the current showcase and crowded reproduction fixtures. [Ticket 22](tickets/22-consistent-axis-label-fitting.md) fixes omitted continuous-axis fitting and dropped box-plot staggering; [Ticket 23](tickets/23-visible-axis-titles.md) fixes clipped vertical titles. Both are delivered with passing validation and independent reviews.
+- The radar sizing defect is fixed in [Ticket 24](tickets/24-readable-radar-labels.md), retaining the approved layout and interactions with a 12px rendered minimum. Validation and independent reviews pass. The audit records evidence. Full locale/theme/visibility combinations and the exploration-host residual page overflow remain follow-up checks, not declared passes.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.
 

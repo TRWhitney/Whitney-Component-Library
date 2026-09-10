@@ -702,3 +702,55 @@ it('fills the radar point up to its border at enlarged and compact scales', () =
     vi.unstubAllGlobals();
   }
 });
+
+it('keeps radar text readable when the rendered plot shrinks and grows', () => {
+  let side = 176;
+  const resize: (() => void)[] = [];
+  const measure = vi
+    .spyOn(SVGElement.prototype, 'getBoundingClientRect')
+    .mockImplementation(() => new DOMRect(0, 0, side, side));
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      constructor(notify: () => void) {
+        resize.push(notify);
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    },
+  );
+  try {
+    const {container} = render(
+      <RadarChart
+        {...common}
+        data={[{id: 'courier', label: 'Courier', speed: 5, range: 4, reliability: 3}]}
+      />,
+    );
+    const assertReadableText = () => {
+      const labels = container.querySelectorAll<SVGTextElement>(
+        '[data-wcl-radar-spoke] text, [data-wcl-radar-guide] text',
+      );
+      expect(labels.length).toBeGreaterThan(0);
+      for (const label of labels) {
+        expect((parseFloat(getComputedStyle(label).fontSize) * side) / 480).toBeGreaterThanOrEqual(
+          12,
+        );
+      }
+    };
+    assertReadableText();
+    side = 144;
+    act(() => {
+      for (const notify of resize) notify();
+    });
+    assertReadableText();
+    side = 720;
+    act(() => {
+      for (const notify of resize) notify();
+    });
+    assertReadableText();
+  } finally {
+    measure.mockRestore();
+    vi.unstubAllGlobals();
+  }
+});

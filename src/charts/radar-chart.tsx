@@ -566,6 +566,9 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   const dimensionCount = props.dimensions.length;
   const isCompact =
     availableSize !== undefined && (availableSize.width <= 400 || availableSize.height <= 360);
+  // SVG text scales with the plot; keep its rendered size readable at compact widths.
+  const dimensionFontSize = Math.max(isCompact ? 20 : 14, 12 / viewScale);
+  const guideFontSize = Math.max(isCompact ? 16 : 11, 12 / viewScale);
   const isStacked =
     availableSize !== undefined && availableSize.width <= 400 && availableSize.height >= 520;
   const hasLocalOverflow =
@@ -1038,7 +1041,11 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                           .join(' ')}
                       />
                       {!isCompact || ratio === 1 ? (
-                        <text x={center + 7} y={center - plotRadius * ratio}>
+                        <text
+                          style={{fontSize: guideFontSize}}
+                          x={center + 7}
+                          y={center - plotRadius * ratio}
+                        >
                           {formatRadarValue(radarGuideValue(model.maximum, ratio), props.value)}
                         </text>
                       ) : null}
@@ -1053,7 +1060,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                       isCompact && dimension.label.length > 7
                         ? `${dimension.label.slice(0, 6)}…`
                         : dimension.label;
-                    const labelInset = displayedLabel.length * (isCompact ? 12 : 8) + 8;
+                    const labelInset = displayedLabel.length * dimensionFontSize * 0.62 + 8;
                     const safeLabelX =
                       anchor === 'end'
                         ? Math.max(labelX, labelInset)
@@ -1077,6 +1084,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                               ? ''
                               : undefined
                           }
+                          style={{fontSize: dimensionFontSize}}
                           textAnchor={anchor}
                           x={safeLabelX}
                           y={labelY}

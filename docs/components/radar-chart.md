@@ -68,6 +68,7 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 - Forced colors preserve guides, spokes, point boundaries, and polygon line patterns in system colors. The generated table remains the complete non-color representation.
 - Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
 - Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.
+- Radar dimension and guide labels retain a minimum rendered size of 12 pixels. Compact names may shorten; the full table retains their wording.
 - Point activation briefly pulses its marker. Dimension activation grows a radial guide from the center through the furthest actual value, holds at full length, then fades. An all-zero dimension briefly underlines its label because it has no line extent. Reduced motion uses brief static activation feedback and removes series-emphasis and scrollbar-fade transitions. With visibility enabled, one interruptible 240ms animation fits the shared zero-based scale to visible profiles. Restored marks stay inside the outer radar edge while the scale expands. Reduced motion settles the scale immediately. Exact readings and table values do not change.
 
 ## Examples

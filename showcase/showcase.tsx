@@ -3729,7 +3729,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Compare a few subjects across ordered qualities that share one nonnegative scale. A dimension is one spoke; a series is one subject and one polygon. Hover near a profile point to isolate it and trace its axis. Its neutral reading fill meets the colored point border at every chart size. Missing dimensions read as zero, while small visual shoulders keep isolated values legible without changing their readings."
+        description="Compare a few subjects across ordered qualities that share one nonnegative scale. A dimension is one spoke; a series is one subject and one polygon. Hover near a profile point to isolate it and trace its axis. Its neutral reading fill meets the colored point border at every chart size. Labels keep a readable minimum size as the plot shrinks; shortened names remain complete in the data table. Missing dimensions read as zero, while small visual shoulders keep isolated values legible without changing their readings."
         name="RadarChart"
       >
         <Example label="Comparable vehicle profiles with selection and details">

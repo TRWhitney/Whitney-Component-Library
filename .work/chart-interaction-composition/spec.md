@@ -479,3 +479,25 @@ individual restoration and Show all. Visibility changes cancel in-flight gesture
 
 [Ticket 21](tickets/21-heatmap-visibility.md) owns public behavior/type tests, generated docs,
 showcase operation and independent production review.
+
+## Line-chart pan and zoom
+
+Whitney approved pan and zoom for the demonstrated continuous-time LineChart. Preserve the
+[accepted behavioral contract and runnable study](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract),
+including direct two-finger exploration, independent selection, attached controls, a collapsed
+Overview disclosure, visible-data fitting and selection persistence. This scoped approval does
+not extend to other chart types or close known compact-layout defects. Public range callbacks,
+fixed application bounds and wheel behavior remain planning decisions.
+
+## Compact chart layout consistency
+
+Use the available space and established fitting techniques before hiding labels. Apply them
+consistently across chart types when appropriate to the geometry, including time and numeric
+axes. Preserve readable text, unambiguous values, complete axis titles, correct tick positions
+and the association between labels and selection indicators. Existing local scroll behavior
+remains available when spacing and staggering cannot preserve the labels.
+
+The [compact-layout audit](research/compact-layout-audit.md) records the confirmed defects and
+limits of the initial review. [Ticket 22](tickets/22-consistent-axis-label-fitting.md) addresses
+axis crowding and missing box staggering. [Ticket 23](tickets/23-visible-axis-titles.md) addresses
+clipped vertical titles. [Ticket 24](tickets/24-readable-radar-labels.md) preserves a 12px rendered minimum for radar labels without changing the approved interactions. None of these findings expands approval of exploration to other charts.
