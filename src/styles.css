@@ -1,5 +1,7 @@
 @layer wcl.reset, wcl.theme, wcl.components, wcl.utilities;
 
+@import url('./charts/chart-exploration.css');
+
 @layer wcl.reset {
   [data-wcl-search-control] [data-wcl-field-input]::-webkit-search-cancel-button {
     /* stylelint-disable-next-line property-no-vendor-prefix -- WebKit requires the prefix on its vendor pseudo-element. */

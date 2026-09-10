@@ -1,5 +1,8 @@
 # Distribution and category navigation
 
+The later [modal overview contract](modal-overview.md#accepted-behavior) replaces the disclosure
+and separate expansion access described in this historical study. Other accepted behavior remains binding.
+
 ## Question and status
 
 Does the approved compact overview work for fixed histogram intervals, box groups, horizontal

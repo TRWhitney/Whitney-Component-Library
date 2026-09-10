@@ -1,5 +1,8 @@
 # Pan and zoom across chart types
 
+The later [modal overview contract](modal-overview.md#accepted-behavior) replaces the disclosure
+and separate expansion access described in this historical study. Other accepted behavior remains binding.
+
 ## Decision
 
 Does the approved line-chart navigation work for area, grouped columns, stacked columns and

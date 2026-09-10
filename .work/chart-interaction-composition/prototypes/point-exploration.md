@@ -1,5 +1,8 @@
 # Scatter and bubble exploration
 
+The later [modal overview contract](modal-overview.md#accepted-behavior) replaces the disclosure
+and separate expansion access described in this historical study. Other accepted behavior remains binding.
+
 ## Decision and status
 
 Does a rectangular overview, two-finger movement and pinch provide intuitive two-axis exploration

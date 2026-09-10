@@ -1,0 +1,193 @@
+@layer wcl.components {
+  [data-wcl-chart-canvas][data-exploration] {
+    margin-block: 4rem 2.75rem;
+  }
+
+  [data-wcl-chart-exploration-layer] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  [data-wcl-chart-exploration-layer] button {
+    pointer-events: auto;
+  }
+
+  [data-wcl-chart-exploration-controls],
+  [data-wcl-chart-exploration-pan] {
+    position: absolute;
+    z-index: 2;
+    right: var(--wcl-exploration-right, 0);
+    left: var(--wcl-exploration-left, 0);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    overflow: visible;
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+  }
+
+  [data-wcl-chart-exploration-controls] {
+    top: var(--wcl-exploration-top, 0);
+    padding-block-end: 0.5rem;
+    transform: translateY(-100%);
+  }
+
+  [data-wcl-chart-exploration-pan] {
+    top: var(--wcl-exploration-bottom, 100%);
+    justify-content: space-between;
+    padding-block-start: 0.25rem;
+  }
+
+  [data-wcl-chart-exploration-range],
+  [data-wcl-chart-exploration-extents] {
+    font-family: var(--wcl-font-utility);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  [data-wcl-chart-exploration-range] {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+
+  [data-wcl-chart-exploration-buttons],
+  [data-wcl-chart-exploration-trigger] {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  [data-wcl-chart-exploration-trigger] svg {
+    color: var(--wcl-accent-rail);
+  }
+
+  [data-wcl-overlay-modal]:has([data-wcl-chart-exploration-overview]) {
+    inline-size: min(48rem, calc(100dvw - 2rem));
+  }
+
+  [data-wcl-overlay-dialog]:has([data-wcl-chart-exploration-overview])
+    [data-wcl-overlay-description] {
+    font-family: var(--wcl-font-utility);
+  }
+
+  [data-wcl-chart-exploration-overview] {
+    min-inline-size: 0;
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+  }
+
+  [data-wcl-chart-exploration-navigator] {
+    position: relative;
+    block-size: 5rem;
+    margin-block: 0.75rem;
+    border: 1px solid var(--wcl-border);
+    border-radius: 0.25rem;
+    background: var(--wcl-surface-subtle);
+    touch-action: none;
+    user-select: none;
+  }
+
+  [data-wcl-chart-exploration-reference],
+  [data-wcl-chart-exploration-reference] > svg {
+    inline-size: 100%;
+    block-size: 100%;
+    pointer-events: none;
+  }
+
+  [data-wcl-chart-exploration-shade] {
+    position: absolute;
+    inset-block: 0;
+    background: color-mix(in srgb, var(--wcl-surface) 65%, transparent);
+    pointer-events: none;
+  }
+
+  [data-wcl-chart-exploration-window],
+  [data-wcl-chart-exploration-handle] {
+    position: absolute;
+    inset-block: -1px;
+    box-sizing: border-box;
+    transition:
+      left 180ms ease,
+      width 180ms ease;
+  }
+
+  [data-wcl-chart-exploration-window] {
+    border: 2px solid var(--wcl-accent-rail);
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--wcl-accent-soft) 25%, transparent);
+    cursor: grab;
+  }
+
+  [data-wcl-chart-exploration-handle] {
+    z-index: 1;
+    inline-size: 1.5rem;
+    cursor: ew-resize;
+    transform: translateX(-50%);
+  }
+
+  [data-wcl-chart-exploration-handle]::after {
+    position: absolute;
+    inset: 30% calc(50% - 2px);
+    border-radius: 2px;
+    background: var(--wcl-accent-rail);
+    content: '';
+  }
+
+  [data-wcl-chart-exploration-navigator][data-dragging]
+    :is([data-wcl-chart-exploration-window], [data-wcl-chart-exploration-handle]) {
+    transition: none;
+  }
+
+  [data-wcl-chart-exploration-window]:focus-visible,
+  [data-wcl-chart-exploration-handle]:focus-visible {
+    outline: 2px solid var(--wcl-accent-focus);
+    outline-offset: 3px;
+  }
+
+  [data-wcl-chart-exploration-extents] {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--wcl-text-muted);
+  }
+
+  [data-wcl-chart-exploration-instructions] {
+    margin-block: 0.75rem 0;
+    color: var(--wcl-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  [data-wcl-chart-canvas][data-exploration] > svg {
+    touch-action: none;
+  }
+
+  @media (width <= 600px) {
+    [data-wcl-chart-exploration-controls] {
+      flex-wrap: wrap;
+      gap: 0.125rem;
+    }
+
+    [data-wcl-chart-exploration-range] {
+      flex-basis: 100%;
+    }
+
+    [data-wcl-chart-exploration-buttons] {
+      margin-inline-start: auto;
+    }
+  }
+
+  [data-wcl-chart-exploration-navigator][data-dragging] [data-wcl-chart-exploration-window] {
+    cursor: grabbing;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-wcl-chart-exploration-window],
+    [data-wcl-chart-exploration-handle] {
+      transition: none;
+    }
+  }
+}

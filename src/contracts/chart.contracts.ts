@@ -686,6 +686,10 @@ export const lineChartContract: ComponentContract = {
   ],
   controlBehavior: [
     ...lineChartBaseContract.controlBehavior,
+    'Opt-in exploration keeps a domain window separate from the complete source and table. Supply labels and optionally defaultWindow for internal state, or window with required onWindowChange for application control. onWindowChange reports live domain values; onWindowChangeEnd reports completed gestures and commands. Date axes return Dates. minimumSpan is a fraction of the complete axis, greater than zero and at most one.',
+    'Attached zoom, pan and reset buttons share the window with an Overview IconButton. Overview opens a horizontal full-data strip in Dialog. Move or resize the window directly, including by touch; closing keeps the range and returns focus. Two fingers pan or pinch the main chart and cancel pending selection or hold activation. Ordinary wheel scrolling remains available.',
+    'The full window follows data updates. A zoomed window retains its domain values and clamps to updated bounds. Explicit data-axis domains constrain navigation; explicit value-axis limits stay fixed. Automatic values fit visible line geometry, including crossings between recorded points. Outside-window selection stays selected and full data remains in the table. Hidden series leave both plot and overview; their data and selection remain available.',
+
     'With selection enabled, ordinary click or touch tap toggles an item. Control/Command-click activates without changing selection. On touchscreens, press and hold activates once; release does not also select. Drag movement and pointer cancellation cancel a pending hold. Without selection, ordinary click or tap activates. Selection and activation never both fire merely because both capabilities are enabled.',
     'Drag horizontally to select a category range or draw a rectangle to select points. A new drag replaces selection. Shift or Control/Command adds; Alt removes. Escape or pointer cancellation restores the selection from before the drag. Dragging never activates and selection does not change chart domains.',
     'Reading previews and activation resolve the same nearest visible category, then the nearest visible point vertically for point targeting. Duplicate category coordinates use input order for category ties; point ties use input order then visible series order. Hidden points cannot be targeted. No rows are implicitly aggregated.',
@@ -707,6 +711,8 @@ export const lineChartContract: ComponentContract = {
   ],
   keyboardBehavior: [
     ...lineChartBaseContract.keyboardBehavior,
+    'Overview window and edge sliders support arrow keys, Home and End. Chart readings stay within the visible window; a window between observations keeps its axes and navigation without inventing a selectable data point.',
+
     'Point readings announce the targeted series and value first while retaining the complete category reading. For interaction, Left/Right move between categories; point targeting also uses Up/Down to move between visible series. Home/End reach category endpoints. With selection enabled, Enter or Space toggles selection; Control/Command plus Enter or Space activates without changing selection. Without selection, Enter or Space activates. Escape cancels an active drag before clearing a reading.',
   ],
   localization: [

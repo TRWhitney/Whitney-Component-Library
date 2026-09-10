@@ -1,3 +1,4 @@
+import {LineExplorationExample} from './line-exploration-examples.js';
 import {CompactAxisExample} from './compact-axis-examples.js';
 import {
   memo,
@@ -3580,6 +3581,12 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference. Tab into the plot and use the arrow keys for keyboard readings; mouse readings clear when the pointer leaves the plot. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
         name="LineChart"
       >
+        <Example label="Pan, zoom and overview">
+          <LineExplorationExample />
+        </Example>
+        <Example label="Coordinated date windows">
+          <LineExplorationExample coordinated />
+        </Example>
         <Example label="Two-series LineChart with selection and details">
           <Stack gap="regular">
             <SegmentedControl

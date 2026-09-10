@@ -10,9 +10,11 @@ Heatmap visibility is delivered in `3600497`. Whitney approved pan and zoom for 
 LineChart in the [exploration study](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract).
 The [compact-layout audit](research/compact-layout-audit.md) led to production fixes in tickets
 22–24: shared axis fitting, visible vertical titles and readable radar text. Validation and
-independent intent and engineering reviews pass. The [combined exploration study](prototypes/chart-exploration-comparison.md) now covers area, grouped and stacked columns, mixed columns/line and a line reference. Whitney approved the corrected horizontal group. The [scatter/bubble study](prototypes/point-exploration.md#accepted-behavior) is approved, including the centered, directly resizable compact map, integrated expand icon and plain dialog. Whitney requires retaining the full-space reference; both the large permanent overview and distorted strip were rejected. The remaining distribution/category/heatmap study is approved. The production boundary and tickets 25–30 define the implementation sequence. Ticket 25 layout prerequisites are delivered with 761 passing tests, packed React 18/19 verification and independent reviews. Line navigation in ticket 26 is ready for implementation.
+independent intent and engineering reviews pass. The [combined exploration study](prototypes/chart-exploration-comparison.md) now covers area, grouped and stacked columns, mixed columns/line and a line reference. Whitney approved the corrected horizontal group. The [scatter/bubble study](prototypes/point-exploration.md#accepted-behavior) is approved, including the centered, directly resizable compact map, integrated expand icon and plain dialog. Whitney requires retaining the full-space reference; both the large permanent overview and distorted strip were rejected. The remaining distribution/category/heatmap study is approved. The production boundary and tickets 25–30 define the implementation sequence. Ticket 25 layout prerequisites are delivered with 761 passing tests, packed React 18/19 verification and independent reviews. The [modal overview](prototypes/modal-overview.md#accepted-behavior) is now approved, including its icon-only trigger and direct touch dragging. Tickets 26–30 reflect the chosen access pattern; ticket 26 is completed. Ticket 27 is next.
 
 ## Progress
+
+- [Ticket 26](tickets/26-line-exploration.md) delivers public LineChart pan, zoom and modal overview with controlled coordination, native touch arbitration, full-data preservation and current showcase/contracts. All 780 tests, repository/package checks and both independent review axes pass.
 
 - Reconciled scope accepted in `e899b8e`.
 - Cartesian eye controls and automatic animated visible-data scales delivered in `a3ea65b`,
@@ -57,7 +59,7 @@ and any change to the accepted chart palette or existing reading semantics.
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
 - Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is `3e6a391`. Radar visibility is `5c51e05`. Legend release is delivered in the commit containing this record.
 - Production showcase: `http://localhost:5174`, Vite session `54846`.
-- Next action: implement [26](tickets/26-line-exploration.md), then extend the shared navigation work through tickets 27–30. [25](tickets/25-exploration-layout-foundation.md) is complete. All demonstrated exploration families are approved. Production verification applies to implementation; prototype tweaks still use no agents or production test suites.
+- Next action: implement ticket 27 with the delivered shared controls/domain model, then continue tickets 28–30. The modal overview design is approved. No further design question is pending. Prototype work used no agents or production tests.
 - Tickets 22–24, accepted exploration source, audit evidence and work records are delivered with the compact-layout fixes. Axis fitting is `813f5c6`; title fitting is `ed596b0`; radar text is `e28dc57`.
 - Ticket 21 component/types/styles/tests, showcase/contracts/generated guides and accepted prototype/spec/map/status records are committed together.
 

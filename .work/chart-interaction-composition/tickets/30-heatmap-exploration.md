@@ -8,11 +8,15 @@
 
 - [ ] Window complete ordered row/column identities; preserve missing cells, zero values, full-data color meaning and complete structured data.
 - [ ] Use one source visibility state for chart and overview. Hidden tracks close their gaps, remain restorable outside the window and preserve selection identity.
-- [ ] Match the compact proportional map and expanded navigator, native two-finger gestures, cell selection/hover/pulse and callback ownership. Do not introduce per-cell eyes.
+- [ ] Match the proportional map opened directly from the Overview IconButton in the existing Dialog, native two-finger gestures, cell selection/hover/pulse and callback ownership. Do not introduce per-cell eyes.
 - [ ] Preserve Room and restore-count readability and compact label fitting. Opening an overview or changing its range cannot resize the main chart.
 - [ ] Update showcase and contracts; verify complete hide/restore/navigation combinations, callback coordination, empty/all-hidden states, focus, touch, reduced motion, SSR/hydration and package types with independent reviews.
 
+- [ ] Overview movement and resizing follow pointer dragging immediately; retain keyboard/reset animation, reduced motion, range changes on dismissal and focus return to the icon.
+
 ## Accepted sources
+
+- [Modal overview access](../prototypes/modal-overview.md#accepted-behavior), superseding earlier disclosure and expansion controls.
 
 - [Production exploration boundary](../spec.md#production-exploration-boundary)
 - [Line contract](../prototypes/domain-exploration.md#accepted-pan-and-zoom-contract)

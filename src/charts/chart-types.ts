@@ -530,10 +530,46 @@ export type LineChartInteraction<
   Category extends ChartDomainValue,
 > = ChartInteraction<Datum, Category>;
 
+/** A visible interval in the original axis units. Date intervals contain Dates. */
+export type ChartDomainWindow<Value extends ChartDomainValue> = readonly [Value, Value];
+export interface ChartExplorationLabels<Value extends ChartDomainValue> {
+  readonly overview: string;
+  readonly closeOverview: string;
+  readonly done: string;
+  readonly reset: string;
+  readonly zoomIn: string;
+  readonly zoomOut: string;
+  readonly panBackward: string;
+  readonly panForward: string;
+  readonly window: string;
+  readonly start: string;
+  readonly end: string;
+  readonly instructions: string;
+  readonly range: (window: ChartDomainWindow<Value>) => string;
+}
+export type ChartExploration<Value extends ChartDomainValue> = {
+  readonly labels: ChartExplorationLabels<Value>;
+  /** Smallest span as a fraction of the full axis, from greater than zero through one. */
+  readonly minimumSpan?: number;
+  readonly onWindowChangeEnd?: (window: ChartDomainWindow<NoInfer<Value>>) => void;
+} & (
+  | {
+      readonly window: ChartDomainWindow<NoInfer<Value>>;
+      readonly defaultWindow?: never;
+      readonly onWindowChange: (window: ChartDomainWindow<NoInfer<Value>>) => void;
+    }
+  | {
+      readonly window?: never;
+      readonly defaultWindow?: ChartDomainWindow<NoInfer<Value>>;
+      readonly onWindowChange?: (window: ChartDomainWindow<NoInfer<Value>>) => void;
+    }
+);
+
 export interface LineChartProps<
   Datum extends object,
   XValue extends ChartDomainValue,
 > extends ChartCommonProps<Datum> {
+  readonly exploration?: ChartExploration<XValue>;
   readonly interaction?: LineChartInteraction<Datum, XValue>;
   readonly annotations?: readonly ChartAnnotation<NoInfer<XValue>, number>[];
   readonly series: NonEmptyChartSeries<ChartLineSeries<Datum>>;

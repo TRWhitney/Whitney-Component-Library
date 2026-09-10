@@ -1,5 +1,8 @@
 # Chart exploration study
 
+The later [modal overview contract](modal-overview.md#accepted-behavior) replaces the disclosure
+and separate expansion access described in this historical study. Other accepted behavior remains binding.
+
 Status: Whitney approved pan and zoom behavior for this line-chart type. Other chart families,
 production implementation, and the compact-layout consistency defects remain pending.
 

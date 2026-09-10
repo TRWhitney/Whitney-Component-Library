@@ -5,6 +5,8 @@ import {
   ColumnChart,
   LineChart,
   type ChartAccessor,
+  type ChartExploration,
+  type ChartExplorationLabels,
   type ChartColor,
   type ChartScale,
 } from '../src/index.js';
@@ -201,4 +203,44 @@ export const mixedSelectionOwnership: import('../src/index.js').ChartSelection =
   selectedItems: [],
   defaultSelectedItems: [],
   onSelectionChange: () => {},
+};
+
+const explorationLabels: ChartExplorationLabels<Date> = {
+  overview: 'Overview',
+  closeOverview: 'Close overview',
+  done: 'Done',
+  reset: 'Reset',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  panBackward: 'Earlier',
+  panForward: 'Later',
+  window: 'Visible dates',
+  start: 'First date',
+  end: 'Last date',
+  instructions: 'Drag or use arrows.',
+  range: ([start, end]) => `${start.toISOString()} to ${end.toISOString()}`,
+};
+export const exploredLine = (
+  <LineChart<Datum, Date>
+    {...common}
+    xAxis={{accessor: 'when', label: 'When', scale: {type: 'time'}}}
+    yAxis={{label: 'Value', scale: {type: 'linear'}}}
+    exploration={{
+      labels: explorationLabels,
+      window: [new Date(0), new Date(1000)],
+      onWindowChange: ([start]) => start.toISOString(),
+    }}
+  />
+);
+// @ts-expect-error Controlled windows require a change callback.
+export const missingWindowCallback: ChartExploration<Date> = {
+  labels: explorationLabels,
+  window: [new Date(0), new Date(1000)],
+};
+// @ts-expect-error Controlled and default windows cannot be combined.
+export const mixedWindowOwnership: ChartExploration<Date> = {
+  labels: explorationLabels,
+  window: [new Date(0), new Date(1000)],
+  defaultWindow: [new Date(0), new Date(1000)],
+  onWindowChange: () => {},
 };

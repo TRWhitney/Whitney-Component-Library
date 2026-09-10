@@ -484,10 +484,9 @@ showcase operation and independent production review.
 
 Whitney approved pan and zoom for the demonstrated continuous-time LineChart. Preserve the
 [accepted behavioral contract and runnable study](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract),
-including direct two-finger exploration, independent selection, attached controls, a collapsed
-Overview disclosure, visible-data fitting and selection persistence. This scoped approval does
-not extend to other chart types or close known compact-layout defects. Public range callbacks,
-fixed application bounds and wheel behavior remain planning decisions.
+including direct two-finger exploration, independent selection, attached controls, visible-data
+fitting and selection persistence. Overview access follows the later accepted modal contract below.
+The production boundary below defines range callbacks, application bounds and wheel behavior.
 
 ## Compact chart layout consistency
 
@@ -507,24 +506,37 @@ clipped vertical titles. [Ticket 24](tickets/24-readable-radar-labels.md) preser
 The [combined study](prototypes/chart-exploration-comparison.md#accepted-behavior) extends the
 approved monthly line exploration to area, grouped columns, stacked columns and columns with a
 line. Its corrected live production selection marks and plot-attached controls are binding.
-Other domain shapes and the public API remain planning work.
+The later family contracts and production boundary below define the other domain shapes and API responsibilities.
 
 ## Accepted scatter and bubble exploration
 
 Use the [accepted two-axis contract](prototypes/point-exploration.md#accepted-behavior) and retained
-source. The centered proportional overview remains useful without expansion: move and resize
-its region directly. An integrated quiet icon opens a larger synchronized map in the existing
-Dialog. Keep the accepted plain copy and retain the view on dismissal. Preserve production
-selection/activation, two-finger pan and pinch, stable magnitude reference, and viewport clipping.
-The public viewport API and remaining domain families still require planning.
+source. The overview keeps its correct proportions in the existing Dialog, opened directly from
+its chart icon under the later modal contract below. Keep the accepted plain copy and retain the
+view on dismissal. Preserve production selection/activation, two-finger pan and pinch, stable
+magnitude reference, and viewport clipping.
 
 ## Accepted remaining exploration families
 
 The [combined distribution/category contract](prototypes/remaining-exploration.md#accepted-behavior)
-is approved. Preserve the horizontal histogram and box strips without popouts, the fixed-height
+is approved. Preserve the horizontal histogram and box strips in the shared overview dialog, the fixed-height
 horizontal station strip transposed to vertical chart categories, the rectangular heatmap map,
 production visibility controls and their synchronized overviews, fixed chart dimensions during
 navigation, and a Room label that remains readable beside the restore eye and count.
+
+## Accepted modal overview access
+
+The [modal overview contract](prototypes/modal-overview.md#accepted-behavior) supersedes earlier
+disclosure and expansion entry points across all demonstrated chart types. Use one quiet
+Overview IconButton beside the chart's zoom/reset controls, with an accessible label and tooltip.
+It opens the existing Dialog directly, containing the current range, full-data reference,
+Reset view and Done. Closing retains the adjusted range and returns focus to the trigger.
+Horizontal families keep horizontal strips, including transposed horizontal bars. Scatter,
+bubble and heatmap keep proportional rectangular maps. Hidden data stays hidden in both views.
+Window movement and resizing follow the pointer immediately throughout a drag. Keyboard and
+reset motion retain their animations and reduced-motion behavior. There is no inline disclosure,
+duplicate miniature or second expand action. These access changes do not alter other accepted
+selection, activation, navigation or identity semantics.
 
 ## Production exploration boundary
 
@@ -544,11 +556,11 @@ The production sequence delivers the following complete paths:
   interaction foundation. Horizontal bars transpose only their overview, keeping the main chart's
   vertical category order. Categorical windows include complete category bands.
 - Scatter and bubble explore both numeric dimensions. Their overview retains correct proportions,
-  the accepted compact sizing and optional expansion. Bubble magnitude is derived before viewport
+  with direct modal access under the accepted overview contract. Bubble magnitude is derived before viewport
   clipping so navigation cannot change an observation's represented size.
 - Histograms explore complete bins prepared from the full data; counts, boundaries and upper-edge
   inclusivity never depend on the current window. Box plots explore group identities and preserve
-  complete summaries and stable outlier IDs. They use horizontal strips without expansion.
+  complete summaries and stable outlier IDs. They use horizontal strips in the shared overview dialog.
 - Heatmap windows contain complete rows and columns. Hidden tracks close their gaps in the chart
   and overview and remain restorable. Color meaning is independent of the viewport.
 

@@ -1,0 +1,91 @@
+/* Disposable comparison of direct chart-to-dialog overview access. */
+.study .zoom-buttons {
+  align-items: center;
+  gap: 0.15rem;
+}
+.study .zoom-buttons .modal-overview-trigger button {
+  width: 2.25rem;
+  height: 2.4rem;
+  min-height: 2.4rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.modal-overview-trigger {
+  display: inline-flex;
+}
+.modal-overview-trigger svg {
+  color: var(--wcl-accent-rail);
+  flex: none;
+}
+[data-wcl-overlay-modal]:has(.modal-overview-content) {
+  inline-size: min(48rem, calc(100dvw - 2rem));
+}
+.modal-overview-content {
+  min-width: 0;
+}
+.modal-overview-content .overview {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  animation: none;
+}
+.modal-overview-content .navigator:not(.map) {
+  margin-block: 1rem;
+}
+.modal-overview-content .overview-map[data-study-expanded] {
+  width: min(100%, calc(50dvh * var(--map-aspect)));
+  margin-inline: auto;
+}
+.modal-overview-content .axis-overview {
+  padding: 0.5rem 0;
+}
+.modal-overview-content .axis-overview .navigator.map {
+  height: 6rem;
+}
+.study .chart-controls {
+  gap: 0.5rem;
+}
+@media (max-width: 600px) {
+  .study .chart-controls {
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    top: calc(var(--plot-top) - 4.5rem);
+    align-items: flex-end;
+    gap: 0.1rem;
+  }
+  .study .chart-controls .period {
+    flex: 1 0 100%;
+    font-size: 0.75rem;
+  }
+  .study .chart-controls .zoom-buttons {
+    margin-left: auto;
+  }
+  .study .chart-host [data-wcl-chart-canvas] {
+    margin-top: 4rem;
+  }
+  .study .example[data-kind='heatmap'] .chart-controls {
+    top: calc(var(--plot-top) - 7.25rem);
+  }
+  .study .example[data-kind='heatmap'] [data-wcl-heatmap-frame] {
+    margin-top: 0.5rem;
+  }
+  .study .zoom-buttons > button,
+  .study .zoom-buttons .modal-overview-trigger button {
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+  }
+}
+
+.overview[data-hidden~='revenue'] :is(.mini-revenue, .revenue),
+.overview[data-hidden~='costs'] :is(.mini-costs, .costs) {
+  display: none;
+}
+
+/* Touch pointer capture does not reliably set :active. Track the actual gesture. */
+.modal-overview-content .navigator[data-dragging] :is(.map-window, .nav-window) {
+  transition: none;
+}
