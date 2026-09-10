@@ -692,6 +692,16 @@ function PartToWholeFrame<Datum extends object>({
   const containsSelected = (segment: Segment<Datum>) =>
     !!interaction?.selection &&
     !!segment.remaining?.some((category) => selectedIds.has(category.id));
+  const hiddenExpansionCategories = (segment: Segment<Datum>) =>
+    segment.remaining?.filter((category) => hiddenIds.includes(category.id)) ?? [];
+  const expansionLabel = (segment: Segment<Datum>) =>
+    [
+      props.labels.moreCategories(segment.remaining?.length ?? 0),
+      ...(containsSelected(segment) ? [interaction!.selection!.containsSelection] : []),
+      ...hiddenExpansionCategories(segment).map(
+        (category) => `${category.label} (${visibilityLabels!.hidden})`,
+      ),
+    ].join('. ');
   const interactionPoints: InteractionPoint[] = segments.map((segment, index) => {
     const [x, y] = pathBuilder.centroid(segment);
     return {
@@ -753,7 +763,7 @@ function PartToWholeFrame<Datum extends object>({
       ? ''
       : [
           activeSegment.isAggregate
-            ? `${props.labels.moreCategories(activeSegment.remaining?.length ?? 0)}${containsSelected(activeSegment) ? `. ${interaction!.selection!.containsSelection}` : ''}`
+            ? expansionLabel(activeSegment)
             : (activeSegment.category?.label ?? ''),
           `${props.value.label}: ${formatChartValue(activeSegment.value, props.value)}`,
           ...(activeSegment.isAggregate
@@ -1154,7 +1164,10 @@ function PartToWholeFrame<Datum extends object>({
                               y={countLabelPoint[1]}
                             >
                               +{segment.remaining?.length ?? 0}
-                              {containsSelected(segment) ? '*' : ''}
+                              {containsSelected(segment) ||
+                              hiddenExpansionCategories(segment).length > 0
+                                ? '*'
+                                : ''}
                             </text>
                           ) : null}
                         </g>
@@ -1288,11 +1301,7 @@ function PartToWholeFrame<Datum extends object>({
                             : validPinnedLegendId === segment.identity
                         }
                         aria-disabled={hidden || undefined}
-                        aria-label={
-                          containsSelected(segment)
-                            ? `${props.labels.moreCategories(segment.remaining?.length ?? 0)}. ${interaction!.selection!.containsSelection}`
-                            : undefined
-                        }
+                        aria-label={segment.isAggregate ? expansionLabel(segment) : undefined}
                         data-wcl-chart-legend-button=""
                         onBlur={() => setTransientLegendId(null)}
                         onClick={() => {

@@ -398,3 +398,63 @@ it('resets to the first page when replacement data also removes the current page
   expect(slice(container, 'i0')).toBeTruthy();
   expect(screen.queryByRole('button', {name: 'Back'})).toBeNull();
 });
+
+it.each(['pie', 'donut'])('marks hidden expansion members in %s even without selection', (kind) => {
+  const records = Array.from({length: 11}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 12 - i,
+  }));
+  const props = {...common, data: records};
+  const {container} = render(
+    kind === 'pie' ? <PieChart {...props} /> : <DonutChart {...props} totalLabel="Visible total" />,
+  );
+  const marker = () => container.querySelector('[data-wcl-radial-aggregate-label]')!.textContent;
+  fireEvent.click(screen.getByRole('button', {name: 'More 4'}));
+  hide('Item 10');
+  fireEvent.click(screen.getByRole('button', {name: 'Back'}));
+  expect(marker()).toBe('+4*');
+  const expansion = screen.getByRole('button', {name: /More 4.*Item 10.*Hidden/});
+  const canvas = container.querySelector('[data-wcl-part-to-whole-canvas]')!;
+  fireEvent.keyDown(canvas, {key: 'End'});
+  expect(container.querySelector('[data-wcl-chart-reading-announcement]')!.textContent).toContain(
+    'Item 10 (Hidden)',
+  );
+  fireEvent.click(expansion);
+  fireEvent.click(screen.getByRole('button', {name: 'Show Item 10'}));
+  fireEvent.click(screen.getByRole('button', {name: 'Back'}));
+  expect(marker()).toBe('+4');
+  hide('Item 0');
+  expect(marker()).toBe('+3');
+});
+
+it('uses one marker when expansion contains both hidden and selected categories', () => {
+  const records = Array.from({length: 11}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 12 - i,
+  }));
+  const {container} = render(
+    <PieChart
+      {...common}
+      data={records}
+      interaction={{
+        selection: {
+          labels,
+          containsSelection: 'Contains selection',
+          defaultSelectedItems: [{id: 'i9'}],
+        },
+      }}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', {name: /More 4/}));
+  hide('Item 10');
+  fireEvent.click(screen.getByRole('button', {name: 'Back'}));
+  expect(container.querySelector('[data-wcl-radial-aggregate-label]')!.textContent).toBe('+4*');
+  fireEvent.click(
+    screen.getByRole('button', {name: /More 4.*Contains selection.*Item 10.*Hidden/}),
+  );
+  fireEvent.click(screen.getByRole('button', {name: 'Show Item 10'}));
+  fireEvent.click(screen.getByRole('button', {name: 'Back'}));
+  expect(container.querySelector('[data-wcl-radial-aggregate-label]')!.textContent).toBe('+4*');
+});

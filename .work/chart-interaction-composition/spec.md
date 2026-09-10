@@ -432,8 +432,10 @@ patterns and selections follow their IDs across these moves.
 Keep hidden entries with closed eyes in the ranked legend so they remain restorable. The legend may
 contain more entries than visible slices; retain bounded scrolling on compact layouts. Page boundaries
 follow visible capacity while retaining hidden records in their ranked legend range. If pages collapse,
-stay on the nearest available page and do not jump forward again on restoration. The expansion count
-and selection asterisk describe only its remaining ranked records, including hidden records. No bulk
+stay on the nearest available page and do not jump forward again on restoration. The expansion count describes its remaining ranked records. Show one asterisk when any of those
+records is selected or hidden, including when selection is disabled. Hidden or selected ordinary
+legend entries outside expansion do not mark it. Accessible expansion names and keyboard readings
+identify the hidden category labels using the localized hidden label, alongside any selection status. No bulk
 eye is added. This replaces Ticket 18's initial fixed-page behavior.
 
 Add optional `visibilityLabels` using the existing chart copy contract. Hiding clears that category's

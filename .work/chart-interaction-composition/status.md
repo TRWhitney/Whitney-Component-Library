@@ -6,10 +6,9 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-[Ticket 19](tickets/19-radial-page-refill.md) is delivered in the commit containing this record.
-Hiding fills freed pie/donut slots from expansion; restoration returns overflow. Hidden categories
-remain restorable in the legend, and colors, patterns and selections follow their identities.
-Repository checks and both independent correction reviews passed. Heatmap visibility remains next.
+[Ticket 20](tickets/20-expansion-hidden-marker.md) delivers the expansion asterisk for hidden categories in the commit containing this record.
+Whitney requested this addition, followed by the next part, heatmap visibility. Refill is delivered
+in `0edac84`.
 
 ## Progress
 
@@ -53,4 +52,4 @@ and any change to the accepted chart palette or existing reading semantics.
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
 - Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is `3e6a391`. Radar visibility is `5c51e05`. Legend release is delivered in the commit containing this record.
 - Production showcase: `http://localhost:5174`, Vite session `54846`.
-- Next action: plan heatmap visibility controls without an eye at every intersection, then present any unresolved behavior for Whitney's choice. Pie/donut refill is complete. No owned changes remain uncommitted after delivery.
+- Next action: continue with the heatmap visibility prototype and its unresolved label-control presentation.

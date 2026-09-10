@@ -3207,9 +3207,10 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
       <p className="showcase-muted">
         Left and Right read each visible slice, including the aggregate. Home and End reach the page
         endpoints. Enter or Space on +N opens the next page. Select a category there and return with
-        Back to see +N*. The asterisk means that the remaining categories include a selection.
-        Selecting only a visible category leaves +N unchanged. Selection survives paging. Sweeping
-        across the aggregate or donut hole selects nothing there.
+        Back to see +N*. The asterisk means that the remaining categories include something selected
+        or hidden. Selecting or hiding a category outside the expansion leaves its count unmarked.
+        Selection survives paging. Sweeping across the aggregate or donut hole selects nothing
+        there.
       </p>
       <p className="showcase-muted">
         Outer arcs mark selected categories. The inset dashed outline and slice pop-out mark the
