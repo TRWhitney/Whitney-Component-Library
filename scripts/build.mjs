@@ -29,6 +29,11 @@ await copyFile(
   resolve(distributionDirectory, 'charts/chart-exploration.css'),
 );
 
+await copyFile(
+  resolve(projectRoot, 'src/charts/chart-rectangular-exploration.css'),
+  resolve(distributionDirectory, 'charts/chart-rectangular-exploration.css'),
+);
+
 const contractModule = await import(
   pathToFileURL(resolve(distributionDirectory, 'contracts', 'index.js')).href
 );

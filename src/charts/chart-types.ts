@@ -1,3 +1,5 @@
+import type {ChartRectangularExploration} from './chart-rectangular-exploration-types.js';
+
 export type ChartDomainValue = string | number | Date;
 type Present<Value> = Exclude<Value, null | undefined>;
 type KeysMatching<Datum, Value> = {
@@ -709,6 +711,7 @@ export interface PointChartInteraction<Datum extends object> {
 }
 
 interface PointChartProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly exploration?: ChartRectangularExploration<number, number>;
   readonly visibilityLabels?: ChartVisibilityLabels;
   readonly interaction?: PointChartInteraction<Datum>;
   readonly idAccessor: ChartAccessor<Datum, string>;

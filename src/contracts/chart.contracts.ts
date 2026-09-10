@@ -1216,6 +1216,13 @@ function statisticalChartContract({
     ],
     contentRules: [guidance.content],
     controlBehavior: [
+      ...(pointInteraction
+        ? [
+            'Optional exploration uses independent numeric x and y windows through ChartRectangularExploration. Supply labels for navigation, corners and the complete range. Use defaultWindow for internal state, or window with required onWindowChange for application control. onWindowChange emits one rectangle per live change; onWindowChangeEnd reports completed gestures or commands. minimumSpan sets a fractional minimum for each axis.',
+            'The Overview icon opens a proportional full-data map in Dialog. Drag the window or its corners directly, or draw a new rectangle. Closing keeps the range and restores focus. Two fingers pan or pinch the main chart and cancel pending selection or hold activation. Pointer navigation follows immediately, keyboard and reset changes animate, and reduced motion removes those transitions.',
+            'Navigation keeps the complete source table and selections outside the window. Only visible observations can be read or activated. Empty windows retain axes and navigation. Full valid visible observations define reset bounds, explicit axis limits constrain exploration, and logarithmic windows navigate in log space. Bubble magnitude sizing is independent of the viewport. Hidden groups leave the plot and map together.',
+          ]
+        : []),
       'Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.',
       ...guidance.control,
       ...(groupVisibility

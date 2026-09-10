@@ -101,3 +101,10 @@ export type {
   StatisticalChartSeries,
   TimeChartScale,
 } from './chart-types.js';
+
+export type {
+  ChartExplorationCorner,
+  ChartRectangularWindow,
+  ChartRectangularExploration,
+  ChartRectangularExplorationLabels,
+} from './chart-rectangular-exploration-types.js';

@@ -1,3 +1,11 @@
+import {ChartExplorationLayer} from './chart-exploration-layer.js';
+import {ChartRectangularExplorationControls} from './chart-rectangular-exploration-controls.js';
+import {useChartRectangularExploration} from './use-chart-rectangular-exploration.js';
+import {useChartRectangularExplorationGesture} from './use-chart-rectangular-exploration-gesture.js';
+import type {
+  ChartRectangularExploration,
+  ChartRectangularWindow,
+} from './chart-rectangular-exploration-types.js';
 import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {ChartActivationOutline, chartActivationOutset} from './chart-activation.js';
@@ -1306,12 +1314,14 @@ function StatisticalMarks<Datum extends object>({
   activeIndex,
   directIndex,
   legendSeriesId,
+  maximumMagnitude,
   model,
   pinnedSeriesId,
   presentation,
   projections,
   readings,
 }: {
+  readonly maximumMagnitude?: number;
   readonly activeIndex: number | null;
   readonly directIndex: number | null;
   readonly legendSeriesId: string | undefined;
@@ -1326,7 +1336,9 @@ function StatisticalMarks<Datum extends object>({
       ? index !== directIndex
       : legendSeriesId !== undefined && seriesId !== legendSeriesId;
   if (model.kind === 'scatter' || model.kind === 'bubble') {
-    const maximum = model.points.reduce((max, point) => Math.max(max, point.magnitude ?? 1), 0);
+    const maximum =
+      maximumMagnitude ??
+      model.points.reduce((max, point) => Math.max(max, point.magnitude ?? 1), 0);
     const pointRows = model.points.map((point, index) => ({
       index,
       point,
@@ -1662,10 +1674,12 @@ function StatisticalFrame<Datum extends object>({
   legend,
   interaction,
   distribution,
+  exploration,
   model: fullModel,
   rootAttribute,
 }: {
   readonly common: CommonProps<Datum>;
+  readonly exploration?: ChartRectangularExploration<number, number>;
   readonly interaction?: PointChartInteraction<Datum>;
   readonly distribution?: DistributionSetup;
   readonly legend?: ChartLegend;
@@ -1673,8 +1687,9 @@ function StatisticalFrame<Datum extends object>({
   readonly rootAttribute: string;
 }): ReactElement {
   validateCommon(common);
+  const explores = !!exploration;
   const aspectRatio = common.aspectRatio ?? 1.75;
-  const minimumSize = common.minimumSize ?? {height: 180, width: 320};
+  const minimumSize = common.minimumSize ?? {height: 180, width: explores ? 240 : 320};
   const overflow = common.overflow ?? 'scroll';
   const status = common.status ?? {kind: 'ready'};
   const availableSeriesIds =
@@ -1737,19 +1752,56 @@ function StatisticalFrame<Datum extends object>({
     observer.observe(frameElement);
     return () => observer.disconnect();
   }, [frameElement]);
+  const visiblePointModel =
+    visibleModel.kind === 'scatter' || visibleModel.kind === 'bubble' ? visibleModel : undefined;
+  const navigation = useChartRectangularExploration(
+    exploration,
+    visiblePointModel?.xAxis.scale ?? {type: 'linear'},
+    visiblePointModel?.yAxis.scale ?? {type: 'linear'},
+    visiblePointModel?.points.map((point) => point.x) ?? [],
+    visiblePointModel?.points.map((point) => point.y) ?? [],
+  );
+  const [navigationDragging, setNavigationDragging] = useState(false);
+  const changeWindow = (
+    range: ChartRectangularWindow<number, number>,
+    phase: 'change' | 'end' | 'cancel',
+  ) => {
+    setNavigationDragging(phase === 'change');
+    navigation.change(range, phase);
+  };
+  const viewportModel =
+    exploration && visiblePointModel
+      ? {
+          ...visiblePointModel,
+          points: visiblePointModel.points.filter(
+            (point) => navigation.x.contains(point.x) && navigation.y.contains(point.y),
+          ),
+        }
+      : visibleModel;
+  // Source labels determine the fixed canvas and axis gutters throughout navigation.
+  const sizingModel = explores ? fullModel : visibleModel;
   const categoryLabels =
-    visibleModel.kind === 'box'
-      ? visibleModel.series.map((item) => item.label)
-      : projectionsFor(visibleModel, {left: 0, right: 1, top: 0, bottom: 1}).xNumber!.ticks.map(
-          (tick) => axisTickLabel(tick, visibleModel.xAxis),
+    sizingModel.kind === 'box'
+      ? sizingModel.series.map((item) => item.label)
+      : projectionsFor(sizingModel, {left: 0, right: 1, top: 0, bottom: 1}).xNumber!.ticks.map(
+          (tick) => axisTickLabel(tick, sizingModel.xAxis),
         );
-  const presentation = presentationMetrics(
+  const basePresentation = presentationMetrics(
     availableWidth ?? minimumSize.width,
     minimumSize.width,
     categoryLabels,
   );
+  const explorationWidth = Math.max(availableWidth ?? minimumSize.width, minimumSize.width);
+  const presentation = explores
+    ? {
+        ...basePresentation,
+        canvasWidth: explorationWidth,
+        viewScale: explorationWidth / viewWidth,
+        staggerLabels: false,
+      }
+    : basePresentation;
   const initialPlot = plotForPresentation(presentation);
-  const initialProjections = projectionsFor(visibleModel, initialPlot);
+  const initialProjections = projectionsFor(viewportModel, initialPlot);
   const yAxis = visibleModel.yAxis;
   const visibleHasData =
     visibleModel.kind === 'box'
@@ -1761,17 +1813,26 @@ function StatisticalFrame<Datum extends object>({
     !!visibilityLabels && visibleHasData && status.kind !== 'loading' && status.kind !== 'error';
   const xScale = visibleModel.kind === 'box' ? undefined : visibleModel.xAxis.scale;
   const xDomain = useAnimatedChartDomain(
-    [initialProjections.xNumber?.domain?.[0] ?? 0, initialProjections.xNumber?.domain?.[1] ?? 1],
-    animate && xScale !== undefined && xScale.domain === undefined,
+    exploration
+      ? navigation.window.x
+      : [
+          initialProjections.xNumber?.domain?.[0] ?? 0,
+          initialProjections.xNumber?.domain?.[1] ?? 1,
+        ],
+    exploration
+      ? !navigationDragging
+      : animate && xScale !== undefined && xScale.domain === undefined,
     xScale?.type === 'logarithmic',
   );
   const yDomain = useAnimatedChartDomain(
-    [initialProjections.y.domain?.[0] ?? 0, initialProjections.y.domain?.[1] ?? 1],
-    animate && yAxis.scale.domain === undefined,
+    exploration
+      ? navigation.window.y
+      : [initialProjections.y.domain?.[0] ?? 0, initialProjections.y.domain?.[1] ?? 1],
+    exploration ? !navigationDragging : animate && yAxis.scale.domain === undefined,
     yAxis.scale.type === 'logarithmic',
   );
-  const model = modelWithDomains(visibleModel, xDomain, yDomain);
-  const yLabels = projectionsFor(model, initialPlot).y.ticks.map((tick) =>
+  const model = modelWithDomains(viewportModel, xDomain, yDomain);
+  const yLabels = projectionsFor(explores ? fullModel : model, initialPlot).y.ticks.map((tick) =>
     axisTickLabel(tick, yAxis),
   );
   const plot = plotForYAxisLabels(
@@ -1865,7 +1926,7 @@ function StatisticalFrame<Datum extends object>({
     JSON.stringify([readingGeometry, status.kind, hiddenIds]),
     common.data,
   );
-  const maximumMagnitude = (pointModel?.points ?? []).reduce(
+  const maximumMagnitude = ((exploration ? visiblePointModel : pointModel)?.points ?? []).reduce(
     (max, point) => Math.max(max, point.magnitude ?? 1),
     0,
   );
@@ -1886,12 +1947,14 @@ function StatisticalFrame<Datum extends object>({
   const markPadding =
     points.reduce((padding, point) => Math.max(padding, point.radius * Math.SQRT2), 0) +
     2 / presentation.viewScale;
-  const marksBounds = {
-    left: Math.max(0, plot.left - markPadding),
-    right: Math.min(viewWidth, plot.right + markPadding),
-    top: Math.max(0, plot.top - markPadding),
-    bottom: Math.min(viewHeight, plot.bottom + markPadding),
-  };
+  const marksBounds = exploration
+    ? plot
+    : {
+        left: Math.max(0, plot.left - markPadding),
+        right: Math.min(viewWidth, plot.right + markPadding),
+        top: Math.max(0, plot.top - markPadding),
+        bottom: Math.min(viewHeight, plot.bottom + markPadding),
+      };
   const inPlot = (x: number, y: number) =>
     x >= plot.left && x <= plot.right && y >= plot.top && y <= plot.bottom;
   const selectablePoints = points.filter((point) => inPlot(point.x, point.y));
@@ -1937,6 +2000,47 @@ function StatisticalFrame<Datum extends object>({
     document.addEventListener('pointerdown', dismiss);
     return () => document.removeEventListener('pointerdown', dismiss);
   }, [rootElement, touchReadingId]);
+  const [navigationSource, setNavigationSource] = useState({data: common.data, revision: 0});
+  if (navigationSource.data !== common.data)
+    setNavigationSource({data: common.data, revision: navigationSource.revision + 1});
+  const navigationVersion = JSON.stringify([
+    navigationSource.revision,
+    statisticalModelGeometry(fullModel),
+    hiddenIds,
+    visiblePointModel?.xAxis.scale,
+    visiblePointModel?.yAxis.scale,
+    status.kind,
+    availableWidth,
+    aspectRatio,
+    plot,
+  ]);
+  const [previousNavigationVersion, setPreviousNavigationVersion] = useState(navigationVersion);
+  if (previousNavigationVersion !== navigationVersion) {
+    setPreviousNavigationVersion(navigationVersion);
+    setNavigationDragging(false);
+  }
+  const navigationGesture = useChartRectangularExplorationGesture<SVGSVGElement>({
+    enabled:
+      !!exploration && visibleHasData && status.kind !== 'loading' && status.kind !== 'error',
+    window: navigation.normalized,
+    minimumSpan: navigation.minimumSpan,
+    onChange: changeWindow,
+    onStart: () => {
+      actions.cancel();
+      setPointerReadingId(null);
+      setTouchReadingId(null);
+      setKeyboardReadingId(null);
+      setPointerPosition(undefined);
+    },
+    version: navigationVersion,
+  });
+  const gestureCoordinate = (event: PointerEvent<SVGSVGElement>) => {
+    const point = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+    return {
+      x: (point.x - plot.left) / plotWidth(plot),
+      y: (plot.bottom - point.y) / plotHeight(plot),
+    };
+  };
   const hasData = allReadings.length > 0;
   const indexForReadingId = (id: string | null): number | null => {
     if (id === null) return null;
@@ -2059,6 +2163,7 @@ function StatisticalFrame<Datum extends object>({
   const readKeyboard = (event: KeyboardEvent<HTMLDivElement>): void => {
     if (event.target !== event.currentTarget) return;
     if (event.key === 'Escape') {
+      navigationGesture.cancel();
       actions.cancel();
       event.preventDefault();
       clearPointer();
@@ -2228,17 +2333,94 @@ function StatisticalFrame<Datum extends object>({
                 data-item-interaction={interactive ? '' : undefined}
                 aria-labelledby={titleId}
                 data-wcl-chart-canvas=""
+                data-exploration={explores ? '' : undefined}
                 onBlur={blurChart}
                 onFocus={focusChart}
                 onKeyDown={readKeyboard}
                 role="group"
                 tabIndex={0}
               >
+                {exploration && visiblePointModel ? (
+                  <ChartExplorationLayer svg={svgElement} plot={plot}>
+                    <ChartRectangularExplorationControls
+                      version={navigationVersion}
+                      window={navigation.normalized}
+                      minimumSpan={navigation.minimumSpan}
+                      labels={exploration.labels}
+                      rangeLabel={exploration.labels.range(navigation.window)}
+                      fullRangeLabel={exploration.labels.range(navigation.full)}
+                      formatWindow={(range) =>
+                        exploration.labels.range(navigation.fromNormalized(range))
+                      }
+                      onChange={changeWindow}
+                      aspectRatio={plotWidth(plot) / plotHeight(plot)}
+                      overview={
+                        <svg
+                          viewBox={`0 0 ${plotWidth(plot)} ${plotHeight(plot)}`}
+                          aria-hidden="true"
+                        >
+                          <g data-wcl-chart-marks="">
+                            {visiblePointModel.points.map((point) => {
+                              const x = navigation.x.position(point.x) * plotWidth(plot);
+                              const y = (1 - navigation.y.position(point.y)) * plotHeight(plot);
+                              const radius = pointRadius(
+                                visiblePointModel,
+                                point,
+                                {...presentation, canvasWidth: viewWidth, viewScale: 1},
+                                maximumMagnitude,
+                              );
+                              return (
+                                <g
+                                  key={point.id}
+                                  data-wcl-statistical-mark=""
+                                  data-color={point.series.color}
+                                >
+                                  <PointShape
+                                    cx={x}
+                                    cy={y}
+                                    radius={radius}
+                                    shape={point.series.shape}
+                                  />
+                                  {selectedKeys.has(
+                                    selectionKey({rowId: point.id, seriesId: point.series.id}),
+                                  ) ? (
+                                    <PointShape
+                                      cx={x}
+                                      cy={y}
+                                      radius={radius + 3 / presentation.viewScale}
+                                      shape={point.series.shape}
+                                      cue="selection"
+                                    />
+                                  ) : null}
+                                </g>
+                              );
+                            })}
+                          </g>
+                        </svg>
+                      }
+                    />
+                  </ChartExplorationLayer>
+                ) : null}
                 <svg
                   aria-hidden="true"
                   data-wcl-chart-svg=""
                   focusable="false"
                   data-selection-enabled={configuration?.selection ? '' : undefined}
+                  onPointerDownCapture={(event) => {
+                    navigationGesture.pointerDown(event, gestureCoordinate);
+                  }}
+                  onPointerMoveCapture={(event) => {
+                    navigationGesture.pointerMove(event, gestureCoordinate);
+                  }}
+                  onPointerUpCapture={(event) => {
+                    navigationGesture.pointerEnd(event);
+                  }}
+                  onPointerCancelCapture={(event) => {
+                    navigationGesture.pointerEnd(event, true);
+                  }}
+                  onLostPointerCaptureCapture={(event) => {
+                    navigationGesture.pointerEnd(event, true);
+                  }}
                   onPointerDown={interactive ? beginItem : readTouch}
                   onPointerUp={
                     interactive ? (event) => actions.end(event, pointFromPointer(event)) : undefined
@@ -2300,7 +2482,7 @@ function StatisticalFrame<Datum extends object>({
                         height={plotHeight(plot)}
                       />
                     </clipPath>
-                    {visibilityLabels ? (
+                    {visibilityLabels || explores ? (
                       <clipPath id={marksClipId}>
                         <rect
                           x={marksBounds.left}
@@ -2312,11 +2494,12 @@ function StatisticalFrame<Datum extends object>({
                     ) : null}
                   </defs>
                   <>
-                    <g clipPath={visibilityLabels ? `url(#${marksClipId})` : undefined}>
+                    <g clipPath={visibilityLabels || explores ? `url(#${marksClipId})` : undefined}>
                       <StatisticalMarks
                         activeIndex={activeIndex}
                         directIndex={directIndex}
                         legendSeriesId={legendSeriesId}
+                        maximumMagnitude={maximumMagnitude}
                         model={model}
                         pinnedSeriesId={validPinnedSeriesId}
                         presentation={presentation}
@@ -2567,6 +2750,7 @@ export function ScatterChart<Datum extends object>(props: ScatterChartProps<Datu
   return (
     <StatisticalFrame
       common={props}
+      {...(props.exploration === undefined ? {} : {exploration: props.exploration})}
       {...(props.interaction === undefined ? {} : {interaction: props.interaction})}
       {...(props.legend === undefined ? {} : {legend: props.legend})}
       model={model}
@@ -2581,6 +2765,7 @@ export function BubbleChart<Datum extends object>(props: BubbleChartProps<Datum>
   return (
     <StatisticalFrame
       common={props}
+      {...(props.exploration === undefined ? {} : {exploration: props.exploration})}
       {...(props.interaction === undefined ? {} : {interaction: props.interaction})}
       {...(props.legend === undefined ? {} : {legend: props.legend})}
       model={model}

@@ -1,0 +1,95 @@
+@layer wcl.components {
+  [data-wcl-chart-rectangular-navigator] {
+    position: relative;
+    box-sizing: border-box;
+    inline-size: min(
+      100%,
+      calc(50dvh * var(--wcl-overview-aspect-ratio)),
+      calc(26rem * var(--wcl-overview-aspect-ratio))
+    );
+    aspect-ratio: var(--wcl-overview-aspect-ratio);
+    margin: 0.75rem auto;
+    border: 1px solid var(--wcl-border);
+    border-radius: 0.25rem;
+    background: var(--wcl-surface-subtle);
+    touch-action: none;
+    user-select: none;
+  }
+
+  [data-wcl-chart-rectangular-window],
+  [data-wcl-chart-rectangular-corner] {
+    position: absolute;
+    box-sizing: border-box;
+    transition:
+      left 180ms ease,
+      top 180ms ease,
+      width 180ms ease,
+      height 180ms ease;
+    touch-action: none;
+  }
+
+  [data-wcl-chart-rectangular-window] {
+    border: 2px solid var(--wcl-accent-rail);
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--wcl-accent-soft) 25%, transparent);
+    cursor: grab;
+  }
+
+  [data-wcl-chart-rectangular-corner] {
+    z-index: 1;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    cursor: nwse-resize;
+  }
+
+  [data-wcl-chart-rectangular-corner='top-right'],
+  [data-wcl-chart-rectangular-corner='bottom-left'] {
+    cursor: nesw-resize;
+  }
+
+  [data-wcl-chart-rectangular-corner]::after {
+    position: absolute;
+    inset: calc(50% - 3px);
+    border: 1px solid var(--wcl-surface);
+    border-radius: 2px;
+    background: var(--wcl-accent-rail);
+    content: '';
+  }
+
+  [data-wcl-chart-rectangular-window]:focus-visible,
+  [data-wcl-chart-rectangular-corner]:focus-visible {
+    outline: 2px solid var(--wcl-accent-focus);
+    outline-offset: 3px;
+  }
+
+  [data-wcl-chart-rectangular-navigator][data-dragging]
+    :is([data-wcl-chart-rectangular-window], [data-wcl-chart-rectangular-corner]) {
+    transition: none;
+  }
+
+  [data-wcl-chart-rectangular-navigator][data-dragging] [data-wcl-chart-rectangular-window] {
+    cursor: grabbing;
+  }
+
+  [data-wcl-chart-rectangular-instructions] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-wcl-chart-rectangular-window],
+    [data-wcl-chart-rectangular-corner] {
+      transition: none;
+    }
+  }
+}

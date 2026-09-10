@@ -1,3 +1,4 @@
+import {PointExplorationExample} from './point-exploration-examples.js';
 import {CartesianExplorationExample} from './cartesian-exploration-examples.js';
 import {LineExplorationExample} from './line-exploration-examples.js';
 import {CompactAxisExample} from './compact-axis-examples.js';
@@ -3801,6 +3802,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Pin a legend group to give it priority where points overlap. ${statisticalVisibilityGuidance}`}
         name="ScatterChart"
       >
+        <Example label="Explore scatter and bubble charts">
+          <PointExplorationExample />
+        </Example>
         <Example label="ScatterChart with group visibility, selection, and details">
           <PointInteractionExample kind="scatter" visibilityLabels={statisticalVisibilityLabels} />
         </Example>
@@ -3813,6 +3817,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Add one positive measurement through proportional mark area. Bubble areas express magnitude within the visible dataset; tooltips and the full table retain exact source values. ${statisticalVisibilityGuidance}`}
         name="BubbleChart"
       >
+        <p>
+          <a href="#scatter-chart">Compare pan and zoom for scatter and bubble charts.</a>
+        </p>
         <Example label="BubbleChart with group visibility, selection, and details">
           <PointInteractionExample kind="bubble" visibilityLabels={statisticalVisibilityLabels} />
         </Example>

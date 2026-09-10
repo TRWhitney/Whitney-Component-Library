@@ -1,4 +1,10 @@
-import {BoxPlot, BubbleChart, Histogram, ScatterChart} from '../src/index.js';
+import {
+  BoxPlot,
+  BubbleChart,
+  Histogram,
+  ScatterChart,
+  type ChartRectangularExploration,
+} from '../src/index.js';
 
 interface PointDatum {
   readonly id: string;
@@ -181,3 +187,62 @@ export const invalidBoxOutliers = (
     yAxis={{label: 'Recovery', scale: {type: 'linear'}}}
   />
 );
+
+const pointExploration: ChartRectangularExploration<number, number> = {
+  labels: {
+    overview: 'Overview',
+    closeOverview: 'Close overview',
+    done: 'Done',
+    reset: 'Reset view',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    panLeft: 'Left',
+    panRight: 'Right',
+    panUp: 'Up',
+    panDown: 'Down',
+    window: 'Visible area',
+    instructions: 'Drag the area.',
+    corner: (corner) => corner,
+    range: ({x, y}) => `${x[0]},${y[0]} to ${x[1]},${y[1]}`,
+  },
+  window: {x: [10, 30], y: [15, 50]},
+  onWindowChange: ({x, y}) => {
+    const lower: number = x[0] + y[0];
+    void lower;
+  },
+};
+export const exploringScatter = (
+  <ScatterChart
+    {...common}
+    data={points}
+    idAccessor="id"
+    labelAccessor="label"
+    series={series}
+    exploration={pointExploration}
+    xAxis={{accessor: 'x', label: 'X', scale: {type: 'linear'}}}
+    yAxis={{accessor: 'y', label: 'Y', scale: {type: 'linear'}}}
+  />
+);
+export const exploringBubble = (
+  <BubbleChart
+    {...common}
+    data={points}
+    idAccessor="id"
+    labelAccessor="label"
+    series={series}
+    exploration={pointExploration}
+    magnitude={{accessor: 'size', label: 'Size'}}
+    xAxis={{accessor: 'x', label: 'X', scale: {type: 'linear'}}}
+    yAxis={{accessor: 'y', label: 'Y', scale: {type: 'linear'}}}
+  />
+);
+// @ts-expect-error A controlled point window needs an update callback.
+export const missingPointWindowCallback: ChartRectangularExploration<number, number> = {
+  labels: pointExploration.labels,
+  window: {x: [0, 1], y: [0, 1]},
+};
+export const invalidPointWindow: ChartRectangularExploration<number, number> = {
+  labels: pointExploration.labels,
+  // @ts-expect-error Point exploration axes are numeric.
+  defaultWindow: {x: ['low', 'high'], y: [0, 1]},
+};
