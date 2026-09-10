@@ -42,15 +42,17 @@ describe('component showcase', () => {
   });
 
   it('lets a reader change the propagated accent and see its exact value', () => {
-    const {container, getByLabelText, getByText} = render(<Showcase />);
-    const accentInput = getByLabelText('Accent');
+    const {container} = render(<Showcase />);
+    const controls = container.querySelector('aside');
+    if (!(controls instanceof HTMLElement)) throw new Error('Showcase controls are missing.');
+    const accentInput = within(controls).getByLabelText('Accent');
 
     fireEvent.change(accentInput, {target: {value: '#ff0000'}});
 
     const provider = container.querySelector('[data-wcl-provider]');
     expect(provider?.getAttribute('style')).toContain('--wcl-accent: #ff0000');
     expect(provider?.getAttribute('style')).toContain('--wcl-accent-fill: #ff0000');
-    expect(getByText('#ff0000')).toBeTruthy();
+    expect(within(controls).getByText('#ff0000')).toBeTruthy();
   });
 
   it('reveals each pane scrollbar while the reader scrolls', () => {

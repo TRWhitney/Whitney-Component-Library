@@ -10,9 +10,7 @@ Heatmap visibility is delivered in `3600497`. Whitney approved pan and zoom for 
 LineChart in the [exploration study](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract).
 The [compact-layout audit](research/compact-layout-audit.md) led to production fixes in tickets
 22–24: shared axis fitting, visible vertical titles and readable radar text. Validation and
-independent intent and engineering reviews pass. Next is one exploration prototype covering several
-chart types together, as Whitney requested. Other chart exploration and public range contracts
-remain planning work.
+independent intent and engineering reviews pass. The [combined exploration study](prototypes/chart-exploration-comparison.md) now covers area, grouped and stacked columns, mixed columns/line and a line reference. Whitney approved the corrected horizontal group. The [scatter/bubble study](prototypes/point-exploration.md#accepted-behavior) is approved, including the centered, directly resizable compact map, integrated expand icon and plain dialog. Whitney requires retaining the full-space reference; both the large permanent overview and distorted strip were rejected. The remaining distribution/category/heatmap study is approved. The production boundary and tickets 25–30 define the implementation sequence. Ticket 25 layout prerequisites are delivered with 761 passing tests, packed React 18/19 verification and independent reviews. Line navigation in ticket 26 is ready for implementation.
 
 ## Progress
 
@@ -44,6 +42,8 @@ are settled. Scatter/bubble Centers inside selection is delivered. Radar, heatma
 
 ## Verification
 
+[Ticket 25](tickets/25-exploration-layout-foundation.md#completion-evidence) records 761 passing tests, repository and package checks, and inspected production spacing and visibility flows. Independent intent and engineering reviews pass.
+
 [Ticket 21](tickets/21-heatmap-visibility.md#completion-evidence) records the passing repository,
 public type, package and browser checks, plus independent intent and engineering reviews.
 
@@ -54,9 +54,14 @@ and any change to the accepted chart palette or existing reading semantics.
 
 ## Continuation
 
-- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
+- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
 - Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is `3e6a391`. Radar visibility is `5c51e05`. Legend release is delivered in the commit containing this record.
 - Production showcase: `http://localhost:5174`, Vite session `54846`.
-- Next action: return to planning and build one combined exploration study for multiple chart types. Do not use agents or production testing for that prototype. Pause only for consequential choices that need Whitney's input.
-- Tickets 22–24, accepted exploration source, audit evidence and work records are delivered with the compact-layout fixes. Axis fitting is `813f5c6`; title fitting is `ed596b0`; radar text is delivered in the commit containing this record.
+- Next action: implement [26](tickets/26-line-exploration.md), then extend the shared navigation work through tickets 27–30. [25](tickets/25-exploration-layout-foundation.md) is complete. All demonstrated exploration families are approved. Production verification applies to implementation; prototype tweaks still use no agents or production test suites.
+- Tickets 22–24, accepted exploration source, audit evidence and work records are delivered with the compact-layout fixes. Axis fitting is `813f5c6`; title fitting is `ed596b0`; radar text is `e28dc57`.
 - Ticket 21 component/types/styles/tests, showcase/contracts/generated guides and accepted prototype/spec/map/status records are committed together.
+
+- Ticket 25 production changes, accepted exploration prototypes and records, and tickets 26–30 are committed. Heatmap spacing is `7a2fe96`. The production preview is refreshed and its Station 10 click was verified remotely.
+- Production checks for tickets 22–24 passed: 758 tests, public consumer types, packed React 18/19 verification, showcase build and independent intent/engineering reviews. The public showcase build is refreshed.
+
+- [Record and run instructions](prototypes/remaining-exploration.md). Revised after overview feedback: histogram/box use long strips without popouts; bar dimensions stay fixed and its horizontal strip transposes station navigation; the heatmap Room label has space for its restore eye; production eyes and shared overview visibility are enabled. Heatmap retains its rectangular overview. Whitney approved the completed study.

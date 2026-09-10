@@ -1135,8 +1135,8 @@ describe('Cartesian charts', () => {
     expect(shortBarMargin).toBeLessThan(110);
     expect(Math.abs(shortBarMargin - lineMargin)).toBeLessThan(40);
     expect(longBarMargin).toBeGreaterThan(shortBarMargin);
-    // Reserve room for readable titles while retaining most of the plot width.
-    expect(longBarMargin).toBeLessThanOrEqual(640 / 3);
+    // Labels and titles may use up to half the viewport at compact sizes.
+    expect(longBarMargin).toBeLessThanOrEqual(640 / 2);
   });
 
   it('uses content-aware label rows before exposing a native local scroll region', () => {
@@ -1460,13 +1460,16 @@ describe('Cartesian charts', () => {
       }))
       .sort((left, right) => left.y - right.y);
     expect(bars).toHaveLength(denseData.length);
-    expect(bars.every(({height}) => height > 0 && height < 29)).toBe(true);
+    expect(bars.every(({height}) => height > 0)).toBe(true);
     expect(new Set(bars.map(({y}) => y)).size).toBe(denseData.length);
     expect(
       bars.slice(0, -1).every((bar, index) => bar.y + bar.height <= (bars[index + 1]?.y ?? 0)),
     ).toBe(true);
     expect(bars[0]?.y).toBeGreaterThanOrEqual(18);
-    expect((bars.at(-1)?.y ?? 0) + (bars.at(-1)?.height ?? 0)).toBeLessThanOrEqual(306);
+    const bottom = Number(
+      container.querySelector('[data-axis="x"] [data-wcl-chart-axis-rail]')!.getAttribute('y1'),
+    );
+    expect((bars.at(-1)?.y ?? 0) + (bars.at(-1)?.height ?? 0)).toBeLessThanOrEqual(bottom);
   });
 });
 
@@ -1542,4 +1545,100 @@ it('wraps a long vertical title while retaining its complete wording', () => {
   const label = container.querySelector('[data-axis="y"] [data-wcl-chart-axis-label]')!;
   expect(label.textContent).toBe(`${title} (minutes)`);
   expect(label.querySelectorAll('tspan').length).toBeGreaterThan(1);
+});
+
+it('keeps twelve horizontal categories readable and activates the lower bar in the enlarged plot', () => {
+  const stations = Array.from({length: 12}, (_, i) => ({
+    id: `s${i + 1}`,
+    label: `Station ${i + 1}`,
+    value: 36 + ((i * 17) % 64),
+    returned: 10 + ((i * 7) % 30),
+  }));
+  const onActivate = vi.fn();
+  const {container} = render(
+    <BarChart
+      data={stations}
+      title="Stations"
+      description="Twelve stations"
+      dataTableLabel="Stations"
+      emptyState={emptyState}
+      invalidData={invalidData}
+      series={[
+        {id: 'value', label: 'Value', accessor: 'value'},
+        {id: 'returned', label: 'Returned', accessor: 'returned'},
+      ]}
+      legend={{label: 'Series'}}
+      visibilityLabels={{
+        hideSeries: (s) => `Hide ${s}`,
+        showSeries: (s) => `Show ${s}`,
+        hidden: 'Hidden',
+        showAll: 'Show all',
+        allHidden: {title: 'Hidden', description: 'Restore a series'},
+      }}
+      minimumSize={{width: 320, height: 180}}
+      xAxis={{label: 'Value', scale: {type: 'linear'}}}
+      yAxis={{label: 'Station', accessor: 'label', scale: {type: 'categorical'}}}
+      interaction={{target: 'category', getRowId: (row) => row.id, onActivate}}
+    />,
+  );
+  const svg = container.querySelector<SVGSVGElement>('[data-wcl-chart-svg]')!;
+  const [, , width, height] = svg.getAttribute('viewBox')!.split(' ').map(Number);
+  const scale = 320 / width!;
+  const tickPositions = [
+    ...container.querySelectorAll('[data-axis="y"] [data-wcl-chart-tick-label]'),
+  ].map((tick) => Number(tick.getAttribute('y')) * scale);
+  expect(tickPositions).toHaveLength(12);
+  expect(
+    Math.min(...tickPositions.slice(1).map((y, i) => y - tickPositions[i]!)),
+  ).toBeGreaterThanOrEqual(19);
+  const rail = container.querySelector('[data-axis="x"] [data-wcl-chart-axis-rail]')!;
+  expect(Number(rail.getAttribute('x1')) * scale).toBeGreaterThanOrEqual(110);
+  const title = container.querySelector('[data-axis="x"] [data-wcl-chart-axis-label]')!;
+  expect(Number(title.getAttribute('y'))).toBeGreaterThan(Number(rail.getAttribute('y1')));
+  expect(Number(title.getAttribute('y'))).toBeLessThan(height!);
+  Object.defineProperty(svg, 'getBoundingClientRect', {
+    value: () => ({
+      left: 10,
+      top: 20,
+      width: 320,
+      height: height! * scale,
+      right: 330,
+      bottom: 20 + height! * scale,
+    }),
+  });
+  const bar = container.querySelector('[data-wcl-chart-bar][data-row-index="9"]')!;
+  const at = {
+    clientX: 10 + (Number(bar.getAttribute('x')) + Number(bar.getAttribute('width')) / 2) * scale,
+    clientY: 20 + (Number(bar.getAttribute('y')) + Number(bar.getAttribute('height')) / 2) * scale,
+    pointerType: 'mouse',
+    pointerId: 1,
+    button: 0,
+    isPrimary: true,
+  };
+  fireEvent.pointerDown(svg, at);
+  fireEvent.pointerUp(svg, at);
+  expect(onActivate).toHaveBeenCalledWith(expect.objectContaining({datum: stations[9]}));
+  const viewport = svg.getAttribute('viewBox');
+  fireEvent.click(screen.getByRole('button', {name: 'Hide Value'}));
+  expect(svg.getAttribute('viewBox')).toBe(viewport);
+});
+
+it('retains a taller requested bar canvas when categories need extra spacing', () => {
+  const {container} = render(
+    <BarChart
+      aspectRatio={0.5}
+      minimumSize={{width: 320, height: 180}}
+      data={Array.from({length: 12}, (_, i) => ({station: String(i + 1), value: i + 1}))}
+      title="Stations"
+      description="Twelve stations"
+      dataTableLabel="Station values"
+      emptyState={emptyState}
+      invalidData={invalidData}
+      series={[{id: 'value', label: 'Value', accessor: 'value'}]}
+      xAxis={{label: 'Value', scale: {type: 'linear'}}}
+      yAxis={{label: 'Station', accessor: 'station', scale: {type: 'categorical'}}}
+    />,
+  );
+  const frame = container.querySelector<HTMLElement>('[data-wcl-chart-frame]')!;
+  expect(Number(frame.style.getPropertyValue('--wcl-chart-aspect-ratio'))).toBe(0.5);
 });

@@ -753,6 +753,14 @@ function interactiveBarContract(
   const valueAxis = '{label: "Energy", unit: "MWh", scale: {type: "linear"}}';
   return {
     ...base,
+    responsiveBehavior: [
+      ...base.responsiveBehavior,
+      ...(horizontal
+        ? [
+            'Narrow charts with many categorical rows gain enough plot height to keep category labels separated. Plot bounds, axis titles and pointer coordinates share that enlarged viewport. Hiding series does not change category spacing.',
+          ]
+        : []),
+    ],
     accessibility: [
       ...base.accessibility,
       'Selection instructions, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the current bar or category without adding a whole-chart focus outline.',

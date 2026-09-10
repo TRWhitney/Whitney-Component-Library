@@ -501,3 +501,90 @@ The [compact-layout audit](research/compact-layout-audit.md) records the confirm
 limits of the initial review. [Ticket 22](tickets/22-consistent-axis-label-fitting.md) addresses
 axis crowding and missing box staggering. [Ticket 23](tickets/23-visible-axis-titles.md) addresses
 clipped vertical titles. [Ticket 24](tickets/24-readable-radar-labels.md) preserves a 12px rendered minimum for radar labels without changing the approved interactions. None of these findings expands approval of exploration to other charts.
+
+## Accepted horizontal exploration group
+
+The [combined study](prototypes/chart-exploration-comparison.md#accepted-behavior) extends the
+approved monthly line exploration to area, grouped columns, stacked columns and columns with a
+line. Its corrected live production selection marks and plot-attached controls are binding.
+Other domain shapes and the public API remain planning work.
+
+## Accepted scatter and bubble exploration
+
+Use the [accepted two-axis contract](prototypes/point-exploration.md#accepted-behavior) and retained
+source. The centered proportional overview remains useful without expansion: move and resize
+its region directly. An integrated quiet icon opens a larger synchronized map in the existing
+Dialog. Keep the accepted plain copy and retain the view on dismissal. Preserve production
+selection/activation, two-finger pan and pinch, stable magnitude reference, and viewport clipping.
+The public viewport API and remaining domain families still require planning.
+
+## Accepted remaining exploration families
+
+The [combined distribution/category contract](prototypes/remaining-exploration.md#accepted-behavior)
+is approved. Preserve the horizontal histogram and box strips without popouts, the fixed-height
+horizontal station strip transposed to vertical chart categories, the rectangular heatmap map,
+production visibility controls and their synchronized overviews, fixed chart dimensions during
+navigation, and a Room label that remains readable beside the restore eye and count.
+
+## Production exploration boundary
+
+Exploration is opt-in and independent of selection and activation. The accepted artifacts define
+its controls, gestures, layout, motion and visible feedback. Applications supply localized control
+and range labels, as for existing chart interaction. They may let the chart own its window or
+provide the current window plus a change callback. Default and controlled windows are exclusive.
+Range callbacks contain domain values or stable category identities, never display indexes,
+pixel coordinates, renderer objects or private gesture state. Applications can coordinate views
+by passing these values deliberately; charts do not share global state.
+
+The production sequence delivers the following complete paths:
+
+- Continuous numeric/time LineChart navigation first, with attached controls, the horizontal
+  overview, native two-finger arbitration and controlled-range examples.
+- Remaining Cartesian category navigation and line/area/column combinations using that same
+  interaction foundation. Horizontal bars transpose only their overview, keeping the main chart's
+  vertical category order. Categorical windows include complete category bands.
+- Scatter and bubble explore both numeric dimensions. Their overview retains correct proportions,
+  the accepted compact sizing and optional expansion. Bubble magnitude is derived before viewport
+  clipping so navigation cannot change an observation's represented size.
+- Histograms explore complete bins prepared from the full data; counts, boundaries and upper-edge
+  inclusivity never depend on the current window. Box plots explore group identities and preserve
+  complete summaries and stable outlier IDs. They use horizontal strips without expansion.
+- Heatmap windows contain complete rows and columns. Hidden tracks close their gaps in the chart
+  and overview and remain restorable. Color meaning is independent of the viewport.
+
+Existing explicit scale domains remain application constraints. Without explicit constraints, the
+full valid, visible data determines reset bounds; the viewport is a separate window within those
+bounds. Navigation never silently overwrites the application's scale definition. Automatic value
+axes fit visible geometry, including boundary-crossing lines/bands and required zero baselines;
+normalized values retain their meaning. Numeric/time windows are clamped in their scale space;
+categorical windows use ordered category values or IDs. Stable identity must survive reordering
+and equal-valued observations. Invalid application windows receive clear validation errors;
+changes to valid data reconcile the window to available bounds without changing selection IDs.
+
+An unchanged full-range view follows changes to the full domain. A zoomed window preserves its
+position and span where possible, shifting only enough to remain within changed bounds. Empty
+numeric windows retain the axes, navigation controls, overview and reset; absence of observations
+inside the window is not invalid input. All-hidden recovery remains the existing visibility state.
+Full data preparation and its structured alternative remain available independently of clipping.
+Keyboard target lists contain visible interactive items; off-screen items cannot be accidentally
+activated through a stale reading. Selections outside the window remain retained and named.
+
+Continuous gesture updates notify the application as the visible range changes; a separate
+completion notification allows expensive work after release. Button and keyboard changes complete
+immediately. Cancelled gestures restore their starting window; the second touch cancels pending
+selection and activation before exploration begins. Controlled changes report intent and follow
+the supplied value without feedback loops. Changing only callback identity must not cancel input.
+
+Ordinary wheel scrolling remains browser scrolling in this delivery. Pie/donut, radar and
+Sparkline do not receive new exploration controls in this phase. The two additional compositions,
+general data-transition animation and whole-library responsiveness budgets remain separate parent
+work. This does not exclude those accepted parent requirements.
+
+### Production verification
+
+Preserve the accepted prototypes and compare rendered production at compact and wide sizes, light
+and dark appearances, visible/hidden/all-hidden states and reduced motion. Verify the public
+component seam for controlled and internal windows, callbacks, IDs, data replacement, full tables,
+clipping and interaction arbitration. Use meaningful regressions for coordinate and state bugs.
+Package types, SSR/hydration, generated contracts, chart isolation and the human-facing showcase
+must remain current. Prototype bridges, DOM mutation and fixture-specific geometry do not ship.

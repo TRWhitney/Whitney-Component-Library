@@ -95,6 +95,8 @@ export type ChartTooltipStyles = CSSProperties & {
 
 export const viewWidth = 640;
 export const viewHeight = 360;
+const categoryBandPadding = 0.18;
+const minimumCategoryStep = 20;
 const compactPlot = {bottom: 306, left: 60, right: 620, top: 18} as const;
 export const defaultColors: readonly ChartColor[] = [
   'accent',
@@ -306,7 +308,10 @@ export function createProjection<Value extends ChartDomainValue>(
     const domain = [...(scale.domain ?? stableDomain(values))];
     const ticks = domain;
     if (useBands) {
-      const band: ScaleBand<Value> = scaleBand<Value>().domain(domain).range(range).padding(0.18);
+      const band: ScaleBand<Value> = scaleBand<Value>()
+        .domain(domain)
+        .range(range)
+        .padding(categoryBandPadding);
       return {
         bandwidth: band.bandwidth(),
         position: (value) => {
@@ -450,9 +455,14 @@ function axisTitle(axis: {readonly label: string; readonly unit?: string}): stri
   return `${axis.label}${axis.unit === undefined ? '' : ` (${axis.unit})`}`;
 }
 
-function verticalTitleLines(title: string, fontSize: number, bounds: PlotBounds): string[] {
+function verticalTitleLines(
+  title: string,
+  fontSize: number,
+  bounds: PlotBounds,
+  viewportHeight = viewHeight,
+): string[] {
   const center = bounds.top + plotHeight(bounds) / 2;
-  const available = Math.min(center, viewHeight - center) * 2 - fontSize;
+  const available = Math.min(center, viewportHeight - center) * 2 - fontSize;
   const lines: string[] = [];
   let line = '';
   for (const word of title.split(' ')) {
@@ -471,14 +481,16 @@ export function plotForYAxisLabels(
   fontScale: number,
   bounds: PlotBounds,
   title = '',
+  viewportHeight = viewHeight,
 ): PlotBounds {
-  const widestLabel = Math.max(0, ...labels.map(estimatedUtilityTextWidth)) * fontScale;
+  const widestLabel =
+    Math.max(0, ...labels.map((label) => [...label].length * 16 * 0.62)) * fontScale;
   const fontSize = fontScale * 16;
-  const lines = verticalTitleLines(title, fontSize, bounds);
+  const lines = verticalTitleLines(title, fontSize, bounds, viewportHeight);
   const titleSpace = fontSize * Math.max(1, lines.length) * 1.25 + 14;
   const left = Math.max(
     compactPlot.left,
-    Math.min(viewWidth / 3, Math.ceil(widestLabel + titleSpace)),
+    Math.min(viewWidth / 2, Math.ceil(widestLabel + titleSpace)),
   );
   return {...bounds, left};
 }
@@ -569,6 +581,7 @@ export function Axis<Value extends ChartDomainValue>({
   projection,
   presentation,
   staggerLabels,
+  viewportHeight = viewHeight,
 }: {
   readonly axis: {
     readonly formatTick?: (tick: Value) => string;
@@ -582,12 +595,15 @@ export function Axis<Value extends ChartDomainValue>({
   readonly projection: Projection<Value>;
   readonly presentation: PresentationMetrics;
   readonly staggerLabels?: boolean;
+  readonly viewportHeight?: number;
 }): ReactElement {
   const horizontal = placement === 'x';
   const titleFontSize = presentation.fontSize / presentation.viewScale;
   const titleX = titleFontSize + 4;
   const title = axisTitle(axis);
-  const titleLines = horizontal ? [title] : verticalTitleLines(title, titleFontSize, plot);
+  const titleLines = horizontal
+    ? [title]
+    : verticalTitleLines(title, titleFontSize, plot, viewportHeight);
   const centerCategoricalLabels = horizontal && axis.scale.type === 'categorical';
   const renderedTicks = projection.ticks.flatMap((tick, sourceIndex) => {
     const position = projection.position(tick);
@@ -677,7 +693,7 @@ export function Axis<Value extends ChartDomainValue>({
           horizontal ? undefined : `rotate(-90 ${titleX} ${plot.top + plotHeight(plot) / 2})`
         }
         x={horizontal ? plot.left + plotWidth(plot) / 2 : titleX}
-        y={horizontal ? viewHeight - 7 : plot.top + plotHeight(plot) / 2}
+        y={horizontal ? viewportHeight - 7 : plot.top + plotHeight(plot) / 2}
       >
         {titleLines.length === 1
           ? title
@@ -753,12 +769,14 @@ function svgViewport(svg: SVGSVGElement): {
   readonly top: number;
 } {
   const rectangle = svg.getBoundingClientRect();
-  const scale = Math.min(rectangle.width / viewWidth, rectangle.height / viewHeight);
+  const [, , width = viewWidth, height = viewHeight] =
+    svg.getAttribute('viewBox')?.trim().split(/\s+/).map(Number) ?? [];
+  const scale = Math.min(rectangle.width / width, rectangle.height / height);
   if (!Number.isFinite(scale) || scale <= 0) return {left: 0, scale: 1, top: 0};
   return {
-    left: rectangle.left + (rectangle.width - viewWidth * scale) / 2,
+    left: rectangle.left + (rectangle.width - width * scale) / 2,
     scale,
-    top: rectangle.top + (rectangle.height - viewHeight * scale) / 2,
+    top: rectangle.top + (rectangle.height - height * scale) / 2,
   };
 }
 
@@ -1826,7 +1844,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         })
       : createProjection(
           valueAxis.scale,
-          valueDomain(prepared.rows, layout, series),
+          valueDomain(allPrepared.rows, layout, allSeries),
           [0, 1],
           valueAxis.tickCount ?? 5,
           false,
@@ -1838,8 +1856,26 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   );
   const hasLocalOverflow =
     overflow === 'scroll' && presentation.canvasWidth > (availableWidth ?? minimumSize.width);
+  const basePlot = plotForPresentation(presentation);
+  const categoryCount =
+    categoryAxis.scale.type === 'categorical'
+      ? (categoryAxis.scale.domain ?? stableDomain(allPrepared.rows.map((row) => row.category)))
+          .length
+      : 0;
+  // Complete source categories and label metrics keep visibility changes from resizing the chart.
+  const extraHeight =
+    categoryPlacement === 'y' && categoryCount > 0
+      ? Math.max(
+          0,
+          ((categoryCount + categoryBandPadding) * minimumCategoryStep) / presentation.viewScale -
+            plotHeight(basePlot),
+        )
+      : 0;
+  const canvasHeight = viewHeight + extraHeight;
+  const presentationPlot = {...basePlot, bottom: basePlot.bottom + extraHeight};
   const frameStyle: ChartFrameStyles = {
-    '--wcl-chart-aspect-ratio': aspectRatio,
+    '--wcl-chart-aspect-ratio':
+      extraHeight > 0 ? Math.min(aspectRatio, viewWidth / canvasHeight) : aspectRatio,
     '--wcl-chart-axis-font-size': `${presentation.fontSize / presentation.viewScale}px`,
     '--wcl-chart-grid-width': `${presentation.gridWidth}px`,
     '--wcl-chart-line-width': `${presentation.lineWidth}px`,
@@ -1960,7 +1996,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
         false,
       ),
     });
-    const presentationPlot = plotForPresentation(presentation);
     const preliminaryProjections = createPlotProjections(presentationPlot);
     const yAxisLabels =
       categoryPlacement === 'x'
@@ -1974,6 +2009,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       presentation.fontSize / presentation.viewScale / 16,
       presentationPlot,
       axisTitle(categoryPlacement === 'x' ? valueAxis : categoryAxis),
+      canvasHeight,
     );
     const {categoryProjection, valueProjection} = createPlotProjections(plot);
     const references = readingReferences(annotations, categoryPlacement);
@@ -2386,11 +2422,12 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
               onPointerLeave={() => setPointerReading(null)}
               onPointerMove={movePointerReading}
               ref={setSvgElement}
-              viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+              viewBox={`0 0 ${viewWidth} ${canvasHeight}`}
             >
               {categoryPlacement === 'x' ? (
                 <>
                   <Axis
+                    viewportHeight={canvasHeight}
                     axis={categoryAxis}
                     placement="x"
                     plot={plot}
@@ -2399,6 +2436,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                     staggerLabels={presentation.staggerLabels}
                   />
                   <Axis
+                    viewportHeight={canvasHeight}
                     axis={valueAxis}
                     placement="y"
                     plot={plot}
@@ -2409,6 +2447,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
               ) : (
                 <>
                   <Axis
+                    viewportHeight={canvasHeight}
                     axis={valueAxis}
                     placement="x"
                     plot={plot}
@@ -2417,6 +2456,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                     staggerLabels={presentation.staggerLabels}
                   />
                   <Axis
+                    viewportHeight={canvasHeight}
                     axis={categoryAxis}
                     placement="y"
                     plot={plot}

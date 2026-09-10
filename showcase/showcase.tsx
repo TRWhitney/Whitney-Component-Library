@@ -3709,6 +3709,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         <Example label="BarChart with selection and details">
           <BarInteractionExample orientation="horizontal" visibilityLabels={visibilityLabels} />
         </Example>
+        <Example label="Twelve stations in a compact container">
+          <CompactAxisExample kind="bar" />
+        </Example>
       </Specimen>
 
       <Specimen
