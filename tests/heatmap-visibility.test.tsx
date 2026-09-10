@@ -295,3 +295,29 @@ it('keeps a visible missing cell operable when all recorded values have been hid
     }),
   );
 });
+
+it('reserves Room and the restore count before hiding short-named tracks', () => {
+  const rows = Array.from({length: 8}, (_, i) => ({id: `r${i}`, label: `A${i + 1}`}));
+  const columns = Array.from({length: 8}, (_, i) => ({id: `c${i}`, label: `${i}:00`}));
+  const {container} = render(
+    <Heatmap
+      {...common}
+      rows={rows}
+      columns={columns}
+      data={[{row: 'r0', column: 'c0', value: 1}]}
+    />,
+  );
+  const labelWidth = () =>
+    parseFloat(
+      container
+        .querySelector<HTMLElement>('[data-wcl-heatmap-frame]')!
+        .style.getPropertyValue('--wcl-heatmap-row-label-width'),
+    );
+  const before = labelWidth();
+  // The Room word, a closed eye with a two-digit count, gaps and padding fit in 100px.
+  expect(before).toBeGreaterThanOrEqual(100);
+  press('Hide row A2');
+  expect(labelWidth()).toBe(before);
+  expect(screen.getByRole('button', {name: 'Restore 1 hidden dimensions'})).toBeTruthy();
+  expect(container.querySelector('[data-wcl-heatmap-corner] > span')?.textContent).toBe('Room');
+});

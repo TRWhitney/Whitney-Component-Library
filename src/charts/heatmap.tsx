@@ -577,9 +577,15 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
     estimatedUtilityTextWidth(props.labels.row),
     ...props.rows.map((row) => estimatedUtilityTextWidth(row.label)),
   );
+  // Reserve the largest possible restore count before any track is hidden.
+  const visibilityLabelSpace = visibility
+    ? 64 +
+      estimatedUtilityTextWidth(String(sourceProps.rows.length + sourceProps.columns.length)) *
+        (12 / 16)
+    : 16;
   const fullRowLabelWidth = clamp(
     48,
-    Math.ceil(widestEstimatedRowLabel * (12 / 16) + (visibility ? 52 : 16)),
+    Math.ceil(widestEstimatedRowLabel * (12 / 16) + visibilityLabelSpace),
     160,
   );
   const fullGridWidth = fullRowLabelWidth + columnCount * 64 + columnCount * 4;
@@ -595,7 +601,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
   const labelFontScale = (isCompact ? 11 : 12) / 16;
   const rowLabelWidth = clamp(
     48,
-    Math.ceil(widestEstimatedRowLabel * labelFontScale + (visibility ? 52 : 16)),
+    Math.ceil(widestEstimatedRowLabel * labelFontScale + visibilityLabelSpace),
     160,
   );
   const calculatedGridWidth = rowLabelWidth + columnCount * cellMinimumWidth + columnCount * 4;

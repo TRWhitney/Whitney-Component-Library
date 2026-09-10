@@ -3464,8 +3464,9 @@ function HeatmapInteractionExample({
       <p>
         Hover or keyboard-focus a room or time label to reveal its eye; touchscreens keep eyes
         visible. Hide a room or time to remove its whole track. To restore it, open the closed eye
-        and count beside Room, then use its eye in the overlaid list. Hidden selections remain
-        selected, and the data table keeps every reading.{' '}
+        and count beside Room, then use its eye in the overlaid list. The heading reserves room for
+        that count before any tracks are hidden. Hidden selections remain selected, and the data
+        table keeps every reading.{' '}
         {deviation
           ? 'This chart keeps a fixed color range of −6 to 6 °C when tracks are hidden.'
           : 'The color range automatically fits the remaining visible readings.'}
