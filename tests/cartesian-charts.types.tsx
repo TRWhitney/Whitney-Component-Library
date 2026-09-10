@@ -244,3 +244,54 @@ export const mixedWindowOwnership: ChartExploration<Date> = {
   defaultWindow: [new Date(0), new Date(1000)],
   onWindowChange: () => {},
 };
+
+const categoryExploration: ChartExploration<string> = {
+  labels: {...explorationLabels, range: ([start, end]) => `${start} to ${end}`},
+  window: ['A', 'C'],
+  onWindowChange: ([start]) => start.toUpperCase(),
+};
+export const exploredArea = (
+  <AreaChart<Datum, Date>
+    {...common}
+    xAxis={{accessor: 'when', label: 'When', scale: {type: 'time'}}}
+    yAxis={{label: 'Value', scale}}
+    exploration={{labels: explorationLabels, defaultWindow: [new Date(0), new Date(1000)]}}
+  />
+);
+export const exploredColumns = (
+  <ColumnChart<Datum, string>
+    {...common}
+    xAxis={{accessor: 'category', label: 'Category', scale: {type: 'categorical'}}}
+    yAxis={{label: 'Value', scale}}
+    exploration={categoryExploration}
+  />
+);
+export const exploredBars = (
+  <BarChart<Datum, string>
+    {...common}
+    xAxis={{label: 'Value', scale}}
+    yAxis={{accessor: 'category', label: 'Category', scale: {type: 'categorical'}}}
+    exploration={categoryExploration}
+  />
+);
+export const exploredMixed = (
+  <CartesianChart<Datum, string>
+    {...common}
+    series={[
+      {...common.series[0], kind: 'area'},
+      {...common.series[0], id: 'line', kind: 'line'},
+    ]}
+    xAxis={{accessor: 'category', label: 'Category', scale: {type: 'categorical'}}}
+    yAxis={{label: 'Value', scale}}
+    exploration={categoryExploration}
+  />
+);
+export const wrongBarWindowValues = (
+  <BarChart<Datum, string>
+    {...common}
+    xAxis={{label: 'Value', scale}}
+    yAxis={{accessor: 'category', label: 'Category', scale: {type: 'categorical'}}}
+    // @ts-expect-error Horizontal exploration values belong to the category axis.
+    exploration={{...categoryExploration, window: [1, 2]}}
+  />
+);

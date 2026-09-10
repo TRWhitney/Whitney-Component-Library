@@ -36,6 +36,7 @@ export interface ChartExplorationControlLabels {
 
 export interface ChartExplorationControlsProps {
   readonly version?: string;
+  readonly largeStepMultiplier?: number;
   readonly step?: number;
   readonly window: WindowRange;
   readonly minimumSpan: number;
@@ -97,6 +98,7 @@ function Glyph({
 
 export function ChartExplorationControls({
   version,
+  largeStepMultiplier = 3,
   step,
   window,
   minimumSpan,
@@ -200,7 +202,7 @@ export function ChartExplorationControls({
 
   function keyDown(event: KeyboardEvent<HTMLDivElement>, kind: WindowPart): void {
     if (gesture.current) return;
-    const keyboardStep = (step ?? minimum) * (event.shiftKey ? 3 : 1);
+    const keyboardStep = (step ?? minimum) * (event.shiftKey ? largeStepMultiplier : 1);
     const delta =
       event.key === 'ArrowLeft' || event.key === 'ArrowDown'
         ? -keyboardStep

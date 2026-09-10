@@ -747,6 +747,12 @@ const areaChartBaseContract = chartContract({
   use: 'magnitude or contribution across an ordered domain benefits from a filled baseline and any stacking relationship is explicit',
 });
 
+const cartesianExplorationBehavior = [
+  'Optional exploration shares the LineChart domain-window contract: labels, defaultWindow or controlled window with onWindowChange, completion through onWindowChangeEnd, and fractional minimumSpan. Categorical windows use complete bands and stable ordered values. Full source tables and selections outside the window remain available.',
+  'Attached zoom, pan and reset controls share an Overview icon. It opens a horizontal full-data strip in Dialog, with the chart’s own area, grouped, stacked or normalized geometry and current series visibility. Horizontal bars transpose their categories into this strip. Closing retains the range and returns focus; navigation and opening the dialog do not resize the main chart.',
+  'Two fingers pan and pinch the main chart without selecting or activating. Overview dragging follows immediately; keyboard and reset changes animate unless reduced motion is requested. Automatic values fit visible geometry, including columns crossing a numeric viewport edge. Stacks and normalized shares use the visible series. Application callbacks retain full-source row identities.',
+];
+
 function interactiveBarContract(
   base: ComponentContract,
   name: 'BarChart' | 'ColumnChart',
@@ -781,6 +787,7 @@ function interactiveBarContract(
     ],
     controlBehavior: [
       ...base.controlBehavior,
+      ...cartesianExplorationBehavior,
       'With selection enabled, ordinary click or touch tap toggles the targeted item. Control/Command-click activates without changing selection. A touch press-and-hold activates once; release does not also select. Movement into a drag or pointer cancellation cancels a pending hold. Without selection, ordinary click or tap activates. Enabling both capabilities does not make both callbacks fire for one action.',
       `Drag ${rangeDirection} to select an inclusive category range, or draw a rectangle to select every bar rectangle it intersects in point mode. A new drag replaces selection; Shift or Control/Command adds, and Alt removes. Escape or pointer cancellation restores the selection from before the drag. Dragging never activates or changes chart domains.`,
       'Reading and activation choose the nearest visible category along its axis, then the nearest actual visible bar rectangle for point targeting. This applies to grouped, stacked, normalized, negative, and zero values within the existing input boundary. Hidden bars are not targets. Category activation remains one source-row action, without implicit aggregation.',
@@ -891,6 +898,7 @@ function interactiveAreaMixedContract(
     ],
     controlBehavior: [
       ...base.controlBehavior,
+      ...cartesianExplorationBehavior,
       'With selection enabled, click or touch tap toggles the target. Control/Command-click activates without changing selection. Touch press-and-hold activates once; release does not also select. Drag movement or pointer cancellation cancels the pending hold. Without selection, ordinary click or tap activates. Selection and activation do not both fire for the same action.',
       `Drag horizontally to select an inclusive category range. In point mode, draw a rectangle to select ${area ? 'area value markers inside it' : 'line and area value markers inside it and every column rectangle it intersects'}. A new drag replaces selection; Shift or Control/Command adds, and Alt removes. Escape or pointer cancellation restores the selection from before the drag. Dragging never activates or changes chart domains.`,
       'Reading previews and activation use the same target. Resolve the nearest visible category, then the actual shapes under the pointer, including sloping area boundaries between categories. Legend emphasis breaks ties only among overlapping shapes under the pointer. A sole hovered shape wins even when another series is pinned. Empty space falls back to the nearest value marker or bar rectangle. Line points have a small nearby hit region so an overlapping column cannot swallow their targets. Hidden series cannot win.',

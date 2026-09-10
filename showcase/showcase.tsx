@@ -1,3 +1,4 @@
+import {CartesianExplorationExample} from './cartesian-exploration-examples.js';
 import {LineExplorationExample} from './line-exploration-examples.js';
 import {CompactAxisExample} from './compact-axis-examples.js';
 import {
@@ -3584,6 +3585,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         <Example label="Pan, zoom and overview">
           <LineExplorationExample />
         </Example>
+        <Example label="Explore areas, columns and bars">
+          <CartesianExplorationExample />
+        </Example>
         <Example label="Coordinated date windows">
           <LineExplorationExample coordinated />
         </Example>
@@ -3695,6 +3699,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Show magnitude or contribution across an ordered domain. Hiding a series recomputes the stack. Normalized areas and readings use visible shares, while the complete table retains shares of all supplied data. ${visibilityGuidance}`}
         name="AreaChart"
       >
+        <p>
+          <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
+        </p>
         <Example label="AreaChart with selection and details">
           <AreaMixedInteractionExample kind="area" visibilityLabels={visibilityLabels} />
         </Example>
@@ -3704,6 +3711,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare discrete categories with grouped, stacked, or normalized vertical columns. Columns retain a zero baseline as visibility changes. A touch reading stays open until another category or an outside press replaces it. ${visibilityGuidance}`}
         name="ColumnChart"
       >
+        <p>
+          <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
+        </p>
         <Example label="ColumnChart with selection and details">
           <BarInteractionExample orientation="vertical" visibilityLabels={visibilityLabels} />
         </Example>
@@ -3713,6 +3723,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare discrete categories on a horizontal plot. Up and Down move through its vertical category axis when the plot has keyboard focus. Bars retain a zero baseline as visibility changes. ${visibilityGuidance}`}
         name="BarChart"
       >
+        <p>
+          <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
+        </p>
         <Example label="BarChart with selection and details">
           <BarInteractionExample orientation="horizontal" visibilityLabels={visibilityLabels} />
         </Example>
@@ -3776,6 +3789,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Restored series keep their original colors and patterns. ${visibilityGuidance}`}
         name="CartesianChart"
       >
+        <p>
+          <a href="#line-chart">Compare pan and zoom for mixed charts.</a>
+        </p>
         <Example label="Mixed CartesianChart with selection and details">
           <AreaMixedInteractionExample kind="mixed" visibilityLabels={visibilityLabels} />
         </Example>

@@ -1135,6 +1135,16 @@ function readingReferences(
   );
 }
 
+function barGroupWidth<Category extends ChartDomainValue>(
+  projection: Projection<Category>,
+  availableLength: number,
+  rowCount: number,
+): number {
+  return projection.bandwidth > 0
+    ? projection.bandwidth
+    : Math.min(48, (availableLength / Math.max(rowCount, 1)) * 0.7);
+}
+
 function Marks<Datum extends object, Category extends ChartDomainValue>({
   categoryPlacement,
   categoryProjection,
@@ -1236,10 +1246,7 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
         }
 
         const availableLength = isHorizontal ? plotHeight(plot) : plotWidth(plot);
-        const groupWidth =
-          categoryProjection.bandwidth > 0
-            ? categoryProjection.bandwidth
-            : Math.min(48, (availableLength / Math.max(rows.length, 1)) * 0.7);
+        const groupWidth = barGroupWidth(categoryProjection, availableLength, rows.length);
         const grouped = layout === 'grouped';
         const barIndex = barSeries.findIndex((bar) => bar.id === item.id);
 
@@ -1852,9 +1859,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
           domain: navigation.fromNormalized(displayedNormalized),
         } as ChartScale<Category>)
       : navigation.scale;
-  const visibleRowIndexes = prepared.rows.flatMap((row, index) =>
-    !exploration || navigation.contains(row.category) ? [index] : [],
-  );
   const windowKey = exploration ? JSON.stringify(navigation.window) : '';
   const [previousWindowKey, setPreviousWindowKey] = useState(windowKey);
   if (previousWindowKey !== windowKey) {
@@ -1936,19 +1940,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     },
     version: navigationVersion,
   });
-  const candidateReading = pointerReading ?? touchReading ?? keyboardReading;
-  const activeReading =
-    actions.box !== null ||
-    (candidateReading !== null && !visibleRowIndexes.includes(candidateReading.index))
-      ? null
-      : candidateReading;
-  const availableSeriesId = (id: string | null | undefined): string | undefined =>
-    id !== null && id !== undefined && series.some((item) => item.id === id) ? id : undefined;
-  const validPinnedLegendSeriesId = availableSeriesId(pinnedLegendSeriesId) ?? null;
-  const emphasizedSeriesId =
-    availableSeriesId(pinnedLegendSeriesId) ??
-    availableSeriesId(transientLegendSeriesId) ??
-    availableSeriesId(activeReading?.seriesId);
   const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
   const isLoading = status.kind === 'loading';
   const isError = status.kind === 'error';
@@ -2063,6 +2054,83 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   }, [rootElement, touchReading]);
 
   const fullValueDomain = valueDomain(prepared.rows, layout, series);
+  const usesBars = series.some((item) => item.kind === 'bar' || item.kind === 'column');
+  const categoryValues = prepared.rows.map((row) => row.category);
+  // Full-source labels keep the plot bounds stable while fitting the viewport's values.
+  const explorationPlot = exploration
+    ? plotForYAxisLabels(
+        categoryPlacement === 'x'
+          ? createProjection(
+              valueAxis.scale,
+              valueDomain(allPrepared.rows, layout, allSeries),
+              [0, 1],
+              valueAxis.tickCount ?? 5,
+              false,
+            ).ticks.map((tick) => axisTickLabel(tick, valueAxis))
+          : createProjection(
+              categoryAxis.scale,
+              categoryValues,
+              [0, 1],
+              categoryAxis.tickCount ?? 6,
+              usesBars,
+            ).ticks.map((tick) => {
+              const label = axisTickLabel(tick, categoryAxis);
+              return categoryAxis.scale.type === 'categorical'
+                ? truncateTickLabel(label, 14)
+                : label;
+            }),
+        presentation.fontSize / presentation.viewScale / 16,
+        presentationPlot,
+        axisTitle(categoryPlacement === 'x' ? valueAxis : categoryAxis),
+        canvasHeight,
+      )
+    : undefined;
+  const barCrossings = new Map<number, readonly number[]>();
+  if (explorationPlot && usesBars && categoryAxis.scale.type !== 'categorical') {
+    const horizontal = categoryPlacement === 'y';
+    const start = horizontal ? explorationPlot.top : explorationPlot.left;
+    const end = horizontal ? explorationPlot.bottom : explorationPlot.right;
+    const projection = createProjection(navigation.scale, categoryValues, [start, end], 6, false);
+    const groupWidth = barGroupWidth(projection, end - start, prepared.rows.length);
+    const bars = series.filter((item) => item.kind === 'bar' || item.kind === 'column');
+    prepared.rows.forEach((row, rowIndex) => {
+      const category = projection.position(row.category);
+      if (category === undefined) return;
+      const crossing = series.flatMap((item, seriesIndex) => {
+        const barIndex = bars.findIndex((bar) => bar.id === item.id);
+        if (barIndex < 0) return [];
+        const rect = barRectangle({
+          category,
+          start: 0,
+          end: 1,
+          groupWidth,
+          seriesIndex: barIndex,
+          seriesCount: bars.length,
+          grouped: layout === 'grouped',
+          horizontal: false,
+        });
+        return rect.x + rect.width >= start && rect.x <= end ? [seriesIndex] : [];
+      });
+      if (crossing.length) barCrossings.set(rowIndex, crossing);
+    });
+  }
+  const visibleRowIndexes = prepared.rows.flatMap((row, index) =>
+    !exploration || navigation.contains(row.category) || barCrossings.has(index) ? [index] : [],
+  );
+  const candidateReading = pointerReading ?? touchReading ?? keyboardReading;
+  const activeReading =
+    actions.box !== null ||
+    (candidateReading !== null && !visibleRowIndexes.includes(candidateReading.index))
+      ? null
+      : candidateReading;
+  const availableSeriesId = (id: string | null | undefined): string | undefined =>
+    id !== null && id !== undefined && series.some((item) => item.id === id) ? id : undefined;
+  const validPinnedLegendSeriesId = availableSeriesId(pinnedLegendSeriesId) ?? null;
+  const emphasizedSeriesId =
+    availableSeriesId(pinnedLegendSeriesId) ??
+    availableSeriesId(transientLegendSeriesId) ??
+    availableSeriesId(activeReading?.seriesId);
+
   const visibleValueDomain = exploration
     ? categoryAxis.scale.type === 'categorical'
       ? valueDomain(
@@ -2070,14 +2138,22 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
           layout,
           series,
         )
-      : explorationValueDomain(
-          prepared.rows,
-          series,
-          layout,
-          navigation.position,
-          navigation.normalized,
-          valueAxis.scale.type === 'logarithmic',
-        )
+      : [
+          ...explorationValueDomain(
+            prepared.rows,
+            series,
+            layout,
+            navigation.position,
+            navigation.normalized,
+            valueAxis.scale.type === 'logarithmic',
+          ),
+          ...[...barCrossings].flatMap(([rowIndex, indexes]) =>
+            indexes.flatMap((index) => {
+              const {start, end} = coordinates(prepared.rows[rowIndex]!, index, layout);
+              return [start, end];
+            }),
+          ),
+        ]
     : fullValueDomain;
   const rawDomain = visibleValueDomain.length > 0 ? visibleValueDomain : fullValueDomain;
   const targetProjection = createProjection(
@@ -2147,8 +2223,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       </>
     );
   } else {
-    const usesBars = series.some((item) => item.kind === 'bar' || item.kind === 'column');
-    const categoryValues = prepared.rows.map((row) => row.category);
     const createPlotProjections = (bounds: PlotBounds) => ({
       categoryProjection: createProjection(
         exploration ? displayedCategoryScale : categoryAxis.scale,
@@ -2173,13 +2247,15 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             const label = axisTickLabel(tick, categoryAxis);
             return categoryAxis.scale.type === 'categorical' ? truncateTickLabel(label, 14) : label;
           });
-    const plot = plotForYAxisLabels(
-      yAxisLabels,
-      presentation.fontSize / presentation.viewScale / 16,
-      presentationPlot,
-      axisTitle(categoryPlacement === 'x' ? valueAxis : categoryAxis),
-      canvasHeight,
-    );
+    const plot =
+      explorationPlot ??
+      plotForYAxisLabels(
+        yAxisLabels,
+        presentation.fontSize / presentation.viewScale / 16,
+        presentationPlot,
+        axisTitle(categoryPlacement === 'x' ? valueAxis : categoryAxis),
+        canvasHeight,
+      );
     const {categoryProjection, valueProjection} = createPlotProjections(plot);
     const references = readingReferences(annotations, categoryPlacement);
     const readingRow = activeReading === null ? undefined : prepared.rows[activeReading.index];
@@ -2253,7 +2329,10 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
               if (
                 category === undefined ||
                 value === undefined ||
-                (exploration && !navigation.contains(row.category))
+                (exploration &&
+                  !navigation.contains(row.category) &&
+                  item.kind !== 'bar' &&
+                  item.kind !== 'column')
               )
                 return [];
               if (item.kind === 'bar' || item.kind === 'column') {
@@ -2261,10 +2340,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 if (from === undefined) return [];
                 const horizontal = categoryPlacement === 'y';
                 const extent = horizontal ? plotHeight(plot) : plotWidth(plot);
-                const groupWidth =
-                  categoryProjection.bandwidth > 0
-                    ? categoryProjection.bandwidth
-                    : Math.min(48, (extent / Math.max(prepared.rows.length, 1)) * 0.7);
+                const groupWidth = barGroupWidth(categoryProjection, extent, prepared.rows.length);
                 const bounds = clipBar(
                   barRectangle({
                     category,
@@ -2585,6 +2661,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             {exploration ? (
               <ChartExplorationLayer svg={svgElement} plot={plot}>
                 <ChartExplorationControls
+                  largeStepMultiplier={categoryPlacement === 'y' ? 2 : 3}
                   version={navigationVersion}
                   {...(categoryCount > 0 ? {step: 1 / categoryCount} : {})}
                   window={navigation.normalized}
@@ -2601,32 +2678,33 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   onChange={changeWindow}
                   overview={
                     <svg viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true">
-                      {series.map((item, index) => {
-                        const ys = createProjection(
+                      <Marks
+                        categoryPlacement="x"
+                        categoryProjection={{
+                          bandwidth:
+                            usesBars && categoryCount > 0
+                              ? (1000 / categoryCount) * (1 - categoryBandPadding)
+                              : 0,
+                          position: (category) => navigation.position(category) * 1000,
+                          ticks: [],
+                        }}
+                        emphasizedSeriesId={undefined}
+                        layout={layout}
+                        plot={{left: 0, right: 1000, top: 8, bottom: 72}}
+                        rows={prepared.rows}
+                        series={series}
+                        valueProjection={createProjection(
                           valueAxis.scale,
                           fullValueDomain,
                           [72, 8],
                           5,
                           false,
-                        );
-                        const line = createLine<PreparedRow<Datum, Category>>()
-                          .x((row) => navigation.position(row.category) * 1000)
-                          .y((row) => ys.position(row.values[index]!) ?? 40)
-                          .curve(item.curve === 'step' ? curveStep : curveLinear);
-                        return (
-                          <g
-                            key={item.id}
-                            data-wcl-chart-series=""
-                            data-color={item.color}
-                            data-series-index={item.patternIndex}
-                          >
-                            <path data-wcl-chart-line="" d={line(prepared.rows) ?? undefined} />
-                          </g>
-                        );
-                      })}
+                        )}
+                      />
                       {actions.selected.map((item) => {
                         const row = interactionRows.find((row) => row.id === item.rowId);
-                        if (!row) return null;
+                        if (!row || (item.seriesId && hiddenIds.includes(item.seriesId)))
+                          return null;
                         const x = navigation.position(row.category) * 1000;
                         return (
                           <line

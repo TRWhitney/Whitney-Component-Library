@@ -581,6 +581,7 @@ type AreaChartSharedProps<
   Datum extends object,
   XValue extends ChartDomainValue,
 > = ChartCommonProps<Datum> & {
+  readonly exploration?: ChartExploration<XValue>;
   readonly interaction?: ChartInteraction<Datum, XValue>;
   readonly annotations?: readonly ChartAnnotation<NoInfer<XValue>, number>[];
   readonly series: NonEmptyChartSeries<ChartAreaSeries<Datum>>;
@@ -606,6 +607,7 @@ type ColumnChartSharedProps<
   Datum extends object,
   XValue extends ChartDomainValue,
 > = ChartCommonProps<Datum> & {
+  readonly exploration?: ChartExploration<XValue>;
   readonly interaction?: ChartInteraction<Datum, XValue>;
   readonly annotations?: readonly ChartAnnotation<NoInfer<XValue>, number>[];
   readonly series: NonEmptyChartSeries<ChartBarSeries<Datum>>;
@@ -631,6 +633,7 @@ type BarChartSharedProps<
   Datum extends object,
   YValue extends ChartDomainValue,
 > = ChartCommonProps<Datum> & {
+  readonly exploration?: ChartExploration<YValue>;
   readonly interaction?: ChartInteraction<Datum, YValue>;
   readonly annotations?: readonly ChartAnnotation<number, NoInfer<YValue>>[];
   readonly series: NonEmptyChartSeries<ChartBarSeries<Datum>>;
@@ -656,6 +659,7 @@ export interface CartesianChartProps<
   Datum extends object,
   XValue extends ChartDomainValue,
 > extends ChartCommonProps<Datum> {
+  readonly exploration?: ChartExploration<XValue>;
   readonly interaction?: ChartInteraction<Datum, XValue>;
   readonly annotations?: readonly ChartAnnotation<NoInfer<XValue>, number>[];
   readonly series: NonEmptyChartSeries<CartesianChartSeries<Datum>>;
