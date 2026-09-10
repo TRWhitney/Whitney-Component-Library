@@ -16,7 +16,10 @@
 
   [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-frame] {
     block-size: clamp(
-      var(--wcl-chart-minimum-height),
+      max(
+        var(--wcl-chart-minimum-height),
+        min(30rem, calc(var(--wcl-heatmap-header-height) + var(--wcl-heatmap-source-rows) * 44px))
+      ),
       calc(100cqi / var(--wcl-chart-aspect-ratio)),
       30rem
     );

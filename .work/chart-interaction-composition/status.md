@@ -12,6 +12,10 @@ Cartesian charts, scatter/bubble, histogram/box plot and heatmap. Ticket 26 is d
 All 841 tests, repository checks, packed React 18/19 verification and native browser checks pass.
 Independent intent and engineering reviews pass after bounded correction reviews.
 
+The reported mobile room examples lacked navigation configuration and clipped their grids.
+[Ticket 31](tickets/31-heatmap-mobile-navigation.md) enables their controls and corrects exploration
+frame sizing. Native reproduction and corrected touch/layout checks pass; repository/package validation and independent intent/engineering review pass. The correction is delivered in the commit containing this record.
+
 ## Progress
 
 - [Ticket 26](tickets/26-line-exploration.md) delivers LineChart navigation.

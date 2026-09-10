@@ -54,6 +54,7 @@ type HeatmapStyles = CSSProperties & {
   '--wcl-heatmap-row-label-width': string;
   '--wcl-heatmap-row-height': string;
   '--wcl-heatmap-rows': number;
+  '--wcl-heatmap-source-rows': number;
 };
 
 type CellStyles = CSSProperties & {'--wcl-heatmap-intensity': string};
@@ -766,6 +767,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
     '--wcl-heatmap-row-label-width': `${rowLabelWidth}px`,
     '--wcl-heatmap-row-height': `${rowHeight}px`,
     '--wcl-heatmap-rows': Math.max(1, rowCount),
+    '--wcl-heatmap-source-rows': Math.max(1, sourceProps.rows.length),
   };
   const [lowColor, highColor] =
     props.scale.type === 'sequential' ? [props.scale.color, props.scale.color] : props.scale.colors;

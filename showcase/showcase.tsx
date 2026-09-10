@@ -3387,11 +3387,11 @@ function HeatmapInteractionExample({
   const [detailsEnabled, setDetailsEnabled] = useState(true);
   const [selectedItems, setSelectedItems] = useState<readonly HeatmapSelectionItem[]>([]);
   const [details, setDetails] = useState<HeatmapActivation<RoomReading> | null>(null);
-  const instructions = distributionInstructions(
+  const instructions = `${distributionInstructions(
     selectionEnabled,
     detailsEnabled,
     'cells touched by the rectangle',
-  );
+  )} Use two fingers to pan and pinch to zoom.`;
   const itemLabel = (item: HeatmapSelectionItem) =>
     `${heatmapRows.find((row) => row.id === item.rowId)?.label ?? item.rowId}, ${heatmapColumns.find((column) => column.id === item.columnId)?.label ?? item.columnId}`;
   const interaction: HeatmapInteraction<RoomReading> = {
@@ -3493,6 +3493,26 @@ function HeatmapInteractionExample({
         value={{accessor: 'value', label: deviation ? 'Deviation' : 'Temperature', unit: '°C'}}
         interaction={interaction}
         visibilityLabels={visibilityLabels}
+        exploration={{
+          labels: {
+            overview: 'Overview',
+            closeOverview: 'Close overview',
+            done: 'Done',
+            reset: 'Reset view',
+            zoomIn: 'Zoom in',
+            zoomOut: 'Zoom out',
+            panLeft: 'Earlier times',
+            panRight: 'Later times',
+            panUp: 'Previous rooms',
+            panDown: 'Next rooms',
+            window: 'Visible rooms and times',
+            corner: (corner) => `Resize ${corner.replace('-', ' ')} corner`,
+            instructions:
+              'Drag the window to move it or drag a corner to resize it. Arrow keys adjust the focused window or corner.',
+            range: ({x, y}) =>
+              `${heatmapColumns.find((column) => column.id === x[0])?.label} to ${heatmapColumns.find((column) => column.id === x[1])?.label}, ${heatmapRows.find((row) => row.id === y[0])?.label} to ${heatmapRows.find((row) => row.id === y[1])?.label}`,
+          },
+        }}
       />
       {details ? (
         <Stack gap="tight">
