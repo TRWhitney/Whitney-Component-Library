@@ -450,7 +450,7 @@ export const heatmapContract: ComponentContract = {
     'Heatmap does not read the application accent. A sequential scale accepts one color. A two-sided scale accepts ordered low and high colors. Callers may pass their application accent when it fits the measure. Missing cells stay neutral and outside both numeric scales.',
   ],
   accessibility: [
-    'The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. The visual grid is hidden from assistive technology, and a generated native table preserves every declared row and column intersection.',
+    'The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. Visual cells are hidden from assistive technology, while enabled visibility controls remain accessible. A generated native table preserves every declared row and column intersection, marking hidden dimensions.',
   ],
   appearance: [
     'Every numeric cell uses one visible continuous color key. Sequential color represents low-to-high magnitude. Two-sided color meets at the declared midpoint. Missing cells use a neutral dashed crosshatch that cannot be mistaken for zero or a numeric extreme. Dashed inner outlines mark hover and keyboard reading. Solid cell frames mark persistent selection. Selection preserves numeric colors and uses no whole-chart focus border.',
@@ -468,6 +468,9 @@ export const heatmapContract: ComponentContract = {
     'Selection follows the shared ChartSelection ownership model: selectedItems plus onSelectionChange is controlled; defaultSelectedItems initializes local state. Items retain row/column identity across reordering and value changes; unknown or removed coordinates are pruned. Localized instructions, count, item descriptions and a Clear selection action accompany selection.',
     'Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.',
     'Optional interaction selects cells by stable rowId and columnId. Click/tap toggles selection; Control/Command-click or touch hold activates without changing it. Without selection, ordinary click/tap activates. Rectangle dragging selects boxes it touches, replacing by default, adding with Shift or Control/Command, and removing with Alt. Escape, pointer cancellation, scrolling, data or geometry changes cancel the preview.',
+    'Optional visibilityLabels enables individual row and column eyes. Hiding removes the entire track without leaving a blank row or column. Eyes reveal on label hover or keyboard focus and stay visible on touch. A permanently visible closed eye with the hidden-dimension count beside the row heading opens an overlaid restore list. Individual closed eyes restore dimensions; Show all restores every dimension.',
+    'Visibility belongs to the chart and follows stable row and column IDs across value changes and reordering. Removed IDs are pruned. Removing visibilityLabels restores the full chart. Hidden cells retain selection, use the selection hidden-label formatter, and remain in the complete table. They cannot receive reading, activation, keyboard or drag gestures. Clear selection also clears hidden items. Visibility changes cancel active gestures.',
+    'Automatic color domains fit visible readings after hiding or restoring; explicit domains stay fixed. All original data is validated before visibility filtering, and accessor indices and activation records retain their original source identity.',
   ],
   counterExamples: [
     {
@@ -490,7 +493,7 @@ export const heatmapContract: ComponentContract = {
     {
       code: example(
         'HeatmapExample',
-        '<Heatmap\n  interaction={{selection: {labels: {instructions: "Click or tap to select. Drag to select touched cells. Shift adds; Alt removes.", clear: "Clear selection", empty: "Nothing selected", summary: count => `${count} cells selected`, item: item => `${item.rowId}, ${item.columnId}`, hidden: label => label}}}}\n  columnAccessor="hour"\n  columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}\n  data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}\n  dataTableLabel="Room temperature data"\n  description="Temperature by room and time; patterned cells have no reading."\n  emptyState={{title: "No grid", description: "Declare rooms and times to begin."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}\n  rowAccessor="location"\n  rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}\n  scale={{color: "#d14f00", type: "sequential"}}\n  title="Room temperature"\n  value={{accessor: "value", label: "Temperature", unit: "°C"}}\n/>',
+        '<Heatmap\n  interaction={{selection: {labels: {instructions: "Click or tap to select. Drag to select touched cells. Shift adds; Alt removes.", clear: "Clear selection", empty: "Nothing selected", summary: count => `${count} cells selected`, item: item => `${item.rowId}, ${item.columnId}`, hidden: label => `${label} (hidden)`}}}}\n  columnAccessor="hour"\n  columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}\n  data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}\n  dataTableLabel="Room temperature data"\n  description="Temperature by room and time; patterned cells have no reading."\n  emptyState={{title: "No grid", description: "Declare rooms and times to begin."}}\n  invalidData={{title: "Invalid readings", description: "Correct non-finite readings."}}\n  labels={{row: "Room", column: "Time", colorKey: "Temperature scale", missing: "No reading", scrollRegion: "Temperature grid"}}\n  rowAccessor="location"\n  rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}\n  scale={{color: "#d14f00", type: "sequential"}}\n  title="Room temperature"\n  visibilityLabels={{hideRow: label => `Hide room ${label}`, showRow: label => `Show room ${label}`, hideColumn: label => `Hide time ${label}`, showColumn: label => `Show time ${label}`, restore: count => `Restore ${count} hidden dimensions`, hiddenRows: "Hidden rooms", hiddenColumns: "Hidden times", hidden: "Hidden", showAll: "Show all", close: "Close hidden dimensions", allHidden: {title: "No visible cells", description: "Restore a room and time, or show all."}}}\n  value={{accessor: "value", label: "Temperature", unit: "°C"}}\n/>',
       ),
       description:
         'Show sparse values across a complete declared grid while keeping zero separate from missing.',
@@ -509,7 +512,8 @@ export const heatmapContract: ComponentContract = {
     'unrelated units, area-proportional comparison, precise scanning of a very large matrix, arbitrary two-sided midpoints, or datasets that need aggregation to answer the question',
   ],
   keyboardBehavior: [
-    'Tab reaches one title-named grid boundary. Left and Right move across columns; Up and Down move across rows. Home and End reach row endpoints. Control/Command Home and Control/Command End reach the first and last cell in the complete grid. Enter/Space selects when selection is enabled; Control/Command plus Enter/Space activates. With selection disabled, Enter/Space activates. Navigation stops at boundaries, and Escape clears the reading.',
+    'Tab reaches one title-named grid boundary. Left and Right move across columns; Up and Down move across rows. Home and End reach row endpoints. Control/Command Home and Control/Command End reach the first and last visible cell. Enter/Space selects when selection is enabled; Control/Command plus Enter/Space activates. With selection disabled, Enter/Space activates. Navigation stops at boundaries, and Escape clears the reading.',
+    'When visibility is enabled, Tab also reaches the label eyes and corner restore control. Hiding moves focus to the corner control. Escape or an outside press dismisses the restore list, with focus returning to the corner control when appropriate. Restoring an item moves focus to the next restore eye while hidden items remain. Restoring the final item or using Show all closes the list and focuses the first visible row eye.',
   ],
   kind: 'component',
   labeling: [
@@ -517,6 +521,7 @@ export const heatmapContract: ComponentContract = {
   ],
   localization: [
     'Localize all visible and announced copy, domain labels, missing copy, and units. value.formatValue controls locale-specific number formatting. Selection labels provide localized instructions, clearing, empty and count summaries, and cell names.',
+    'HeatmapVisibilityLabels requires hideRow, showRow, hideColumn and showColumn formatters receiving the readable domain label; restore formats the total hidden-dimension count. Provide hiddenRows and hiddenColumns list headings, hidden table copy, showAll and close actions, and allHidden title and description.',
   ],
   name: 'Heatmap',
   parts: [
@@ -532,7 +537,7 @@ export const heatmapContract: ComponentContract = {
   reducedMotionBehavior: [
     activationTiming,
     outlineMotion,
-    'Reduced motion removes active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same. Grid geometry does not animate.',
+    'Visibility changes briefly animate remaining cells and their colors as the grid and automatic range refit. Reduced motion removes visibility, active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same.',
   ],
   relatedExports: ['AppearanceProvider', ...chartNames.filter((name) => name !== 'Heatmap')],
   responsiveBehavior: [
@@ -540,6 +545,7 @@ export const heatmapContract: ComponentContract = {
   ],
   states: [
     'Ready, loading, empty-domain, partial, invalid-data, and error states are explicit. A declared grid with no records remains an all-missing grid. Non-finite records are omitted and reported; an entirely invalid nonempty dataset becomes unavailable.',
+    'When every row or every column is hidden, an all-hidden state retains the caption, full table and selection. The corner restore list and Show all remain available even when no cells can be displayed.',
   ],
   stylesheet: './styles.css',
   summary: 'Show one numeric measure across two ordered categorical domains.',

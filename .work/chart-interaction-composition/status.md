@@ -6,9 +6,12 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-[Ticket 20](tickets/20-expansion-hidden-marker.md) delivers the expansion asterisk for hidden categories in the commit containing this record.
-Whitney requested this addition, followed by the next part, heatmap visibility. Refill is delivered
-in `0edac84`.
+[Ticket 21](tickets/21-heatmap-visibility.md) implements the approved public Heatmap visibility
+controls and corner restore list. The showcase and canonical/generated guides are current.
+Repository checks pass 752 tests, type matrices and chart isolation. Desktop/touch hide,
+restore and first-hold activation flows pass. Independent intent and engineering reviews pass. The long-label clipping finding was corrected
+and revalidated; the bounded correction review passed. This slice is delivered in the commit
+containing this record.
 
 ## Progress
 
@@ -27,7 +30,7 @@ in `0edac84`.
 ## Frontier
 
 The [decision map](map.md) indexes the remaining work. Frame for bars and Value marker for areas
-are settled. Scatter/bubble Centers inside selection is delivered. Radar, heatmap and Sparkline interaction are delivered. Remaining visibility follows. Exploration and the added compositions remain later work.
+are settled. Scatter/bubble Centers inside selection is delivered. Radar, heatmap and Sparkline interaction are delivered. Heatmap visibility completes the planned visibility controls. Exploration and the added compositions remain later work.
 
 ## Accepted sources
 
@@ -39,8 +42,8 @@ are settled. Scatter/bubble Centers inside selection is delivered. Radar, heatma
 
 ## Verification
 
-[Ticket 19](tickets/19-radial-page-refill.md#completion-evidence) records the passing repository,
-public type, package and browser checks, plus independent intent and engineering reviews with no findings.
+[Ticket 21](tickets/21-heatmap-visibility.md#completion-evidence) records the passing repository,
+public type, package and browser checks, plus independent intent and engineering reviews.
 
 ## Out of scope
 
@@ -52,4 +55,5 @@ and any change to the accepted chart palette or existing reading semantics.
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
 - Branch: `main`; Heatmap interaction is `4567f20`. Sparkline is `f06085b`. Statistical visibility is `3e6a391`. Radar visibility is `5c51e05`. Legend release is delivered in the commit containing this record.
 - Production showcase: `http://localhost:5174`, Vite session `54846`.
-- Next action: continue with the heatmap visibility prototype and its unresolved label-control presentation.
+- Next action: settle exploration controls and their interaction with selection, automatic fitting and explicit domains, then plan the next implementation slice. All planned visibility controls are delivered; the map retains remaining animation/composition decisions.
+- Ticket 21 component/types/styles/tests, showcase/contracts/generated guides and accepted prototype/spec/map/status records are committed together. No intentionally uncommitted work remains.

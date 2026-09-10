@@ -9285,3 +9285,123 @@
     fill: CanvasText;
   }
 }
+
+@layer wcl.components {
+  [data-wcl-heatmap][data-visibility] [data-wcl-heatmap-column-label] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: end;
+    gap: 0.25rem;
+    white-space: normal;
+  }
+
+  [data-wcl-heatmap][data-visibility] :is([data-wcl-heatmap-row-label], [data-wcl-heatmap-corner]) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+    white-space: normal;
+  }
+
+  [data-wcl-heatmap][data-visibility]
+    :is([data-wcl-heatmap-row-label], [data-wcl-heatmap-column-label], [data-wcl-heatmap-corner])
+    > span:not([data-wcl-heatmap-visibility-control]) {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  [data-wcl-heatmap-visibility-control] {
+    display: inline-flex;
+    flex: none;
+    touch-action: manipulation;
+  }
+
+  [data-wcl-heatmap-visibility-control] > [data-wcl-chart-visibility] {
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  [data-wcl-heatmap-restore-trigger] {
+    display: inline-flex;
+    align-items: center;
+    inline-size: auto;
+    gap: 0.25rem;
+    border-radius: var(--wcl-radius);
+    font: 0.75rem var(--wcl-font-utility);
+  }
+
+  :is([data-wcl-heatmap-row-label], [data-wcl-heatmap-column-label]):is(:hover, :focus-within)
+    [data-wcl-chart-visibility],
+  [data-wcl-heatmap][data-touch] [data-wcl-chart-visibility],
+  [data-wcl-heatmap-visibility-control] > [data-wcl-heatmap-restore-trigger] {
+    opacity: 1;
+  }
+
+  [data-wcl-heatmap-restore-popover] {
+    inline-size: min(17rem, calc(100vw - 1rem));
+    max-block-size: min(24rem, 65vh);
+    overflow: auto;
+    padding: 0.75rem;
+    border: 1px solid var(--wcl-border);
+    border-radius: var(--wcl-radius);
+    background: var(--wcl-surface);
+    color: var(--wcl-text);
+    box-shadow: 0 6px 24px #0003;
+    font: 0.875rem/1.5 var(--wcl-font-body);
+  }
+
+  [data-wcl-heatmap-restore-dialog] {
+    outline: none;
+  }
+
+  [data-wcl-heatmap-restore-dialog] p {
+    margin: 0.25rem 0;
+    color: var(--wcl-text-muted);
+    font: 0.75rem/1.5 var(--wcl-font-utility);
+  }
+
+  [data-wcl-heatmap-restore-dialog] section + section {
+    margin-block-start: 0.75rem;
+  }
+
+  [data-wcl-heatmap-restore-item] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  [data-wcl-heatmap][data-visibility] [data-wcl-heatmap-cell] {
+    transition:
+      background-color 240ms ease,
+      border-color 240ms ease;
+  }
+
+  [data-wcl-heatmap][data-visibility] [data-wcl-chart-all-hidden] {
+    aspect-ratio: auto;
+    align-content: start;
+    padding-block: 0.5rem;
+  }
+
+  [data-wcl-heatmap][data-visibility] [data-wcl-chart-all-hidden] [data-wcl-heatmap-corner] {
+    justify-self: start;
+    gap: 0.5rem;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  [data-wcl-heatmap-visibility-control] > [data-wcl-chart-visibility] {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wcl-heatmap-visibility-control] > [data-wcl-chart-visibility],
+  [data-wcl-heatmap][data-visibility] [data-wcl-heatmap-cell] {
+    transition: none;
+  }
+}

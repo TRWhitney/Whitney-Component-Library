@@ -455,3 +455,27 @@ the table without slices or visibility eyes. Full-source validation and loading/
 When all categories are hidden, pages collapse to one; retain the full legend, caption, table and
 selection and show recovery. Offer individual eyes and Show all, with no instruction to change page.
 Show all restores all categories and focuses the first eye. Update both public guides and showcase.
+
+## Heatmap visibility: accepted behavior
+
+The [accepted visibility study](prototypes/heatmap-visibility.md#acceptance-contract) binds the next
+Heatmap visibility slice. Put individual eyes on row and column labels, revealing on hover or
+keyboard focus and keeping them visible on touch. Hiding removes the entire data track and lets
+remaining cells refit. A permanently visible closed eye with a count beside the row-axis heading
+opens an overlaid restore list. Restore individual dimensions using their closed eyes. Preserve
+hidden selection and the full readings table, including missing cells and zero. Do not reserve
+blank tracks, put eyes at intersections, or add a bottom restoration section. Preserve existing
+selection and activation semantics, including visible feedback on the first touch hold.
+
+Optional `visibilityLabels: HeatmapVisibilityLabels` enables internal hiding by stable row/column IDs.
+The copy contract provides `hideRow`, `showRow`, `hideColumn`, `showColumn`, `restore` count formatter,
+`hiddenRows`, `hiddenColumns`, `hidden`, `showAll`, `close`, and `allHidden` state copy. Hidden IDs
+survive values and reordering, prune on domain removal, and reset when visibility is disabled.
+Validate full-source records and accessor indices before deriving visible geometry and automatic
+color domains; explicit domains remain fixed. Animate refitting briefly with reduced-motion support.
+Keep hidden selections labeled and recoverable, with Clear selection clearing everything. The
+full table labels hidden rows and columns. All-hidden recovery retains caption, table, selection,
+individual restoration and Show all. Visibility changes cancel in-flight gestures.
+
+[Ticket 21](tickets/21-heatmap-visibility.md) owns public behavior/type tests, generated docs,
+showcase operation and independent production review.

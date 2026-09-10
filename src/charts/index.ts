@@ -57,6 +57,7 @@ export type {
   HeatmapActivation,
   HeatmapInteraction,
   HeatmapLabels,
+  HeatmapVisibilityLabels,
   HeatmapProps,
   HeatmapScale,
   HeatmapValue,

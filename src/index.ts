@@ -87,6 +87,7 @@ export {
   type HeatmapActivation,
   type HeatmapInteraction,
   type HeatmapLabels,
+  type HeatmapVisibilityLabels,
   type HeatmapProps,
   type HeatmapScale,
   type HeatmapValue,

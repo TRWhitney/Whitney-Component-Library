@@ -12,6 +12,9 @@ import {
   type ReactNode,
 } from 'react';
 import {createPortal} from 'react-dom';
+import {ChartVisibilityButton} from './chart-visibility-button.js';
+import {HeatmapRestore, type HeatmapAxis} from './heatmap-visibility.js';
+import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {
   heatmapKey,
   useHeatmapInteraction,
@@ -360,9 +363,13 @@ function HeatmapTooltip<Datum extends object>({
 function HeatmapTable<Datum extends object>({
   model,
   props,
+  hiddenRows = [],
+  hiddenColumns = [],
 }: {
   readonly model: HeatmapModel;
   readonly props: HeatmapProps<Datum>;
+  readonly hiddenRows?: readonly string[];
+  readonly hiddenColumns?: readonly string[];
 }): ReactElement {
   return (
     <table aria-label={props.dataTableLabel} data-wcl-chart-table="">
@@ -372,6 +379,7 @@ function HeatmapTable<Datum extends object>({
           {props.columns.map((column) => (
             <th key={column.id} scope="col">
               {column.label}
+              {hiddenColumns.includes(column.id) ? ` (${props.visibilityLabels!.hidden})` : ''}
             </th>
           ))}
         </tr>
@@ -379,7 +387,10 @@ function HeatmapTable<Datum extends object>({
       <tbody>
         {props.rows.map((row, rowIndex) => (
           <tr key={row.id}>
-            <th scope="row">{row.label}</th>
+            <th scope="row">
+              {row.label}
+              {hiddenRows.includes(row.id) ? ` (${props.visibilityLabels!.hidden})` : ''}
+            </th>
             {props.columns.map((column, columnIndex) => {
               const cell = model.cells[rowIndex * props.columns.length + columnIndex]!;
               return (
@@ -397,9 +408,150 @@ function HeatmapTable<Datum extends object>({
   );
 }
 
-export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): ReactElement {
-  const model = prepareModel(props);
+export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>): ReactElement {
+  const fullModel = prepareModel(sourceProps);
+  const visibility = sourceProps.visibilityLabels;
+  if (visibility) {
+    for (const label of [
+      visibility.hidden,
+      visibility.hiddenRows,
+      visibility.hiddenColumns,
+      visibility.showAll,
+      visibility.close,
+      visibility.allHidden.title,
+      visibility.allHidden.description,
+    ])
+      assertText(label, 'Heatmap visibility label');
+    for (const row of sourceProps.rows) {
+      assertText(visibility.hideRow(row.label), 'Hide-row label');
+      assertText(visibility.showRow(row.label), 'Show-row label');
+    }
+    for (const column of sourceProps.columns) {
+      assertText(visibility.hideColumn(column.label), 'Hide-column label');
+      assertText(visibility.showColumn(column.label), 'Show-column label');
+    }
+  }
+  const [hidden, setHidden] = useState<{rows: readonly string[]; columns: readonly string[]}>({
+    rows: [],
+    columns: [],
+  });
+  const domainIdentity = JSON.stringify([
+    !!visibility,
+    sourceProps.rows.map((r) => r.id),
+    sourceProps.columns.map((c) => c.id),
+  ]);
+  const [previousDomain, setPreviousDomain] = useState(domainIdentity);
+  if (domainIdentity !== previousDomain) {
+    setPreviousDomain(domainIdentity);
+    setHidden({
+      rows: visibility ? hidden.rows.filter((id) => sourceProps.rows.some((r) => r.id === id)) : [],
+      columns: visibility
+        ? hidden.columns.filter((id) => sourceProps.columns.some((c) => c.id === id))
+        : [],
+    });
+  }
+  const hiddenRows = visibility ? hidden.rows : [],
+    hiddenColumns = visibility ? hidden.columns : [];
+  const rows = sourceProps.rows.filter((row) => !hiddenRows.includes(row.id));
+  const columns = sourceProps.columns.filter((column) => !hiddenColumns.includes(column.id));
+  const props = {...sourceProps, rows, columns};
+  const visibleCells = fullModel.cells.filter(
+    (cell) =>
+      !hiddenRows.includes(sourceProps.rows[cell.rowIndex]!.id) &&
+      !hiddenColumns.includes(sourceProps.columns[cell.columnIndex]!.id),
+  );
+  const values = visibleCells.flatMap((cell) => (cell.value === undefined ? [] : [cell.value]));
+  const targetDomain = derivedDomain(values, props.scale);
+  const domain = useAnimatedChartDomain(targetDomain, !!visibility, false);
+  const midpoint = props.scale.type === 'two-sided' ? props.scale.midpoint : domain[0];
+  const model: HeatmapModel = {
+    ...fullModel,
+    domain,
+    hasNumericKey: values.length > 0 || props.scale.domain !== undefined,
+    midpointPosition:
+      domain[0] === domain[1] ? 0.5 : relativePosition(midpoint, domain[0], domain[1]),
+    cells: visibleCells.map((cell, index) => ({
+      ...cell,
+      index,
+      rowIndex: Math.floor(index / columns.length),
+      columnIndex: index % columns.length,
+      ...(cell.value === undefined ? {} : valueEncoding(cell.value, domain, props.scale)),
+    })),
+  };
+  const hiddenRowItems = sourceProps.rows.filter((r) => hiddenRows.includes(r.id));
+  const hiddenColumnItems = sourceProps.columns.filter((c) => hiddenColumns.includes(c.id));
+  const hiddenCount = hiddenRowItems.length + hiddenColumnItems.length;
+  if (visibility) assertText(visibility.restore(hiddenCount), 'Restore-dimensions label');
+  const restoreRef = useRef<HTMLButtonElement>(null);
+  const firstEyeRef = useRef<HTMLButtonElement>(null);
+  const pendingFocus = useRef<'restore' | 'first' | null>(null);
+  const [touch, setTouch] = useState(false);
+  const [restoreOpen, setRestoreOpen] = useState(false);
+  const visibilityVersion = JSON.stringify([hiddenRows, hiddenColumns]);
+  useLayoutEffect(() => {
+    if (pendingFocus.current) {
+      const target = pendingFocus.current === 'restore' ? restoreRef.current : firstEyeRef.current;
+      target?.focus({preventScroll: true});
+      pendingFocus.current = null;
+      // Let the closing overlay release its focus scope before returning to the chart.
+      const timer = setTimeout(() => target?.focus({preventScroll: true}), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [visibilityVersion]);
+  const toggleVisibility = (axis: HeatmapAxis, id: string, restore = false) => {
+    const key = axis === 'row' ? 'rows' : 'columns';
+    if (!restore) pendingFocus.current = 'restore';
+    else if (hiddenCount === 1) pendingFocus.current = 'first';
+    setHidden((previous) => ({
+      ...previous,
+      [key]: restore ? previous[key].filter((item) => item !== id) : [...previous[key], id],
+    }));
+  };
+  const restoreControl =
+    visibility && hiddenCount ? (
+      <HeatmapRestore
+        rows={hiddenRowItems}
+        columns={hiddenColumnItems}
+        labels={visibility}
+        onRestore={(axis, id) => toggleVisibility(axis, id, true)}
+        buttonRef={restoreRef}
+        open={restoreOpen}
+        onOpenChange={setRestoreOpen}
+      />
+    ) : null;
+  const axisEye = (axis: HeatmapAxis, item: HeatmapDomainItem, first = false) =>
+    visibility ? (
+      <span
+        data-wcl-heatmap-visibility-control=""
+        onPointerDown={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <ChartVisibilityButton
+          hidden={false}
+          label={
+            axis === 'row' ? visibility.hideRow(item.label) : visibility.hideColumn(item.label)
+          }
+          onClear={() => {}}
+          onToggle={() => toggleVisibility(axis, item.id)}
+          {...(first ? {buttonRef: firstEyeRef} : {})}
+        />
+      </span>
+    ) : null;
+
   const [canvasElement, setCanvasElement] = useState<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const lastVisibility = useRef(visibilityVersion);
+  useLayoutEffect(() => {
+    if (lastVisibility.current === visibilityVersion) return;
+    lastVisibility.current = visibilityVersion;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const animation = gridRef.current?.animate?.([{opacity: 0.65}, {opacity: 1}], {
+      duration: 240,
+      easing: 'ease-out',
+    });
+    return () => animation?.cancel();
+  }, [visibilityVersion]);
+
   const pointerFocus = useRef(false);
   const status = props.status ?? {kind: 'ready'};
   const minimumSize = props.minimumSize ?? {height: 180, width: 320};
@@ -425,7 +577,11 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
     estimatedUtilityTextWidth(props.labels.row),
     ...props.rows.map((row) => estimatedUtilityTextWidth(row.label)),
   );
-  const fullRowLabelWidth = clamp(48, Math.ceil(widestEstimatedRowLabel * (12 / 16) + 16), 160);
+  const fullRowLabelWidth = clamp(
+    48,
+    Math.ceil(widestEstimatedRowLabel * (12 / 16) + (visibility ? 52 : 16)),
+    160,
+  );
   const fullGridWidth = fullRowLabelWidth + columnCount * 64 + columnCount * 4;
   const fullGridHeight = 30 + rowCount * 44;
   const isCompact =
@@ -434,10 +590,14 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
       availableSize.width < Math.max(fullGridWidth, minimumSize.width) ||
       availableSize.height < Math.max(fullGridHeight, minimumSize.height));
   const cellMinimumWidth = isCompact ? 48 : 64;
-  const headerHeight = isCompact ? 26 : 30;
+  const headerHeight = visibility ? 64 : isCompact ? 26 : 30;
   const rowHeight = isCompact ? 32 : 40;
   const labelFontScale = (isCompact ? 11 : 12) / 16;
-  const rowLabelWidth = clamp(48, Math.ceil(widestEstimatedRowLabel * labelFontScale + 16), 160);
+  const rowLabelWidth = clamp(
+    48,
+    Math.ceil(widestEstimatedRowLabel * labelFontScale + (visibility ? 52 : 16)),
+    160,
+  );
   const calculatedGridWidth = rowLabelWidth + columnCount * cellMinimumWidth + columnCount * 4;
   const calculatedGridHeight = headerHeight + rowCount * (rowHeight + 4);
   const preferredGridWidth = Math.max(calculatedGridWidth, minimumSize.width);
@@ -474,6 +634,7 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
         cell.value === undefined ? null : formatHeatmapValue(cell.value, props.value),
       ),
     ]),
+    {props: sourceProps, cells: fullModel.cells},
   );
   const {actions, points, selected} = interactionState;
   const interactive = props.interaction !== undefined;
@@ -643,7 +804,7 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
     );
   } else if (status.kind === 'error') {
     content = <Feedback copy={status} kind="error" />;
-  } else if (props.rows.length === 0 || props.columns.length === 0) {
+  } else if (sourceProps.rows.length === 0 || sourceProps.columns.length === 0) {
     content = (
       <EmptyState
         description={props.emptyState.description}
@@ -651,7 +812,7 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
         title={props.emptyState.title}
       />
     );
-  } else if (model.cells.every((cell) => cell.value === undefined) && props.data.length > 0) {
+  } else if (fullModel.cells.every((cell) => cell.value === undefined) && props.data.length > 0) {
     content = (
       <EmptyState
         description={props.invalidData.description}
@@ -664,207 +825,247 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
       <div data-wcl-heatmap-body="">
         {status.kind === 'partial' ? <Feedback copy={status} kind="partial" /> : null}
         {model.invalidCount > 0 ? <Feedback copy={props.invalidData} kind="invalid" /> : null}
-        <div data-wcl-heatmap-visual="">
-          <div
-            {...(hasLocalOverflow ? scrollbarActivityProps : {})}
-            aria-label={hasLocalOverflow ? props.labels.scrollRegion : undefined}
-            data-overflow={hasLocalOverflow ? 'scroll' : 'clip'}
-            data-scrollable={hasLocalOverflow ? '' : undefined}
-            data-wcl-chart-frame=""
-            data-wcl-heatmap-frame=""
-            onScroll={(event) => {
-              if (hasLocalOverflow) scrollbarActivityProps.onScroll?.(event);
-              actions.cancel();
-              clearDirectReading();
-              if (keyboardIndex !== null && canvasElement) {
-                setPointerPosition(cellAnchor(canvasElement, keyboardIndex));
-              }
-            }}
-            ref={setFrameElement}
-            role={hasLocalOverflow ? 'region' : undefined}
-            style={frameStyle}
-            tabIndex={hasLocalOverflow ? 0 : undefined}
-          >
+        {(!rows.length || !columns.length) && visibility ? (
+          <div data-wcl-chart-all-hidden="">
+            <span data-wcl-heatmap-corner="">
+              <span title={props.labels.row}>{props.labels.row}</span>
+              {restoreControl}
+            </span>
+            <strong>{visibility.allHidden.title}</strong>
+            <p>{visibility.allHidden.description}</p>
+            <button
+              type="button"
+              data-wcl-chart-show-all=""
+              onClick={() => {
+                pendingFocus.current = 'first';
+                setHidden({rows: [], columns: []});
+              }}
+            >
+              {visibility.showAll}
+            </button>
+          </div>
+        ) : (
+          <div data-wcl-heatmap-visual="">
             <div
-              aria-keyshortcuts={
-                interactive
-                  ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Control+Home Control+End Meta+Home Meta+End Enter Space Control+Enter Control+Space Meta+Enter Meta+Space Escape'
-                  : 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Control+Home Control+End Escape'
-              }
-              aria-describedby={props.interaction?.selection ? selectionInstructionsId : undefined}
-              ref={setCanvasElement}
-              data-interactive={interactive ? '' : undefined}
-              data-selectable={props.interaction?.selection ? '' : undefined}
-              aria-labelledby={titleId}
-              data-show-values={showCellValues ? '' : undefined}
-              data-wcl-chart-canvas=""
-              data-wcl-heatmap-canvas=""
-              onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                if (!(
-                  event.relatedTarget instanceof Node &&
-                  event.currentTarget.contains(event.relatedTarget)
-                )) {
+              {...(hasLocalOverflow ? scrollbarActivityProps : {})}
+              aria-label={hasLocalOverflow ? props.labels.scrollRegion : undefined}
+              data-overflow={hasLocalOverflow ? 'scroll' : 'clip'}
+              data-scrollable={hasLocalOverflow ? '' : undefined}
+              data-wcl-chart-frame=""
+              data-wcl-heatmap-frame=""
+              onScroll={(event) => {
+                if (hasLocalOverflow) scrollbarActivityProps.onScroll?.(event);
+                actions.cancel();
+                clearDirectReading();
+                if (keyboardIndex !== null && canvasElement) {
+                  setPointerPosition(cellAnchor(canvasElement, keyboardIndex));
+                }
+              }}
+              ref={setFrameElement}
+              role={hasLocalOverflow ? 'region' : undefined}
+              style={frameStyle}
+              tabIndex={hasLocalOverflow ? 0 : undefined}
+            >
+              <div
+                aria-keyshortcuts={
+                  interactive
+                    ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Control+Home Control+End Meta+Home Meta+End Enter Space Control+Enter Control+Space Meta+Enter Meta+Space Escape'
+                    : 'ArrowLeft ArrowRight ArrowUp ArrowDown Home End Control+Home Control+End Escape'
+                }
+                aria-describedby={
+                  props.interaction?.selection ? selectionInstructionsId : undefined
+                }
+                ref={setCanvasElement}
+                data-interactive={interactive ? '' : undefined}
+                data-selectable={props.interaction?.selection ? '' : undefined}
+                aria-labelledby={titleId}
+                data-show-values={showCellValues ? '' : undefined}
+                data-wcl-chart-canvas=""
+                data-wcl-heatmap-canvas=""
+                onBlur={(event: FocusEvent<HTMLDivElement>) => {
+                  if (!(
+                    event.relatedTarget instanceof Node &&
+                    event.currentTarget.contains(event.relatedTarget)
+                  )) {
+                    actions.cancel();
+                    setKeyboardIndex(null);
+                    if (pointerIndex === null && touchIndex === null) setPointerPosition(undefined);
+                  }
+                }}
+                onFocus={(event) => {
+                  if (pointerFocus.current) return;
+                  if (
+                    event.currentTarget === event.target &&
+                    activeIndex === null &&
+                    model.cells.length > 0
+                  ) {
+                    selectKeyboardCell(0, event.currentTarget);
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                onPointerDown={(event) => {
+                  pointerFocus.current = true;
+                  if (interactive && event.button === 0 && event.isPrimary !== false) {
+                    event.preventDefault();
+                    setKeyboardIndex(null);
+                    event.currentTarget.focus({preventScroll: true});
+                    const location = pointerLocation(event);
+                    actions.begin(event, location.point, location.x, location.y);
+                  }
+                  if (event.pointerType !== 'touch') return;
+                  const index = cellFromEvent(event);
+                  if (index === null) return;
+                  setKeyboardIndex(null);
+                  setPointerIndex(null);
+                  setTouchIndex(index);
+                  setPointerPosition(cellAnchor(event.currentTarget, index));
+                }}
+                onPointerUp={(event) => {
+                  if (interactive) actions.end(event, pointerLocation(event).point);
+                  pointerFocus.current = false;
+                }}
+                onPointerCancel={() => {
                   actions.cancel();
-                  setKeyboardIndex(null);
-                  if (pointerIndex === null && touchIndex === null) setPointerPosition(undefined);
-                }
-              }}
-              onFocus={(event) => {
-                if (pointerFocus.current) return;
-                if (
-                  event.currentTarget === event.target &&
-                  activeIndex === null &&
-                  model.cells.length > 0
-                ) {
-                  selectKeyboardCell(0, event.currentTarget);
-                }
-              }}
-              onKeyDown={handleKeyDown}
-              onPointerDown={(event) => {
-                pointerFocus.current = true;
-                if (interactive && event.button === 0 && event.isPrimary !== false) {
-                  event.preventDefault();
-                  setKeyboardIndex(null);
-                  event.currentTarget.focus({preventScroll: true});
-                  const location = pointerLocation(event);
-                  actions.begin(event, location.point, location.x, location.y);
-                }
-                if (event.pointerType !== 'touch') return;
-                const index = cellFromEvent(event);
-                if (index === null) return;
-                setKeyboardIndex(null);
-                setPointerIndex(null);
-                setTouchIndex(index);
-                setPointerPosition(cellAnchor(event.currentTarget, index));
-              }}
-              onPointerUp={(event) => {
-                if (interactive) actions.end(event, pointerLocation(event).point);
-                pointerFocus.current = false;
-              }}
-              onPointerCancel={() => {
-                actions.cancel();
-                pointerFocus.current = false;
-              }}
-              onLostPointerCapture={() => {
-                actions.cancel();
-                pointerFocus.current = false;
-              }}
-              onContextMenu={(event) => {
-                if (actions.isHolding() || actions.isDragging()) event.preventDefault();
-              }}
-              onPointerLeave={(event) => {
-                pointerFocus.current = false;
-                if (event.pointerType === 'touch') return;
-                setPointerIndex(null);
-                setPointerPosition(
-                  touchIndex === null ? undefined : cellAnchor(event.currentTarget, touchIndex),
-                );
-              }}
-              onPointerMove={(event) => {
-                const location = interactive ? pointerLocation(event) : undefined;
-                if (
-                  location &&
-                  actions.move(event, location.x, location.y, points, location.bounds)
-                ) {
-                  clearDirectReading();
-                  return;
-                }
-                if (event.pointerType === 'touch') return;
-                const index = location ? (location.point?.index ?? null) : cellFromEvent(event);
-                if (index === null) {
+                  pointerFocus.current = false;
+                }}
+                onLostPointerCapture={() => {
+                  actions.cancel();
+                  pointerFocus.current = false;
+                }}
+                onContextMenu={(event) => {
+                  if (actions.isHolding() || actions.isDragging()) event.preventDefault();
+                }}
+                onPointerLeave={(event) => {
+                  pointerFocus.current = false;
+                  if (event.pointerType === 'touch') return;
                   setPointerIndex(null);
                   setPointerPosition(
                     touchIndex === null ? undefined : cellAnchor(event.currentTarget, touchIndex),
                   );
-                  return;
-                }
-                setKeyboardIndex(null);
-                setPointerIndex(index);
-                setPointerPosition({x: event.clientX, y: event.clientY});
-              }}
-              role="group"
-              tabIndex={0}
-            >
-              <div aria-hidden="true" data-wcl-heatmap-grid="">
-                <span data-wcl-heatmap-corner="">{props.labels.row}</span>
-                {props.columns.map((column) => (
-                  <span data-wcl-heatmap-column-label="" key={column.id}>
-                    {column.label}
+                }}
+                onPointerMove={(event) => {
+                  const location = interactive ? pointerLocation(event) : undefined;
+                  if (
+                    location &&
+                    actions.move(event, location.x, location.y, points, location.bounds)
+                  ) {
+                    clearDirectReading();
+                    return;
+                  }
+                  if (event.pointerType === 'touch') return;
+                  const index = location ? (location.point?.index ?? null) : cellFromEvent(event);
+                  if (index === null) {
+                    setPointerIndex(null);
+                    setPointerPosition(
+                      touchIndex === null ? undefined : cellAnchor(event.currentTarget, touchIndex),
+                    );
+                    return;
+                  }
+                  setKeyboardIndex(null);
+                  setPointerIndex(index);
+                  setPointerPosition({x: event.clientX, y: event.clientY});
+                }}
+                role="group"
+                tabIndex={0}
+              >
+                <div
+                  aria-hidden={visibility ? undefined : true}
+                  data-wcl-heatmap-grid=""
+                  ref={gridRef}
+                >
+                  <span data-wcl-heatmap-corner="">
+                    <span title={props.labels.row}>{props.labels.row}</span>
+                    {restoreControl}
                   </span>
-                ))}
-                {props.rows.map((row, rowIndex) => (
-                  <div data-wcl-heatmap-row="" key={row.id}>
-                    <span data-wcl-heatmap-row-label="">{row.label}</span>
-                    {props.columns.map((column, columnIndex) => {
-                      const cell = model.cells[rowIndex * columnCount + columnIndex]!;
-                      const intensity =
-                        props.scale.type === 'two-sided' ? cell.ratio * 84 : 12 + cell.ratio * 72;
-                      return (
-                        <span
-                          data-active={activeIndex === cell.index ? '' : undefined}
-                          data-selected={
-                            props.interaction?.selection &&
-                            selected.has(heatmapKey({rowId: row.id, columnId: column.id}))
-                              ? ''
-                              : undefined
-                          }
-                          data-cell-index={cell.index}
-                          data-range={cell.value === undefined ? undefined : cell.range}
-                          data-missing={cell.value === undefined ? '' : undefined}
-                          data-scale-ratio={
-                            cell.value === undefined ? undefined : cell.ratio.toFixed(4)
-                          }
-                          data-wcl-heatmap-cell=""
-                          key={column.id}
-                          style={{'--wcl-heatmap-intensity': `${intensity}%`} as CellStyles}
-                        >
-                          {cell.value === undefined ? null : (
-                            <span data-wcl-heatmap-cell-value="">
-                              {formatHeatmapValue(cell.value, props.value)}
-                            </span>
-                          )}
-                        </span>
-                      );
-                    })}
-                  </div>
-                ))}
+                  {props.columns.map((column) => (
+                    <span data-wcl-heatmap-column-label="" key={column.id}>
+                      <span title={column.label}>{column.label}</span>
+                      {axisEye('column', column)}
+                    </span>
+                  ))}
+                  {props.rows.map((row, rowIndex) => (
+                    <div data-wcl-heatmap-row="" key={row.id}>
+                      <span data-wcl-heatmap-row-label="">
+                        <span title={row.label}>{row.label}</span>
+                        {axisEye('row', row, rowIndex === 0)}
+                      </span>
+                      {props.columns.map((column, columnIndex) => {
+                        const cell = model.cells[rowIndex * columnCount + columnIndex]!;
+                        const intensity =
+                          props.scale.type === 'two-sided' ? cell.ratio * 84 : 12 + cell.ratio * 72;
+                        return (
+                          <span
+                            aria-hidden={visibility ? true : undefined}
+                            data-active={activeIndex === cell.index ? '' : undefined}
+                            data-selected={
+                              props.interaction?.selection &&
+                              selected.has(heatmapKey({rowId: row.id, columnId: column.id}))
+                                ? ''
+                                : undefined
+                            }
+                            data-cell-index={cell.index}
+                            data-range={cell.value === undefined ? undefined : cell.range}
+                            data-missing={cell.value === undefined ? '' : undefined}
+                            data-scale-ratio={
+                              cell.value === undefined ? undefined : cell.ratio.toFixed(4)
+                            }
+                            data-wcl-heatmap-cell=""
+                            key={column.id}
+                            style={{'--wcl-heatmap-intensity': `${intensity}%`} as CellStyles}
+                          >
+                            {cell.value === undefined ? null : (
+                              <span data-wcl-heatmap-cell-value="">
+                                {formatHeatmapValue(cell.value, props.value)}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+                {interactive ? <HeatmapInteractionFeedback state={interactionState} /> : null}
+                {activeCell === undefined || pointerPosition === undefined ? null : (
+                  <HeatmapTooltip
+                    anchor={pointerPosition}
+                    cell={activeCell}
+                    portalTarget={rootElement?.closest('[data-wcl-provider]') ?? rootElement}
+                    props={props}
+                  />
+                )}
               </div>
-              {interactive ? <HeatmapInteractionFeedback state={interactionState} /> : null}
-              {activeCell === undefined || pointerPosition === undefined ? null : (
-                <HeatmapTooltip
-                  anchor={pointerPosition}
-                  cell={activeCell}
-                  portalTarget={rootElement?.closest('[data-wcl-provider]') ?? rootElement}
-                  props={props}
-                />
-              )}
+            </div>
+            <div
+              aria-label={props.labels.colorKey}
+              data-scale={props.scale.type}
+              data-wcl-heatmap-key=""
+              style={frameStyle}
+            >
+              {model.hasNumericKey ? (
+                <div data-wcl-heatmap-key-numeric="">
+                  <span data-wcl-heatmap-key-gradient="" />
+                  <span>{formatHeatmapValue(model.domain[0], props.value)}</span>
+                  {props.scale.type === 'two-sided' ? (
+                    <span data-wcl-heatmap-key-midpoint="">
+                      {formatHeatmapValue(props.scale.midpoint, props.value)}
+                    </span>
+                  ) : null}
+                  <span>{formatHeatmapValue(model.domain[1], props.value)}</span>
+                </div>
+              ) : null}
+              <span data-wcl-heatmap-key-missing="">
+                <i />
+                {props.labels.missing}
+              </span>
             </div>
           </div>
-          <div
-            aria-label={props.labels.colorKey}
-            data-scale={props.scale.type}
-            data-wcl-heatmap-key=""
-            style={frameStyle}
-          >
-            {model.hasNumericKey ? (
-              <div data-wcl-heatmap-key-numeric="">
-                <span data-wcl-heatmap-key-gradient="" />
-                <span>{formatHeatmapValue(model.domain[0], props.value)}</span>
-                {props.scale.type === 'two-sided' ? (
-                  <span data-wcl-heatmap-key-midpoint="">
-                    {formatHeatmapValue(props.scale.midpoint, props.value)}
-                  </span>
-                ) : null}
-                <span>{formatHeatmapValue(model.domain[1], props.value)}</span>
-              </div>
-            ) : null}
-            <span data-wcl-heatmap-key-missing="">
-              <i />
-              {props.labels.missing}
-            </span>
-          </div>
-        </div>
-        <HeatmapTable model={model} props={props} />
+        )}
+        <HeatmapTable
+          model={fullModel}
+          props={sourceProps}
+          hiddenRows={hiddenRows}
+          hiddenColumns={hiddenColumns}
+        />
         <p aria-live="polite" data-wcl-chart-reading-announcement="">
           {readingAnnouncement}
         </p>
@@ -879,6 +1080,11 @@ export function Heatmap<Datum extends object>(props: HeatmapProps<Datum>): React
       data-density={isCompact ? 'compact' : 'regular'}
       data-wcl-chart=""
       data-wcl-heatmap=""
+      data-visibility={visibility ? '' : undefined}
+      data-touch={touch ? '' : undefined}
+      onPointerDownCapture={(event) => {
+        if (event.pointerType === 'touch') setTouch(true);
+      }}
       ref={setRootElement}
       style={rootStyle}
     >

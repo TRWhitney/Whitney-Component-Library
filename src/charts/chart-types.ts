@@ -344,6 +344,20 @@ export interface HeatmapLabels {
   readonly scrollRegion: string;
 }
 
+export interface HeatmapVisibilityLabels {
+  readonly hideRow: (label: string) => string;
+  readonly showRow: (label: string) => string;
+  readonly hideColumn: (label: string) => string;
+  readonly showColumn: (label: string) => string;
+  readonly restore: (count: number) => string;
+  readonly hiddenRows: string;
+  readonly hiddenColumns: string;
+  readonly hidden: string;
+  readonly showAll: string;
+  readonly close: string;
+  readonly allHidden: ChartStateCopy;
+}
+
 export interface HeatmapSelectionItem {
   readonly rowId: string;
   readonly columnId: string;
@@ -364,6 +378,7 @@ export interface HeatmapInteraction<Datum extends object> {
 }
 
 export interface HeatmapProps<Datum extends object> {
+  readonly visibilityLabels?: HeatmapVisibilityLabels;
   readonly interaction?: HeatmapInteraction<Datum>;
   readonly aspectRatio?: number;
   readonly columnAccessor: ChartAccessor<Datum, string>;

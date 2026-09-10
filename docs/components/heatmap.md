@@ -30,25 +30,31 @@ Show one numeric measure across the complete intersections of two ordered domain
 ## States
 
 - Ready, loading, empty-domain, partial, invalid-data, and error states are explicit. A declared grid with no records remains an all-missing grid. Non-finite records are omitted and reported; an entirely invalid nonempty dataset becomes unavailable.
+- When every row or every column is hidden, an all-hidden state retains the caption, full table and selection. The corner restore list and Show all remain available even when no cells can be displayed.
 
 ## Control, events, validation, and forms
 
 - Selection follows the shared ChartSelection ownership model: selectedItems plus onSelectionChange is controlled; defaultSelectedItems initializes local state. Items retain row/column identity across reordering and value changes; unknown or removed coordinates are pruned. Localized instructions, count, item descriptions and a Clear selection action accompany selection.
 - Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.
 - Optional interaction selects cells by stable rowId and columnId. Click/tap toggles selection; Control/Command-click or touch hold activates without changing it. Without selection, ordinary click/tap activates. Rectangle dragging selects boxes it touches, replacing by default, adding with Shift or Control/Command, and removing with Alt. Escape, pointer cancellation, scrolling, data or geometry changes cancel the preview.
+- Optional visibilityLabels enables individual row and column eyes. Hiding removes the entire track without leaving a blank row or column. Eyes reveal on label hover or keyboard focus and stay visible on touch. A permanently visible closed eye with the hidden-dimension count beside the row heading opens an overlaid restore list. Individual closed eyes restore dimensions; Show all restores every dimension.
+- Visibility belongs to the chart and follows stable row and column IDs across value changes and reordering. Removed IDs are pruned. Removing visibilityLabels restores the full chart. Hidden cells retain selection, use the selection hidden-label formatter, and remain in the complete table. They cannot receive reading, activation, keyboard or drag gestures. Clear selection also clears hidden items. Visibility changes cancel active gestures.
+- Automatic color domains fit visible readings after hiding or restoring; explicit domains stay fixed. All original data is validated before visibility filtering, and accessor indices and activation records retain their original source identity.
 - interaction.onActivate receives the cell item, labeled row and column, input method, value and original datum. Missing values are undefined; omitted records have undefined datum. An invalid source value remains missing while its original record is available. Zero remains numeric zero. Selection onSelectionChange returns coordinate items and never mutates source data.
 - Runtime preparation requires unique nonblank row and column ids, declared record coordinates, and at most one record per cell. Scale colors must be nonblank strings containing browser-supported CSS color values. Sequential scales require one color, and two-sided scales require ordered low and high colors. Zero and negative values are valid. Missing pairs remain missing. Non-finite values are invalid. Fixed domains must be ascending and finite, and a two-sided midpoint must be finite and inside its fixed domain.
 - Heatmap is not a form control and does not submit, validate, or reset values. Place dataset and scale controls beside it in consumer-owned composition.
 
 ## Accessibility
 
-- The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. The visual grid is hidden from assistive technology, and a generated native table preserves every declared row and column intersection.
+- The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. Visual cells are hidden from assistive technology, while enabled visibility controls remain accessible. A generated native table preserves every declared row and column intersection, marking hidden dimensions.
 
 ## Keyboard, labeling, localization, and direction
 
-- Tab reaches one title-named grid boundary. Left and Right move across columns; Up and Down move across rows. Home and End reach row endpoints. Control/Command Home and Control/Command End reach the first and last cell in the complete grid. Enter/Space selects when selection is enabled; Control/Command plus Enter/Space activates. With selection disabled, Enter/Space activates. Navigation stops at boundaries, and Escape clears the reading.
+- Tab reaches one title-named grid boundary. Left and Right move across columns; Up and Down move across rows. Home and End reach row endpoints. Control/Command Home and Control/Command End reach the first and last visible cell. Enter/Space selects when selection is enabled; Control/Command plus Enter/Space activates. With selection disabled, Enter/Space activates. Navigation stops at boundaries, and Escape clears the reading.
+- When visibility is enabled, Tab also reaches the label eyes and corner restore control. Hiding moves focus to the corner control. Escape or an outside press dismisses the restore list, with focus returning to the corner control when appropriate. Restoring an item moves focus to the next restore eye while hidden items remain. Restoring the final item or using Show all closes the list and focuses the first visible row eye.
 - title, description, dataTableLabel, value label, row and column headings, color-key label, localized missing copy, scroll-region label, and state copy are required. Row and column ids stay stable while labels provide readable names.
 - Localize all visible and announced copy, domain labels, missing copy, and units. value.formatValue controls locale-specific number formatting. Selection labels provide localized instructions, clearing, empty and count summaries, and cell names.
+- HeatmapVisibilityLabels requires hideRow, showRow, hideColumn and showColumn formatters receiving the readable domain label; restore formats the total hidden-dimension count. Provide hiddenRows and hiddenColumns list headings, hidden table copy, showAll and close actions, and allHidden title and description.
 - Caption, labels, tooltip, key, and table follow inherited writing direction. Declared row and column order remains the source order.
 
 ## Appearance and responsive behavior
@@ -62,7 +68,7 @@ Show one numeric measure across the complete intersections of two ordered domain
 - Forced colors preserve numeric cells, missing patterns, active boundaries, labels, and the complete table in system colors. The table remains the exact non-color representation.
 - Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
 - Outline pulses use a four-pixel stroke, a five-pixel outset, and three pixels of outward travel per edge at every rendered size. Degenerate lines retain their zero dimension. Selection and value-bearing geometry do not move.
-- Reduced motion removes active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same. Grid geometry does not animate.
+- Visibility changes briefly animate remaining cells and their colors as the grid and automatic range refit. Reduced motion removes visibility, active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same.
 
 ## Examples
 
@@ -78,7 +84,7 @@ export function HeatmapExample() {
   return (
     <AppearanceProvider appearance="dark" accent="#2878ff">
       <Heatmap
-        interaction={{selection: {labels: {instructions: "Click or tap to select. Drag to select touched cells. Shift adds; Alt removes.", clear: "Clear selection", empty: "Nothing selected", summary: count => `${count} cells selected`, item: item => `${item.rowId}, ${item.columnId}`, hidden: label => label}}}}
+        interaction={{selection: {labels: {instructions: "Click or tap to select. Drag to select touched cells. Shift adds; Alt removes.", clear: "Clear selection", empty: "Nothing selected", summary: count => `${count} cells selected`, item: item => `${item.rowId}, ${item.columnId}`, hidden: label => `${label} (hidden)`}}}}
         columnAccessor="hour"
         columns={[{id: "morning", label: "Morning"}, {id: "evening", label: "Evening"}]}
         data={[{location: "north", hour: "morning", value: 0}, {location: "south", hour: "evening", value: 18}]}
@@ -91,6 +97,7 @@ export function HeatmapExample() {
         rows={[{id: "north", label: "North room"}, {id: "south", label: "South room"}]}
         scale={{color: "#d14f00", type: "sequential"}}
         title="Room temperature"
+        visibilityLabels={{hideRow: label => `Hide room ${label}`, showRow: label => `Show room ${label}`, hideColumn: label => `Hide time ${label}`, showColumn: label => `Show time ${label}`, restore: count => `Restore ${count} hidden dimensions`, hiddenRows: "Hidden rooms", hiddenColumns: "Hidden times", hidden: "Hidden", showAll: "Show all", close: "Close hidden dimensions", allHidden: {title: "No visible cells", description: "Restore a room and time, or show all."}}}
         value={{accessor: "value", label: "Temperature", unit: "°C"}}
       />
     </AppearanceProvider>

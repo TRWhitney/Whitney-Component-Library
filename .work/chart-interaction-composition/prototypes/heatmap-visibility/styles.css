@@ -1,0 +1,251 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+[data-wcl-provider] {
+  min-height: 100vh;
+  background: var(--wcl-canvas);
+  color: var(--wcl-text);
+  font-family: var(--wcl-font-body);
+}
+.study {
+  max-width: 64rem;
+  margin: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+h1 {
+  font-size: 1.5rem;
+  margin: 0.3rem 0;
+}
+h2 {
+  font-size: 1rem;
+}
+header p {
+  line-height: 1.6;
+  margin-block: 0.4rem;
+}
+.kicker {
+  font: 0.75rem/1.5 var(--wcl-font-utility);
+  color: var(--wcl-text-muted);
+}
+.controls {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+legend {
+  font-weight: 650;
+  margin-bottom: 0.5rem;
+}
+.choices,
+.toggles {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.choices label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.hint {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--wcl-text-muted);
+}
+.example {
+  padding: 1rem;
+  background: var(--wcl-surface);
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-radius);
+}
+.example[data-compact] {
+  max-width: 26rem;
+  margin: auto;
+}
+.chart-host [data-wcl-heatmap] {
+  inline-size: 100%;
+  --wcl-heatmap-row-label-width: 9rem !important;
+}
+.chart-host [data-wcl-chart-selection] {
+  display: none;
+}
+.chart-host [data-wcl-heatmap-column-label] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  white-space: normal;
+  min-block-size: 4rem;
+  gap: 0.25rem;
+  overflow: visible;
+}
+.chart-host [data-wcl-heatmap-row-label] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  white-space: normal;
+  overflow: visible;
+}
+.axis-eye {
+  display: inline-flex;
+  flex: none;
+}
+.axis-eye button {
+  opacity: 1;
+  transition: opacity 150ms ease;
+}
+.chart-host [data-wcl-heatmap-cell] {
+  transition:
+    background-color 240ms ease,
+    border-color 240ms ease;
+}
+[data-reveal] .chart-host .axis-eye button {
+  opacity: 0;
+}
+[data-reveal]
+  .chart-host
+  :is([data-wcl-heatmap-row-label], [data-wcl-heatmap-column-label]):is(:hover, :focus-within)
+  .axis-eye
+  button {
+  opacity: 1;
+}
+.selection {
+  margin-top: 1.5rem;
+}
+.selection ul {
+  font: 0.875rem/1.7 var(--wcl-font-utility);
+}
+.empty {
+  padding: 1rem;
+  text-align: center;
+}
+.raw {
+  margin: 1rem 0;
+}
+.raw > div {
+  overflow: auto;
+}
+table {
+  border-collapse: collapse;
+  font: 0.8rem/1.5 var(--wcl-font-utility);
+}
+th,
+td {
+  padding: 0.5rem;
+  text-align: start;
+  border-bottom: 1px solid var(--wcl-border);
+}
+.identifier {
+  position: fixed;
+  inset: auto 1rem 1rem;
+  padding: 0.6rem;
+  background: var(--wcl-surface);
+  border: 1px solid var(--wcl-border);
+  font: 0.75rem/1.5 var(--wcl-font-utility);
+  pointer-events: none;
+}
+@media (pointer: coarse) {
+  [data-reveal] .chart-host .axis-eye button {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .axis-eye button,
+  .chart-host [data-wcl-heatmap-cell] {
+    transition: none;
+  }
+}
+.chart-host [data-wcl-heatmap-frame] {
+  block-size: auto !important;
+  max-block-size: none !important;
+  overflow: auto !important;
+}
+.chart-host [data-wcl-heatmap-canvas] {
+  min-inline-size: 0;
+  min-block-size: 0;
+  --wcl-heatmap-row-label-width: 7.5rem !important;
+  --wcl-heatmap-cell-minimum-width: 2.7rem !important;
+}
+.chart-host [data-wcl-heatmap-grid] {
+  inline-size: 100%;
+  min-block-size: 0;
+  grid-template-rows: 4rem repeat(var(--wcl-heatmap-rows), minmax(2.75rem, 1fr));
+}
+.chart-host [data-wcl-heatmap-column-label] {
+  overflow-wrap: anywhere;
+}
+.study[data-touch] .chart-host .axis-eye button {
+  opacity: 1;
+}
+
+.chart-host [data-hidden-axis] {
+  color: var(--wcl-text-muted);
+}
+.chart-host [data-hidden-axis] .axis-name {
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.65;
+}
+.study[data-reveal] .chart-host [data-hidden-axis] .axis-eye button {
+  opacity: 1;
+}
+.chart-host [data-wcl-heatmap-row] {
+  min-block-size: 2.75rem;
+}
+.chart-host [data-wcl-heatmap-corner],
+.empty-corner {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: visible;
+}
+.restore-trigger[data-wcl-chart-visibility] {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  inline-size: auto;
+  padding-inline: 0.25rem;
+  gap: 0.2rem;
+  font: 0.75rem var(--wcl-font-utility);
+}
+.restore-menu {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  inline-size: 16rem;
+  max-block-size: min(22rem, 65vh);
+  overflow: auto;
+  padding: 0.75rem;
+  background: var(--wcl-surface);
+  color: var(--wcl-text);
+  border: 1px solid var(--wcl-border);
+  border-radius: var(--wcl-radius);
+  box-shadow: 0 6px 24px #0003;
+  font: 0.875rem/1.5 var(--wcl-font-body);
+  white-space: normal;
+}
+.restore-menu p {
+  margin: 0.25rem 0;
+  font-size: 0.75rem;
+  color: var(--wcl-text-muted);
+}
+.restore-menu > div + div {
+  margin-top: 0.75rem;
+}
+.restore-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}

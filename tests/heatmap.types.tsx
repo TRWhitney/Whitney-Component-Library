@@ -1,4 +1,4 @@
-import {Heatmap, type HeatmapProps} from '../src/index.js';
+import {Heatmap, type HeatmapProps, type HeatmapVisibilityLabels} from '../src/index.js';
 
 interface Reading {
   readonly hour: string;
@@ -159,5 +159,47 @@ export const invalidHeatmapCoordinate = (
         defaultSelectedItems: [{rowId: 'north'}],
       },
     }}
+  />
+);
+
+const visibilityLabels: HeatmapVisibilityLabels = {
+  hideRow: (label) => `Hide row ${label}`,
+  showRow: (label) => `Show row ${label}`,
+  hideColumn: (label) => `Hide column ${label}`,
+  showColumn: (label) => `Show column ${label}`,
+  restore: (count) => `Restore ${count} hidden dimensions`,
+  hiddenRows: 'Hidden locations',
+  hiddenColumns: 'Hidden times',
+  hidden: 'Hidden',
+  showAll: 'Show all',
+  close: 'Close hidden dimensions',
+  allHidden: {
+    title: 'No visible cells',
+    description: 'Restore a location and time to see readings.',
+  },
+};
+
+export const hideableHeatmap = (
+  <Heatmap {...common} data={[]} visibilityLabels={visibilityLabels} />
+);
+
+export const invalidVisibilityFormatter: HeatmapVisibilityLabels = {
+  ...visibilityLabels,
+  // @ts-expect-error Visibility action formatters receive a readable domain label.
+  hideRow: (label: number) => String(label),
+};
+
+export const invalidRestoreFormatter: HeatmapVisibilityLabels = {
+  ...visibilityLabels,
+  // @ts-expect-error Restore copy formats a numeric hidden-dimension count.
+  restore: (count: string) => count,
+};
+
+export const incompleteVisibilityCopy = (
+  <Heatmap
+    {...common}
+    data={[]}
+    // @ts-expect-error Enabling visibility requires the complete localized label contract.
+    visibilityLabels={{hideRow: (label) => `Hide ${label}`}}
   />
 );

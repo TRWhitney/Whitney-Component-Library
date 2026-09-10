@@ -50,6 +50,7 @@ import {
   type HeatmapActivation,
   type HeatmapInteraction,
   type HeatmapSelectionItem,
+  type HeatmapVisibilityLabels,
   InlineAlert,
   InlineGroup,
   Link,
@@ -3400,11 +3401,27 @@ function HeatmapInteractionExample({
               empty: 'Nothing selected',
               summary: (count) => `${count} ${count === 1 ? 'cell' : 'cells'} selected`,
               item: itemLabel,
-              hidden: (label) => label,
+              hidden: (label) => `${label} (hidden)`,
             },
           },
         }
       : {}),
+  };
+  const visibilityLabels: HeatmapVisibilityLabels = {
+    hideRow: (label) => `Hide room ${label}`,
+    showRow: (label) => `Show room ${label}`,
+    hideColumn: (label) => `Hide time ${label}`,
+    showColumn: (label) => `Show time ${label}`,
+    restore: (count) => `Restore ${count} hidden rooms and times`,
+    hiddenRows: 'Hidden rooms',
+    hiddenColumns: 'Hidden times',
+    hidden: 'Hidden',
+    showAll: 'Show all',
+    close: 'Close hidden rooms and times',
+    allHidden: {
+      title: 'No visible cells',
+      description: 'Restore a room and time using the closed eye beside Room, or show all.',
+    },
   };
   const heatmapCommon = {
     columnAccessor: 'period',
@@ -3443,6 +3460,15 @@ function HeatmapInteractionExample({
         {instructions} Dashed inner outlines show the current reading. Solid frames show selected
         cells, including missing readings.
       </p>
+      <p>
+        Hover or keyboard-focus a room or time label to reveal its eye; touchscreens keep eyes
+        visible. Hide a room or time to remove its whole track. To restore it, open the closed eye
+        and count beside Room, then use its eye in the overlaid list. Hidden selections remain
+        selected, and the data table keeps every reading.{' '}
+        {deviation
+          ? 'This chart keeps a fixed color range of −6 to 6 °C when tracks are hidden.'
+          : 'The color range automatically fits the remaining visible readings.'}
+      </p>
       <Heatmap
         {...heatmapCommon}
         data={deviation ? roomDeviationData : roomTemperatureData}
@@ -3459,6 +3485,7 @@ function HeatmapInteractionExample({
         title={deviation ? 'Temperature deviation' : 'Room temperature'}
         value={{accessor: 'value', label: deviation ? 'Deviation' : 'Temperature', unit: '°C'}}
         interaction={interaction}
+        visibilityLabels={visibilityLabels}
       />
       {details ? (
         <Stack gap="tight">

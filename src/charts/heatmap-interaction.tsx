@@ -7,7 +7,7 @@ import {
   type SelectionBox,
 } from './chart-interaction.js';
 import {itemInteractionSetup} from './item-interaction.js';
-import type {HeatmapProps, HeatmapSelectionItem} from './chart-types.js';
+import type {ChartSelection, HeatmapProps, HeatmapSelectionItem} from './chart-types.js';
 
 export interface HeatmapCell {
   readonly index: number;
@@ -24,6 +24,7 @@ export function useHeatmapInteraction<Datum extends object>(
   cells: readonly HeatmapCell[],
   canvas: HTMLDivElement | null,
   version: string,
+  source = {props, cells},
 ) {
   const [geometry, setGeometry] = useState<{
     cells: readonly SelectionBox[];
@@ -51,28 +52,68 @@ export function useHeatmapInteraction<Datum extends object>(
     observer?.observe(canvas);
     return () => observer?.disconnect();
   }, [canvas, version, enabled]);
-  const entries = cells.map((cell) => {
-    const row = props.rows[cell.rowIndex]!,
-      column = props.columns[cell.columnIndex]!;
-    const item = {rowId: row.id, columnId: column.id};
-    return {
-      item,
-      cell,
-      activate: (input: 'pointer' | 'keyboard' | 'touch') =>
-        props.interaction?.onActivate?.({
-          item,
-          row,
-          column,
-          value: cell.value,
-          datum: cell.sourceIndex === undefined ? undefined : props.data[cell.sourceIndex],
-          input,
-        }),
-    };
-  });
+  const makeEntries = (input: HeatmapProps<Datum>, inputCells: readonly HeatmapCell[]) =>
+    inputCells.map((cell) => {
+      const row = input.rows[cell.rowIndex]!,
+        column = input.columns[cell.columnIndex]!;
+      const item = {rowId: row.id, columnId: column.id};
+      return {
+        item,
+        cell,
+        activate: (inputMethod: 'pointer' | 'keyboard' | 'touch') =>
+          props.interaction?.onActivate?.({
+            item,
+            row,
+            column,
+            value: cell.value,
+            datum: cell.sourceIndex === undefined ? undefined : source.props.data[cell.sourceIndex],
+            input: inputMethod,
+          }),
+      };
+    });
+  const entries = makeEntries(props, cells);
+  const allEntries = makeEntries(source.props, source.cells);
+  const visible = new Set(entries.map(({item}) => heatmapKey(item)));
+  const allowed = new Set(allEntries.map(({item}) => heatmapKey(item)));
+  const selection = props.interaction?.selection;
+  const normalize = (items: readonly HeatmapSelectionItem[]) => [
+    ...new Map(
+      items.filter((item) => allowed.has(heatmapKey(item))).map((item) => [heatmapKey(item), item]),
+    ).values(),
+  ];
+  const [internal, setInternal] = useState<readonly HeatmapSelectionItem[]>(
+    selection?.defaultSelectedItems ?? [],
+  );
+  const allowedVersion = JSON.stringify([...allowed]);
+  const [previousAllowed, setPreviousAllowed] = useState(allowedVersion);
+  if (previousAllowed !== allowedVersion) {
+    setPreviousAllowed(allowedVersion);
+    setInternal(normalize(internal));
+  }
+  const retained = normalize(selection?.selectedItems ?? internal);
+  const commit = (items: readonly HeatmapSelectionItem[]) => {
+    const next = normalize(items);
+    if (selection?.selectedItems === undefined) setInternal(next);
+    selection?.onSelectionChange?.(next);
+  };
+  const controlledSelection: ChartSelection<HeatmapSelectionItem> | undefined = selection
+    ? {
+        labels: {
+          ...selection.labels,
+          item: (item) => {
+            const label = selection.labels.item(item);
+            return visible.has(heatmapKey(item)) ? label : selection.labels.hidden(label);
+          },
+        },
+        selectedItems: retained,
+        onSelectionChange: (items) =>
+          commit([...retained.filter((item) => !visible.has(heatmapKey(item))), ...items]),
+      }
+    : undefined;
   const setup = props.interaction
     ? itemInteractionSetup(
-        entries,
-        props.interaction.selection,
+        allEntries,
+        controlledSelection,
         !!props.interaction.onActivate,
         heatmapKey,
       )
@@ -92,7 +133,7 @@ export function useHeatmapInteraction<Datum extends object>(
             : {}),
         }
       : undefined,
-    entries.map(({item, cell}) => ({
+    allEntries.map(({item, cell}) => ({
       id: heatmapKey(item),
       category: item.columnId,
       datum: cell,
@@ -118,7 +159,22 @@ export function useHeatmapInteraction<Datum extends object>(
       : [];
   });
   const selected = new Set(actions.selected.map((item) => item.rowId));
-  return {actions, points, selected, setup, entries};
+  return {
+    actions: {
+      ...actions,
+      change: (items: readonly {rowId: string}[]) =>
+        commit(
+          items.flatMap((item) => {
+            const entry = allEntries.find((entry) => heatmapKey(entry.item) === item.rowId);
+            return entry ? [entry.item] : [];
+          }),
+        ),
+    },
+    points,
+    selected,
+    setup,
+    entries,
+  };
 }
 
 export function HeatmapInteractionFeedback({
