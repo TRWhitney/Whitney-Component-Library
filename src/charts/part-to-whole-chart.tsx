@@ -191,17 +191,45 @@ function prepareModel<Datum extends object>(
   };
 }
 
-function makePages(recordCount: number): readonly Page[] {
-  if (recordCount <= pageSize) return [{count: recordCount, hasMore: false, start: 0}];
-  const pages: Page[] = [{count: pageSize - 1, hasMore: true, start: 0}];
-  let start = pageSize - 1;
-  while (start < recordCount) {
-    const remaining = recordCount - start;
-    const count = Math.min(pageSize, remaining);
-    pages.push({count, hasMore: remaining > count, start});
-    start += count;
-  }
+function makePages<Datum extends object>(
+  records: readonly PreparedCategory<Datum>[],
+  hiddenIds: readonly string[],
+): readonly Page[] {
+  const pages: Page[] = [];
+  let remainingVisible = records.filter((record) => !hiddenIds.includes(record.id)).length;
+  let start = 0;
+  do {
+    // Hidden legend entries retain their ranked place but consume no slice capacity.
+    if (remainingVisible <= pageSize) {
+      pages.push({start, count: records.length - start, hasMore: false});
+      break;
+    }
+    const capacity = pages.length === 0 ? pageSize - 1 : pageSize;
+    let end = start;
+    let visibleCount = 0;
+    while (end < records.length) {
+      const hidden = hiddenIds.includes(records[end]!.id);
+      if (!hidden && visibleCount === capacity) break;
+      if (!hidden) visibleCount++;
+      end++;
+    }
+    pages.push({start, count: end - start, hasMore: true});
+    remainingVisible -= visibleCount;
+    start = end;
+  } while (start < records.length);
   return pages;
+}
+
+/** Preserve the palette role from the original ranked page when a category moves. */
+function categoryStyleIndex(rank: number, recordCount: number): number {
+  return recordCount <= pageSize || rank < pageSize - 1 ? rank : (rank - (pageSize - 1)) % pageSize;
+}
+
+/** Short and long dashes encode the occurrence, keeping patterns stable as pages mix. */
+function categoryDashPattern(styleIndex: number): string | undefined {
+  const occurrence = Math.floor(styleIndex / defaultColors.length);
+  if (occurrence === 0) return undefined;
+  return `6 2 ${[...occurrence.toString(2)].map((bit) => (bit === '1' ? '1 2' : '3 2')).join(' ')}`;
 }
 
 function makeSegments<Datum extends object>(
@@ -210,6 +238,15 @@ function makeSegments<Datum extends object>(
   aggregateSizing: PartToWholeAggregateSizing,
   hiddenIds: readonly string[] = [],
 ): readonly Segment<Datum>[] {
+  const colorCounts = new Map<number, number>();
+  const styleIndices = new Map(
+    records.map((record, rank) => {
+      const colorIndex = categoryStyleIndex(rank, records.length) % defaultColors.length;
+      const occurrence = colorCounts.get(colorIndex) ?? 0;
+      colorCounts.set(colorIndex, occurrence + 1);
+      return [record.id, colorIndex + occurrence * defaultColors.length];
+    }),
+  );
   const pageRecords = records.slice(page.start, page.start + page.count);
   const ordinary = pageRecords.filter((category) => !hiddenIds.includes(category.id));
   const remainingRecords = records.slice(page.start + page.count);
@@ -231,7 +268,7 @@ function makeSegments<Datum extends object>(
   const ordinaryAngle = Math.PI * 2 - aggregateAngle;
   let cursor = -Math.PI / 2;
   const segments: Segment<Datum>[] = ordinary.map((category) => {
-    const index = pageRecords.findIndex((record) => record.id === category.id);
+    const index = styleIndices.get(category.id)!;
     const startAngle = cursor;
     cursor += (category.value / ordinaryTotal) * ordinaryAngle;
     return {
@@ -248,11 +285,11 @@ function makeSegments<Datum extends object>(
   });
   if (hasAggregate) {
     segments.push({
-      color: defaultColors[page.count % defaultColors.length]!,
+      color: defaultColors[(page.start === 0 ? pageSize - 1 : pageSize) % defaultColors.length]!,
       endAngle: Math.PI * 1.5,
       id: 'aggregate',
       identity: 'aggregate',
-      index: page.count,
+      index: page.start === 0 ? pageSize - 1 : pageSize,
       isAggregate: true,
       remaining: remainingRecords,
       startAngle: cursor,
@@ -294,7 +331,8 @@ function pieSectorCentroid<Datum extends object>(
   segment: Segment<Datum>,
 ): readonly [number, number] {
   const angle = segment.endAngle - segment.startAngle;
-  const radius = (4 * outerRadius * Math.sin(angle / 2)) / (3 * angle);
+  const radius =
+    angle === 0 ? (2 * outerRadius) / 3 : (4 * outerRadius * Math.sin(angle / 2)) / (3 * angle);
   const middle = (segment.startAngle + segment.endAngle) / 2;
   return [Math.cos(middle - Math.PI / 2) * radius, Math.sin(middle - Math.PI / 2) * radius];
 }
@@ -507,7 +545,7 @@ function PartToWholeFrame<Datum extends object>({
     assertText(interaction.selection.containsSelection, 'Expansion selection label');
   const {isFocusVisible} = useFocusVisible();
   const pressedSegment = useRef<string | null>(null);
-  const pages = makePages(model.positiveCategories.length);
+  const pages = makePages(model.positiveCategories, hiddenIds);
   const aggregateSizing = props.aggregateSizing ?? 'proportional';
   const titleId = useId();
   const descriptionId = useId();
@@ -550,6 +588,8 @@ function PartToWholeFrame<Datum extends object>({
     setAnnouncement('');
   }
   const safePageIndex = Math.min(pageIndex, pages.length - 1);
+  if (retainedModelIdentity === modelIdentity && safePageIndex !== pageIndex)
+    setPageIndex(safePageIndex);
   const page = pages[safePageIndex]!;
   const legendSegments = makeSegments(model.positiveCategories, page, aggregateSizing);
   const targetSegments = makeSegments(model.positiveCategories, page, aggregateSizing, hiddenIds);
@@ -968,7 +1008,7 @@ function PartToWholeFrame<Datum extends object>({
       : `M${x},${y} A${radius},${radius} 0 ${b - a > Math.PI ? 1 : 0} 1 ${Math.cos(b) * radius},${Math.sin(b) * radius}`;
   };
   const frameStyle: PartToWholeFrameStyles = {
-    '--wcl-radial-legend-rows': Math.ceil(legendSegments.length / 2),
+    '--wcl-radial-legend-rows': Math.min(4, Math.ceil(legendSegments.length / 2)),
     '--wcl-chart-aspect-ratio': props.aspectRatio ?? 1.72,
     '--wcl-chart-minimum-height': `${minimumSize.height}px`,
     '--wcl-chart-minimum-width': `${minimumSize.width}px`,
@@ -1100,6 +1140,9 @@ function PartToWholeFrame<Datum extends object>({
                           <path
                             d={pathBuilder(segment) ?? undefined}
                             data-wcl-radial-slice=""
+                            strokeDasharray={
+                              segment.isAggregate ? undefined : categoryDashPattern(segment.index)
+                            }
                             onClick={() => {
                               if (!interaction && segment.isAggregate) openNextPage(false);
                             }}
@@ -1291,6 +1334,9 @@ function PartToWholeFrame<Datum extends object>({
                         >
                           <rect
                             data-aggregate={segment.isAggregate ? '' : undefined}
+                            strokeDasharray={
+                              segment.isAggregate ? undefined : categoryDashPattern(segment.index)
+                            }
                             height="8"
                             rx="2"
                             width="20"
@@ -1317,6 +1363,12 @@ function PartToWholeFrame<Datum extends object>({
                             setPinnedLegendId(null);
                           }}
                           onToggle={() => {
+                            const focusedEye = document.activeElement;
+                            if (focusedEye?.hasAttribute('data-wcl-chart-visibility')) {
+                              requestAnimationFrame(() => {
+                                if (!focusedEye.isConnected) firstEye.current?.focus();
+                              });
+                            }
                             actions.cancel();
                             clearReading();
                             pressedSegment.current = null;

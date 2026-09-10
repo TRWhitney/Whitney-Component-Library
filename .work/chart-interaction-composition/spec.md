@@ -423,9 +423,18 @@ reflects visible values. Full source records remain available in the table, and 
 selection as in the other chart families. Preserve the approved animated fitting and eye controls.
 
 Eyes apply only to individual categories. Expansion remains navigation and receives no bulk eye.
-Keep existing ranked pages and legend positions when categories are hidden, including their colors
-and patterns. A hidden entry remains on its page for restoration. When hiding removes the expansion
-slice, keep a labeled next-page action available so hidden categories on later pages remain reachable.
+Hiding frees an ordinary-slice slot and pulls the next visible ranked category out of the expansion.
+Hidden categories do not consume slice slots. When the remaining visible categories fit, remove the
+expansion and show them all. Preserve source ranking; restoration puts the category back in rank
+order and returns the last ordinary category to the expansion when the page is full. Category colors,
+patterns and selections follow their IDs across these moves.
+
+Keep hidden entries with closed eyes in the ranked legend so they remain restorable. The legend may
+contain more entries than visible slices; retain bounded scrolling on compact layouts. Page boundaries
+follow visible capacity while retaining hidden records in their ranked legend range. If pages collapse,
+stay on the nearest available page and do not jump forward again on restoration. The expansion count
+and selection asterisk describe only its remaining ranked records, including hidden records. No bulk
+eye is added. This replaces Ticket 18's initial fixed-page behavior.
 
 Add optional `visibilityLabels` using the existing chart copy contract. Hiding clears that category's
 pin and reading, cancels gestures, and excludes it from pointer, keyboard, activation and sweep
@@ -441,6 +450,6 @@ on the current page. The donut center reports the visible total across all pages
 The full table keeps raw records, marks hidden categories, and reports visible shares for visible
 rows; hidden rows use the localized hidden label instead of a percentage. Zero records remain in
 the table without slices or visibility eyes. Full-source validation and loading/error feedback remain.
-When the current page has no visible slices, retain its legend, paging, caption, table and selection,
-and show recovery. Use copy appropriate to a page with no visible slices; Show all restores all
-categories and focuses the first eye on the current page. Update both public guides and showcase.
+When all categories are hidden, pages collapse to one; retain the full legend, caption, table and
+selection and show recovery. Offer individual eyes and Show all, with no instruction to change page.
+Show all restores all categories and focuses the first eye. Update both public guides and showcase.

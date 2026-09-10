@@ -33,3 +33,5 @@
 ## Design completion
 
 Reuses the approved open/closed eye, outer selection edge, and expansion navigation. Existing figure and monospace chart typography and chart palette remain; no new visual role or color is introduced. Phone legends use two columns with room for 32px eyes. Slice boundaries animate for 240ms; reduced motion settles directly. The visible example explains what hiding changes and retains all raw records in the table.
+
+Ticket 19 supersedes the fixed-page portion of this delivery with [automatic refill from expansion](19-radial-page-refill.md). Its other visibility behavior remains accepted.

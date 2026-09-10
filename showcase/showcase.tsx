@@ -3138,8 +3138,8 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
       showSeries: (label: string) => `Show ${label}`,
       showAll: 'Show all categories',
       allHidden: {
-        title: 'No visible slices on this page',
-        description: 'Use an eye to restore a category, change page, or show all categories.',
+        title: 'All categories are hidden',
+        description: 'Use an eye to restore a category, or show all categories.',
       },
     },
     data: energyCategoryData,
@@ -3197,9 +3197,12 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
       )}
       <p className="showcase-muted">
         Use an eye to hide or restore a category. Remaining slices animate to fill the circle;
-        percentages and the donut total use visible values. Hidden entries stay on the same legend
-        page with their colors unchanged. The expansion entry has no eye; click it to open the next
-        page, even when its slice is hidden. The table retains all records and labels hidden rows.
+        percentages and the donut total use visible values. Hiding pulls the next category out of
+        the expansion to fill the space. Closed eyes in the legend let you restore hidden
+        categories; restoring one sends the last category back to expansion if needed. Colors and
+        selections follow each category. The expansion disappears when everything visible fits. It
+        has no eye; click it to open the next page. The table retains all records and labels hidden
+        rows.
       </p>
       <p className="showcase-muted">
         Left and Right read each visible slice, including the aggregate. Home and End reach the page

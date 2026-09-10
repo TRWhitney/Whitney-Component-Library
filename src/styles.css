@@ -6666,10 +6666,6 @@
     cursor: pointer;
   }
 
-  [data-wcl-radial-segment][data-pattern-index='1']:not([data-aggregate]) [data-wcl-radial-slice] {
-    stroke-dasharray: 6 2 1 2;
-  }
-
   [data-wcl-radial-aggregate-label],
   [data-wcl-radial-total] text {
     fill: var(--wcl-text);
@@ -6701,8 +6697,8 @@
   [data-wcl-radial-legend] {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    align-content: center;
-    max-block-size: 100%;
+    align-content: safe center;
+    max-block-size: 17rem;
     overflow: auto;
     scrollbar-color: transparent transparent;
     scrollbar-width: thin;

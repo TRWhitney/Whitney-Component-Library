@@ -207,3 +207,5 @@ The fix applies to all four legend renderers, with current guides and rendered e
 tests and repository checks pass. Independent production review passes on intent and engineering axes with no findings.
 
 Pie/donut visibility is implemented in [Ticket 18](../../chart-interaction-composition/tickets/18-pie-donut-visibility.md), with passing repository/package/browser checks and independent intent and engineering reviews. Individual category eyes preserve ranked pages and colors. Visible categories refill the chart and determine percentages and donut totals; expansion remains navigation without a bulk eye. Heatmap visibility remains the next decision.
+
+[Ticket 19](../../chart-interaction-composition/tickets/19-radial-page-refill.md) updates pie/donut paging so hiding fills freed slots from expansion. Hidden categories remain restorable and their colors and selections follow them between pages.

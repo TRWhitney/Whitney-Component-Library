@@ -34,7 +34,7 @@ The [Sparkline study](prototypes/sparkline-selection.md) is approved, including 
 
 ## Not yet specified
 
-- Statistical visibility is delivered for scatter, bubble and box groups in [Ticket 15](tickets/15-statistical-visibility.md). Radar visibility is delivered in [Ticket 16](tickets/16-radar-visibility.md). Pie/donut visible-total recalculation is accepted in [the specification](spec.md#pie-and-donut-visibility-accepted-totals). Whitney chose individual category eyes only; [Ticket 18](tickets/18-pie-donut-visibility.md) implements visibility and keeps expansion as navigation. Heatmap controls require the remaining decision. Histogram and Sparkline visibility are excluded.
+- Statistical visibility is delivered for scatter, bubble and box groups in [Ticket 15](tickets/15-statistical-visibility.md). Radar visibility is delivered in [Ticket 16](tickets/16-radar-visibility.md). Pie/donut visible-total recalculation is accepted in [the specification](spec.md#pie-and-donut-visibility-accepted-totals). Whitney chose individual category eyes only; [Ticket 18](tickets/18-pie-donut-visibility.md) implements visibility and keeps expansion as navigation. [Ticket 19](tickets/19-radial-page-refill.md) replaces fixed pie/donut pages with automatic refill from expansion when hiding frees space. Heatmap controls require the remaining decision. Histogram and Sparkline visibility are excluded.
 - Exploration controls and their interaction with selection, automatic fitting, and explicit domains.
 - General data-change animation and responsiveness budgets.
 - Detailed public boundaries of scatter plus line and line plus changing range band.

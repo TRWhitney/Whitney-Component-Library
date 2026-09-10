@@ -120,23 +120,57 @@ it('keeps hidden selection and the full table through all-hidden recovery', () =
   expect(document.activeElement).toBe(screen.getByRole('button', {name: 'Hide A'}));
   expect(container.querySelectorAll('[data-wcl-radial-slice]')).toHaveLength(3);
 });
-it('keeps fixed legend pages, individual eyes and access to hidden later categories', () => {
-  const many = Array.from({length: 9}, (_, i) => ({id: `i${i}`, label: `Item ${i}`, value: 9 - i}));
-  const {container} = render(<PieChart {...common} data={many} />);
-  expect(screen.queryByRole('button', {name: 'Hide More 2'})).toBeNull();
+it.each(['pie', 'donut'])('fills freed %s slots and returns overflow on restoration', (kind) => {
+  const many = Array.from({length: 11}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 11 - i,
+  }));
+  const onActivate = vi.fn();
+  const props = {
+    ...common,
+    data: many,
+    interaction: {
+      onActivate,
+      selection: {
+        labels,
+        containsSelection: 'Contains selection',
+        defaultSelectedItems: [{id: 'i7'}],
+      },
+    },
+  };
+  const {container} = render(
+    kind === 'pie' ? <PieChart {...props} /> : <DonutChart {...props} totalLabel="Visible total" />,
+  );
+  fireEvent.click(screen.getByRole('button', {name: /More 4/}));
+  const color = slice(container, 'i7')!.getAttribute('data-color');
+  const pattern = slice(container, 'i7')!.getAttribute('data-pattern-index');
+  fireEvent.click(screen.getByRole('button', {name: 'Back'}));
   hide('Item 0');
   expect(screen.getByRole('button', {name: 'Show Item 0'})).toBeTruthy();
-  expect(screen.queryByRole('button', {name: 'Hide Item 7'})).toBeNull();
-  fireEvent.click(container.querySelector('[data-aggregate][data-wcl-radial-segment] path')!);
-  hide('Item 7');
-  hide('Item 8');
-  fireEvent.click(screen.getByRole('button', {name: 'Back'}));
-  expect(container.querySelector('[data-aggregate][data-wcl-radial-segment]')).toBeNull();
-  const paging = container.querySelector('[data-wcl-radial-legend]')!;
-  fireEvent.click(within(paging as HTMLElement).getByRole('button', {name: 'More 2'}));
-  expect(screen.getByRole('button', {name: 'Show Item 7'})).toBeTruthy();
-  fireEvent.click(screen.getByRole('button', {name: 'Show Item 7'}));
   expect(slice(container, 'i7')).toBeTruthy();
+  expect(slice(container, 'i7')!.getAttribute('data-color')).toBe(color);
+  expect(slice(container, 'i7')!.getAttribute('data-pattern-index')).toBe(pattern);
+  expect(screen.getByRole('button', {name: 'More 3'})).toBeTruthy();
+  expect(container.querySelector('[data-wcl-radial-aggregate-label]')!.textContent).toBe('+3');
+  expect(onActivate).not.toHaveBeenCalled();
+  const canvas = container.querySelector('[data-wcl-part-to-whole-canvas]')!;
+  fireEvent.keyDown(canvas, {key: 'Home'});
+  for (let index = 0; index < 6; index++) fireEvent.keyDown(canvas, {key: 'ArrowRight'});
+  fireEvent.keyDown(canvas, {key: 'Enter', ctrlKey: true});
+  expect(onActivate).toHaveBeenCalledWith(
+    expect.objectContaining({
+      item: {id: 'i7'},
+      value: 4,
+      total: 55,
+      shareOfTotal: 4 / 55,
+      shareOnPage: 4 / 49,
+    }),
+  );
+  expect(screen.queryByRole('button', {name: 'Hide More 3'})).toBeNull();
+  fireEvent.click(screen.getByRole('button', {name: 'Show Item 0'}));
+  expect(slice(container, 'i7')).toBeNull();
+  expect(screen.getByRole('button', {name: /More 4/})).toBeTruthy();
 });
 it('preserves visibility on value updates and retires it when an ID leaves the data', () => {
   const {container, rerender} = render(<PieChart {...common} />);
@@ -211,12 +245,16 @@ it('settles reduced motion directly and preserves zero records and invalid feedb
   expect(screen.getByText('No visible slices')).toBeTruthy();
 });
 it('keeps selected hidden later categories marked on expansion and prunes removed data', () => {
-  const many = Array.from({length: 9}, (_, i) => ({id: `i${i}`, label: `Item ${i}`, value: 9 - i}));
+  const many = Array.from({length: 11}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 11 - i,
+  }));
   const interaction = {
     selection: {
       labels,
       containsSelection: 'Contains selection',
-      defaultSelectedItems: [{id: 'i8'}],
+      defaultSelectedItems: [{id: 'i10'}],
     },
   };
   const {container, rerender} = render(
@@ -224,15 +262,15 @@ it('keeps selected hidden later categories marked on expansion and prunes remove
   );
   fireEvent.click(
     within(container.querySelector<HTMLElement>('[data-wcl-radial-legend]')!).getByRole('button', {
-      name: /More 2/,
+      name: /More 4/,
     }),
   );
-  hide('Item 8');
+  hide('Item 10');
   fireEvent.click(screen.getByRole('button', {name: 'Back'}));
-  expect(container.querySelector('[data-wcl-radial-aggregate-label]')!.textContent).toBe('+2*');
-  expect(screen.getByText('i8 hidden')).toBeTruthy();
-  rerender(<PieChart {...common} data={many.slice(0, 8)} interaction={interaction} />);
-  expect(screen.queryByText('i8 hidden')).toBeNull();
+  expect(container.querySelector('[data-wcl-radial-aggregate-label]')!.textContent).toBe('+4*');
+  expect(screen.getByText('i10 hidden')).toBeTruthy();
+  rerender(<PieChart {...common} data={many.slice(0, 10)} interaction={interaction} />);
+  expect(screen.queryByText('i10 hidden')).toBeNull();
 });
 it('cancels pending touch activation when its category is hidden', () => {
   vi.useFakeTimers();
@@ -261,23 +299,102 @@ it('cancels pending touch activation when its category is hidden', () => {
   expect(onActivate).not.toHaveBeenCalled();
 });
 
-it('keeps a lone expansion slice visible with smallest aggregate sizing', async () => {
-  const records = Array.from({length: 9}, (_, index) => ({
-    id: `i${index}`,
-    label: `Item ${index}`,
-    value: 10 - index,
-  }));
-  const {container} = render(<PieChart {...common} data={records} aggregateSizing="smallest" />);
-  for (let index = 0; index < 7; index++) hide(`Item ${index}`);
-  await waitFor(() =>
-    expect(
-      Number(
-        container
-          .querySelector('[data-aggregate][data-wcl-radial-segment]')!
-          .getAttribute('data-angle-size'),
+it.each(['proportional', 'smallest'] as const)(
+  'uses the last expansion slot when remaining categories fit with %s sizing',
+  async (aggregateSizing) => {
+    const records = Array.from({length: 9}, (_, i) => ({
+      id: `i${i}`,
+      label: `Item ${i}`,
+      value: 10 - i,
+    }));
+    const {container} = render(
+      <PieChart {...common} data={records} aggregateSizing={aggregateSizing} />,
+    );
+    hide('Item 0');
+    expect(container.querySelector('[data-aggregate][data-wcl-radial-segment]')).toBeNull();
+    expect(container.querySelectorAll('[data-wcl-radial-segment]')).toHaveLength(8);
+    for (let i = 1; i < 9; i++) hide(`Item ${i}`);
+    expect(screen.getByText('No visible slices')).toBeTruthy();
+    expect(screen.getAllByRole('button', {name: /^Show Item/})).toHaveLength(9);
+    fireEvent.click(screen.getByRole('button', {name: 'Show Item 8'}));
+    await waitFor(() =>
+      expect(Number(slice(container, 'i8')!.getAttribute('data-angle-size'))).toBeCloseTo(
+        Math.PI * 2,
+        5,
       ),
-    ).toBeCloseTo(Math.PI * 2, 5),
-  );
+    );
+  },
+);
+
+it('settles a collapsed later page and keeps restored categories reachable', async () => {
+  const records = Array.from({length: 9}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 10 - i,
+  }));
+  const {container} = render(<PieChart {...common} data={records} />);
   fireEvent.click(screen.getByRole('button', {name: 'More 2'}));
-  expect(screen.getByRole('button', {name: 'Hide Item 7'})).toBeTruthy();
+  hide('Item 8');
+  expect(screen.queryByRole('button', {name: 'Back'})).toBeNull();
+  expect(slice(container, 'i0')).toBeTruthy();
+  screen.getByRole('button', {name: 'Show Item 8'}).focus();
+  fireEvent.click(screen.getByRole('button', {name: 'Show Item 8'}));
+  await waitFor(() =>
+    expect(document.activeElement).toBe(screen.getByRole('button', {name: 'Hide Item 0'})),
+  );
+  expect(slice(container, 'i0')).toBeTruthy();
+  expect(screen.getByRole('button', {name: 'More 2'})).toBeTruthy();
+});
+
+it('keeps the expansion label positioned when restoration animates it back in', () => {
+  vi.stubGlobal('requestAnimationFrame', () => 1);
+  vi.stubGlobal('cancelAnimationFrame', () => {});
+  const records = Array.from({length: 9}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 10 - i,
+  }));
+  const {container} = render(<PieChart {...common} data={records} />);
+  hide('Item 0');
+  fireEvent.click(screen.getByRole('button', {name: 'Show Item 0'}));
+  const count = container.querySelector('[data-wcl-radial-aggregate-label]')!;
+  expect(Number.isFinite(Number(count.getAttribute('x')))).toBe(true);
+  expect(Number.isFinite(Number(count.getAttribute('y')))).toBe(true);
+});
+
+it('keeps promoted categories distinguishable when their original pages reuse a color', () => {
+  const records = Array.from({length: 11}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 12 - i,
+  }));
+  const {container} = render(<PieChart {...common} data={records} />);
+  hide('Item 1');
+  expect(slice(container, 'i0')!.getAttribute('data-color')).toBe(
+    slice(container, 'i7')!.getAttribute('data-color'),
+  );
+  const dash = (id: string) =>
+    slice(container, id)!
+      .querySelector('[data-wcl-radial-slice]')!
+      .getAttribute('stroke-dasharray');
+  expect(dash('i0')).not.toBe(dash('i7'));
+  const promotedPattern = dash('i7');
+  fireEvent.click(screen.getByRole('button', {name: 'Show Item 1'}));
+  fireEvent.click(screen.getByRole('button', {name: 'More 4'}));
+  expect(dash('i7')).toBe(promotedPattern);
+});
+
+it('resets to the first page when replacement data also removes the current page', () => {
+  const records = Array.from({length: 24}, (_, i) => ({
+    id: `i${i}`,
+    label: `Item ${i}`,
+    value: 25 - i,
+  }));
+  const {container, rerender} = render(<PieChart {...common} data={records} />);
+  for (const count of [17, 9, 1])
+    fireEvent.click(screen.getByRole('button', {name: `More ${count}`}));
+  expect(slice(container, 'i23')).toBeTruthy();
+  rerender(<PieChart {...common} data={records.slice(0, 16)} />);
+  expect(slice(container, 'i0')).toBeTruthy();
+  expect(screen.queryByRole('button', {name: 'Back'})).toBeNull();
 });
