@@ -4,6 +4,7 @@ import {
   Histogram,
   ScatterChart,
   type ChartRectangularExploration,
+  type ChartExploration,
 } from '../src/index.js';
 
 interface PointDatum {
@@ -245,4 +246,60 @@ export const invalidPointWindow: ChartRectangularExploration<number, number> = {
   labels: pointExploration.labels,
   // @ts-expect-error Point exploration axes are numeric.
   defaultWindow: {x: ['low', 'high'], y: [0, 1]},
+};
+
+const histogramExploration: ChartExploration<number> = {
+  labels: {
+    ...pointExploration.labels,
+    panBackward: 'Earlier',
+    panForward: 'Later',
+    start: 'First bin',
+    end: 'Last bin',
+    range: (range) => `${range[0]} to ${range[1]}`,
+  },
+  defaultWindow: [0, 100],
+  onWindowChange: (range) => {
+    const edge: number = range[0];
+    void edge;
+  },
+};
+const groupExploration: ChartExploration<string> = {
+  labels: {...histogramExploration.labels, range: (range) => `${range[0]} to ${range[1]}`},
+  window: ['north', 'north'],
+  onWindowChange: (range) => {
+    const id: string = range[0];
+    void id;
+  },
+};
+export const exploringHistogram = (
+  <Histogram
+    {...common}
+    data={points}
+    distribution={{accessor: 'x', kind: 'raw', thresholds: 5}}
+    exploration={histogramExploration}
+    xAxis={{label: 'Temperature', scale: {type: 'linear'}}}
+    yAxis={{label: 'Count', scale: {type: 'linear'}}}
+  />
+);
+export const exploringBox = (
+  <BoxPlot
+    {...common}
+    data={points}
+    groups={series}
+    groupAccessor="series"
+    distribution={{kind: 'raw', valueAccessor: 'y', whisker: 'tukey'}}
+    exploration={groupExploration}
+    xAxis={{label: 'Group'}}
+    yAxis={{label: 'Demand', scale: {type: 'linear'}}}
+  />
+);
+export const invalidHistogramWindow: ChartExploration<number> = {
+  labels: histogramExploration.labels,
+  // @ts-expect-error Histogram exploration uses numeric bin edges.
+  defaultWindow: ['first', 'last'],
+};
+export const invalidBoxWindow: ChartExploration<string> = {
+  labels: groupExploration.labels,
+  // @ts-expect-error Box exploration uses stable group IDs.
+  defaultWindow: [0, 1],
 };

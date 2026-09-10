@@ -54,7 +54,7 @@ changes to the accepted palette or reading semantics.
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
-- Branch: `main`. Tickets 26–28 are delivered. Commit the remaining validated tickets through 30 as separate outcomes.
+- Branch: `main`. Tickets 26–29 are delivered. Commit the remaining validated tickets through 30 as separate outcomes.
 - Accepted prototypes remain isolated at the same preview host under `/domain-exploration/`,
   `/chart-exploration-comparison/`, `/point-exploration/`, `/remaining-exploration/` and their linked records.
 - No further pan/zoom design decision is pending. After delivery, resume the remaining parent work

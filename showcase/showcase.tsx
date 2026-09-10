@@ -1,3 +1,4 @@
+import {DistributionExplorationExample} from './distribution-exploration-examples.js';
 import {PointExplorationExample} from './point-exploration-examples.js';
 import {CartesianExplorationExample} from './cartesian-exploration-examples.js';
 import {LineExplorationExample} from './line-exploration-examples.js';
@@ -3829,6 +3830,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show a numeric distribution from raw observations or explicit pre-binned intervals. Directly reading one bin dims the others; blank plot space has no inferred reading."
         name="Histogram"
       >
+        <Example label="Explore histograms and box plots">
+          <DistributionExplorationExample />
+        </Example>
         <Example label="Histogram with bin selection and details">
           <HistogramInteractionExample />
         </Example>
@@ -3838,6 +3842,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare group medians, quartiles, whiskers, and outliers. Select group summaries and individual outliers separately, and open the original observations through details. ${statisticalVisibilityGuidance}`}
         name="BoxPlot"
       >
+        <p>
+          <a href="#histogram">Compare pan and zoom for histograms and box plots.</a>
+        </p>
         <Example label="BoxPlot with group visibility, summary and outlier selection, and details">
           <BoxPlotInteractionExample visibilityLabels={statisticalVisibilityLabels} />
         </Example>

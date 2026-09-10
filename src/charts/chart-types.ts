@@ -817,6 +817,7 @@ export interface BoxPlotInteraction<Datum extends object> {
 }
 
 export interface HistogramProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly exploration?: ChartExploration<number>;
   readonly interaction?: HistogramInteraction<Datum>;
   readonly color?: ChartColor;
   readonly distribution: HistogramDistribution<Datum>;
@@ -844,6 +845,7 @@ export type BoxPlotDistribution<Datum extends object> =
     };
 
 export interface BoxPlotProps<Datum extends object> extends StatisticalChartCommonProps<Datum> {
+  readonly exploration?: ChartExploration<string>;
   readonly visibilityLabels?: ChartVisibilityLabels;
   readonly interaction?: BoxPlotInteraction<Datum>;
   readonly distribution: BoxPlotDistribution<Datum>;

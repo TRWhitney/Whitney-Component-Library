@@ -39,6 +39,7 @@ export interface ChartExplorationControlsProps {
   readonly version?: string;
   readonly largeStepMultiplier?: number;
   readonly step?: number;
+  readonly isZoomInDisabled?: boolean;
   readonly window: WindowRange;
   readonly minimumSpan: number;
   readonly labels: ChartExplorationControlLabels;
@@ -76,6 +77,7 @@ function stopPropagation(event: SyntheticEvent): void {
 export function ChartExplorationControls({
   version,
   largeStepMultiplier = 3,
+  isZoomInDisabled = false,
   step,
   window,
   minimumSpan,
@@ -320,7 +322,7 @@ export function ChartExplorationControls({
             variant="quiet"
             size="compact"
             label={labels.zoomIn}
-            isDisabled={span <= minimum + Number.EPSILON}
+            isDisabled={isZoomInDisabled || span <= minimum + Number.EPSILON}
             onPress={() => zoom(0.5)}
           >
             <Glyph kind="plus" />

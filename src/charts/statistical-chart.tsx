@@ -1,3 +1,6 @@
+import {ChartExplorationControls} from './chart-exploration-controls.js';
+import {useChartExploration} from './use-chart-exploration.js';
+import {useChartExplorationGesture} from './use-chart-exploration-gesture.js';
 import {ChartExplorationLayer} from './chart-exploration-layer.js';
 import {ChartRectangularExplorationControls} from './chart-rectangular-exploration-controls.js';
 import {useChartRectangularExploration} from './use-chart-rectangular-exploration.js';
@@ -75,6 +78,7 @@ import type {
   BubbleChartProps,
   BubbleMagnitude,
   ChartColor,
+  ChartExploration,
   ChartInteraction,
   PointChartInteraction,
   ChartLegend,
@@ -484,6 +488,152 @@ function prepareHistogram<Datum extends object>(
     kind: 'histogram',
     xAxis: props.xAxis,
     yAxis: props.yAxis,
+  };
+}
+
+/** Keep navigation tied to the original prepared intervals, including unequal density bins. */
+function useHistogramExploration<Datum extends object>(
+  config: ChartExploration<number> | undefined,
+  bins: readonly PreparedBin<Datum>[],
+  scale: LinearChartScale,
+) {
+  function snap(range: readonly [number, number], outward: boolean): readonly [number, number] {
+    if (
+      !Array.isArray(range) ||
+      range.length !== 2 ||
+      !range.every(Number.isFinite) ||
+      range[0] >= range[1]
+    )
+      throw new TypeError('Histogram exploration window must contain two ascending finite values.');
+    if (!bins.length) return range;
+    let [start, end] = range;
+    const fullStart = scale.domain?.[0] ?? bins[0]!.lower;
+    const fullEnd = scale.domain?.[1] ?? bins.at(-1)!.upper;
+    const binEdges = bins.flatMap((bin) => [bin.lower, bin.upper]);
+    const edges = [fullStart, ...binEdges, fullEnd];
+    const tolerance = Math.max(1, ...edges.map(Math.abs)) * Number.EPSILON * 16;
+    start = edges.find((edge) => Math.abs(edge - start) <= tolerance) ?? start;
+    end = edges.find((edge) => Math.abs(edge - end) <= tolerance) ?? end;
+    if (!outward) {
+      const nearest = (value: number) =>
+        binEdges.reduce((best, edge) =>
+          Math.abs(edge - value) < Math.abs(best - value) ? edge : best,
+        );
+      start = start <= fullStart ? fullStart : nearest(start);
+      end = end >= fullEnd ? fullEnd : nearest(end);
+    }
+    const minimum = (config?.minimumSpan ?? 0.01) * (fullEnd - fullStart);
+    if (end - start < minimum) {
+      start = clamp(fullStart, (start + end - minimum) / 2, fullEnd - minimum);
+      end = start + minimum;
+    }
+    const intersecting = bins.filter((bin) => bin.upper > start && bin.lower < end);
+    function preserveMinimum(range: readonly [number, number]): readonly [number, number] {
+      if (range[1] - range[0] >= minimum) return range;
+      const lower = clamp(fullStart, (range[0] + range[1] - minimum) / 2, fullEnd - minimum);
+      const upper = lower + minimum;
+      const covered = bins.filter((bin) => bin.upper > lower && bin.lower < upper);
+      return [
+        Math.min(lower, covered[0]?.lower ?? lower),
+        Math.max(upper, covered.at(-1)?.upper ?? upper),
+      ];
+    }
+    if (intersecting.length)
+      return preserveMinimum([
+        start <= fullStart ? fullStart : intersecting[0]!.lower,
+        end >= fullEnd ? fullEnd : intersecting.at(-1)!.upper,
+      ]);
+    const center = (range[0] + range[1]) / 2;
+    const closest = bins.reduce((best, bin) =>
+      Math.abs((bin.lower + bin.upper) / 2 - center) <
+      Math.abs((best.lower + best.upper) / 2 - center)
+        ? bin
+        : best,
+    );
+    return preserveMinimum([closest.lower, closest.upper]);
+  }
+  const mapped =
+    config === undefined
+      ? undefined
+      : ({
+          ...config,
+          ...(config.onWindowChange === undefined
+            ? {}
+            : {
+                onWindowChange: (range: readonly [number, number]) =>
+                  config.onWindowChange?.(snap(range, true)),
+              }),
+          ...(config.onWindowChangeEnd === undefined
+            ? {}
+            : {
+                onWindowChangeEnd: (range: readonly [number, number]) =>
+                  config.onWindowChangeEnd?.(snap(range, true)),
+              }),
+          ...(config.window === undefined ? {} : {window: snap(config.window, true)}),
+          ...(config.defaultWindow === undefined
+            ? {}
+            : {defaultWindow: snap(config.defaultWindow, true)}),
+        } as ChartExploration<number>);
+  const navigation = useChartExploration(
+    mapped,
+    scale,
+    bins.flatMap((bin) => [bin.lower, bin.upper]),
+  );
+  const width = bins[0] ? bins[0].upper - bins[0].lower : 0;
+  const span = navigation.full[1] - navigation.full[0];
+  const step =
+    width > 0 &&
+    bins.every(
+      (bin, index) =>
+        Math.abs(bin.upper - bin.lower - width) < width * 1e-9 &&
+        (index === 0 || bin.lower === bins[index - 1]!.upper),
+    )
+      ? width / span
+      : undefined;
+  const fromNormalized = (range: readonly [number, number]) =>
+    snap(navigation.fromNormalized(range), false);
+  const window = snap(navigation.window, true);
+  return {
+    ...navigation,
+    window,
+    normalized: [navigation.position(window[0]), navigation.position(window[1])] as const,
+    step,
+    minimumSpan: Math.max(
+      navigation.minimumSpan,
+      bins.length ? Math.min(...bins.map((bin) => bin.upper - bin.lower)) / span : 1,
+    ),
+    fromNormalized,
+    change: (range: readonly [number, number], phase: 'change' | 'end' | 'cancel') => {
+      let next = fromNormalized(range);
+      const current: readonly [number, number] = [
+        navigation.position(window[0]),
+        navigation.position(window[1]),
+      ];
+      const delta = range[0] - current[0];
+      if (
+        bins.length &&
+        phase !== 'cancel' &&
+        Math.abs(delta) > 1e-10 &&
+        Math.abs(range[1] - range[0] - (current[1] - current[0])) < 1e-10
+      ) {
+        const first = bins.findIndex((bin) => bin.upper > window[0] && bin.lower < window[1]);
+        const last = bins.reduce(
+          (last, bin, index) => (bin.upper > window[0] && bin.lower < window[1] ? index : last),
+          -1,
+        );
+        const count = last - first + 1;
+        const proposed = navigation.fromNormalized(range)[0];
+        let index = bins.reduce(
+          (best, bin, index) =>
+            Math.abs(bin.lower - proposed) < Math.abs(bins[best]!.lower - proposed) ? index : best,
+          0,
+        );
+        if (phase === 'end' && index === first) index += Math.sign(delta);
+        index = clamp(0, index, bins.length - count);
+        next = snap([bins[index]!.lower, bins[index + count - 1]!.upper], true);
+      }
+      navigation.change([navigation.position(next[0]), navigation.position(next[1])], phase);
+    },
   };
 }
 
@@ -1675,11 +1825,15 @@ function StatisticalFrame<Datum extends object>({
   interaction,
   distribution,
   exploration,
+  histogramExploration,
+  boxExploration,
   model: fullModel,
   rootAttribute,
 }: {
   readonly common: CommonProps<Datum>;
   readonly exploration?: ChartRectangularExploration<number, number>;
+  readonly histogramExploration?: ChartExploration<number>;
+  readonly boxExploration?: ChartExploration<string>;
   readonly interaction?: PointChartInteraction<Datum>;
   readonly distribution?: DistributionSetup;
   readonly legend?: ChartLegend;
@@ -1687,7 +1841,7 @@ function StatisticalFrame<Datum extends object>({
   readonly rootAttribute: string;
 }): ReactElement {
   validateCommon(common);
-  const explores = !!exploration;
+  const explores = !!(exploration || histogramExploration || boxExploration);
   const aspectRatio = common.aspectRatio ?? 1.75;
   const minimumSize = common.minimumSize ?? {height: 180, width: explores ? 240 : 320};
   const overflow = common.overflow ?? 'scroll';
@@ -1761,6 +1915,41 @@ function StatisticalFrame<Datum extends object>({
     visiblePointModel?.points.map((point) => point.x) ?? [],
     visiblePointModel?.points.map((point) => point.y) ?? [],
   );
+  const histogramNavigation = useHistogramExploration(
+    histogramExploration,
+    visibleModel.kind === 'histogram' ? visibleModel.bins : [],
+    visibleModel.kind === 'histogram' ? visibleModel.xAxis.scale : {type: 'linear'},
+  );
+  // All-hidden feedback still formats a valid source range while its eyes remain available.
+  const boxIds =
+    visibleModel.kind === 'box'
+      ? (visibleModel.series.length
+          ? visibleModel.series
+          : fullModel.kind === 'box'
+            ? fullModel.series
+            : []
+        ).map((series) => series.id)
+      : [];
+  const fullBoxIds = fullModel.kind === 'box' ? fullModel.series.map((series) => series.id) : [];
+  function visibleBoxWindow(window: readonly [string, string]): readonly [string, string] {
+    const start = fullBoxIds.indexOf(window[0]);
+    const end = fullBoxIds.indexOf(window[1]);
+    if (start < 0 || end < start || !boxIds.length) return window;
+    const inside = boxIds.filter(
+      (id) => fullBoxIds.indexOf(id) >= start && fullBoxIds.indexOf(id) <= end,
+    );
+    if (inside.length) return [inside[0]!, inside.at(-1)!];
+    const nearest = boxIds.find((id) => fullBoxIds.indexOf(id) > end) ?? boxIds.at(-1)!;
+    return [nearest, nearest];
+  }
+  const boxNavigation = useChartExploration(
+    boxExploration?.window === undefined
+      ? boxExploration
+      : {...boxExploration, window: visibleBoxWindow(boxExploration.window)},
+    {type: 'categorical', domain: boxIds},
+    boxIds,
+  );
+  const stripNavigation = histogramExploration ? histogramNavigation : boxNavigation;
   const [navigationDragging, setNavigationDragging] = useState(false);
   const changeWindow = (
     range: ChartRectangularWindow<number, number>,
@@ -1768,6 +1957,13 @@ function StatisticalFrame<Datum extends object>({
   ) => {
     setNavigationDragging(phase === 'change');
     navigation.change(range, phase);
+  };
+  const changeStripWindow = (
+    range: readonly [number, number],
+    phase: 'change' | 'end' | 'cancel',
+  ) => {
+    setNavigationDragging(phase === 'change');
+    stripNavigation.change(range, phase);
   };
   const viewportModel =
     exploration && visiblePointModel
@@ -1777,7 +1973,22 @@ function StatisticalFrame<Datum extends object>({
             (point) => navigation.x.contains(point.x) && navigation.y.contains(point.y),
           ),
         }
-      : visibleModel;
+      : histogramExploration && visibleModel.kind === 'histogram'
+        ? {
+            ...visibleModel,
+            bins: visibleModel.bins.filter(
+              (bin) =>
+                bin.lower >= histogramNavigation.window[0] &&
+                bin.upper <= histogramNavigation.window[1],
+            ),
+          }
+        : boxExploration && visibleModel.kind === 'box'
+          ? {
+              ...visibleModel,
+              series: visibleModel.series.filter((series) => boxNavigation.contains(series.id)),
+              boxes: visibleModel.boxes.filter((box) => boxNavigation.contains(box.series.id)),
+            }
+          : visibleModel;
   // Source labels determine the fixed canvas and axis gutters throughout navigation.
   const sizingModel = explores ? fullModel : visibleModel;
   const categoryLabels =
@@ -1815,11 +2026,13 @@ function StatisticalFrame<Datum extends object>({
   const xDomain = useAnimatedChartDomain(
     exploration
       ? navigation.window.x
-      : [
-          initialProjections.xNumber?.domain?.[0] ?? 0,
-          initialProjections.xNumber?.domain?.[1] ?? 1,
-        ],
-    exploration
+      : histogramExploration
+        ? histogramNavigation.window
+        : [
+            initialProjections.xNumber?.domain?.[0] ?? 0,
+            initialProjections.xNumber?.domain?.[1] ?? 1,
+          ],
+    exploration || histogramExploration
       ? !navigationDragging
       : animate && xScale !== undefined && xScale.domain === undefined,
     xScale?.type === 'logarithmic',
@@ -1828,7 +2041,9 @@ function StatisticalFrame<Datum extends object>({
     exploration
       ? navigation.window.y
       : [initialProjections.y.domain?.[0] ?? 0, initialProjections.y.domain?.[1] ?? 1],
-    exploration ? !navigationDragging : animate && yAxis.scale.domain === undefined,
+    exploration
+      ? !navigationDragging
+      : (explores ? !navigationDragging : animate) && yAxis.scale.domain === undefined,
     yAxis.scale.type === 'logarithmic',
   );
   const model = modelWithDomains(viewportModel, xDomain, yDomain);
@@ -2034,6 +2249,24 @@ function StatisticalFrame<Datum extends object>({
     },
     version: navigationVersion,
   });
+  const stripGesture = useChartExplorationGesture({
+    enabled:
+      !!(histogramExploration || boxExploration) &&
+      visibleHasData &&
+      status.kind !== 'loading' &&
+      status.kind !== 'error',
+    window: stripNavigation.normalized,
+    minimumSpan: stripNavigation.minimumSpan,
+    onChange: changeStripWindow,
+    onStart: () => {
+      actions.cancel();
+      setPointerReadingId(null);
+      setTouchReadingId(null);
+      setKeyboardReadingId(null);
+      setPointerPosition(undefined);
+    },
+    version: navigationVersion,
+  });
   const gestureCoordinate = (event: PointerEvent<SVGSVGElement>) => {
     const point = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
     return {
@@ -2164,6 +2397,7 @@ function StatisticalFrame<Datum extends object>({
     if (event.target !== event.currentTarget) return;
     if (event.key === 'Escape') {
       navigationGesture.cancel();
+      stripGesture.cancel();
       actions.cancel();
       event.preventDefault();
       clearPointer();
@@ -2235,6 +2469,24 @@ function StatisticalFrame<Datum extends object>({
       left: inheritedDirection(frameElement) === 'rtl' ? left - maximum : left,
     });
   };
+  const stripPlot = {left: 0, right: 1000, top: 8, bottom: 72};
+  const stripModel =
+    visibleModel.kind === 'histogram' && histogramExploration
+      ? {
+          ...visibleModel,
+          xAxis: {
+            ...visibleModel.xAxis,
+            scale: {...visibleModel.xAxis.scale, domain: histogramNavigation.full},
+          },
+        }
+      : visibleModel;
+  const stripProjections = projectionsFor(stripModel, stripPlot);
+  const stripReadings = readingTargets(stripModel, stripProjections);
+  const formatStripWindow = (range: readonly [number, number]) =>
+    histogramExploration
+      ? histogramExploration.labels.range(histogramNavigation.fromNormalized(range))
+      : boxExploration!.labels.range(boxNavigation.fromNormalized(range));
+  const stripLabels = histogramExploration?.labels ?? boxExploration?.labels;
   let content: ReactNode;
   if (status.kind === 'loading') {
     content = (
@@ -2340,6 +2592,81 @@ function StatisticalFrame<Datum extends object>({
                 role="group"
                 tabIndex={0}
               >
+                {stripLabels ? (
+                  <ChartExplorationLayer svg={svgElement} plot={plot}>
+                    <ChartExplorationControls
+                      largeStepMultiplier={2}
+                      version={navigationVersion}
+                      {...(histogramExploration
+                        ? histogramNavigation.step === undefined
+                          ? {}
+                          : {step: histogramNavigation.step}
+                        : boxIds.length
+                          ? {step: 1 / boxIds.length}
+                          : {})}
+                      window={stripNavigation.normalized}
+                      minimumSpan={stripNavigation.minimumSpan}
+                      isZoomInDisabled={
+                        !!histogramExploration &&
+                        viewportModel.kind === 'histogram' &&
+                        viewportModel.bins.length === 1 &&
+                        histogramNavigation.window[0] === viewportModel.bins[0]!.lower &&
+                        histogramNavigation.window[1] === viewportModel.bins[0]!.upper
+                      }
+                      labels={stripLabels}
+                      rangeLabel={
+                        histogramExploration
+                          ? histogramExploration.labels.range(histogramNavigation.window)
+                          : boxExploration!.labels.range(boxNavigation.window)
+                      }
+                      fullRangeLabels={
+                        histogramExploration && visibleModel.kind === 'histogram'
+                          ? [
+                              axisTickLabel(histogramNavigation.full[0], visibleModel.xAxis),
+                              axisTickLabel(histogramNavigation.full[1], visibleModel.xAxis),
+                            ]
+                          : (boxNavigation.full.map((id) =>
+                              visibleModel.kind === 'box'
+                                ? (visibleModel.series.find((series) => series.id === id)?.label ??
+                                  id)
+                                : id,
+                            ) as [string, string])
+                      }
+                      formatWindow={formatStripWindow}
+                      onChange={changeStripWindow}
+                      overview={
+                        <svg viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true">
+                          <StatisticalMarks
+                            activeIndex={null}
+                            directIndex={null}
+                            legendSeriesId={undefined}
+                            model={stripModel}
+                            pinnedSeriesId={null}
+                            presentation={{...presentation, canvasWidth: 1000, viewScale: 1}}
+                            projections={stripProjections}
+                            readings={stripReadings}
+                          />
+                          {actions.selected.map((item) => {
+                            const reading = stripReadings.find(
+                              (reading) => reading.id === item.rowId,
+                            );
+                            return reading ? (
+                              <line
+                                key={selectionKey(item)}
+                                x1={reading.x - 4}
+                                x2={reading.x + 4}
+                                y1="77"
+                                y2="77"
+                                stroke="var(--wcl-text)"
+                                strokeWidth="2"
+                              />
+                            ) : null;
+                          })}
+                        </svg>
+                      }
+                    />
+                  </ChartExplorationLayer>
+                ) : null}
                 {exploration && visiblePointModel ? (
                   <ChartExplorationLayer svg={svgElement} plot={plot}>
                     <ChartRectangularExplorationControls
@@ -2408,18 +2735,23 @@ function StatisticalFrame<Datum extends object>({
                   data-selection-enabled={configuration?.selection ? '' : undefined}
                   onPointerDownCapture={(event) => {
                     navigationGesture.pointerDown(event, gestureCoordinate);
+                    stripGesture.pointerDown(event, (event) => gestureCoordinate(event).x);
                   }}
                   onPointerMoveCapture={(event) => {
                     navigationGesture.pointerMove(event, gestureCoordinate);
+                    stripGesture.pointerMove(event, (event) => gestureCoordinate(event).x);
                   }}
                   onPointerUpCapture={(event) => {
                     navigationGesture.pointerEnd(event);
+                    stripGesture.pointerEnd(event);
                   }}
                   onPointerCancelCapture={(event) => {
                     navigationGesture.pointerEnd(event, true);
+                    stripGesture.pointerEnd(event, true);
                   }}
                   onLostPointerCaptureCapture={(event) => {
                     navigationGesture.pointerEnd(event, true);
+                    stripGesture.pointerEnd(event, true);
                   }}
                   onPointerDown={interactive ? beginItem : readTouch}
                   onPointerUp={
@@ -2803,6 +3135,7 @@ export function Histogram<Datum extends object>(props: HistogramProps<Datum>): R
   return (
     <StatisticalFrame
       common={props}
+      {...(props.exploration === undefined ? {} : {histogramExploration: props.exploration})}
       model={model}
       {...(distribution ? {distribution} : {})}
       rootAttribute="data-wcl-histogram"
@@ -2872,6 +3205,7 @@ export function BoxPlot<Datum extends object>(props: BoxPlotProps<Datum>): React
   return (
     <StatisticalFrame
       common={props}
+      {...(props.exploration === undefined ? {} : {boxExploration: props.exploration})}
       {...(props.legend === undefined ? {} : {legend: props.legend})}
       model={model}
       {...(distribution ? {distribution} : {})}

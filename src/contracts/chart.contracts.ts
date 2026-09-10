@@ -1225,6 +1225,12 @@ function statisticalChartContract({
         : []),
       'Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.',
       ...guidance.control,
+      ...(!pointInteraction
+        ? [
+            'Optional exploration uses the shared ChartExploration labels and controlled or internal window ownership. Histogram windows report original bin boundaries and show complete bins prepared from the full source. Counts, ordinates and boundary inclusivity do not change with navigation. BoxPlot windows report ordered stable group IDs and retain each summary, whisker and outlier.',
+            'The Overview icon opens a horizontal distribution strip in Dialog. Zoom, pan, reset and direct window dragging share one range. Two fingers pan and pinch the main chart without selecting or activating. Closing keeps the range and returns focus. Main-chart dimensions remain stable. Full tables and selections outside the window remain available; visible geometry controls automatic value-axis fitting.',
+          ]
+        : []),
       ...(groupVisibility
         ? [
             'Each legend eye hides or restores its group independently of name-based emphasis. Hidden entries retain legend order, colors, and shapes. Hidden names cannot emphasize invisible marks. Hiding clears that group pin; restoring does not repin it.',
