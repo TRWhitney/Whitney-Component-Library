@@ -1738,7 +1738,11 @@ function StatisticalFrame<Datum extends object>({
     return () => observer.disconnect();
   }, [frameElement]);
   const categoryLabels =
-    visibleModel.kind === 'box' ? visibleModel.series.map((item) => item.label) : [];
+    visibleModel.kind === 'box'
+      ? visibleModel.series.map((item) => item.label)
+      : projectionsFor(visibleModel, {left: 0, right: 1, top: 0, bottom: 1}).xNumber!.ticks.map(
+          (tick) => axisTickLabel(tick, visibleModel.xAxis),
+        );
   const presentation = presentationMetrics(
     availableWidth ?? minimumSize.width,
     minimumSize.width,
@@ -2260,6 +2264,7 @@ function StatisticalFrame<Datum extends object>({
                       plot={plot}
                       presentation={presentation}
                       projection={projections.xCategory!}
+                      staggerLabels={presentation.staggerLabels}
                     />
                   ) : (
                     <Axis
@@ -2268,6 +2273,7 @@ function StatisticalFrame<Datum extends object>({
                       plot={plot}
                       presentation={presentation}
                       projection={projections.xNumber!}
+                      staggerLabels={presentation.staggerLabels}
                     />
                   )}
                   <Axis

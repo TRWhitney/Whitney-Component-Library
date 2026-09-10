@@ -791,3 +791,62 @@ describe('statistical charts', () => {
     expect(host.querySelectorAll('[data-wcl-chart]')).toHaveLength(4);
   });
 });
+
+it('staggers crowded box group labels as well as reserving space for them', () => {
+  const groups = [
+    {id: '0', label: 'Turbine loop 1'},
+    {id: '1', label: 'Turbine loop 2'},
+    {id: '2', label: 'Turbine loop 3'},
+    {id: '3', label: 'Turbine loop 4'},
+    {id: '4', label: 'Turbine loop 5'},
+    {id: '5', label: 'Turbine loop 6'},
+  ] as const;
+  const samples = groups.flatMap((group) =>
+    [10, 20, 30, 40, 50].map((value) => ({group: group.id, value})),
+  );
+  const {container} = render(
+    <BoxPlot
+      {...stateCopy}
+      data={samples}
+      title="Recovery"
+      distribution={{kind: 'raw', valueAccessor: 'value', whisker: 'tukey'}}
+      groupAccessor="group"
+      groups={groups}
+      legend={{label: 'Loops'}}
+      xAxis={{label: 'Loop'}}
+      yAxis={{label: 'Time', scale: {type: 'linear'}}}
+    />,
+  );
+  const labels = [...container.querySelectorAll('[data-axis="x"] [data-wcl-chart-tick-label]')];
+  expect(labels).toHaveLength(6);
+  expect(new Set(labels.map((label) => label.getAttribute('data-label-row')))).toEqual(
+    new Set(['1', '2']),
+  );
+});
+
+it('fits large numeric ticks without shortening their values', () => {
+  const {container} = render(
+    <ScatterChart
+      {...stateCopy}
+      data={Array.from({length: 12}, (_, i) => ({id: String(i), x: 100000 + i * 1000, y: i}))}
+      title="Coordinates"
+      idAccessor="id"
+      labelAccessor="id"
+      series={[{id: 'values', label: 'Values'}]}
+      xAxis={{
+        accessor: 'x',
+        label: 'Position',
+        scale: {type: 'linear', domain: [100000, 111000]},
+        tickCount: 12,
+      }}
+      yAxis={{accessor: 'y', label: 'Value', scale: {type: 'linear'}}}
+    />,
+  );
+  const labels = [...container.querySelectorAll('[data-axis="x"] [data-wcl-chart-tick-label]')];
+  expect(labels.map((label) => label.textContent)).toEqual(
+    Array.from({length: 12}, (_, i) => String(100000 + i * 1000)),
+  );
+  expect(new Set(labels.map((label) => label.getAttribute('data-label-row')))).toEqual(
+    new Set(['1', '2']),
+  );
+});

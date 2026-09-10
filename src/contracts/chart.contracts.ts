@@ -132,6 +132,7 @@ function chartContract({
       'title and description are visible and required. dataTableLabel supplies a localized accessible name for the generated table. Axis and series labels must stand on their own; legend labels name the series collection rather than repeating the chart title.',
     ],
     localization: [
+      'Crowded categorical, time and numeric axes use staggered label rows before local scrolling. Numeric and date labels retain complete values.',
       'Localize title, description, state copy, labels, units, legend and annotation text. Supply formatTick when locale-specific date or number formatting differs from the deterministic default. Optional visibilityLabels uses ChartVisibilityLabels: hideSeries(label) and showSeries(label) name the next eye action; hidden labels table headers; allHidden supplies title and description; showAll names the recovery action.',
     ],
     name,
@@ -984,7 +985,7 @@ const statisticalChartGuidance: Record<
     reducedMotion:
       'Reduced motion removes point-emphasis, legend, and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
     responsive:
-      'The production chart frame scales type, strokes, and plot geometry from measured space. Scatter points keep a bounded readable rendered size as the plot narrows. minimumSize and overflow retain the established local-scroll behavior.',
+      'Horizontal axes consider formatted labels on categorical, time and numeric scales, using staggered rows before local scrolling. The production chart frame scales type, strokes, and plot geometry from measured space. Scatter points keep a bounded readable rendered size as the plot narrows. minimumSize and overflow retain the established local-scroll behavior.',
   },
   BubbleChart: {
     accent:
@@ -1011,7 +1012,7 @@ const statisticalChartGuidance: Record<
     reducedMotion:
       'Reduced motion removes bubble-emphasis, legend, and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
     responsive:
-      'The production chart frame scales type, strokes, and plot geometry from measured space. Bubble area remains proportional to source magnitude while the maximum rendered radius stays bounded across widths. minimumSize and overflow retain the established local-scroll behavior.',
+      'Horizontal axes consider formatted labels on categorical, time and numeric scales, using staggered rows before local scrolling. The production chart frame scales type, strokes, and plot geometry from measured space. Bubble area remains proportional to source magnitude while the maximum rendered radius stays bounded across widths. minimumSize and overflow retain the established local-scroll behavior.',
   },
   Histogram: {
     accent:

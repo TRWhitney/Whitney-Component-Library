@@ -1272,6 +1272,14 @@ describe('Cartesian charts', () => {
 
     expect(canvasWidth).toBe(320);
     expect(renderedGap).toBeGreaterThanOrEqual(20);
+    const upperLabel = container.querySelector(
+      '[data-axis="x"] [data-wcl-chart-tick-label][data-label-row="1"]',
+    );
+    const rowGap =
+      ((Number(lowerLabel?.getAttribute('y')) - Number(upperLabel?.getAttribute('y'))) *
+        canvasWidth) /
+      640;
+    expect(rowGap).toBeGreaterThanOrEqual(18);
   });
 
   it('budgets overflow from the bounded visible category labels', () => {
@@ -1460,3 +1468,37 @@ describe('Cartesian charts', () => {
     expect((bars.at(-1)?.y ?? 0) + (bars.at(-1)?.height ?? 0)).toBeLessThanOrEqual(306);
   });
 });
+
+it('fits all formatted time ticks using staggered rows without changing their dates', () => {
+  const months = Array.from({length: 12}, (_, i) => ({
+    date: new Date(Date.UTC(2026, i, 1)),
+    value: i,
+  }));
+  const {container} = render(
+    <LineChart
+      data={months}
+      title="Monthly values"
+      description="A year"
+      dataTableLabel="Months"
+      emptyState={emptyState}
+      invalidData={invalidData}
+      series={[{id: 'value', label: 'Value', accessor: 'value'}]}
+      xAxis={{
+        accessor: 'date',
+        label: 'Month',
+        scale: {type: 'time', domain: [months[0]!.date, months[11]!.date]},
+        tickCount: 12,
+        formatTick: (date) => date.toISOString().slice(0, 7),
+      }}
+      yAxis={{label: 'Value', scale: {type: 'linear'}}}
+    />,
+  );
+  const labels = [...container.querySelectorAll('[data-axis="x"] [data-wcl-chart-tick-label]')];
+  expect(labels.map((label) => label.textContent)).toEqual(
+    months.map((row) => row.date.toISOString().slice(0, 7)),
+  );
+  expect(new Set(labels.map((label) => label.getAttribute('data-label-row')))).toEqual(
+    new Set(['1', '2']),
+  );
+});
+

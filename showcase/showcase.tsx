@@ -1,3 +1,4 @@
+import {CompactAxisExample} from './compact-axis-examples.js';
 import {
   memo,
   useState,
@@ -3677,6 +3678,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
             ) : null}
           </Stack>
         </Example>
+        <Example label="Crowded time labels and a long axis title">
+          <CompactAxisExample kind="time" />
+        </Example>
       </Specimen>
 
       <Specimen
@@ -3773,6 +3777,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         <Example label="ScatterChart with group visibility, selection, and details">
           <PointInteractionExample kind="scatter" visibilityLabels={statisticalVisibilityLabels} />
         </Example>
+        <Example label="Crowded numeric labels">
+          <CompactAxisExample kind="numeric" />
+        </Example>
       </Specimen>
 
       <Specimen
@@ -3799,6 +3806,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       >
         <Example label="BoxPlot with group visibility, summary and outlier selection, and details">
           <BoxPlotInteractionExample visibilityLabels={statisticalVisibilityLabels} />
+        </Example>
+        <Example label="Crowded box group labels">
+          <CompactAxisExample kind="box" />
         </Example>
       </Specimen>
     </>

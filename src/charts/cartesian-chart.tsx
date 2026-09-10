@@ -432,9 +432,13 @@ export function estimatedUtilityTextWidth(label: string): number {
   }, 0);
 }
 
+function tickLabelOffset(staggered: boolean, index: number): number {
+  return staggered && index % 2 === 1 ? 2.625 : 1.125;
+}
+
 export function plotForPresentation(presentation: PresentationMetrics): PlotBounds {
   const axisFontSize = presentation.fontSize / presentation.viewScale;
-  const tickOffset = axisFontSize * (presentation.staggerLabels ? 1.75 : 1.125);
+  const tickOffset = axisFontSize * tickLabelOffset(presentation.staggerLabels, 1);
   const labelGap = axisFontSize * 1.45;
   return {
     ...compactPlot,
@@ -625,7 +629,7 @@ export function Axis<Value extends ChartDomainValue>({
                   ? staggerLabels
                     ? plot.bottom +
                       (presentation.fontSize / presentation.viewScale) *
-                        (sourceIndex % 2 === 0 ? 0.875 : 1.75)
+                        tickLabelOffset(true, sourceIndex)
                     : plot.bottom + (presentation.fontSize / presentation.viewScale) * 1.125
                   : position + 4
               }
@@ -1765,16 +1769,29 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   if (rootAttribute === 'data-wcl-bar-chart' || rootAttribute === 'data-wcl-column-chart') {
     rootProps['data-layout'] = layout;
   }
-  const categoryLabels =
-    categoryPlacement === 'x' && categoryAxis.scale.type === 'categorical'
-      ? (categoryAxis.scale.domain ?? stableDomain(prepared.rows.map((row) => row.category))).map(
-          (category) => truncateTickLabel(axisTickLabel(category, categoryAxis), 18),
-        )
-      : [];
+  const horizontalLabels =
+    categoryPlacement === 'x'
+      ? createProjection(
+          categoryAxis.scale,
+          prepared.rows.map((row) => row.category),
+          [0, 1],
+          categoryAxis.tickCount ?? 6,
+          false,
+        ).ticks.map((tick) => {
+          const label = axisTickLabel(tick, categoryAxis);
+          return categoryAxis.scale.type === 'categorical' ? truncateTickLabel(label, 18) : label;
+        })
+      : createProjection(
+          valueAxis.scale,
+          valueDomain(prepared.rows, layout, series),
+          [0, 1],
+          valueAxis.tickCount ?? 5,
+          false,
+        ).ticks.map((tick) => axisTickLabel(tick, valueAxis));
   const presentation = presentationMetrics(
     availableWidth ?? minimumSize.width,
     minimumSize.width,
-    categoryLabels,
+    horizontalLabels,
   );
   const hasLocalOverflow =
     overflow === 'scroll' && presentation.canvasWidth > (availableWidth ?? minimumSize.width);
@@ -2353,6 +2370,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                     plot={plot}
                     presentation={presentation}
                     projection={valueProjection}
+                    staggerLabels={presentation.staggerLabels}
                   />
                   <Axis
                     axis={categoryAxis}
@@ -2477,11 +2495,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                       const tickIndex = categoryProjection.ticks.findIndex(
                         (tick) => domainValueKey(tick) === domainValueKey(row.category),
                       );
-                      const labelOffset = presentation.staggerLabels
-                        ? tickIndex % 2 === 0
-                          ? 0.875
-                          : 1.75
-                        : 1.125;
+                      const labelOffset = tickLabelOffset(presentation.staggerLabels, tickIndex);
                       const y =
                         categoryPlacement === 'x'
                           ? plot.bottom +
