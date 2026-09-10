@@ -13,7 +13,7 @@ Existing approvals and deliveries remain canonical in the [specification](spec.m
 
 ## Decisions so far
 
-- [Line-chart pan and zoom](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract): approved for the demonstrated continuous-time LineChart. Area, grouped/stacked columns and mixed columns/line are also approved in the [combined study](prototypes/chart-exploration-comparison.md#accepted-behavior). Scatter/bubble and the remaining distribution/category/heatmap families are approved in the linked studies. Public delivery is pending.
+- [Line-chart pan and zoom](prototypes/domain-exploration.md#accepted-pan-and-zoom-contract): approved for the demonstrated continuous-time LineChart. Area, grouped/stacked columns and mixed columns/line are also approved in the [combined study](prototypes/chart-exploration-comparison.md#accepted-behavior). Scatter/bubble and the remaining distribution/category/heatmap families are approved in the linked studies. Tickets 26–30 deliver public navigation.
 
 - [Bar selection indicators](decisions/01-bar-selection.md): Frame, adjoining shared edges, and a continuous inner month contour.
 
@@ -38,7 +38,7 @@ Statistical visibility is delivered for scatter, bubble and box groups in [Ticke
 
 ## Not yet specified
 
-- All demonstrated exploration groups are approved. [Production boundary](spec.md#production-exploration-boundary) and tickets 25–30 define the implementation sequence, with [layout prerequisites](tickets/25-exploration-layout-foundation.md) delivered. The [modal overview](prototypes/modal-overview.md#accepted-behavior) is approved. A quiet chart icon opens the overview directly in a Dialog; touch dragging follows the pointer without animation lag. Ticket 26 delivers production LineChart navigation. Ticket 27 is next. Ordinary wheel scrolling remains unchanged. Delivery for the remaining chart families is pending.
+- All demonstrated exploration groups are approved. [Production boundary](spec.md#production-exploration-boundary) and tickets 25–30 define the implementation sequence, with [layout prerequisites](tickets/25-exploration-layout-foundation.md) delivered. The [modal overview](prototypes/modal-overview.md#accepted-behavior) is approved. A quiet chart icon opens the overview directly in a Dialog; touch dragging follows the pointer without animation lag. Tickets 26–30 deliver production navigation across these families. Ordinary wheel scrolling remains unchanged.
 - The [initial compact-layout audit](research/compact-layout-audit.md) is complete across the current showcase and crowded reproduction fixtures. [Ticket 22](tickets/22-consistent-axis-label-fitting.md) fixes omitted continuous-axis fitting and dropped box-plot staggering; [Ticket 23](tickets/23-visible-axis-titles.md) fixes clipped vertical titles. Both are delivered with passing validation and independent reviews.
 - The radar sizing defect is fixed in [Ticket 24](tickets/24-readable-radar-labels.md), retaining the approved layout and interactions with a 12px rendered minimum. Validation and independent reviews pass. The audit records evidence. Full locale/theme/visibility combinations and the exploration-host residual page overflow remain follow-up checks, not declared passes.
 - General data-change animation and responsiveness budgets.

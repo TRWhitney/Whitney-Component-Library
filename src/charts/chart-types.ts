@@ -380,6 +380,7 @@ export interface HeatmapInteraction<Datum extends object> {
 }
 
 export interface HeatmapProps<Datum extends object> {
+  readonly exploration?: ChartRectangularExploration<string, string>;
   readonly visibilityLabels?: HeatmapVisibilityLabels;
   readonly interaction?: HeatmapInteraction<Datum>;
   readonly aspectRatio?: number;

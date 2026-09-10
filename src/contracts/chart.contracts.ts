@@ -449,7 +449,7 @@ export const radarChartContract: ComponentContract = {
 
 export const heatmapContract: ComponentContract = {
   accentBehavior: [
-    'Heatmap does not read the application accent. A sequential scale accepts one color. A two-sided scale accepts ordered low and high colors. Callers may pass their application accent when it fits the measure. Missing cells stay neutral and outside both numeric scales.',
+    'The Heatmap cell encoding does not read the application accent; optional navigation controls use it. A sequential scale accepts one color. A two-sided scale accepts ordered low and high colors. Callers may pass their application accent when it fits the measure. Missing cells stay neutral and outside both numeric scales.',
   ],
   accessibility: [
     'The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. Visual cells are hidden from assistive technology, while enabled visibility controls remain accessible. A generated native table preserves every declared row and column intersection, marking hidden dimensions.',
@@ -467,6 +467,10 @@ export const heatmapContract: ComponentContract = {
     'Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. Choose colors that match the measure, state what they mean in the description, and use a two-sided scale only when its midpoint has a real interpretation.',
   ],
   controlBehavior: [
+    'Optional exploration uses ChartRectangularExploration<string, string> with column IDs on x and row IDs on y. Windows include complete ordered tracks. Supply localized navigation, corner and range labels, defaultWindow for internal state, or window with required onWindowChange for controlled state. Live callbacks return one domain rectangle; onWindowChangeEnd reports completed gestures and commands.',
+    'A quiet Overview icon opens the complete visible grid in Dialog. Move or resize its rectangular window directly. Two fingers pan and pinch the main grid without selecting or activating. Closing retains the range and restores focus. The main frame keeps its size, and narrow layouts stagger column labels. Viewport changes preserve the color domain, missing cells, zeros and the complete source table.',
+    'Hidden rows and columns close their gaps in both views. The restore control remains available when a hidden track is outside the window. Selections retain their row and column IDs outside the viewport, while reading and activation target only visible cells.',
+
     'Selection follows the shared ChartSelection ownership model: selectedItems plus onSelectionChange is controlled; defaultSelectedItems initializes local state. Items retain row/column identity across reordering and value changes; unknown or removed coordinates are pruned. Localized instructions, count, item descriptions and a Clear selection action accompany selection.',
     'Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.',
     'Optional interaction selects cells by stable rowId and columnId. Click/tap toggles selection; Control/Command-click or touch hold activates without changing it. Without selection, ordinary click/tap activates. Rectangle dragging selects boxes it touches, replacing by default, adding with Shift or Control/Command, and removing with Alt. Escape, pointer cancellation, scrolling, data or geometry changes cancel the preview.',

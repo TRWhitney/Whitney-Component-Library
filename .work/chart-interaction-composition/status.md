@@ -8,7 +8,7 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 The modal overview design is approved. Production pan and zoom covers LineChart, the remaining
 Cartesian charts, scatter/bubble, histogram/box plot and heatmap. Ticket 26 is delivered in
-`50c19c2`; tickets 27–30 are validated with updated public examples, contracts and generated guides.
+`50c19c2`; tickets 27–30 are delivered with updated public examples, contracts and generated guides.
 All 841 tests, repository checks, packed React 18/19 verification and native browser checks pass.
 Independent intent and engineering reviews pass after bounded correction reviews.
 
@@ -53,8 +53,9 @@ changes to the accepted palette or reading semantics.
 
 ## Continuation
 
-- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
-- Branch: `main`. Tickets 26–29 are delivered. Commit the remaining validated tickets through 30 as separate outcomes.
+- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
+- Branch: `main`. Cartesian navigation is `1d9aac6`, scatter/bubble is `4af6ede`, and
+  histogram/box plot is `baa6a23`. Heatmap navigation is delivered in the commit containing this record.
 - Accepted prototypes remain isolated at the same preview host under `/domain-exploration/`,
   `/chart-exploration-comparison/`, `/point-exploration/`, `/remaining-exploration/` and their linked records.
 - No further pan/zoom design decision is pending. After delivery, resume the remaining parent work

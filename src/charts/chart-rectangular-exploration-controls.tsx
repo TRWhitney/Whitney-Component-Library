@@ -35,6 +35,7 @@ const corners: readonly ChartExplorationCorner[] = [
 
 export interface ChartRectangularExplorationControlsProps {
   readonly version?: string;
+  readonly largeStepMultiplier?: number;
   readonly step?: {readonly x: number; readonly y: number};
   readonly window: Window;
   readonly minimumSpan: {readonly x: number; readonly y: number};
@@ -69,6 +70,7 @@ function stopPropagation(event: SyntheticEvent): void {
 
 export function ChartRectangularExplorationControls({
   version,
+  largeStepMultiplier = 3,
   step,
   window,
   minimumSpan,
@@ -236,7 +238,8 @@ export function ChartRectangularExplorationControls({
           : event.key === 'ArrowUp'
             ? -directionY
             : directionY;
-      const amount = (increment(axis) ?? minimum(axis)) * (event.shiftKey ? 3 : 1) * direction;
+      const amount =
+        (increment(axis) ?? minimum(axis)) * (event.shiftKey ? largeStepMultiplier : 1) * direction;
       if (part === 'window') return bounded(boundary ?? window[axis][0] + amount, span[axis], axis);
       const index = cornerIndex(part, axis);
       return edge(window[axis], index, boundary ?? window[axis][index] + amount, axis);

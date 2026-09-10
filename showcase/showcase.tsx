@@ -1,4 +1,5 @@
 import {DistributionExplorationExample} from './distribution-exploration-examples.js';
+import {HeatmapExplorationExample} from './heatmap-exploration-examples.js';
 import {PointExplorationExample} from './point-exploration-examples.js';
 import {CartesianExplorationExample} from './cartesian-exploration-examples.js';
 import {LineExplorationExample} from './line-exploration-examples.js';
@@ -3770,6 +3771,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show one numeric measure across two ordered domains. Zero is colored as a real value; patterned cells have no data. Use a two-sided scale only when its midpoint has a clear meaning. Dense grids hide inline values before moving into a labeled local scroll region."
         name="Heatmap"
       >
+        <Example label="Explore rows and columns">
+          <HeatmapExplorationExample />
+        </Example>
         <Example label="Sequential Heatmap with zero and missing cells">
           <HeatmapInteractionExample accent={accent} />
         </Example>

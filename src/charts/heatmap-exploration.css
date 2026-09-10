@@ -1,0 +1,103 @@
+@layer wcl.components {
+  [data-wcl-heatmap-visual][data-exploration] {
+    position: relative;
+    padding-block: 4rem 2.75rem;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] > [data-wcl-chart-exploration-controls] {
+    top: 0;
+    transform: none;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] > [data-wcl-chart-exploration-pan] {
+    top: auto;
+    bottom: 0;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-frame] {
+    block-size: clamp(
+      var(--wcl-chart-minimum-height),
+      calc(100cqi / var(--wcl-chart-aspect-ratio)),
+      30rem
+    );
+    max-block-size: none;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-canvas],
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-grid] {
+    block-size: 100%;
+    inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: 0;
+    touch-action: none;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-grid] {
+    grid-template-columns: var(--wcl-heatmap-row-label-width) repeat(
+        var(--wcl-heatmap-columns),
+        minmax(0, 1fr)
+      );
+    grid-template-rows: var(--wcl-heatmap-header-height) repeat(
+        var(--wcl-heatmap-rows),
+        minmax(0, 1fr)
+      );
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-row] {
+    grid-template-columns: var(--wcl-heatmap-row-label-width) repeat(
+        var(--wcl-heatmap-columns),
+        minmax(0, 1fr)
+      );
+    min-block-size: 0;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-cell] {
+    border-radius: min(0.375rem, 20%);
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-column-label] {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+    overflow: visible;
+    padding-inline: 0;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-corner] > span:first-child {
+    flex: 1 1 auto;
+  }
+
+  [data-wcl-heatmap]
+    [data-wcl-heatmap-visual][data-exploration]
+    [data-wcl-heatmap-column-label]
+    > span:not([data-wcl-heatmap-visibility-control]) {
+    flex: none;
+    inline-size: max-content;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  [data-wcl-heatmap-overview] {
+    display: grid;
+    gap: 1px;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  [data-wcl-heatmap-overview-cell] {
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+
+  [data-wcl-heatmap-overview-cell][data-missing] {
+    background: repeating-linear-gradient(
+      135deg,
+      var(--wcl-surface) 0 3px,
+      var(--wcl-border) 3px 4px
+    );
+  }
+}

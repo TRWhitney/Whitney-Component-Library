@@ -34,6 +34,11 @@ await copyFile(
   resolve(distributionDirectory, 'charts/chart-rectangular-exploration.css'),
 );
 
+await copyFile(
+  resolve(projectRoot, 'src/charts/heatmap-exploration.css'),
+  resolve(distributionDirectory, 'charts/heatmap-exploration.css'),
+);
+
 const contractModule = await import(
   pathToFileURL(resolve(distributionDirectory, 'contracts', 'index.js')).href
 );

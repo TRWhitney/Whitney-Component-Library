@@ -12,6 +12,10 @@ import {
   type ReactNode,
 } from 'react';
 import {createPortal} from 'react-dom';
+import {ChartRectangularExplorationControls} from './chart-rectangular-exploration-controls.js';
+import {useChartRectangularExploration} from './use-chart-rectangular-exploration.js';
+import {useChartRectangularExplorationGesture} from './use-chart-rectangular-exploration-gesture.js';
+import type {ChartRectangularWindow} from './chart-rectangular-exploration-types.js';
 import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {HeatmapRestore, type HeatmapAxis} from './heatmap-visibility.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
@@ -452,8 +456,48 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
   }
   const hiddenRows = visibility ? hidden.rows : [],
     hiddenColumns = visibility ? hidden.columns : [];
-  const rows = sourceProps.rows.filter((row) => !hiddenRows.includes(row.id));
-  const columns = sourceProps.columns.filter((column) => !hiddenColumns.includes(column.id));
+  const visibleRows = sourceProps.rows.filter((row) => !hiddenRows.includes(row.id));
+  const visibleColumns = sourceProps.columns.filter((column) => !hiddenColumns.includes(column.id));
+  const explorationConfig = sourceProps.exploration;
+  // Hiding a boundary track keeps the closest surviving complete cells in view.
+  const retainRange = (
+    range: readonly [string, string],
+    source: readonly HeatmapDomainItem[],
+    visible: readonly HeatmapDomainItem[],
+  ): readonly [string, string] => {
+    if (!source.length) return range;
+    const start = source.findIndex((item) => item.id === range[0]);
+    const end = source.findIndex((item) => item.id === range[1]);
+    // The exploration hook validates initial input and reconciles later source removals.
+    if (start < 0 || end < start) return range;
+    if (!visible.length) return range;
+    const surviving = visible.filter((item) => {
+      const index = source.findIndex((candidate) => candidate.id === item.id);
+      return index >= start && index <= end;
+    });
+    if (surviving.length) return [surviving[0]!.id, surviving[surviving.length - 1]!.id];
+    const nearest =
+      visible.find((item) => source.findIndex((candidate) => candidate.id === item.id) > end) ??
+      visible[visible.length - 1]!;
+    return [nearest.id, nearest.id];
+  };
+  const retainWindow = (range: ChartRectangularWindow<string, string>) => ({
+    x: retainRange(range.x, sourceProps.columns, visibleColumns),
+    y: retainRange(range.y, sourceProps.rows, visibleRows),
+  });
+  const exploration = useChartRectangularExploration(
+    explorationConfig?.window !== undefined
+      ? {...explorationConfig, window: retainWindow(explorationConfig.window)}
+      : explorationConfig?.defaultWindow !== undefined
+        ? {...explorationConfig, defaultWindow: retainWindow(explorationConfig.defaultWindow)}
+        : explorationConfig,
+    {type: 'categorical'},
+    {type: 'categorical'},
+    (visibleColumns.length ? visibleColumns : sourceProps.columns).map((column) => column.id),
+    (visibleRows.length ? visibleRows : sourceProps.rows).map((row) => row.id),
+  );
+  const rows = visibleRows.filter((row) => exploration.y.contains(row.id));
+  const columns = visibleColumns.filter((column) => exploration.x.contains(column.id));
   const props = {...sourceProps, rows, columns};
   const visibleCells = fullModel.cells.filter(
     (cell) =>
@@ -470,13 +514,19 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
     hasNumericKey: values.length > 0 || props.scale.domain !== undefined,
     midpointPosition:
       domain[0] === domain[1] ? 0.5 : relativePosition(midpoint, domain[0], domain[1]),
-    cells: visibleCells.map((cell, index) => ({
-      ...cell,
-      index,
-      rowIndex: Math.floor(index / columns.length),
-      columnIndex: index % columns.length,
-      ...(cell.value === undefined ? {} : valueEncoding(cell.value, domain, props.scale)),
-    })),
+    cells: visibleCells
+      .filter(
+        (cell) =>
+          exploration.y.contains(sourceProps.rows[cell.rowIndex]!.id) &&
+          exploration.x.contains(sourceProps.columns[cell.columnIndex]!.id),
+      )
+      .map((cell, index) => ({
+        ...cell,
+        index,
+        rowIndex: Math.floor(index / columns.length),
+        columnIndex: index % columns.length,
+        ...(cell.value === undefined ? {} : valueEncoding(cell.value, domain, props.scale)),
+      })),
   };
   const hiddenRowItems = sourceProps.rows.filter((r) => hiddenRows.includes(r.id));
   const hiddenColumnItems = sourceProps.columns.filter((c) => hiddenColumns.includes(c.id));
@@ -575,7 +625,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
   const rowCount = props.rows.length;
   const widestEstimatedRowLabel = Math.max(
     estimatedUtilityTextWidth(props.labels.row),
-    ...props.rows.map((row) => estimatedUtilityTextWidth(row.label)),
+    ...sourceProps.rows.map((row) => estimatedUtilityTextWidth(row.label)),
   );
   // Reserve the largest possible restore count before any track is hidden.
   const visibilityLabelSpace = visibility
@@ -588,15 +638,25 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
     Math.ceil(widestEstimatedRowLabel * (12 / 16) + visibilityLabelSpace),
     160,
   );
-  const fullGridWidth = fullRowLabelWidth + columnCount * 64 + columnCount * 4;
-  const fullGridHeight = 30 + rowCount * 44;
+  const layoutColumnCount = explorationConfig ? sourceProps.columns.length : columnCount;
+  const layoutRowCount = explorationConfig ? sourceProps.rows.length : rowCount;
+  const fullGridWidth = fullRowLabelWidth + layoutColumnCount * 68;
+  const fullGridHeight = 30 + layoutRowCount * 44;
   const isCompact =
     availableSize !== undefined &&
     (availableSize.width <= 400 ||
       availableSize.width < Math.max(fullGridWidth, minimumSize.width) ||
       availableSize.height < Math.max(fullGridHeight, minimumSize.height));
   const cellMinimumWidth = isCompact ? 48 : 64;
-  const headerHeight = visibility ? 64 : isCompact ? 26 : 30;
+  const headerHeight = explorationConfig
+    ? visibility
+      ? 80
+      : 52
+    : visibility
+      ? 64
+      : isCompact
+        ? 26
+        : 30;
   const rowHeight = isCompact ? 32 : 40;
   const labelFontScale = (isCompact ? 11 : 12) / 16;
   const rowLabelWidth = clamp(
@@ -604,15 +664,32 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
     Math.ceil(widestEstimatedRowLabel * labelFontScale + visibilityLabelSpace),
     160,
   );
+  const columnPitch = Math.max(
+    1,
+    ((availableSize?.width ?? minimumSize.width) - rowLabelWidth) / Math.max(1, columnCount),
+  );
+  const widestColumnLabel = Math.max(
+    0,
+    ...props.columns.map((column) =>
+      Math.max(
+        estimatedUtilityTextWidth(column.label) * labelFontScale,
+        [...column.label].length * (isCompact ? 11 : 12) * 0.62,
+      ),
+    ),
+  );
+  const labelLanes = explorationConfig
+    ? clamp(1, Math.ceil((widestColumnLabel + 4) / columnPitch), 3)
+    : 1;
   const calculatedGridWidth = rowLabelWidth + columnCount * cellMinimumWidth + columnCount * 4;
   const calculatedGridHeight = headerHeight + rowCount * (rowHeight + 4);
   const preferredGridWidth = Math.max(calculatedGridWidth, minimumSize.width);
   const preferredGridHeight = Math.max(calculatedGridHeight, minimumSize.height);
   const fallbackDense = columnCount > 8 || rowCount > 8;
   const hasLocalOverflow =
-    availableSize === undefined
+    !explorationConfig &&
+    (availableSize === undefined
       ? fallbackDense
-      : availableSize.width < preferredGridWidth || availableSize.height < preferredGridHeight;
+      : availableSize.width < preferredGridWidth || availableSize.height < preferredGridHeight);
   const showCellValues =
     availableSize === undefined
       ? !fallbackDense
@@ -643,6 +720,29 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
     {props: sourceProps, cells: fullModel.cells},
   );
   const {actions, points, selected} = interactionState;
+  const explorationGesture = useChartRectangularExplorationGesture<HTMLDivElement>({
+    enabled: !!explorationConfig,
+    window: exploration.normalized,
+    minimumSpan: exploration.minimumSpan,
+    onChange: exploration.change,
+    onStart: () => {
+      actions.cancel();
+      clearDirectReading();
+      setKeyboardIndex(null);
+    },
+    version: JSON.stringify([domainIdentity, visibilityVersion, status.kind]),
+  });
+  const explorationCoordinate = (event: PointerEvent<HTMLDivElement>) => {
+    const grid = gridRef.current;
+    const first = grid?.querySelector('[data-wcl-heatmap-cell]')?.getBoundingClientRect();
+    const bounds = grid?.getBoundingClientRect() ?? event.currentTarget.getBoundingClientRect();
+    const left = first?.left ?? bounds.left;
+    const top = first?.top ?? bounds.top;
+    return {
+      x: clamp(0, (event.clientX - left) / Math.max(1, bounds.right - left), 1),
+      y: clamp(0, (event.clientY - top) / Math.max(1, bounds.bottom - top), 1),
+    };
+  };
   const interactive = props.interaction !== undefined;
   const selectionInstructionsId = `${descriptionId}-selection-instructions`;
   const [retainedModelIdentity, setRetainedModelIdentity] = useState(modelIdentity);
@@ -745,7 +845,10 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
       }
       return;
     }
-    if (event.key === 'Escape') actions.cancel();
+    if (event.key === 'Escape') {
+      actions.cancel();
+      explorationGesture.cancel();
+    }
     const current = keyboardIndex ?? 0;
     let next: number | undefined;
     if (event.key === 'Escape') {
@@ -801,6 +904,27 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
       ? ''
       : `${props.rows[activeCell.rowIndex]!.label}. ${props.columns[activeCell.columnIndex]!.label}. ${activeCell.value === undefined ? props.labels.missing : formatHeatmapValue(activeCell.value, props.value)}`;
 
+  const allHidden = (!rows.length || !columns.length) && !!visibility;
+  const allHiddenContent = visibility ? (
+    <div data-wcl-chart-all-hidden="">
+      <span data-wcl-heatmap-corner="">
+        <span title={props.labels.row}>{props.labels.row}</span>
+        {restoreControl}
+      </span>
+      <strong>{visibility.allHidden.title}</strong>
+      <p>{visibility.allHidden.description}</p>
+      <button
+        type="button"
+        data-wcl-chart-show-all=""
+        onClick={() => {
+          pendingFocus.current = 'first';
+          setHidden({rows: [], columns: []});
+        }}
+      >
+        {visibility.showAll}
+      </button>
+    </div>
+  ) : null;
   let content: ReactNode;
   if (status.kind === 'loading') {
     content = (
@@ -831,27 +955,68 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
       <div data-wcl-heatmap-body="">
         {status.kind === 'partial' ? <Feedback copy={status} kind="partial" /> : null}
         {model.invalidCount > 0 ? <Feedback copy={props.invalidData} kind="invalid" /> : null}
-        {(!rows.length || !columns.length) && visibility ? (
-          <div data-wcl-chart-all-hidden="">
-            <span data-wcl-heatmap-corner="">
-              <span title={props.labels.row}>{props.labels.row}</span>
-              {restoreControl}
-            </span>
-            <strong>{visibility.allHidden.title}</strong>
-            <p>{visibility.allHidden.description}</p>
-            <button
-              type="button"
-              data-wcl-chart-show-all=""
-              onClick={() => {
-                pendingFocus.current = 'first';
-                setHidden({rows: [], columns: []});
-              }}
-            >
-              {visibility.showAll}
-            </button>
-          </div>
+        {allHidden && !explorationConfig ? (
+          allHiddenContent
         ) : (
-          <div data-wcl-heatmap-visual="">
+          <div data-wcl-heatmap-visual="" data-exploration={explorationConfig ? '' : undefined}>
+            {explorationConfig ? (
+              <ChartRectangularExplorationControls
+                largeStepMultiplier={2}
+                version={JSON.stringify([domainIdentity, visibilityVersion])}
+                window={exploration.normalized}
+                minimumSpan={exploration.minimumSpan}
+                step={{
+                  x: 1 / Math.max(1, visibleColumns.length),
+                  y: 1 / Math.max(1, visibleRows.length),
+                }}
+                labels={{
+                  ...explorationConfig.labels,
+                  range: (range) =>
+                    explorationConfig.labels.range(exploration.fromNormalized(range)),
+                }}
+                rangeLabel={explorationConfig.labels.range(exploration.window)}
+                fullRangeLabel={explorationConfig.labels.range(exploration.full)}
+                formatWindow={(range) =>
+                  explorationConfig.labels.range(exploration.fromNormalized(range))
+                }
+                onChange={exploration.change}
+                aspectRatio={visibleColumns.length / Math.max(1, visibleRows.length)}
+                yIncreasesDown
+                overview={
+                  <div
+                    data-wcl-heatmap-overview=""
+                    style={{
+                      ...rootStyle,
+                      gridTemplateColumns: `repeat(${Math.max(1, visibleColumns.length)}, minmax(0, 1fr))`,
+                    }}
+                  >
+                    {visibleCells.map((cell) => {
+                      const encoding =
+                        cell.value === undefined
+                          ? cell
+                          : valueEncoding(cell.value, domain, props.scale);
+                      const intensity =
+                        props.scale.type === 'two-sided'
+                          ? encoding.ratio * 84
+                          : 12 + encoding.ratio * 72;
+                      return (
+                        <span
+                          key={cell.index}
+                          data-wcl-heatmap-overview-cell=""
+                          data-missing={cell.value === undefined ? '' : undefined}
+                          style={{
+                            background:
+                              cell.value === undefined
+                                ? undefined
+                                : `color-mix(in oklch, ${encoding.range === 'low' ? lowColor : highColor} ${intensity}%, var(--wcl-surface))`,
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                }
+              />
+            ) : null}
             <div
               {...(hasLocalOverflow ? scrollbarActivityProps : {})}
               aria-label={hasLocalOverflow ? props.labels.scrollRegion : undefined}
@@ -888,6 +1053,15 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
                 data-show-values={showCellValues ? '' : undefined}
                 data-wcl-chart-canvas=""
                 data-wcl-heatmap-canvas=""
+                onPointerDownCapture={(event) =>
+                  explorationGesture.pointerDown(event, explorationCoordinate)
+                }
+                onPointerMoveCapture={(event) =>
+                  explorationGesture.pointerMove(event, explorationCoordinate)
+                }
+                onPointerUpCapture={(event) => explorationGesture.pointerEnd(event)}
+                onPointerCancelCapture={(event) => explorationGesture.pointerEnd(event, true)}
+                onLostPointerCaptureCapture={(event) => explorationGesture.pointerEnd(event, true)}
                 onBlur={(event: FocusEvent<HTMLDivElement>) => {
                   if (!(
                     event.relatedTarget instanceof Node &&
@@ -974,62 +1148,86 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
                 role="group"
                 tabIndex={0}
               >
-                <div
-                  aria-hidden={visibility ? undefined : true}
-                  data-wcl-heatmap-grid=""
-                  ref={gridRef}
-                >
-                  <span data-wcl-heatmap-corner="">
-                    <span title={props.labels.row}>{props.labels.row}</span>
-                    {restoreControl}
-                  </span>
-                  {props.columns.map((column) => (
-                    <span data-wcl-heatmap-column-label="" key={column.id}>
-                      <span title={column.label}>{column.label}</span>
-                      {axisEye('column', column)}
+                {allHidden ? (
+                  allHiddenContent
+                ) : (
+                  <div
+                    aria-hidden={visibility ? undefined : true}
+                    data-wcl-heatmap-grid=""
+                    ref={gridRef}
+                  >
+                    <span data-wcl-heatmap-corner="">
+                      <span title={props.labels.row}>{props.labels.row}</span>
+                      {restoreControl}
                     </span>
-                  ))}
-                  {props.rows.map((row, rowIndex) => (
-                    <div data-wcl-heatmap-row="" key={row.id}>
-                      <span data-wcl-heatmap-row-label="">
-                        <span title={row.label}>{row.label}</span>
-                        {axisEye('row', row, rowIndex === 0)}
+                    {props.columns.map((column, columnIndex) => (
+                      <span data-wcl-heatmap-column-label="" key={column.id}>
+                        <span
+                          title={column.label}
+                          style={
+                            explorationConfig
+                              ? {
+                                  transform: `translateY(-${(columnIndex % labelLanes) * 14}px)`,
+                                  maxInlineSize: `${Math.max(1, columnPitch * labelLanes - 4)}px`,
+                                  alignSelf:
+                                    columnIndex === 0
+                                      ? 'start'
+                                      : columnIndex === columnCount - 1
+                                        ? 'end'
+                                        : 'center',
+                                }
+                              : undefined
+                          }
+                        >
+                          {column.label}
+                        </span>
+                        {axisEye('column', column)}
                       </span>
-                      {props.columns.map((column, columnIndex) => {
-                        const cell = model.cells[rowIndex * columnCount + columnIndex]!;
-                        const intensity =
-                          props.scale.type === 'two-sided' ? cell.ratio * 84 : 12 + cell.ratio * 72;
-                        return (
-                          <span
-                            aria-hidden={visibility ? true : undefined}
-                            data-active={activeIndex === cell.index ? '' : undefined}
-                            data-selected={
-                              props.interaction?.selection &&
-                              selected.has(heatmapKey({rowId: row.id, columnId: column.id}))
-                                ? ''
-                                : undefined
-                            }
-                            data-cell-index={cell.index}
-                            data-range={cell.value === undefined ? undefined : cell.range}
-                            data-missing={cell.value === undefined ? '' : undefined}
-                            data-scale-ratio={
-                              cell.value === undefined ? undefined : cell.ratio.toFixed(4)
-                            }
-                            data-wcl-heatmap-cell=""
-                            key={column.id}
-                            style={{'--wcl-heatmap-intensity': `${intensity}%`} as CellStyles}
-                          >
-                            {cell.value === undefined ? null : (
-                              <span data-wcl-heatmap-cell-value="">
-                                {formatHeatmapValue(cell.value, props.value)}
-                              </span>
-                            )}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                    {props.rows.map((row, rowIndex) => (
+                      <div data-wcl-heatmap-row="" key={row.id}>
+                        <span data-wcl-heatmap-row-label="">
+                          <span title={row.label}>{row.label}</span>
+                          {axisEye('row', row, rowIndex === 0)}
+                        </span>
+                        {props.columns.map((column, columnIndex) => {
+                          const cell = model.cells[rowIndex * columnCount + columnIndex]!;
+                          const intensity =
+                            props.scale.type === 'two-sided'
+                              ? cell.ratio * 84
+                              : 12 + cell.ratio * 72;
+                          return (
+                            <span
+                              aria-hidden={visibility ? true : undefined}
+                              data-active={activeIndex === cell.index ? '' : undefined}
+                              data-selected={
+                                props.interaction?.selection &&
+                                selected.has(heatmapKey({rowId: row.id, columnId: column.id}))
+                                  ? ''
+                                  : undefined
+                              }
+                              data-cell-index={cell.index}
+                              data-range={cell.value === undefined ? undefined : cell.range}
+                              data-missing={cell.value === undefined ? '' : undefined}
+                              data-scale-ratio={
+                                cell.value === undefined ? undefined : cell.ratio.toFixed(4)
+                              }
+                              data-wcl-heatmap-cell=""
+                              key={column.id}
+                              style={{'--wcl-heatmap-intensity': `${intensity}%`} as CellStyles}
+                            >
+                              {cell.value === undefined ? null : (
+                                <span data-wcl-heatmap-cell-value="">
+                                  {formatHeatmapValue(cell.value, props.value)}
+                                </span>
+                              )}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {interactive ? <HeatmapInteractionFeedback state={interactionState} /> : null}
                 {activeCell === undefined || pointerPosition === undefined ? null : (
                   <HeatmapTooltip

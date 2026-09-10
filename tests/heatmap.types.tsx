@@ -203,3 +203,60 @@ export const incompleteVisibilityCopy = (
     visibilityLabels={{hideRow: (label) => `Hide ${label}`}}
   />
 );
+
+const explorationLabels = {
+  overview: 'Overview',
+  closeOverview: 'Close overview',
+  done: 'Done',
+  reset: 'Reset view',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  panLeft: 'Left',
+  panRight: 'Right',
+  panUp: 'Up',
+  panDown: 'Down',
+  window: 'Visible cells',
+  instructions: 'Move the window or resize a corner.',
+  corner: (corner: string) => `Resize ${corner}`,
+  range: (window: {x: readonly string[]; y: readonly string[]}) =>
+    `${window.x.join(' to ')} / ${window.y.join(' to ')}`,
+};
+
+export const exploringHeatmap = (
+  <Heatmap
+    {...common}
+    data={[]}
+    exploration={{
+      labels: explorationLabels,
+      window: {x: ['morning', 'morning'], y: ['north', 'north']},
+      onWindowChange: ({x, y}) => {
+        const columnId: string = x[0];
+        const rowId: string = y[0];
+        void [columnId, rowId];
+      },
+    }}
+  />
+);
+
+export const invalidHeatmapExploration = (
+  <Heatmap
+    {...common}
+    data={[]}
+    // @ts-expect-error Controlled exploration requires its change callback.
+    exploration={{
+      labels: explorationLabels,
+      window: {x: ['morning', 'morning'], y: ['north', 'north']},
+    }}
+  />
+);
+export const numericHeatmapExploration = (
+  <Heatmap
+    {...common}
+    data={[]}
+    exploration={{
+      labels: explorationLabels,
+      // @ts-expect-error Heatmap windows use column and row identifiers rather than numeric indices.
+      defaultWindow: {x: [0, 1], y: [0, 1]},
+    }}
+  />
+);

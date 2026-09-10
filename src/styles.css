@@ -2,6 +2,7 @@
 
 @import url('./charts/chart-exploration.css');
 @import url('./charts/chart-rectangular-exploration.css');
+@import url('./charts/heatmap-exploration.css');
 
 @layer wcl.reset {
   [data-wcl-search-control] [data-wcl-field-input]::-webkit-search-cancel-button {
