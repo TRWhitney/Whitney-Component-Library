@@ -428,6 +428,7 @@ export const radarChartContract: ComponentContract = {
   ],
   purpose: 'Compare a few subjects across ordered qualities on one shared radial scale.',
   reducedMotionBehavior: [
+    'Retained profile values and automatic bounds animate together over 240ms with cubic ease-out, including without visibility controls. Selection and hit testing follow displayed geometry; readings, tables and callbacks retain supplied scores. Updates retarget the current display. Initial, profile/dimension membership or order, missing-value topology, configuration and empty-state changes settle immediately. Reduced motion settles values and scales directly.',
     activationTiming,
     'Filled point pulses use a ten-screen-pixel base radius with the shared expansion and fade, including compact charts.',
     'Radar dimension and guide labels retain a minimum rendered size of 12 pixels. Compact names may shorten; the full table retains their wording.',

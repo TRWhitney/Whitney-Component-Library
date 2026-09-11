@@ -1,5 +1,6 @@
 import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
+import {useChartDataMotion} from './use-chart-data-motion.js';
 import {chartActivationPointRadius} from './chart-activation.js';
 import {arc} from 'd3-shape';
 import {
@@ -62,6 +63,7 @@ interface PreparedRadarSeries {
   readonly color: ChartColor;
   readonly id: string;
   readonly label: string;
+  readonly missing: readonly boolean[];
   readonly values: readonly number[];
 }
 
@@ -284,6 +286,7 @@ function prepareModel<Datum extends object>(props: RadarChartProps<Datum>): Rada
       id,
       label,
       requestedColor: requestedColor ?? undefined,
+      missing: values.map((value) => value === null || value === undefined),
       values: values.map((value) => value ?? 0),
     });
   });
@@ -455,20 +458,60 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   const targetMaximum = radarMaximum(
     Math.max(0, ...visibleSeries.flatMap((series) => series.values)),
   );
+  const accessors = [
+    props.idAccessor,
+    props.labelAccessor,
+    props.colorAccessor,
+    props.value.formatValue,
+    ...props.dimensions.map((dimension) => dimension.accessor),
+  ];
+  const [accessorConfiguration, setAccessorConfiguration] = useState({accessors, version: 0});
+  if (
+    accessors.length !== accessorConfiguration.accessors.length ||
+    accessors.some((accessor, index) => accessor !== accessorConfiguration.accessors[index])
+  ) {
+    setAccessorConfiguration({accessors, version: accessorConfiguration.version + 1});
+  }
+  const motionResetKey = JSON.stringify([
+    props.status?.kind ?? 'ready',
+    fullModel.invalidCount,
+    props.dimensions.map((dimension) => [dimension.id, dimension.label]),
+    fullModel.series.map((series) => [series.id, series.label, series.color, series.missing]),
+    accessorConfiguration.version,
+    props.value,
+    props.aspectRatio,
+    props.minimumSize,
+    props.overflow,
+    !!visibilityLabels,
+  ]);
+  const motionEnabled =
+    visibleSeries.length > 0 && props.status?.kind !== 'loading' && props.status?.kind !== 'error';
+  const movingValues = useChartDataMotion(
+    visibleSeries.map((series) => ({id: series.id, value: series.values})),
+    {
+      version: JSON.stringify(visibleSeries.map((series) => [series.id, series.values])),
+      resetKey: JSON.stringify([motionResetKey, hiddenIds]),
+      enabled: motionEnabled,
+      interpolate: (from, to, progress) =>
+        to.map((value, index) => (1 - progress) * from[index]! + progress * value),
+    },
+  );
+  const displayValues = new Map(movingValues.map((item) => [item.id, item.value]));
+  // Visibility changes settle profile values while retaining the shared scale transition.
   const [, maximum] = useAnimatedChartDomain(
     [0, targetMaximum],
-    !!visibilityLabels &&
-      visibleSeries.length > 0 &&
-      props.status?.kind !== 'loading' &&
-      props.status?.kind !== 'error',
+    motionEnabled,
     false,
+    motionResetKey,
   );
+  // Marks and hit targets use this display model; readings retain visibleSeries source values.
   const model: RadarModel = {
     ...fullModel,
     maximum,
     series: visibleSeries.map((series) => ({
       ...series,
-      areaRatios: radarAreaRatios(series.values, maximum),
+      values: displayValues.get(series.id) ?? series.values,
+      areaRatios: radarAreaRatios(displayValues.get(series.id) ?? series.values, maximum),
     })),
   };
   const interaction = props.interaction;
@@ -515,7 +558,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
   const modelIdentity = JSON.stringify([
     status.kind,
     props.dimensions.map((dimension) => [dimension.id, dimension.label]),
-    model.series.map((item) => [item.id, item.label, item.color, ...item.values]),
+    visibleSeries.map((item) => [item.id, item.label, item.color]),
   ]);
   const [retainedModelIdentity, setRetainedModelIdentity] = useState(modelIdentity);
   if (retainedModelIdentity !== modelIdentity) {
@@ -575,8 +618,11 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
     overflow === 'scroll' && availableSize !== undefined && availableSize.width < minimumSize.width;
   const readingSeries =
     validDirectSeriesId === null || interaction?.target === 'dimension'
-      ? model.series
-      : model.series.filter((item) => item.id === validDirectSeriesId);
+      ? visibleSeries
+      : visibleSeries.filter((item) => item.id === validDirectSeriesId);
+  const displayReadingSeries = model.series.filter((series) =>
+    readingSeries.some((reading) => reading.id === series.id),
+  );
   const readingAnnouncement = !isReading
     ? ''
     : [
@@ -588,7 +634,7 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
 
   const entries = props.dimensions.flatMap((dimension, index) => {
     if (fullModel.series.length === 0) return [];
-    const values = model.series.map((series) => ({
+    const values = visibleSeries.map((series) => ({
       seriesId: series.id,
       label: series.label,
       value: series.values[index]!,
@@ -647,7 +693,10 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
     })),
     JSON.stringify([
       modelIdentity,
-      maximum,
+      motionResetKey,
+      // Source changes invalidate gestures; animation frames do not.
+      targetMaximum,
+      visibleSeries.map((series) => series.values),
       interaction?.target,
       !!interaction?.onActivate,
       viewScale,
@@ -1135,44 +1184,45 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
                   })}
                   {isReading ? (
                     <g data-wcl-radar-reading-guide="">
-                      {(interaction || validDirectSeriesId !== null ? readingSeries : []).map(
-                        (series) => {
-                          const value = series.values[activeIndex]!;
-                          const [cx, cy] = pointAt(
-                            activeIndex,
-                            dimensionCount,
-                            value / model.maximum,
-                          );
-                          const borderWidth = emphasizedSeriesId === series.id ? 3 : 2;
-                          return (
-                            <g key={series.id} data-color={series.color}>
-                              <line
-                                data-color={series.color}
-                                data-wcl-radar-reading-line=""
-                                x1={center}
-                                y1={center}
-                                x2={cx}
-                                y2={cy}
+                      {(interaction || validDirectSeriesId !== null
+                        ? displayReadingSeries
+                        : []
+                      ).map((series) => {
+                        const value = series.values[activeIndex]!;
+                        const [cx, cy] = pointAt(
+                          activeIndex,
+                          dimensionCount,
+                          value / model.maximum,
+                        );
+                        const borderWidth = emphasizedSeriesId === series.id ? 3 : 2;
+                        return (
+                          <g key={series.id} data-color={series.color}>
+                            <line
+                              data-color={series.color}
+                              data-wcl-radar-reading-line=""
+                              x1={center}
+                              y1={center}
+                              x2={cx}
+                              y2={cy}
+                            />
+                            {!interaction ||
+                            (pointerHasTarget && pointerIndex !== null) ||
+                            keyboardIndex !== null ||
+                            touchIndex !== null ? (
+                              <circle
+                                data-wcl-radar-reading-point=""
+                                cx={cx}
+                                cy={cy}
+                                r={
+                                  value === 0
+                                    ? 2.5
+                                    : Math.max(0, 4 - (borderWidth / 2 - 0.2) / viewScale)
+                                }
                               />
-                              {!interaction ||
-                              (pointerHasTarget && pointerIndex !== null) ||
-                              keyboardIndex !== null ||
-                              touchIndex !== null ? (
-                                <circle
-                                  data-wcl-radar-reading-point=""
-                                  cx={cx}
-                                  cy={cy}
-                                  r={
-                                    value === 0
-                                      ? 2.5
-                                      : Math.max(0, 4 - (borderWidth / 2 - 0.2) / viewScale)
-                                  }
-                                />
-                              ) : null}
-                            </g>
-                          );
-                        },
-                      )}
+                            ) : null}
+                          </g>
+                        );
+                      })}
                     </g>
                   ) : null}
                   <g data-wcl-chart-interaction-overlay="" pointerEvents="none">
