@@ -1687,7 +1687,12 @@ function StatisticalMarks<Datum extends object>({
               data-wcl-histogram-bin=""
               data-wcl-statistical-mark=""
               height={Math.abs(baseline - y)}
-              key={`${bin.lower}-${bin.upper}-${bin.sourceIndex}`}
+              key={distributionKey({
+                kind: 'bin',
+                lower: bin.lower,
+                upper: bin.upper,
+                upperInclusive: bin.final,
+              })}
               width={Math.max(0, right - left)}
               x={left}
               y={Math.min(y, baseline)}
@@ -1776,7 +1781,7 @@ function StatisticalMarks<Datum extends object>({
                   data-reading-index={index}
                   data-wcl-box-outlier=""
                   data-wcl-statistical-mark=""
-                  key={`${outlier}-${outlierIndex}`}
+                  key={box.outlierIds?.[outlierIndex] ?? outlierIndex}
                   r={5 / presentation.viewScale}
                 />
               );
@@ -1850,7 +1855,14 @@ function StatisticalTable<Datum extends object>({
         </thead>
         <tbody>
           {model.bins.map((bin) => (
-            <tr key={`${bin.lower}-${bin.upper}-${bin.sourceIndex}`}>
+            <tr
+              key={distributionKey({
+                kind: 'bin',
+                lower: bin.lower,
+                upper: bin.upper,
+                upperInclusive: bin.final,
+              })}
+            >
               <th scope="row">
                 [{axisTickLabel(bin.lower, model.xAxis)}, {axisTickLabel(bin.upper, model.xAxis)}
                 {bin.final ? ']' : ')'}
@@ -1959,6 +1971,58 @@ function distributionPoints<Datum extends object>(
       ...box.outliers.map(() => ({...point(index++, box.series.id), kind: 'outlier' as const})),
     ];
   });
+}
+
+/** Reset distributions when their source topology cannot preserve numeric correspondence. */
+function distributionMotionTopology<Datum extends object>(model: StatisticalModel<Datum>): unknown {
+  if (model.kind === 'histogram')
+    return model.bins.map((bin) => [
+      bin.lower,
+      bin.upper,
+      bin.final,
+      bin.ordinate,
+      bin.source.kind,
+    ]);
+  if (model.kind === 'box')
+    return model.boxes.map((box) => [
+      box.series.id,
+      box.source.kind,
+      box.whisker,
+      // A sole noninteractive outlier has unambiguous correspondence. Multiple moving
+      // outliers require application IDs; unchanged values can retain their positions.
+      box.outlierIds ?? (box.outliers.length <= 1 ? box.outliers.length : box.outliers),
+    ]);
+  return null;
+}
+
+function interpolateDistribution<Datum extends object>(
+  from: StatisticalModel<Datum>,
+  to: StatisticalModel<Datum>,
+  progress: number,
+): StatisticalModel<Datum> {
+  const mix = (start: number, end: number) => start + (end - start) * progress;
+  if (from.kind === 'histogram' && to.kind === 'histogram')
+    return {
+      ...to,
+      bins: to.bins.map((bin, index) => ({...bin, value: mix(from.bins[index]!.value, bin.value)})),
+    };
+  if (from.kind === 'box' && to.kind === 'box')
+    return {
+      ...to,
+      boxes: to.boxes.map((box, index) => {
+        const previous = from.boxes[index]!;
+        return {
+          ...box,
+          lowerWhisker: mix(previous.lowerWhisker, box.lowerWhisker),
+          q1: mix(previous.q1, box.q1),
+          median: mix(previous.median, box.median),
+          q3: mix(previous.q3, box.q3),
+          upperWhisker: mix(previous.upperWhisker, box.upperWhisker),
+          outliers: box.outliers.map((value, index) => mix(previous.outliers[index]!, value)),
+        };
+      }),
+    };
+  return to;
 }
 
 function StatisticalFrame<Datum extends object>({
@@ -2147,21 +2211,29 @@ function StatisticalFrame<Datum extends object>({
     aspectRatio,
     minimumSize,
     overflow,
-    visiblePointModel?.xAxis.scale,
-    visiblePointModel?.yAxis.scale,
-    fullModel.kind === 'scatter' || fullModel.kind === 'bubble' ? fullModel.series : null,
+    fullModel.kind === 'box' ? fullModel.xAxis : fullModel.xAxis.scale,
+    fullModel.yAxis.scale,
+    fullModel.kind === 'histogram' ? fullModel.color : fullModel.series,
+    distributionMotionTopology(fullModel),
     (fullModel.kind === 'scatter' || fullModel.kind === 'bubble') &&
     fullModel.line?.samples.some((point) => point === null)
       ? fullModel.line.samples.map((point) => (point ? pointKey(point) : null))
       : null,
   ];
-  const domainResetKey = visiblePointModel ? JSON.stringify(motionConfiguration) : undefined;
-  const navigationKey = exploration ? navigation.normalized : null;
+  const domainResetKey = JSON.stringify(motionConfiguration);
+  const navigationKey = exploration
+    ? navigation.normalized
+    : histogramExploration || boxExploration
+      ? stripNavigation.normalized
+      : null;
   const motionResetKey = JSON.stringify([hiddenIds, motionConfiguration, navigationKey]);
   const plotResetKey = JSON.stringify([motionConfiguration, navigationKey]);
   const motionEnabled =
-    !!visiblePointModel &&
-    visiblePointModel.points.length > 0 &&
+    (visibleModel.kind === 'histogram'
+      ? visibleModel.bins.length > 0
+      : visibleModel.kind === 'box'
+        ? visibleModel.boxes.length > 0
+        : visibleModel.points.length > 0) &&
     status.kind !== 'loading' &&
     status.kind !== 'error';
   const dataMotion = useChartDataMotion(
@@ -2193,6 +2265,13 @@ function StatisticalFrame<Datum extends object>({
       }),
     },
   );
+  const distributionMotion = useChartDataMotion([{id: 'distribution', value: visibleModel}], {
+    version: JSON.stringify(visiblePointModel ? null : statisticalModelGeometry(visibleModel)),
+    resetKey: motionResetKey,
+    enabled: motionEnabled && !visiblePointModel,
+    interpolate: interpolateDistribution<Datum>,
+  });
+  const displayedDistribution = distributionMotion[0]!.value;
   const liveMotion = new Map(
     dataMotion.filter((item) => !item.exiting).map((item) => [item.id, item]),
   );
@@ -2234,11 +2313,7 @@ function StatisticalFrame<Datum extends object>({
       : visibleModel.kind === 'histogram'
         ? !!visibleModel.bins.length
         : !!visibleModel.points.length;
-  const animate =
-    (!!visibilityLabels || !!visiblePointModel) &&
-    visibleHasData &&
-    status.kind !== 'loading' &&
-    status.kind !== 'error';
+  const animate = visibleHasData && status.kind !== 'loading' && status.kind !== 'error';
   const xScale = visibleModel.kind === 'box' ? undefined : visibleModel.xAxis.scale;
   const xDomain = useAnimatedChartDomain(
     exploration
@@ -2266,10 +2341,9 @@ function StatisticalFrame<Datum extends object>({
     domainResetKey,
   );
   const model = modelWithDomains(viewportModel, xDomain, yDomain);
-  const yLabels = projectionsFor(
-    explores ? fullModel : visiblePointModel ? viewportModel : model,
-    initialPlot,
-  ).y.ticks.map((tick) => axisTickLabel(tick, yAxis));
+  const yLabels = projectionsFor(explores ? fullModel : viewportModel, initialPlot).y.ticks.map(
+    (tick) => axisTickLabel(tick, yAxis),
+  );
   const targetPlot = plotForYAxisLabels(
     yLabels,
     presentation.fontSize / presentation.viewScale / 16,
@@ -2295,6 +2369,24 @@ function StatisticalFrame<Datum extends object>({
       ? {...point, x: displayed.x, y: displayed.y, magnitudeRatio: displayed.magnitudeRatio}
       : point;
   };
+  const displayedBins = new Map(
+    displayedDistribution.kind === 'histogram'
+      ? displayedDistribution.bins.map((bin) => [
+          distributionKey({
+            kind: 'bin',
+            lower: bin.lower,
+            upper: bin.upper,
+            upperInclusive: bin.final,
+          }),
+          bin,
+        ])
+      : [],
+  );
+  const displayedBoxes = new Map(
+    displayedDistribution.kind === 'box'
+      ? displayedDistribution.boxes.map((box) => [box.series.id, box])
+      : [],
+  );
   const displayModel =
     model.kind === 'scatter' || model.kind === 'bubble'
       ? {
@@ -2311,7 +2403,27 @@ function StatisticalFrame<Datum extends object>({
               }
             : {}),
         }
-      : model;
+      : model.kind === 'histogram' && displayedDistribution.kind === 'histogram'
+        ? {
+            ...model,
+            bins: model.bins.map(
+              (bin) =>
+                displayedBins.get(
+                  distributionKey({
+                    kind: 'bin',
+                    lower: bin.lower,
+                    upper: bin.upper,
+                    upperInclusive: bin.final,
+                  }),
+                ) ?? bin,
+            ),
+          }
+        : model.kind === 'box' && displayedDistribution.kind === 'box'
+          ? {
+              ...model,
+              boxes: model.boxes.map((box) => displayedBoxes.get(box.series.id) ?? box),
+            }
+          : model;
   const targetReadings = readingTargets(model, projections);
   const readings = readingTargets(displayModel, projections).map((reading, index) => ({
     ...targetReadings[index]!,
@@ -2326,11 +2438,22 @@ function StatisticalFrame<Datum extends object>({
       }
     : undefined;
   const allReadings = readingTargets(fullModel, projectionsFor(fullModel, initialPlot));
-  const distributionGeometry = distributionPoints(model, projections, readings, presentation);
+  const distributionGeometry = distributionPoints(
+    displayModel,
+    projections,
+    readings,
+    presentation,
+  );
+  const sourceReadings = readingTargets(viewportModel, targetInitialProjections);
   const readingIdentity = JSON.stringify(readings.map((reading) => reading.id));
   const readingGeometry = JSON.stringify({
-    model: statisticalModelGeometry(visiblePointModel ? viewportModel : model),
-    distribution: distributionGeometry.map((point) => [point.bounds, point.whiskers]),
+    model: statisticalModelGeometry(viewportModel),
+    distribution: distributionPoints(
+      viewportModel,
+      targetInitialProjections,
+      sourceReadings,
+      presentation,
+    ).map((point) => [point.bounds, point.whiskers]),
     presentation: [
       aspectRatio,
       availableWidth,
@@ -2341,10 +2464,7 @@ function StatisticalFrame<Datum extends object>({
       presentation.pointStrokeWidth,
       presentation.viewScale,
     ],
-    readings: (visiblePointModel
-      ? readingTargets(viewportModel, targetInitialProjections)
-      : readings
-    ).map((reading) => [reading.id, reading.x, reading.y]),
+    readings: sourceReadings.map((reading) => [reading.id, reading.x, reading.y]),
   });
   const pointModel = model.kind === 'scatter' || model.kind === 'bubble' ? model : undefined;
   const fullPointModel =
@@ -2514,7 +2634,7 @@ function StatisticalFrame<Datum extends object>({
     status.kind,
     availableWidth,
     aspectRatio,
-    visiblePointModel ? targetInitialPlot : plot,
+    visiblePointModel ? targetInitialPlot : targetPlot,
   ]);
   const [previousNavigationVersion, setPreviousNavigationVersion] = useState(navigationVersion);
   if (previousNavigationVersion !== navigationVersion) {

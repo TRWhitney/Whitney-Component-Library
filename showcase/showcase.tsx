@@ -1,3 +1,4 @@
+import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
 import {RadarDataMotionExample} from './radar-data-motion-example.js';
 import {SparklineDataMotionExample} from './sparkline-data-motion-example.js';
 import {CartesianDataMotionExample} from './cartesian-data-motion-example.js';
@@ -3904,6 +3905,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show a numeric distribution from raw observations or explicit pre-binned intervals. Directly reading one bin dims the others; blank plot space has no inferred reading."
         name="Histogram"
       >
+        <Example label="Updated distributions">
+          <DistributionDataMotionExample kind="histogram" />
+        </Example>
         <Example label="Explore histograms and box plots">
           <DistributionExplorationExample />
         </Example>
@@ -3916,6 +3920,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare group medians, quartiles, whiskers, and outliers. Select group summaries and individual outliers separately, and open the original observations through details. ${statisticalVisibilityGuidance}`}
         name="BoxPlot"
       >
+        <Example label="Updated distributions">
+          <DistributionDataMotionExample kind="box" />
+        </Example>
         <p>
           <a href="#histogram">Compare pan and zoom for histograms and box plots.</a>
         </p>

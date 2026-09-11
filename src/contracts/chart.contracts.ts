@@ -1104,7 +1104,7 @@ const statisticalChartGuidance: Record<
       'Drag selects bin rectangles that intersect the drag rectangle, including zero-height bins at their rendered baseline.',
     ],
     events:
-      'interaction.onActivate receives HistogramActivation<Datum> with the interval item, raw displayed value, ordinate of count, proportion, or density, and input of pointer, keyboard, or touch. source.kind is raw with data containing the valid original records in the bin, or binned with datum containing the supplied bin record. onSelectionChange receives named interval items. Density and proportion are never reported as counts.',
+      'interaction.onActivate receives HistogramActivation<Datum> with the interval item, supplied value, ordinate of count, proportion, or density, and input of pointer, keyboard, or touch. source.kind is raw with data containing the valid original records in the bin, or binned with datum containing the supplied bin record. onSelectionChange receives named interval items. Density and proportion are never reported as counts.',
     forcedColors:
       'Forced colors preserve axes and bin boundaries in system colors. Interval and ordinate values remain complete in the generated table.',
     labeling:
@@ -1114,7 +1114,7 @@ const statisticalChartGuidance: Record<
     parts:
       'Histogram contains a named figure, visible caption, optional feedback, interactive SVG plot, two quantitative axes, contiguous translucent bins, shared tooltip, polite announcement, and generated native data table.',
     reducedMotion:
-      'Reduced motion removes bin-emphasis and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
+      'Counts, proportions and densities animate over 240ms with cubic ease-out when exact bin intervals remain unchanged. Automatic bounds and selected frames follow displayed bars; readings, tables and callbacks report supplied statistics. Changed bin boundaries, configuration and empty states settle directly. Repeated updates retarget the current display. Reduced motion settles values and bounds immediately and removes bin-emphasis and scrollbar transitions.',
     responsive:
       'The production chart frame scales type, strokes, and plot geometry from measured space while bin boundaries remain aligned to their numeric intervals. minimumSize and overflow retain the established local-scroll behavior.',
   },
@@ -1144,7 +1144,7 @@ const statisticalChartGuidance: Record<
     parts:
       'BoxPlot contains a named figure, visible caption, optional feedback, a group legend when multiple groups exist, interactive SVG plot, categorical and quantitative axes, quartile boxes, medians, split whisker tails, separate outlier marks, shared tooltip, polite announcement, and generated native data table.',
     reducedMotion:
-      'Reduced motion removes mark-emphasis, legend, and scrollbar transitions. Reading, focus, and native scrolling behavior stays the same.',
+      'Summary statistics and identified outliers animate over 240ms with cubic ease-out. Values and automatic bounds move together; selection and hit testing follow displayed boxes and outliers while readings, tables and callbacks report actual statistics. Updates retarget the current display. Changed group order/membership, outlier membership, configuration and empty states settle directly. Multiple changing outliers without stable IDs also settle directly. Reduced motion settles values and bounds immediately and removes emphasis and scrollbar transitions.',
     responsive:
       'The production chart frame scales type, strokes, boxes, whiskers, and outliers from measured space while preserving their statistical relationships. minimumSize and overflow retain the established local-scroll behavior.',
   },
@@ -1291,7 +1291,7 @@ function statisticalChartContract({
               ? 'Hiding a group hides its summary and every outlier together. Remaining categories use declared group order. The numeric axis fits visible summaries and outliers without recomputing statistics across groups.'
               : 'Hiding a series hides all its observations. Both numeric axes fit visible observations. Bubble areas retain their magnitude interpretation within the visible dataset.',
             'Automatic numeric bounds fit visible groups with interruptible animation. Explicit consumer domains remain fixed and logarithmic bounds remain positive. Readings retain exact values throughout animation.',
-            `Selections remain attached to hidden items and use the localized hidden selection label. Hidden items cannot be read, selected by dragging, or activated. ${name === 'BoxPlot' ? 'Visibility, data, or geometry changes cancel pending gestures and stale readings;' : 'Visibility, source-data, or configuration changes cancel pending gestures and stale readings; animation frames preserve active gestures;'} removed data still prunes selection.`,
+            'Selections remain attached to hidden items and use the localized hidden selection label. Hidden items cannot be read, selected by dragging, or activated. Visibility, source-data, or configuration changes cancel pending gestures and stale readings; animation frames preserve active gestures; removed data still prunes selection.',
           ]
         : []),
       ...(pointInteraction
