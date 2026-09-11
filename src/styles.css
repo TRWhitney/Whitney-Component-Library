@@ -6686,6 +6686,7 @@
     stroke-width: 2.25px;
   }
 
+  [data-wcl-radial-departure][data-aggregate] [data-wcl-radial-slice],
   [data-wcl-radial-segment][data-aggregate] [data-wcl-radial-slice] {
     fill: color-mix(in oklch, var(--wcl-chart-series-color) 13%, var(--wcl-surface));
     stroke-dasharray: 3 2;

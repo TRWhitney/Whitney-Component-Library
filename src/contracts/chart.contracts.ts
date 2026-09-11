@@ -291,7 +291,7 @@ function partToWholeContract({
     purpose,
     reducedMotionBehavior: [
       activationTiming,
-      'Visibility animates slice boundaries over 240ms and can reverse from the current angles. Reduced motion settles immediately; paging and source-data changes reset directly. Readings, callbacks, table percentages, and the donut center always use exact current values, never interpolated values.',
+      'Visibility and source share changes animate slice boundaries over 240ms with cubic ease-out and can reverse from the current angles. Stable category IDs retain their colors. Arrivals and departures fade; changed ranks crossfade instead of sweeping slices through each other. Departures cannot receive interaction. Reduced motion settles immediately; paging, configuration and empty-state changes reset directly. Readings, callbacks, table percentages, and the donut center always use exact current values, never interpolated values.',
       'Reduced motion removes slice pop-out and scrollbar-fade transitions. Reading, focus, paging, emphasis, and native scrolling behavior stays the same.',
       'Reduced motion replaces each activation pulse with brief static feedback. Callbacks and selection remain the same.',
     ],

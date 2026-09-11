@@ -1,4 +1,5 @@
 import {CartesianDataMotionExample} from './cartesian-data-motion-example.js';
+import {RadialDataMotionExample} from './radial-data-motion-example.js';
 import {StatisticalDataMotionExample} from './statistical-data-motion-example.js';
 import {RangeChartExample} from './range-chart-example.js';
 import {ScatterLineExample} from './scatter-line-example.js';
@@ -3777,6 +3778,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show how categories make up one whole. More than eight positive categories use a proportional aggregate that opens the next page. Hover slices for readings, or use the legend to emphasize and pin a category without opening a tooltip. Tap or click a pinned legend name again to clear its highlight."
         name="PieChart"
       >
+        <Example label="Changing category shares">
+          <RadialDataMotionExample kind="pie" />
+        </Example>
         <Example label="Paged PieChart with category selection and details">
           <PartToWholeInteractionExample kind="pie" />
         </Example>
@@ -3786,6 +3790,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Use the same part-to-whole and paging behavior with a derived total in the center. Tap or click a pinned legend name again to clear its highlight. Zero values remain in the generated table but do not create slices."
         name="DonutChart"
       >
+        <Example label="Changing category shares">
+          <RadialDataMotionExample kind="donut" />
+        </Example>
         <Example label="Paged DonutChart with category selection and details">
           <PartToWholeInteractionExample kind="donut" />
         </Example>

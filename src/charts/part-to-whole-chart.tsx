@@ -232,14 +232,11 @@ function categoryDashPattern(styleIndex: number): string | undefined {
   return `6 2 ${[...occurrence.toString(2)].map((bit) => (bit === '1' ? '1 2' : '3 2')).join(' ')}`;
 }
 
-function makeSegments<Datum extends object>(
+function initialCategoryStyles<Datum extends object>(
   records: readonly PreparedCategory<Datum>[],
-  page: Page,
-  aggregateSizing: PartToWholeAggregateSizing,
-  hiddenIds: readonly string[] = [],
-): readonly Segment<Datum>[] {
+): ReadonlyMap<string, number> {
   const colorCounts = new Map<number, number>();
-  const styleIndices = new Map(
+  return new Map(
     records.map((record, rank) => {
       const colorIndex = categoryStyleIndex(rank, records.length) % defaultColors.length;
       const occurrence = colorCounts.get(colorIndex) ?? 0;
@@ -247,6 +244,15 @@ function makeSegments<Datum extends object>(
       return [record.id, colorIndex + occurrence * defaultColors.length];
     }),
   );
+}
+
+function makeSegments<Datum extends object>(
+  records: readonly PreparedCategory<Datum>[],
+  page: Page,
+  aggregateSizing: PartToWholeAggregateSizing,
+  hiddenIds: readonly string[] = [],
+  styleIndices: ReadonlyMap<string, number> = initialCategoryStyles(records),
+): readonly Segment<Datum>[] {
   const pageRecords = records.slice(page.start, page.start + page.count);
   const ordinary = pageRecords.filter((category) => !hiddenIds.includes(category.id));
   const remainingRecords = records.slice(page.start + page.count);
@@ -511,6 +517,18 @@ function PartToWholeFrame<Datum extends object>({
   readonly props: PartToWholeProps<Datum>;
 }): ReactElement {
   const fullModel = prepareModel(props);
+  const [categoryStyles, setCategoryStyles] = useState(() =>
+    initialCategoryStyles(fullModel.positiveCategories),
+  );
+  let styles = categoryStyles;
+  const additions = fullModel.positiveCategories.filter((category) => !styles.has(category.id));
+  if (additions.length > 0) {
+    const next = new Map(styles);
+    let index = Math.max(-1, ...next.values()) + 1;
+    for (const category of additions) next.set(category.id, index++);
+    styles = next;
+    setCategoryStyles(next);
+  }
   const visibilityLabels = props.visibilityLabels;
   const firstEye = useRef<HTMLButtonElement>(null);
   const [hiddenCategoryIds, setHiddenCategoryIds] = useState<readonly string[]>([]);
@@ -591,21 +609,31 @@ function PartToWholeFrame<Datum extends object>({
   if (retainedModelIdentity === modelIdentity && safePageIndex !== pageIndex)
     setPageIndex(safePageIndex);
   const page = pages[safePageIndex]!;
-  const legendSegments = makeSegments(model.positiveCategories, page, aggregateSizing);
-  const targetSegments = makeSegments(model.positiveCategories, page, aggregateSizing, hiddenIds);
-  const angles = useAnimatedRadialAngles(
-    targetSegments,
-    JSON.stringify([modelIdentity, safePageIndex, kind]),
-    !!visibilityLabels &&
-      targetSegments.length > 0 &&
-      props.status?.kind !== 'loading' &&
-      props.status?.kind !== 'error',
+  const legendSegments = makeSegments(model.positiveCategories, page, aggregateSizing, [], styles);
+  const targetSegments = makeSegments(
+    model.positiveCategories,
+    page,
+    aggregateSizing,
+    hiddenIds,
+    styles,
   );
-  const segments = targetSegments.map((segment) => ({
-    ...segment,
-    startAngle: angles.get(segment.identity)?.startAngle ?? segment.startAngle,
-    endAngle: angles.get(segment.identity)?.endAngle ?? segment.startAngle,
-  }));
+  const radialFrames = useAnimatedRadialAngles(
+    targetSegments,
+    JSON.stringify([
+      safePageIndex,
+      kind,
+      aggregateSizing,
+      props.minimumSize,
+      props.aspectRatio,
+      props.status?.kind,
+      targetSegments.length === 0,
+    ]),
+    targetSegments.length > 0 && props.status?.kind !== 'loading' && props.status?.kind !== 'error',
+    modelIdentity,
+  );
+  const activeFrames = radialFrames.filter((item) => !item.exiting);
+  const segments = activeFrames.map((item) => item.value);
+  const departures = radialFrames.filter((item) => item.exiting);
   const pathBuilder = radialArc<Segment<Datum>>(kind === 'donut' ? donutInnerRadius : 0);
   const activeIndex = pointerIndex ?? touchIndex ?? keyboardIndex ?? 0;
   const isReading = pointerIndex !== null || touchIndex !== null || keyboardIndex !== null;
@@ -678,7 +706,7 @@ function PartToWholeFrame<Datum extends object>({
       safePageIndex,
       modelIdentity,
       hiddenIds,
-      segments.map((segment) => [segment.identity, segment.startAngle, segment.endAngle]),
+      targetSegments.map((segment) => [segment.identity, segment.startAngle, segment.endAngle]),
       svgViewScale,
       svgGeometry,
       props.minimumSize,
@@ -746,13 +774,16 @@ function PartToWholeFrame<Datum extends object>({
   const segmentAt = (p: RadialPoint) => {
     const hits = segments
       .map((segment, index) => ({segment, index}))
-      .filter(({index}) => radialContains(positionedPolygon(index), p));
+      .filter(
+        ({index}) =>
+          activeFrames[index]!.opacity > 0 && radialContains(positionedPolygon(index), p),
+      );
     return hits.find(({segment}) => segment.identity === emphasizedSegmentId) ?? hits.at(-1);
   };
   const sweep = (from: RadialPoint, to: RadialPoint) =>
     segments
       .flatMap((segment, index) => {
-        if (segment.isAggregate) return [];
+        if (segment.isAggregate || activeFrames[index]!.opacity === 0) return [];
         const crossing = radialCrossing(positionedPolygon(index), from, to);
         return crossing === undefined ? [] : [{crossing, point: interactionPoints[index]!}];
       })
@@ -925,7 +956,7 @@ function PartToWholeFrame<Datum extends object>({
     if (event.pointerType === 'touch') return;
     const target =
       event.target instanceof Element ? event.target.closest('[data-segment-index]') : null;
-    const index = Number(target?.getAttribute('data-segment-index'));
+    const index = target ? Number(target.getAttribute('data-segment-index')) : -1;
     if (!Number.isInteger(index) || segments[index] === undefined) {
       setPointerIndex(null);
       setPointerPosition(undefined);
@@ -941,7 +972,7 @@ function PartToWholeFrame<Datum extends object>({
     if (event.pointerType !== 'touch') return;
     const target =
       event.target instanceof Element ? event.target.closest('[data-segment-index]') : null;
-    const index = Number(target?.getAttribute('data-segment-index'));
+    const index = target ? Number(target.getAttribute('data-segment-index')) : -1;
     if (!Number.isInteger(index) || segments[index] === undefined) return;
     setKeyboardIndex(null);
     setPointerIndex(null);
@@ -1132,47 +1163,81 @@ function PartToWholeFrame<Datum extends object>({
                       const popY = Math.sin(angle - Math.PI / 2) * popDistance;
                       return (
                         <g
-                          data-active={isEmphasized ? '' : undefined}
-                          data-aggregate={segment.isAggregate ? '' : undefined}
-                          data-angle-size={(segment.endAngle - segment.startAngle).toFixed(6)}
-                          data-color={segment.color}
-                          data-emphasized={isEmphasized ? '' : undefined}
-                          data-muted={
-                            emphasizedSegmentId !== null && !isEmphasized ? '' : undefined
-                          }
-                          data-pattern-index={Math.floor(segment.index / defaultColors.length)}
-                          data-segment-id={segment.id}
-                          data-segment-index={index}
-                          data-wcl-radial-segment=""
                           key={segment.identity}
-                          style={{transform: `translate(${popX}px, ${popY}px)`}}
+                          opacity={activeFrames[index]!.opacity}
+                          data-wcl-radial-motion=""
                         >
-                          <path
-                            d={pathBuilder(segment) ?? undefined}
-                            data-wcl-radial-slice=""
-                            strokeDasharray={
-                              segment.isAggregate ? undefined : categoryDashPattern(segment.index)
+                          <g
+                            data-active={isEmphasized ? '' : undefined}
+                            data-aggregate={segment.isAggregate ? '' : undefined}
+                            data-angle-size={(segment.endAngle - segment.startAngle).toFixed(6)}
+                            data-color={segment.color}
+                            data-emphasized={isEmphasized ? '' : undefined}
+                            data-muted={
+                              emphasizedSegmentId !== null && !isEmphasized ? '' : undefined
                             }
-                            onClick={() => {
-                              if (!interaction && segment.isAggregate) openNextPage(false);
-                            }}
-                          />
-                          {segment.isAggregate ? (
-                            <text
-                              data-wcl-radial-aggregate-label=""
-                              x={countLabelPoint[0]}
-                              y={countLabelPoint[1]}
-                            >
-                              +{segment.remaining?.length ?? 0}
-                              {containsSelected(segment) ||
-                              hiddenExpansionCategories(segment).length > 0
-                                ? '*'
-                                : ''}
-                            </text>
-                          ) : null}
+                            data-pattern-index={Math.floor(segment.index / defaultColors.length)}
+                            data-segment-id={segment.id}
+                            data-segment-index={index}
+                            data-wcl-radial-segment=""
+                            style={{transform: `translate(${popX}px, ${popY}px)`}}
+                          >
+                            <path
+                              d={pathBuilder(segment) ?? undefined}
+                              data-wcl-radial-slice=""
+                              strokeDasharray={
+                                segment.isAggregate ? undefined : categoryDashPattern(segment.index)
+                              }
+                              onClick={() => {
+                                if (!interaction && segment.isAggregate) openNextPage(false);
+                              }}
+                            />
+                            {segment.isAggregate ? (
+                              <text
+                                data-wcl-radial-aggregate-label=""
+                                x={countLabelPoint[0]}
+                                y={countLabelPoint[1]}
+                              >
+                                +{segment.remaining?.length ?? 0}
+                                {containsSelected(segment) ||
+                                hiddenExpansionCategories(segment).length > 0
+                                  ? '*'
+                                  : ''}
+                              </text>
+                            ) : null}
+                          </g>
                         </g>
                       );
                     })}
+                    {departures.map((item) => (
+                      <g
+                        key={item.key}
+                        data-wcl-radial-departure=""
+                        data-aggregate={item.value.isAggregate ? '' : undefined}
+                        data-color={item.value.color}
+                        opacity={item.opacity}
+                        pointerEvents="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d={pathBuilder(item.value) ?? undefined}
+                          data-wcl-radial-slice=""
+                          strokeDasharray={
+                            item.value.isAggregate
+                              ? undefined
+                              : categoryDashPattern(item.value.index)
+                          }
+                        />
+                        {selectedIds.has(item.value.id) &&
+                        interaction?.selection &&
+                        !item.value.isAggregate ? (
+                          <path
+                            data-wcl-radial-cue="selection"
+                            d={outerEdge(item.value, outerRadius + 5 / svgViewScale)}
+                          />
+                        ) : null}
+                      </g>
+                    ))}
                     {interaction ? (
                       <g data-wcl-radial-interaction-overlay="" pointerEvents="none">
                         {segments.map((segment, index) => {
@@ -1202,6 +1267,7 @@ function PartToWholeFrame<Datum extends object>({
                             <g
                               key={segment.identity}
                               data-wcl-radial-cue-group=""
+                              opacity={activeFrames[index]!.opacity}
                               style={{
                                 transform: `translate(${Math.cos(angle) * pop}px,${Math.sin(angle) * pop}px)`,
                               }}
