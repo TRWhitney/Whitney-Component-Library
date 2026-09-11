@@ -1,3 +1,4 @@
+import {RangeChartExample} from './range-chart-example.js';
 import {DistributionExplorationExample} from './distribution-exploration-examples.js';
 import {HeatmapExplorationExample} from './heatmap-exploration-examples.js';
 import {PointExplorationExample} from './point-exploration-examples.js';
@@ -3812,12 +3813,15 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description={`Combine compatible line, area, and column series only when they share one domain, numeric scale, and comparison question. Restored series keep their original colors and patterns. ${visibilityGuidance}`}
+        description={`Combine compatible line, range, area, and column series only when they share one domain, numeric scale, and comparison question. Restored series keep their original colors and patterns. ${visibilityGuidance}`}
         name="CartesianChart"
       >
         <p>
           <a href="#line-chart">Compare pan and zoom for mixed charts.</a>
         </p>
+        <Example label="Line with a supplied range">
+          <RangeChartExample />
+        </Example>
         <Example label="Mixed CartesianChart with selection and details">
           <AreaMixedInteractionExample kind="mixed" visibilityLabels={visibilityLabels} />
         </Example>

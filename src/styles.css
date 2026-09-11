@@ -8856,8 +8856,14 @@
   }
 
   [data-wcl-chart-interaction-overlay] > *,
+  [data-wcl-chart-range-connector],
   [data-wcl-chart-selected-point] {
     vector-effect: non-scaling-stroke;
+  }
+
+  [data-wcl-chart-range-connector] {
+    stroke: var(--wcl-text);
+    stroke-width: 1.5px;
   }
 
   [data-wcl-chart-selected-point] {
@@ -8977,6 +8983,7 @@
 }
 
 @media (forced-colors: active) {
+  [data-wcl-chart-range-connector],
   [data-wcl-chart-selected-point],
   [data-wcl-chart-selected-category],
   [data-wcl-chart-activation-guide] {

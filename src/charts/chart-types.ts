@@ -93,12 +93,23 @@ export interface ChartLineSeries<Datum extends object> extends ChartSeriesBase<D
 export type ChartAreaSeries<Datum extends object> = ChartSeriesBase<Datum>;
 export type ChartBarSeries<Datum extends object> = ChartSeriesBase<Datum>;
 
-export type CartesianChartSeries<Datum extends object> = ChartSeriesBase<Datum> &
-  (
-    | {readonly curve?: 'linear' | 'step'; readonly kind: 'line'; readonly showPoints?: boolean}
-    | {readonly kind: 'area'}
-    | {readonly kind: 'column'}
-  );
+export interface ChartRangeSeries<Datum extends object> {
+  readonly kind: 'range';
+  readonly id: string;
+  readonly label: string;
+  readonly color?: ChartColor;
+  readonly lowerAccessor: ChartAccessor<Datum, number>;
+  readonly upperAccessor: ChartAccessor<Datum, number>;
+}
+
+export type CartesianChartSeries<Datum extends object> =
+  | ChartRangeSeries<Datum>
+  | (ChartSeriesBase<Datum> &
+      (
+        | {readonly curve?: 'linear' | 'step'; readonly kind: 'line'; readonly showPoints?: boolean}
+        | {readonly kind: 'area'}
+        | {readonly kind: 'column'}
+      ));
 
 /** The bounded series vocabulary supplies six distinct colors and line patterns. */
 export type NonEmptyChartSeries<Series> =
@@ -484,9 +495,18 @@ export interface ChartSelectionItem {
   readonly seriesId?: string;
 }
 
+export interface ChartActivatedRange {
+  readonly seriesId: string;
+  readonly label: string;
+  readonly lower: number;
+  readonly upper: number;
+  readonly hidden: boolean;
+}
+
 export interface ChartActivation<Datum extends object, Category extends ChartDomainValue> {
   readonly item: ChartSelectionItem;
   readonly category: Category;
+  readonly ranges?: readonly ChartActivatedRange[];
   readonly datum: Datum;
   readonly input: 'pointer' | 'keyboard' | 'touch';
   readonly values: readonly {

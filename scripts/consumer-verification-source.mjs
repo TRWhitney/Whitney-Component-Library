@@ -13,6 +13,7 @@ import {
   ButtonGroup,
   BubbleChart,
   CardCollection,
+  CartesianChart,
   Checkbox,
   CheckboxGroup,
   ComboBox,
@@ -531,6 +532,17 @@ const view = React.createElement(
           xAxis: {accessor: 'month', label: 'Month', scale: {type: 'categorical'}},
           yAxis: {label: 'Energy', scale: {type: 'linear'}, unit: 'MWh'},
         }),
+        React.createElement(CartesianChart, {
+          data: [{month: 'Jan', measured: 7, low: 3, high: 10}, {month: 'Feb', measured: 12, low: 5, high: 11}],
+          title: 'Packed temperature range', description: 'Measured temperatures and supplied limits.',
+          dataTableLabel: 'Packed range readings',
+          emptyState: {title: 'No readings', description: 'Add readings.'},
+          invalidData: {title: 'Invalid readings', description: 'Check bounds.'},
+          legend: {label: 'Temperature series'},
+          series: [{id: 'measured', label: 'Measured', kind: 'line', accessor: 'measured'}, {id: 'expected', label: 'Expected', kind: 'range', lowerAccessor: 'low', upperAccessor: 'high'}],
+          xAxis: {label: 'Month', accessor: 'month', scale: {type: 'categorical'}},
+          yAxis: {label: 'Temperature', scale: {type: 'linear'}},
+        }),
         React.createElement(ScatterChart, {
           data: [
             {id: 'north', label: 'North loop', x: 18, y: 28},
@@ -1000,6 +1012,7 @@ if (
   throw new Error('Packed Cartesian chart did not preserve its plotted and tabular meaning.');
 }
 if (
+  !document.querySelector('[data-wcl-cartesian-chart] [data-wcl-chart-area]') ||
   !document.querySelector('[data-wcl-scatter-chart] [data-wcl-statistical-point]') ||
   !document.querySelector('[data-wcl-bubble-chart] [data-wcl-statistical-point]') ||
   !document.querySelector('[data-wcl-histogram] [data-wcl-histogram-bin]') ||

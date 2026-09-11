@@ -91,10 +91,10 @@ describe('component showcase', () => {
   });
 
   it('shows distinct automatic colors for the mixed Cartesian bars and line', () => {
-    const {container} = render(<Showcase />);
-    const specimen = container.querySelector('[data-showcase-component="CartesianChart"]');
-    const colors = [...(specimen?.querySelectorAll('[data-wcl-chart-legend] > li') ?? [])].map(
-      (item) => item.getAttribute('data-color'),
+    render(<Showcase />);
+    const chart = screen.getByRole('figure', {name: 'Heating and cooling comparison'});
+    const colors = [...chart.querySelectorAll('[data-wcl-chart-legend] > li')].map((item) =>
+      item.getAttribute('data-color'),
     );
 
     expect(colors).toEqual(['accent', 'series-2']);
@@ -191,11 +191,16 @@ describe('component showcase', () => {
   });
 
   it('demonstrates every notification variant with separate controls without moving focus', () => {
-    const {getByRole, getByText} = render(<Showcase />);
-    const generalTrigger = getByRole('button', {name: 'Show general notification'});
-    const successTrigger = getByRole('button', {name: 'Show success notification'});
-    const warningTrigger = getByRole('button', {name: 'Show warning notification'});
-    const errorTrigger = getByRole('button', {name: 'Show error notification'});
+    const {container, getByRole, getByText} = render(<Showcase />);
+    const specimen = container.querySelector<HTMLElement>(
+      '[data-showcase-component="NotificationProvider"]',
+    );
+    if (!specimen) throw new Error('The notification showcase is missing.');
+    const notification = within(specimen);
+    const generalTrigger = notification.getByRole('button', {name: 'Show general notification'});
+    const successTrigger = notification.getByRole('button', {name: 'Show success notification'});
+    const warningTrigger = notification.getByRole('button', {name: 'Show warning notification'});
+    const errorTrigger = notification.getByRole('button', {name: 'Show error notification'});
     errorTrigger.focus();
 
     fireEvent.click(generalTrigger);

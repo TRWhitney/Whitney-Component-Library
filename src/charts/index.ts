@@ -14,6 +14,8 @@ export type {
   BubbleMagnitude,
   CartesianChartProps,
   CartesianChartSeries,
+  ChartRangeSeries,
+  ChartActivatedRange,
   CategoricalChartScale,
   ChartAccessor,
   ChartAnnotation,

@@ -12,11 +12,13 @@ export interface InteractionRow<Datum extends object, Category extends ChartDoma
   readonly category: Category;
   readonly datum: Datum;
   readonly values: ChartActivation<Datum, Category>['values'];
+  readonly ranges?: ChartActivation<Datum, Category>['ranges'];
 }
 export interface InteractionPoint {
   readonly seriesId: string;
   readonly categoryPosition: number;
   readonly bounds?: SelectionBox;
+  readonly companions?: readonly {readonly x: number; readonly y: number}[];
   readonly area?: readonly {readonly x: number; readonly y: number}[];
   readonly item: ChartSelectionItem;
   readonly index: number;
@@ -67,7 +69,7 @@ export function nearestInteraction(
           Math.max(rect.x - x, 0, x - rect.x - rect.width),
           Math.max(rect.y - y, 0, y - rect.y - rect.height),
         )
-      : Math.abs(point.y - y);
+      : Math.min(...[point, ...(point.companions ?? [])].map((p) => Math.abs(p.y - y)));
   };
   let column: InteractionPoint | undefined;
   for (const point of points) {
@@ -148,7 +150,9 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     rows.flatMap((row) =>
       configuration?.target === 'category'
         ? [selectionKey({rowId: row.id})]
-        : row.values.map((value) => selectionKey({rowId: row.id, seriesId: value.seriesId})),
+        : [...row.values, ...(row.ranges ?? [])].map((value) =>
+            selectionKey({rowId: row.id, seriesId: value.seriesId}),
+          ),
     ),
   );
   const normalized = (items: readonly ChartSelectionItem[]) => [
@@ -236,6 +240,13 @@ export function useChartInteraction<Datum extends object, Category extends Chart
       category: row.category,
       datum: row.datum,
       input,
+      ...(row.ranges === undefined
+        ? {}
+        : {
+            ranges: row.ranges.filter(
+              (range) => item.seriesId === undefined || range.seriesId === item.seriesId,
+            ),
+          }),
       values: row.values.filter(
         (value) => item.seriesId === undefined || value.seriesId === item.seriesId,
       ),
@@ -348,10 +359,13 @@ export function useChartInteraction<Datum extends object, Category extends Chart
               p.bounds.x + p.bounds.width >= rect.x &&
               p.bounds.y <= rect.y + rect.height &&
               p.bounds.y + p.bounds.height >= rect.y
-            : p.x >= rect.x &&
-              p.x <= rect.x + rect.width &&
-              p.y >= rect.y &&
-              p.y <= rect.y + rect.height,
+            : [p, ...(p.companions ?? [])].some(
+                (center) =>
+                  center.x >= rect.x &&
+                  center.x <= rect.x + rect.width &&
+                  center.y >= rect.y &&
+                  center.y <= rect.y + rect.height,
+              ),
         )
         .map((p) => p.item);
     }

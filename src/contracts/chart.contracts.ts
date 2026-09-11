@@ -871,8 +871,8 @@ const cartesianChartBaseContract = chartContract({
   misuse:
     'series with incompatible units or domains, decorative mixed marks, or a case already expressed clearly by one named chart type',
   name: 'CartesianChart',
-  purpose: 'Combine compatible line, area, and column series in one shared Cartesian frame.',
-  use: 'compatible line, area, or column series share one category domain, one numeric scale, and one comparison question',
+  purpose: 'Combine compatible line, range, area, and column series in one shared Cartesian frame.',
+  use: 'compatible line, range, area, or column series share one category domain, one numeric scale, and one comparison question',
 });
 
 function interactiveAreaMixedContract(
@@ -951,10 +951,57 @@ function interactiveAreaMixedContract(
 }
 
 export const areaChartContract = interactiveAreaMixedContract(areaChartBaseContract, 'AreaChart');
-export const cartesianChartContract = interactiveAreaMixedContract(
+const interactiveCartesianChartContract = interactiveAreaMixedContract(
   cartesianChartBaseContract,
   'CartesianChart',
 );
+
+export const cartesianChartContract: ComponentContract = {
+  ...interactiveCartesianChartContract,
+  composition: [
+    ...interactiveCartesianChartContract.composition,
+    'Add a ChartRangeSeries with kind="range", lowerAccessor and upperAccessor alongside a line. The application supplies both limits at each category, in the same units as the line. The chart does not calculate the interval. Range series use the shared linear value axis, six-series vocabulary, visibility state and horizontal modal Overview.',
+  ],
+  appearance: [
+    ...interactiveCartesianChartContract.appearance,
+    'A range fills the space between its changing lower and upper boundaries. Point-target reading fills both endpoint markers. One selected interval has two outer rings joined by a stem; equal bounds coincide. Whole-category selection keeps the shared label underline. Shared activation pulses acknowledge both limits with the existing duration, size and reduced-motion behavior.',
+  ],
+  controlBehavior: [
+    ...interactiveCartesianChartContract.controlBehavior,
+    'Range selection uses one row/series identity for both bounds. A drag includes the interval when either endpoint center is inside its rectangle. Hidden intervals retain selection. Automatic fitting includes both limits and the portions crossing viewport edges. Missing intervals cannot win hover or activation.',
+  ],
+  events: [
+    ...interactiveCartesianChartContract.events,
+    'ChartActivation optionally includes ranges, each with seriesId, label, lower, upper and hidden. Scalar values remain in values. Activating an individual range sends one range and no scalar values. Category activation sends all present scalar values and ranges, including hidden series, with the original datum. No endpoint is represented as a separate selected item.',
+  ],
+  validation: [
+    ...interactiveCartesianChartContract.validation,
+    'Range bounds must be finite and lower must not exceed upper; equal bounds are valid. In a chart containing range series, a missing scalar value or either missing bound leaves a gap in that series while other valid series at that category remain. Nonfinite values and reversed bounds also leave gaps and use invalidData feedback. No values are swapped or interpolated across missing samples. The table retains those categories and displays a dash for an unavailable value or interval.',
+  ],
+  examples: [
+    ...interactiveCartesianChartContract.examples,
+    {
+      title: 'Measured line with a supplied range',
+      description:
+        'The range has its own selection and detail event. Both bounds appear in readings and the full table. The rendered showcase also provides month targeting, eyes and navigation.',
+      code: example(
+        'TemperatureRangeExample',
+        `<CartesianChart
+  data={[{id: "jan", month: "Jan", measured: 7, low: 3, high: 10}, {id: "feb", month: "Feb", measured: 12, low: 5, high: 11}]}
+  title="Monthly temperature" description="Measured temperature and expected range."
+  dataTableLabel="Temperature readings"
+  emptyState={{title: "No readings", description: "Add monthly readings."}}
+  invalidData={{title: "Invalid readings", description: "Check the supplied values and limits."}}
+  legend={{label: "Temperature series"}}
+  series={[{id: "measured", kind: "line", label: "Measured", accessor: "measured", showPoints: true}, {id: "expected", kind: "range", label: "Expected", lowerAccessor: "low", upperAccessor: "high"}]}
+  xAxis={{label: "Month", accessor: "month", scale: {type: "categorical"}}}
+  yAxis={{label: "Temperature", unit: "°C", scale: {type: "linear"}}}
+  interaction={{target: "point", getRowId: row => row.id, onActivate: event => console.log(event.values, event.ranges)}}
+/>`,
+      ),
+    },
+  ],
+};
 
 interface StatisticalChartContractOptions {
   readonly alternative: string;

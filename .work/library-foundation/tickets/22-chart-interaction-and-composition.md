@@ -23,46 +23,46 @@ mixed-chart combinations.
 - [x] The existing column-and-line combination can display columns with a moving-average line when
       the application supplies the calculated values.
 
-## Remaining acceptance checks
+## Acceptance checks
 
-- [ ] Separate, obvious, visually restrained legend controls hide and restore individual series
+- [x] Separate, obvious, visually restrained legend controls hide and restore individual series
       while clicking the series name retains the existing emphasis behavior. Hidden entries remain
       discoverable and restorable. An opening/closing eye is the leading visual candidate, subject
       to review in a working example; its meaning must also be accessible without the icon.
-- [ ] Hiding or restoring series automatically fits the scale to visible data without requiring an
+- [x] Hiding or restoring series automatically fits the scale to visible data without requiring an
       application setting to enable that behavior. Required chart baselines remain valid.
-- [ ] Applications can receive activation callbacks for actual chart items, including categories
+- [x] Applications can receive activation callbacks for actual chart items, including categories
       and points, with sufficient identity and associated data to act on them. Activation does not
       require adopting chart selection. Pointer, keyboard, and touch have equivalent activation
       paths.
-- [ ] Apply the [accepted indicator convention](../../chart-interaction-composition/spec.md#accepted-activation-and-selection-convention)
+- [x] Apply the [accepted indicator convention](../../chart-interaction-composition/spec.md#accepted-activation-and-selection-convention)
       consistently: filled centers mark current readings on circular point markers, a brief pulse
       acknowledges activation without retained inspection state, outer rings mark selected points,
       and underlines mark selected months. With selection enabled, ordinary clicks select and
       Control/Command-clicks activate without changing selection. With selection disabled, ordinary
       clicks activate. Reading previews and clicks target the same item. Category activation emits
       one category event with associated values. Reduced motion retains a brief static acknowledgment.
-- [ ] Charts support visible selection and application-controlled selection. Applications can
+- [x] Charts support visible selection and application-controlled selection. Applications can
       deliberately coordinate charts, tables, detail views, or filters through explicit public
       state and callbacks without hidden global coupling or a prescribed application action.
-- [ ] Meaningful chart domains support pan, zoom, and brush/range selection, with keyboard paths,
+- [x] Meaningful chart domains support pan, zoom, and brush/range selection, with keyboard paths,
       discoverable controls, an easy reset, and range callbacks available to the application.
-- [ ] Exploration and selection controls are intuitive, visually restrained, and consistent with
+- [x] Exploration and selection controls are intuitive, visually restrained, and consistent with
       the chart. Their gestures do not accidentally interfere with value reading, activation, or
       legend emphasis. Working examples demonstrate both appearance and operation before acceptance.
 - [ ] Brief, purposeful animations explain data and scale changes, remain responsive to further
       input, never loop idly, and settle immediately under reduced motion.
 - [ ] Scatter points can share a chart with a supplied trend, target, or other compatible line.
-- [ ] A line can share a chart with a supplied lower/upper range band that changes along the domain,
+- [x] A line can share a chart with a supplied lower/upper range band that changes along the domain,
       such as an uncertainty or forecast band. This extends the existing fixed reference bands.
-- [ ] Applications supply calculated trend, average, forecast, and range values. Charts do not
+- [x] Applications supply calculated trend, average, forecast, and range values. Charts do not
       silently choose statistical calculations or expose private renderer objects.
-- [ ] Accessible names, readings, focus, and structured data alternatives remain accurate as
+- [x] Accessible names, readings, focus, and structured data alternatives remain accurate as
       visibility, filters, selection, and the displayed domain change. Selection is distinguishable
       without color alone, and the complete-data alternative remains available.
 - [ ] Representative datasets meet a recorded responsiveness budget covering reading, selection,
       visibility changes, exploration, and animation.
-- [ ] Public contracts, generated guidance, showcase examples, and focused interaction, type,
+- [x] Public contracts, generated guidance, showcase examples, and focused interaction, type,
       accessibility, reduced-motion, server-rendering, hydration, and package checks cover the
       delivered additions.
 
@@ -211,3 +211,5 @@ Pie/donut visibility is implemented in [Ticket 18](../../chart-interaction-compo
 [Ticket 19](../../chart-interaction-composition/tickets/19-radial-page-refill.md) updates pie/donut paging so hiding fills freed slots from expansion. Hidden categories remain restorable and their colors and selections follow them between pages.
 
 [Ticket 20](../../chart-interaction-composition/tickets/20-expansion-hidden-marker.md) extends the pie/donut expansion asterisk to hidden members, including when selection is off.
+
+The remaining delivered chart behavior is indexed in the [active effort](../../chart-interaction-composition/status.md). Tickets 21–30 and the mobile heatmap correction cover visibility, compact fitting and navigation. [Ticket 32](../../chart-interaction-composition/tickets/32-line-range.md) delivers supplied ranges with public examples, original-data callbacks and shared interactions. The supplied scatter line is approved and follows separately. General data-change animation and a recorded responsiveness budget keep this parent open.

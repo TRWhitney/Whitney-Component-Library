@@ -112,7 +112,7 @@ export const defaultColors: readonly ChartColor[] = [
   'series-6',
 ];
 
-type SeriesKind = 'area' | 'bar' | 'column' | 'line';
+type SeriesKind = 'area' | 'bar' | 'column' | 'line' | 'range';
 
 export interface PlotBounds {
   readonly bottom: number;
@@ -141,6 +141,7 @@ export function plotHeight(plot: PlotBounds): number {
 }
 
 interface InternalSeries<Datum extends object> {
+  readonly lowerAccessor?: ChartAccessor<Datum, number>;
   readonly patternIndex: number;
   readonly accessor: ChartAccessor<Datum, number>;
   readonly color: ChartColor;
@@ -156,6 +157,7 @@ interface PreparedRow<Datum extends object, Category extends ChartDomainValue> {
   readonly datum: Datum;
   readonly index: number;
   readonly values: readonly number[];
+  readonly lowerValues?: readonly number[];
 }
 
 interface ChartReading {
@@ -243,9 +245,9 @@ function prepareRows<Datum extends object, Category extends ChartDomainValue>(
   const rows: PreparedRow<Datum, Category>[] = [];
   let invalidCount = 0;
 
+  const hasRanges = series.some((item) => item.kind === 'range');
   data.forEach((datum, index) => {
     const category = readAccessor(categoryAxis.accessor, datum, index);
-    const values = series.map((item) => readAccessor(item.accessor, datum, index));
     const isInExplicitDomain =
       isDomainValue(category) &&
       (categoryAxis.scale.type !== 'categorical' ||
@@ -253,24 +255,47 @@ function prepareRows<Datum extends object, Category extends ChartDomainValue>(
         categoryAxis.scale.domain.some(
           (domainValue) => domainValueKey(domainValue) === domainValueKey(category),
         ));
-    const valid =
-      isDomainValue(category) &&
-      isValueForScale(category, categoryAxis.scale) &&
-      isInExplicitDomain &&
-      values.every(
-        (value) =>
-          typeof value === 'number' &&
-          Number.isFinite(value) &&
-          (valueAxis.scale.type !== 'logarithmic' || value > 0) &&
-          ((layout !== 'stacked' && layout !== 'normalized') || value >= 0),
-      );
-
-    if (!valid) {
+    if (
+      !isDomainValue(category) ||
+      !isValueForScale(category, categoryAxis.scale) ||
+      !isInExplicitDomain
+    ) {
       invalidCount += 1;
       return;
     }
-
-    rows.push({category, datum, index, values: values as number[]});
+    let invalid = false;
+    const lowerValues = series.map((item) =>
+      item.lowerAccessor === undefined ? 0 : readAccessor(item.lowerAccessor, datum, index),
+    );
+    const values = series.map((item, seriesIndex) => {
+      const value = readAccessor(item.accessor, datum, index);
+      const lower = lowerValues[seriesIndex];
+      const missing = value == null || (item.kind === 'range' && lower == null);
+      const valid =
+        typeof value === 'number' &&
+        Number.isFinite(value) &&
+        (valueAxis.scale.type !== 'logarithmic' || value > 0) &&
+        ((layout !== 'stacked' && layout !== 'normalized') || value >= 0) &&
+        (item.kind !== 'range' ||
+          (typeof lower === 'number' && Number.isFinite(lower) && lower <= value));
+      if (!valid && (!hasRanges || !missing)) invalid = true;
+      return valid ? value : Number.NaN;
+    });
+    if (invalid) invalidCount += 1;
+    if (!hasRanges && invalid) return;
+    rows.push({
+      category,
+      datum,
+      index,
+      values,
+      ...(hasRanges
+        ? {
+            lowerValues: lowerValues.map((value, i) =>
+              Number.isFinite(values[i]) && typeof value === 'number' ? value : Number.NaN,
+            ),
+          }
+        : {}),
+    });
   });
 
   return {invalidCount, rows};
@@ -391,8 +416,16 @@ function valueDomain<Datum extends object, Category extends ChartDomainValue>(
       row.values.reduce((total, value) => total + Math.max(0, value), 0),
     ]);
   }
-  const needsZero = series.some((item) => item.kind !== 'line');
-  return rows.flatMap((row) => [...(needsZero ? [0] : []), ...row.values]);
+  const needsZero = series.some((item) => item.kind !== 'line' && item.kind !== 'range');
+  return rows
+    .flatMap((row) => [
+      ...(needsZero ? [0] : []),
+      ...row.values,
+      ...series.flatMap((item, index) =>
+        item.kind === 'range' ? [row.lowerValues?.[index] ?? Number.NaN] : [],
+      ),
+    ])
+    .filter(Number.isFinite);
 }
 
 function explorationValueDomain<Datum extends object, Category extends ChartDomainValue>(
@@ -414,10 +447,11 @@ function explorationValueDomain<Datum extends object, Category extends ChartDoma
     const nextX = position(next.category);
     if (x === nextX || Math.max(x, nextX) < window[0] || Math.min(x, nextX) > window[1]) return;
     series.forEach((item, seriesIndex) => {
-      if (item.kind !== 'line' && item.kind !== 'area') return;
+      if (item.kind !== 'line' && item.kind !== 'area' && item.kind !== 'range') return;
       const left = coordinates(row, seriesIndex, layout),
         right = coordinates(next, seriesIndex, layout);
-      for (const key of item.kind === 'area' ? (['start', 'end'] as const) : (['end'] as const)) {
+      if (!Number.isFinite(left.end) || !Number.isFinite(right.end)) return;
+      for (const key of item.kind !== 'line' ? (['start', 'end'] as const) : (['end'] as const)) {
         for (const edge of [
           Math.max(window[0], Math.min(x, nextX)),
           Math.min(window[1], Math.max(x, nextX)),
@@ -770,13 +804,31 @@ function coordinates<Datum extends object, Category extends ChartDomainValue>(
   layout: ChartBarLayout | ChartStacking,
 ): {readonly end: number; readonly start: number} {
   const value = row.values[seriesIndex] ?? 0;
-  if (layout === 'overlap' || layout === 'grouped') return {end: value, start: 0};
+  if (layout === 'overlap' || layout === 'grouped')
+    return {end: value, start: row.lowerValues?.[seriesIndex] ?? 0};
   const total =
     layout === 'normalized' ? row.values.reduce((sum, item) => sum + Math.max(0, item), 0) : 1;
   const divisor = total === 0 ? 1 : total;
   const start =
     row.values.slice(0, seriesIndex).reduce((sum, item) => sum + Math.max(0, item), 0) / divisor;
   return {end: start + Math.max(0, value) / divisor, start};
+}
+
+function formatSeriesReading<Datum extends object, Category extends ChartDomainValue>(
+  row: PreparedRow<Datum, Category>,
+  seriesIndex: number,
+  item: InternalSeries<Datum>,
+  layout: ChartBarLayout | ChartStacking,
+  axis: ChartValueAxis,
+  includeUnit = true,
+): string {
+  const value = displayedValues(row, layout)[seriesIndex];
+  if (value === undefined || !Number.isFinite(value)) return '—';
+  const format = (n: number) =>
+    includeUnit ? formatReadingValue(n, axis) : axisTickLabel(n, axis);
+  return item.kind === 'range'
+    ? `${format(row.lowerValues![seriesIndex]!)} – ${format(value)}`
+    : format(value);
 }
 
 function displayedValues<Datum extends object, Category extends ChartDomainValue>(
@@ -898,50 +950,56 @@ function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>
           y2={categoryPlacement === 'x' ? plot.bottom : category}
         />
       )}
-      {series.map((item, seriesIndex) => {
+      {series.flatMap((item, seriesIndex) => {
         if (pointTarget && reading.seriesId !== item.id) return null;
         if (filledPresentation && (item.kind === 'bar' || item.kind === 'column')) return null;
-        const plottedValue = coordinates(row, seriesIndex, layout).end;
-        const value = valueProjection.position(plottedValue);
-        if (value === undefined) return null;
-        const stroke = filledPresentation
-          ? filledPresentation.pointStrokeWidth * (emphasizedSeriesId === item.id ? 1.5 : 1)
-          : 0;
-        return (
-          <g key={item.id} data-color={item.color}>
-            {filledPresentation ? (
-              <circle
-                cx={category}
-                cy={value}
-                r={filledPresentation.pointRadius / filledPresentation.viewScale}
-                data-wcl-chart-reading-outline=""
-                style={{strokeWidth: stroke}}
-              />
-            ) : null}
-            <circle
-              cx={categoryPlacement === 'x' ? category : value}
-              cy={categoryPlacement === 'x' ? value : category}
-              data-active={emphasizedSeriesId === item.id ? '' : undefined}
-              data-color={item.color}
-              data-muted={
-                emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
-              }
-              data-series-index={item.patternIndex}
-              data-wcl-chart-reading-node=""
-              data-filled={filledPresentation ? '' : undefined}
-              style={
-                filledPresentation
-                  ? {
-                      r:
-                        (filledPresentation.pointRadius - stroke / 2 + 0.35) /
-                        filledPresentation.viewScale,
-                    }
-                  : undefined
-              }
-              key={item.id}
-              r="4.5"
-            />
-          </g>
+        const limits = coordinates(row, seriesIndex, layout);
+        return (item.kind === 'range' ? [limits.end, limits.start] : [limits.end]).map(
+          (plottedValue, endpoint) => {
+            const value = valueProjection.position(plottedValue);
+            if (value === undefined) return null;
+            const stroke = filledPresentation
+              ? filledPresentation.pointStrokeWidth * (emphasizedSeriesId === item.id ? 1.5 : 1)
+              : 0;
+            return (
+              <g key={`${item.id}-${endpoint}`} data-color={item.color}>
+                {filledPresentation ? (
+                  <circle
+                    cx={category}
+                    cy={value}
+                    r={filledPresentation.pointRadius / filledPresentation.viewScale}
+                    data-wcl-chart-reading-outline=""
+                    style={{strokeWidth: stroke}}
+                  />
+                ) : null}
+                <circle
+                  cx={categoryPlacement === 'x' ? category : value}
+                  cy={categoryPlacement === 'x' ? value : category}
+                  data-active={emphasizedSeriesId === item.id ? '' : undefined}
+                  data-color={item.color}
+                  data-muted={
+                    emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id
+                      ? ''
+                      : undefined
+                  }
+                  data-series-index={item.patternIndex}
+                  data-wcl-chart-reading-node=""
+                  data-filled={filledPresentation ? '' : undefined}
+                  style={
+                    filledPresentation
+                      ? {
+                          r:
+                            (filledPresentation.pointRadius - stroke / 2 + 0.35) /
+                            filledPresentation.viewScale,
+                        }
+                      : undefined
+                  }
+                  key={item.id}
+                  r="4.5"
+                />
+              </g>
+            );
+          },
         );
       })}
     </g>
@@ -980,9 +1038,8 @@ function ReadingTooltip<Datum extends object, Category extends ChartDomainValue>
   readonly svg: SVGSVGElement | null;
 }): ReactElement | null {
   const row = rows[reading.index];
-  const values = row === undefined ? [] : displayedValues(row, layout);
-  const formattedValues = series.map((_, seriesIndex) =>
-    formatReadingValue(values[seriesIndex] ?? 0, valueAxis),
+  const formattedValues = series.map((item, seriesIndex) =>
+    row ? formatSeriesReading(row, seriesIndex, item, layout, valueAxis) : '—',
   );
   const formattedReferenceValues = references.map((reference) =>
     formatReadingValue(reference.value, valueAxis),
@@ -1177,7 +1234,11 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
         const color = item.color;
         if (item.kind === 'line') {
           const path = createLine<PreparedRow<Datum, Category>>()
-            .defined((row) => categoryProjection.position(row.category) !== undefined)
+            .defined(
+              (row) =>
+                categoryProjection.position(row.category) !== undefined &&
+                Number.isFinite(row.values[seriesIndex]),
+            )
             .x((row) => categoryProjection.position(row.category) ?? plot.left)
             .y((row) => valueProjection.position(row.values[seriesIndex] ?? 0) ?? plot.bottom)
             .curve(item.curve === 'step' ? curveStep : curveLinear)(rows);
@@ -1197,7 +1258,8 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
               <path d={path ?? undefined} data-series={item.id} data-wcl-chart-line="" />
               {item.showPoints
                 ? rows.map((row, rowIndex) =>
-                    categoryProjection.position(row.category) === undefined ? null : (
+                    categoryProjection.position(row.category) === undefined ||
+                    !Number.isFinite(row.values[seriesIndex]) ? null : (
                       <circle
                         cx={categoryProjection.position(row.category)}
                         cy={valueProjection.position(row.values[seriesIndex] ?? 0)}
@@ -1214,9 +1276,13 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
           );
         }
 
-        if (item.kind === 'area') {
+        if (item.kind === 'area' || item.kind === 'range') {
           const path = createArea<PreparedRow<Datum, Category>>()
-            .defined((row) => categoryProjection.position(row.category) !== undefined)
+            .defined(
+              (row) =>
+                categoryProjection.position(row.category) !== undefined &&
+                Number.isFinite(row.values[seriesIndex]),
+            )
             .x((row) => categoryProjection.position(row.category) ?? plot.left)
             .y0(
               (row) =>
@@ -1434,15 +1500,9 @@ function DataTable<Datum extends object, Category extends ChartDomainValue>({
         {rows.map((row) => (
           <tr key={row.index}>
             <th scope="row">{axisTickLabel(row.category, categoryAxis)}</th>
-            {row.values.map((value, index) => (
+            {row.values.map((_, index) => (
               <td key={series[index]?.id ?? index}>
-                {axisTickLabel(
-                  layout === 'normalized'
-                    ? value /
-                        (row.values.reduce((total, item) => total + Math.max(0, item), 0) || 1)
-                    : value,
-                  valueAxis,
-                )}
+                {formatSeriesReading(row, index, series[index]!, layout, valueAxis, false)}
               </td>
             ))}
           </tr>
@@ -1835,6 +1895,9 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     rows: allPrepared.rows.map((row) => ({
       ...row,
       values: visibleIndexes.map((index) => row.values[index] ?? 0),
+      ...(row.lowerValues
+        ? {lowerValues: visibleIndexes.map((index) => row.lowerValues![index]!)}
+        : {}),
     })),
   };
   const navigation = useChartExploration(
@@ -1887,15 +1950,38 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     id: rowIds[row.index] ?? '',
     category: row.category,
     datum: row.datum,
-    values: allSeries.map((item, index) => ({
-      seriesId: item.id,
-      label: item.label,
-      value: row.values[index]!,
-      hidden: hiddenIds.includes(item.id),
-    })),
+    ...(allSeries.some((s) => s.kind === 'range')
+      ? {
+          ranges: allSeries.flatMap((item, index) =>
+            item.kind === 'range' && Number.isFinite(row.values[index])
+              ? [
+                  {
+                    seriesId: item.id,
+                    label: item.label,
+                    lower: row.lowerValues![index]!,
+                    upper: row.values[index]!,
+                    hidden: hiddenIds.includes(item.id),
+                  },
+                ]
+              : [],
+          ),
+        }
+      : {}),
+    values: allSeries.flatMap((item, index) =>
+      item.kind === 'range' || !Number.isFinite(row.values[index])
+        ? []
+        : [
+            {
+              seriesId: item.id,
+              label: item.label,
+              value: row.values[index]!,
+              hidden: hiddenIds.includes(item.id),
+            },
+          ],
+    ),
   }));
   const interactionVersion = JSON.stringify([
-    interactionRows.map((row) => [row.id, domainValueKey(row.category), row.values]),
+    interactionRows.map((row) => [row.id, domainValueKey(row.category), row.values, row.ranges]),
     status.kind,
     layout,
     categoryPlacement,
@@ -1911,7 +1997,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     categoryPlacement,
   );
   const navigationVersion = JSON.stringify([
-    allPrepared.rows.map((row) => [row.category, row.values]),
+    allPrepared.rows.map((row) => [row.category, row.values, row.lowerValues]),
     hiddenIds,
     categoryAxis.scale,
     valueAxis.scale,
@@ -1943,7 +2029,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
   const isLoading = status.kind === 'loading';
   const isError = status.kind === 'error';
-  const hasData = prepared.rows.length > 0;
+  const hasData = allPrepared.rows.some((row) => row.values.some(Number.isFinite));
   const rootProps: Record<string, string> = {[rootAttribute]: ''};
   if (rootAttribute === 'data-wcl-area-chart') rootProps['data-stacking'] = layout;
   if (rootAttribute === 'data-wcl-bar-chart' || rootAttribute === 'data-wcl-column-chart') {
@@ -2262,7 +2348,9 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     const readingValues =
       readingRow === undefined
         ? []
-        : displayedValues(readingRow, layout).map((value) => formatReadingValue(value, valueAxis));
+        : series.map((item, index) =>
+            formatSeriesReading(readingRow, index, item, layout, valueAxis),
+          );
     const readingAnnouncement =
       readingRow === undefined
         ? ''
@@ -2288,36 +2376,34 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       interaction !== undefined &&
       (rootAttribute === 'data-wcl-area-chart' || rootAttribute === 'data-wcl-cartesian-chart');
     const barSeries = series.filter((item) => item.kind === 'bar' || item.kind === 'column');
-    const areaRegions = new Map(
-      series.flatMap((item, seriesIndex) => {
-        if (!isShapeInteraction || item.kind !== 'area') return [];
-        const edges = prepared.rows.flatMap((row) => {
-          const x = categoryProjection.position(row.category);
-          const values = coordinates(row, seriesIndex, layout);
-          const top = valueProjection.position(values.end),
-            bottom = valueProjection.position(values.start);
-          return x === undefined || top === undefined || bottom === undefined
-            ? []
-            : [{x, top, bottom}];
-        });
-        return [
-          [
-            item.id,
-            [
-              ...edges.map((p) => ({x: p.x, y: p.top})),
-              ...[...edges].reverse().map((p) => ({x: p.x, y: p.bottom})),
-            ],
-          ],
-        ] as const;
-      }),
-    );
-    const visibleAreaIds = new Set(
-      [...areaRegions].flatMap(([id, area]) =>
-        area.some((point) => point.y <= plot.bottom) && area.some((point) => point.y >= plot.top)
-          ? [id]
-          : [],
-      ),
-    );
+    const areaRegions = new Map<string, readonly {x: number; y: number}[]>();
+    series.forEach((item, seriesIndex) => {
+      if (!isShapeInteraction || (item.kind !== 'area' && item.kind !== 'range')) return;
+      let run: {index: number; x: number; top: number; bottom: number}[] = [];
+      const finish = () => {
+        const region = [
+          ...run.map((p) => ({x: p.x, y: p.top})),
+          ...[...run].reverse().map((p) => ({x: p.x, y: p.bottom})),
+        ];
+        for (const point of run) areaRegions.set(JSON.stringify([item.id, point.index]), region);
+        run = [];
+      };
+      prepared.rows.forEach((row, index) => {
+        const x = categoryProjection.position(row.category);
+        const values = coordinates(row, seriesIndex, layout);
+        const top = valueProjection.position(values.end),
+          bottom = valueProjection.position(values.start);
+        if (
+          x === undefined ||
+          top === undefined ||
+          bottom === undefined ||
+          !Number.isFinite(values.end)
+        )
+          finish();
+        else run.push({index, x, top, bottom});
+      });
+      finish();
+    });
     const interactionPoints: InteractionPoint[] =
       interaction === undefined
         ? []
@@ -2370,9 +2456,12 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   },
                 ];
               }
-              const area = areaRegions.get(item.id);
+              const area = areaRegions.get(JSON.stringify([item.id, index]));
               // A clipped value marker does not remove the visible fill from targeting.
-              const hasVisibleArea = visibleAreaIds.has(item.id);
+              const hasVisibleArea =
+                area !== undefined &&
+                area.some((p) => p.y <= plot.bottom) &&
+                area.some((p) => p.y >= plot.top);
               if (
                 category < plot.left - 1e-8 ||
                 category > plot.right + 1e-8 ||
@@ -2390,6 +2479,9 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   categoryPosition: category,
                   x: category,
                   y: value,
+                  ...(item.kind === 'range'
+                    ? {companions: [{x: category, y: valueProjection.position(start)!}]}
+                    : {}),
                   ...(area === undefined ? {} : {area}),
                 },
               ];
@@ -2876,15 +2968,19 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                       presentation.pointStrokeWidth *
                       (emphasizedSeriesId === item.seriesId ? 1.5 : 1);
                     return (
-                      <circle
-                        key={selectionKey(item)}
-                        data-color={selectedSeries.color}
-                        data-wcl-chart-reading-outline=""
-                        cx={point.x}
-                        cy={point.y}
-                        r={presentation.pointRadius / presentation.viewScale}
-                        style={{strokeWidth: stroke}}
-                      />
+                      <g key={selectionKey(item)}>
+                        {[point, ...(point.companions ?? [])].map((center, endpoint) => (
+                          <circle
+                            key={endpoint}
+                            data-color={selectedSeries.color}
+                            data-wcl-chart-reading-outline=""
+                            cx={center.x}
+                            cy={center.y}
+                            r={presentation.pointRadius / presentation.viewScale}
+                            style={{strokeWidth: stroke}}
+                          />
+                        ))}
+                      </g>
                     );
                   })}
                 </g>
@@ -2970,12 +3066,31 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                         data-color={selectedSeries.color}
                         clipPath={isShapeInteraction ? `url(#${plotClipId})` : undefined}
                       >
-                        <circle
-                          data-wcl-chart-selected-point=""
-                          cx={point.x}
-                          cy={point.y}
-                          r={(presentation.pointRadius + stroke / 2 + 1) / presentation.viewScale}
-                        />
+                        {point.companions?.map((center, endpoint) => {
+                          const radius =
+                            (presentation.pointRadius + stroke / 2 + 1) / presentation.viewScale;
+                          const top = Math.min(point.y, center.y) + radius,
+                            bottom = Math.max(point.y, center.y) - radius;
+                          return top < bottom ? (
+                            <line
+                              key={`stem-${endpoint}`}
+                              data-wcl-chart-range-connector=""
+                              x1={point.x}
+                              x2={center.x}
+                              y1={top}
+                              y2={bottom}
+                            />
+                          ) : null;
+                        })}
+                        {[point, ...(point.companions ?? [])].map((center, endpoint) => (
+                          <circle
+                            key={endpoint}
+                            data-wcl-chart-selected-point=""
+                            cx={center.x}
+                            cy={center.y}
+                            r={(presentation.pointRadius + stroke / 2 + 1) / presentation.viewScale}
+                          />
+                        ))}
                       </g>
                     );
                   })}
@@ -2999,6 +3114,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                           (p) =>
                             !p.bounds && selectionKey(p.item) === selectionKey(actions.pulse!.item),
                         )
+                        .flatMap((point) => [point, ...(point.companions ?? [])])
                         .map((point, index) => (
                           <circle
                             key={index}
@@ -3204,7 +3320,8 @@ function normalizeSeries<Datum extends object>(
   return series.map((item, patternIndex) => {
     const color = item.color ?? nextAutomaticColor();
     return {
-      accessor: item.accessor,
+      accessor: 'upperAccessor' in item ? item.upperAccessor : item.accessor,
+      ...('lowerAccessor' in item ? {lowerAccessor: item.lowerAccessor} : {}),
       patternIndex,
       color,
       curve: 'curve' in item ? (item.curve ?? 'linear') : 'linear',

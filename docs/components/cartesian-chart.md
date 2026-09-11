@@ -1,10 +1,10 @@
 # CartesianChart
 
-Combine compatible line, area, and column series in one shared Cartesian frame.
+Combine compatible line, range, area, and column series in one shared Cartesian frame.
 
 ## Use for
 
-- compatible line, area, or column series share one category domain, one numeric scale, and one comparison question
+- compatible line, range, area, or column series share one category domain, one numeric scale, and one comparison question
 
 ## Do not use for
 
@@ -18,6 +18,7 @@ Combine compatible line, area, and column series in one shared Cartesian frame.
 
 - Render inside AppearanceProvider in the consumer-owned layout. Supply the records, typed accessors, axes, series, and state copy that describe this data view. A visible legend is required whenever the chart has more than one series; annotations remain optional. Supply visibilityLabels and a named legend to enable separate eye controls, including for a single series.
 - Optional interaction uses ChartInteraction<Datum, Category>, shared with LineChart, BarChart, and ColumnChart. LineChartInteraction remains an exported compatibility alias. Supply target="category" or target="point", getRowId, and independently optional onActivate and selection. Point targeting identifies one row and series, including for area values and columns. Consumers own application details and navigation and may share controlled selection across charts with matching stable identities.
+- Add a ChartRangeSeries with kind="range", lowerAccessor and upperAccessor alongside a line. The application supplies both limits at each category, in the same units as the line. The chart does not calculate the interval. Range series use the shared linear value axis, six-series vocabulary, visibility state and horizontal modal Overview.
 - CartesianChart contains a named figure, visible caption, optional feedback, a required multi-series legend, interactive SVG plot, axes, marks, shared reading tooltip, optional annotations, and a generated native data table.
 - Optional interaction adds per-mark reading cues, selection rings, and column frames, category-label underlines, finite activation feedback, and a localized selection summary with Clear selection. Application details and controls remain outside the chart.
 
@@ -47,12 +48,15 @@ Combine compatible line, area, and column series in one shared Cartesian frame.
 - Drag horizontally to select an inclusive category range. In point mode, draw a rectangle to select line and area value markers inside it and every column rectangle it intersects. A new drag replaces selection; Shift or Control/Command adds, and Alt removes. Escape or pointer cancellation restores the selection from before the drag. Dragging never activates or changes chart domains.
 - Reading previews and activation use the same target. Resolve the nearest visible category, then the actual shapes under the pointer, including sloping area boundaries between categories. Legend emphasis breaks ties only among overlapping shapes under the pointer. A sole hovered shape wins even when another series is pinned. Empty space falls back to the nearest value marker or bar rectangle. Line points have a small nearby hit region so an overlapping column cannot swallow their targets. Hidden series cannot win.
 - Category targeting previews all visible series but produces one source-row action. Hidden values remain associated data. Duplicate category coordinates retain input order, without implicit row aggregation.
+- Range selection uses one row/series identity for both bounds. A drag includes the interval when either endpoint center is inside its rectangle. Hidden intervals retain selection. Automatic fitting includes both limits and the portions crossing viewport edges. Missing intervals cannot win hover or activation.
 - CartesianChart manages reading, legend emphasis, and optional series visibility internally. Hiding or restoring series changes automatic bounds and visible readings without changing the supplied records. Stable series ids preserve visibility across value changes; removed series lose their hidden and pinned state, and new series start visible.
 - interaction.onActivate receives ChartActivation with item, category, original datum, input method, and associated raw values. An item has rowId and, for an individual value, seriesId. Each associated value has seriesId, label, value, and hidden. Category activation includes all source series values, including hidden ones; point activation includes its own series value. Stacked and normalized positions do not change raw callback values. No renderer objects or persistent inspected state are exposed.
 - selection accepts controlled selectedItems with required onSelectionChange, or uncontrolled defaultSelectedItems with optional onSelectionChange. These ownership models cannot be combined. onSelectionChange receives stable item identities independently of activation.
 - Stable row and series IDs preserve selection across value updates and reorderings. Internal selection drops deleted rows and series; controlled state remains consumer-owned, with unavailable items omitted from rendering and commands. Hidden values remain selected and named in the summary, and their selection cues return when shown. Data replacement or visibility changes cancel active gestures. Changing target kinds discards incompatible selection.
+- ChartActivation optionally includes ranges, each with seriesId, label, lower, upper and hidden. Scalar values remain in values. Activating an individual range sends one range and no scalar values. Category activation sends all present scalar values and ranges, including hidden series, with the original datum. No endpoint is represented as a separate selected item.
 - TypeScript bounds record accessors, scales, colors, layouts, annotation values, and the one-to-six series vocabulary. Runtime preparation assigns omitted colors without colliding with explicit ordinary choices, excludes missing or non-finite rows, requires a named legend for multiple series or visibilityLabels and a representable filled-mark baseline, and gives empty and unavailable states distinct feedback.
 - interaction.getRowId must return a unique nonempty stable string for each datum, including repeated category labels. Preserve IDs across sorting and refreshes; change an ID when the underlying identity changes. Category items have rowId; individual values also have seriesId. All interaction geometry stays inside explicit plot domains. Existing area stacking, normalization, scale constraints, and compatible mixed-series combinations remain the input boundary.
+- Range bounds must be finite and lower must not exceed upper; equal bounds are valid. In a chart containing range series, a missing scalar value or either missing bound leaves a gap in that series while other valid series at that category remain. Nonfinite values and reversed bounds also leave gaps and use invalidData feedback. No values are swapped or interpolated across missing samples. The table retains those categories and displays a dash for an unavailable value or interval.
 - Charts are not form controls and do not submit, validate, or reset values. Filter and range controls belong beside the chart in consumer-owned composition.
 
 ## Accessibility
@@ -75,6 +79,7 @@ Combine compatible line, area, and column series in one shared Cartesian frame.
 - A direct instrument plot uses restrained grid and axis rails with readable utility typography. Filled marks use softened series color beneath stronger lines and boundaries. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.
 - Each mark keeps its own interaction cues. Columns use inset reading outlines and outer selection frames; line and area values use filled reading markers and outer selection rings. Area markers follow the plotted upper boundary. Category mode previews all visible values, combining column outlines without internal seams, and underlines selected category labels.
 - A brief pulse acknowledges every activation, including repeated activation of the same item. Reading, selection, and whole-series legend emphasis remain distinct in both appearances.
+- A range fills the space between its changing lower and upper boundaries. Point-target reading fills both endpoint markers. One selected interval has two outer rings joined by a stem; equal bounds coincide. Whole-category selection keeps the shared label underline. Shared activation pulses acknowledge both limits with the existing duration, size and reduced-motion behavior.
 - Charts scale readable type, marks, strokes, and pointer targets together from the available plot space. Every categorical label is rendered: horizontal labels use one row when possible, alternate across two rows when needed, and fall back to a labeled native scroll region with ScrollRegion's scrollbar behavior only at the legibility limit. Long labels may shorten while the generated table retains complete values. aspectRatio and minimumSize set explicit lower bounds; choose clip only when shrinking the complete plot is more important than local scrolling.
 
 ## Accent, forced colors, and reduced motion
@@ -91,7 +96,7 @@ Combine compatible line, area, and column series in one shared Cartesian frame.
 
 ### CartesianChart with accessible source data
 
-Combine compatible line, area, and column series in one shared Cartesian frame.
+Combine compatible line, range, area, and column series in one shared Cartesian frame.
 
 ```tsx
 import '@trwhitney/component-library/styles.css';
@@ -157,6 +162,34 @@ export function SelectableCartesianChart({onOpenDetails}: {readonly onOpenDetail
         title="Demand and capacity"
         xAxis={{accessor: "month", label: "Month", scale: {type: "categorical"}}}
         yAxis={{label: "Energy", unit: "MWh", scale: {type: "linear"}}}
+      />
+    </AppearanceProvider>
+  );
+}
+```
+
+### Measured line with a supplied range
+
+The range has its own selection and detail event. Both bounds appear in readings and the full table. The rendered showcase also provides month targeting, eyes and navigation.
+
+```tsx
+import '@trwhitney/component-library/styles.css';
+import {AppearanceProvider, CartesianChart} from '@trwhitney/component-library';
+
+export function TemperatureRangeExample() {
+  return (
+    <AppearanceProvider appearance="dark" accent="#2878ff">
+      <CartesianChart
+        data={[{id: "jan", month: "Jan", measured: 7, low: 3, high: 10}, {id: "feb", month: "Feb", measured: 12, low: 5, high: 11}]}
+        title="Monthly temperature" description="Measured temperature and expected range."
+        dataTableLabel="Temperature readings"
+        emptyState={{title: "No readings", description: "Add monthly readings."}}
+        invalidData={{title: "Invalid readings", description: "Check the supplied values and limits."}}
+        legend={{label: "Temperature series"}}
+        series={[{id: "measured", kind: "line", label: "Measured", accessor: "measured", showPoints: true}, {id: "expected", kind: "range", label: "Expected", lowerAccessor: "low", upperAccessor: "high"}]}
+        xAxis={{label: "Month", accessor: "month", scale: {type: "categorical"}}}
+        yAxis={{label: "Temperature", unit: "°C", scale: {type: "linear"}}}
+        interaction={{target: "point", getRowId: row => row.id, onActivate: event => console.log(event.values, event.ranges)}}
       />
     </AppearanceProvider>
   );
