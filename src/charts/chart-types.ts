@@ -744,7 +744,22 @@ interface PointChartProps<Datum extends object> extends StatisticalChartCommonPr
   readonly yAxis: QuantitativeChartDataAxis<Datum>;
 }
 
-export type ScatterChartProps<Datum extends object> = PointChartProps<Datum>;
+/** A supplied line on the observation axes. Samples connect in input order. */
+export interface ScatterChartLine<Datum extends object> extends StatisticalChartSeries {
+  readonly data: readonly Datum[];
+  readonly idAccessor: ChartAccessor<Datum, string>;
+  readonly labelAccessor: ChartAccessor<Datum, string>;
+  readonly xAccessor: ChartAccessor<Datum, number>;
+  readonly yAccessor: ChartAccessor<Datum, number>;
+  readonly onActivate?: (activation: PointChartActivation<Datum>) => void;
+}
+
+export interface ScatterChartProps<
+  Datum extends object,
+  LineDatum extends object = Datum,
+> extends PointChartProps<Datum> {
+  readonly line?: ScatterChartLine<LineDatum>;
+}
 
 export interface BubbleMagnitude<Datum extends object> {
   readonly accessor: ChartAccessor<Datum, number>;

@@ -40,6 +40,17 @@
     padding-block-start: 0.25rem;
   }
 
+  [data-wcl-chart-exploration-vertical-pan] {
+    position: absolute;
+    z-index: 2;
+    top: calc((var(--wcl-exploration-top, 0px) + var(--wcl-exploration-bottom, 100%) - 28px) / 2);
+    left: calc(100% - var(--wcl-exploration-right, 0px) + 4px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    transform: translateY(-50%);
+  }
+
   [data-wcl-chart-exploration-range],
   [data-wcl-chart-exploration-extents] {
     font-family: var(--wcl-font-utility);

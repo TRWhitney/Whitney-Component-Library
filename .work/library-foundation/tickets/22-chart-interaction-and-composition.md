@@ -52,7 +52,7 @@ mixed-chart combinations.
       legend emphasis. Working examples demonstrate both appearance and operation before acceptance.
 - [ ] Brief, purposeful animations explain data and scale changes, remain responsive to further
       input, never loop idly, and settle immediately under reduced motion.
-- [ ] Scatter points can share a chart with a supplied trend, target, or other compatible line.
+- [x] Scatter points can share a chart with a supplied trend, target, or other compatible line.
 - [x] A line can share a chart with a supplied lower/upper range band that changes along the domain,
       such as an uncertainty or forecast band. This extends the existing fixed reference bands.
 - [x] Applications supply calculated trend, average, forecast, and range values. Charts do not
@@ -212,4 +212,4 @@ Pie/donut visibility is implemented in [Ticket 18](../../chart-interaction-compo
 
 [Ticket 20](../../chart-interaction-composition/tickets/20-expansion-hidden-marker.md) extends the pie/donut expansion asterisk to hidden members, including when selection is off.
 
-The remaining delivered chart behavior is indexed in the [active effort](../../chart-interaction-composition/status.md). Tickets 21–30 and the mobile heatmap correction cover visibility, compact fitting and navigation. [Ticket 32](../../chart-interaction-composition/tickets/32-line-range.md) delivers supplied ranges with public examples, original-data callbacks and shared interactions. The supplied scatter line is approved and follows separately. General data-change animation and a recorded responsiveness budget keep this parent open.
+The remaining delivered chart behavior is indexed in the [active effort](../../chart-interaction-composition/status.md). Tickets 21–30 and the mobile heatmap correction cover visibility, compact fitting and navigation. [Ticket 32](../../chart-interaction-composition/tickets/32-line-range.md) and [Ticket 33](../../chart-interaction-composition/tickets/33-scatter-line.md) implement the approved supplied combinations with public examples, original-data callbacks and established shared interactions. Repository checks pass 867 tests; packed React 18/19 and native compact/wide checks pass. Independent intent and engineering production reviews pass after bounded correction reviews. General data-change animation and a recorded responsiveness budget keep this parent open.

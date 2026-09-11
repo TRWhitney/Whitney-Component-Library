@@ -1443,7 +1443,7 @@ function statisticalChartContract({
 const statisticalState =
   'dataTableLabel="Statistical data"\n  emptyState={{title: "No observations", description: "Choose a populated interval."}}\n  invalidData={{title: "Invalid observations", description: "Correct missing or non-finite values."}}';
 
-export const scatterChartContract = statisticalChartContract({
+const basicScatterChartContract = statisticalChartContract({
   alternative:
     'Use LineChart for an ordered trend, BubbleChart when one additional numeric measure belongs in mark area, or Histogram for a one-dimensional distribution.',
   counterExample: `<ScatterChart
@@ -1483,6 +1483,52 @@ export const scatterChartContract = statisticalChartContract({
   validation:
     'TypeScript requires numeric axis accessors and string id, label, and series accessors. Runtime preparation rejects duplicate point ids, unknown series, invalid domains, missing or non-finite coordinates, and out-of-domain values. Multiple series require seriesAccessor and a legend.',
 });
+
+export const scatterChartContract: ComponentContract = {
+  ...basicScatterChartContract,
+  composition: [
+    ...basicScatterChartContract.composition,
+    'ScatterChart<Datum, LineDatum> accepts an optional ScatterChartLine<LineDatum> through line. Supply its id, label, data, idAccessor, labelAccessor, xAccessor and yAccessor. Observation and line data types, sample counts and x positions may differ. The line joins its own samples in input order on the observation axes; the library does not calculate a fit or join observations. Line and observation series together use at most six identities and require a visible legend.',
+  ],
+  appearance: [
+    ...basicScatterChartContract.appearance,
+    'The supplied line has a line swatch and circular sample markers. Its eye removes the line and its samples from both plot and rectangular modal Overview. With a supplied line and exploration, Up sits above Down in a reserved gutter beside the plot; Left and Right stay below.',
+  ],
+  controlBehavior: [
+    ...basicScatterChartContract.controlBehavior,
+    'Both datasets participate in shared selection and automatic axis fitting. Segments crossing the viewport remain visible. A click near a line segment resolves to a visible supplied endpoint, never a fabricated interpolated record. A crossing segment with both endpoints outside the viewport remains context until a sample becomes visible. Legend priority resolves only actual overlaps. Drag selection includes visible sample centers inside the rectangle, retaining the shared preview, modifiers, keyboard, touch hold and two-finger navigation behavior.',
+  ],
+  events: [
+    ...basicScatterChartContract.events,
+    'Observation activation uses interaction.onActivate. Supplied sample activation uses line.onActivate with PointChartActivation<LineDatum>, including the original line datum and its supplied coordinates. Both use the shared selection state from interaction.selection. Public items retain rowId and seriesId; identical row IDs in different datasets remain distinct.',
+  ],
+  validation: [
+    ...basicScatterChartContract.validation,
+    'Line sample IDs must be stable, nonempty and unique within the line dataset. Duplicate coordinates are allowed. Missing or invalid line coordinates break the line without joining across the gap. Nonfinite, invalid-scale or out-of-domain values use invalidData feedback. Complete source readings remain in the data table when series are hidden or the viewport changes.',
+  ],
+  examples: [
+    ...basicScatterChartContract.examples,
+    {
+      title: 'Observations with a supplied target',
+      description:
+        'Observation records and supplied target samples have separate types and callbacks. The rendered showcase demonstrates shared selection, both eyes and the rectangular Overview.',
+      code: example(
+        'ScatterTargetExample',
+        `<ScatterChart
+  data={[{id: "observed", label: "Monday", temperature: 12, energy: 60}]}
+  idAccessor="id" labelAccessor="label" series={[{id: "observations", label: "Observations"}]}
+  line={{id: "target", label: "Target", data: [{key: "low", name: "Cool target", x: 5, y: 85}, {key: "high", name: "Mild target", x: 20, y: 45}], idAccessor: "key", labelAccessor: "name", xAccessor: "x", yAccessor: "y", onActivate: event => console.log(event.datum)}}
+  legend={{label: "Energy series"}} title="Temperature and energy" description="Observed energy and supplied targets."
+  dataTableLabel="Energy readings"
+  emptyState={{title: "No readings", description: "Add readings."}}
+  invalidData={{title: "Invalid readings", description: "Check supplied coordinates."}}
+  xAxis={{label: "Temperature", accessor: "temperature", unit: "°C", scale: {type: "linear"}}}
+  yAxis={{label: "Energy", accessor: "energy", unit: "kWh", scale: {type: "linear"}}}
+/>`,
+      ),
+    },
+  ],
+};
 
 export const bubbleChartContract = statisticalChartContract({
   alternative:

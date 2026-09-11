@@ -13,10 +13,12 @@ import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {ChartActivationOutline, chartActivationOutset} from './chart-activation.js';
 import {bin as createBins, quantileSorted} from 'd3-array';
+import {line as createLine} from 'd3-shape';
 import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -80,6 +82,7 @@ import type {
   ChartColor,
   ChartExploration,
   ChartInteraction,
+  ChartSelectionItem,
   PointChartInteraction,
   ChartLegend,
   ChartVisibilityLabels,
@@ -93,6 +96,8 @@ import type {
   LogarithmicChartScale,
   QuantitativeChartDataAxis,
   ScatterChartProps,
+  ScatterChartLine,
+  PointChartActivation,
   StatisticalChartSeries,
 } from './chart-types.js';
 
@@ -100,6 +105,7 @@ type StatisticalKind = 'box' | 'bubble' | 'histogram' | 'scatter';
 
 type StatisticalFrameStyles = CSSProperties & {
   '--wcl-chart-aspect-ratio': number;
+  '--wcl-chart-line-width': string;
   '--wcl-chart-axis-font-size': string;
   '--wcl-chart-grid-width': string;
   '--wcl-chart-minimum-height': string;
@@ -126,9 +132,13 @@ interface InternalSeries {
   readonly id: string;
   readonly label: string;
   readonly shape: number;
+  readonly line?: boolean;
+  readonly patternIndex?: number;
 }
 
 interface PreparedPoint {
+  readonly activate?: (input: PointChartActivation<object>['input']) => void;
+  readonly datum?: object;
   readonly id: string;
   readonly label: string;
   readonly magnitude?: number;
@@ -166,6 +176,14 @@ interface PointModel<Datum extends object, Kind extends 'bubble' | 'scatter'> {
   readonly invalidCount: number;
   readonly kind: Kind;
   readonly magnitude?: BubbleMagnitude<Datum>;
+  readonly line?:
+    | {
+        readonly series: InternalSeries;
+        readonly data: readonly object[];
+        readonly samples: readonly (PreparedPoint | null)[];
+        readonly canActivate: boolean;
+      }
+    | undefined;
   readonly points: readonly PreparedPoint[];
   readonly series: readonly InternalSeries[];
   readonly xAxis: QuantitativeChartDataAxis<Datum>;
@@ -296,7 +314,7 @@ function validNumericValue(
 }
 
 function preparePoints<Datum extends object, Kind extends 'bubble' | 'scatter'>(
-  props: ScatterChartProps<Datum> | BubbleChartProps<Datum>,
+  props: Omit<ScatterChartProps<Datum>, 'line'> | BubbleChartProps<Datum>,
   kind: Kind,
 ): PointModel<Datum, Kind> {
   assertText(props.xAxis.label, 'Point-chart X-axis label');
@@ -361,6 +379,104 @@ function preparePoints<Datum extends object, Kind extends 'bubble' | 'scatter'>(
     xAxis: props.xAxis,
     yAxis: props.yAxis,
   };
+}
+
+function withSuppliedLine<Datum extends object, LineDatum extends object>(
+  model: PointModel<Datum, 'scatter'>,
+  observationSeries: readonly StatisticalChartSeries[],
+  line: ScatterChartLine<LineDatum>,
+  legend: ChartLegend | undefined,
+): PointModel<Datum, 'scatter'> {
+  const series = normalizeSeries([...observationSeries, line]);
+  const preparedSeries = new Map(series.map((item) => [item.id, item]));
+  validateSeries(series, legend);
+  const supplied = {...series.at(-1)!, shape: 0, line: true, patternIndex: series.length - 1};
+  const ids = new Set<string>();
+  let invalidCount = model.invalidCount;
+  const samples = line.data.map((datum, sourceIndex): PreparedPoint | null => {
+    const id = readAccessor(line.idAccessor, datum, sourceIndex);
+    const label = readAccessor(line.labelAccessor, datum, sourceIndex);
+    const x = readAccessor(line.xAccessor, datum, sourceIndex);
+    const y = readAccessor(line.yAccessor, datum, sourceIndex);
+    if (typeof id !== 'string' || !id.trim() || typeof label !== 'string' || !label.trim()) {
+      invalidCount += 1;
+      return null;
+    }
+    if (ids.has(id)) throw new Error(`Statistical-chart line sample id "${id}" is duplicated.`);
+    ids.add(id);
+    if (!validNumericValue(x, model.xAxis.scale) || !validNumericValue(y, model.yAxis.scale)) {
+      invalidCount += 1;
+      return null;
+    }
+    return {
+      id,
+      label,
+      x,
+      y,
+      sourceIndex,
+      datum,
+      series: supplied,
+      ...(line.onActivate
+        ? {
+            activate: (input: PointChartActivation<object>['input']) =>
+              line.onActivate?.({
+                item: {rowId: id, seriesId: supplied.id},
+                datum,
+                label,
+                x,
+                y,
+                input,
+              }),
+          }
+        : {}),
+    };
+  });
+  return {
+    ...model,
+    invalidCount,
+    series: [...series.slice(0, -1), supplied],
+    points: [
+      ...model.points.map((point) => ({...point, series: preparedSeries.get(point.series.id)!})),
+      ...samples.filter((sample): sample is PreparedPoint => sample !== null),
+    ],
+    line: {series: supplied, data: line.data, samples, canActivate: !!line.onActivate},
+  };
+}
+
+function pointKey(point: PreparedPoint): string {
+  return selectionKey({rowId: point.id, seriesId: point.series.id});
+}
+
+function SuppliedLine({
+  line,
+  x,
+  y,
+  emphasized,
+  muted,
+}: {
+  readonly line: NonNullable<PointModel<object, 'scatter'>['line']>;
+  readonly x: (value: number) => number;
+  readonly y: (value: number) => number;
+  readonly emphasized?: boolean;
+  readonly muted?: boolean;
+}): ReactElement {
+  const path =
+    createLine<PreparedPoint | null>()
+      .defined((point): point is PreparedPoint => point !== null)
+      .x((point) => x(point!.x))
+      .y((point) => y(point!.y))(line.samples) ?? '';
+  return (
+    <g
+      data-wcl-chart-series=""
+      data-color={line.series.color}
+      data-series-index={line.series.patternIndex}
+      data-series-id={line.series.id}
+      data-emphasized={emphasized ? '' : undefined}
+      data-muted={muted ? '' : undefined}
+    >
+      <path d={path} data-wcl-chart-line="" />
+    </g>
+  );
 }
 
 function validateThresholds(thresholds: number | readonly number[] | undefined): void {
@@ -941,7 +1057,7 @@ function readingTargets<Datum extends object>(
           : [];
       return [
         {
-          id: point.id,
+          id: model.line ? pointKey(point) : point.id,
           kind: 'point' as const,
           label: point.label,
           rows: [
@@ -1080,7 +1196,9 @@ function LegendSwatch({
       focusable="false"
       viewBox="0 0 20 12"
     >
-      {kind === 'box' ? (
+      {series.line ? (
+        <path d="M1,6 H19" data-wcl-chart-legend-line="" />
+      ) : kind === 'box' ? (
         <rect
           data-shape="box"
           data-wcl-statistical-legend-mark=""
@@ -1136,7 +1254,7 @@ function StatisticalLegend({
           data-muted={
             emphasizedSeriesId !== undefined && emphasizedSeriesId !== item.id ? '' : undefined
           }
-          data-series-index={index}
+          data-series-index={item.patternIndex ?? index}
           data-hidden={hiddenIds.includes(item.id) ? '' : undefined}
           key={item.id}
         >
@@ -1501,6 +1619,23 @@ function StatisticalMarks<Datum extends object>({
     });
     return (
       <g data-wcl-chart-marks="">
+        {model.line ? (
+          <SuppliedLine
+            line={model.line}
+            x={(value) => projections.xNumber!.position(value)!}
+            y={(value) => projections.y.position(value)!}
+            emphasized={
+              directIndex !== null
+                ? readings[directIndex]?.seriesId === model.line.series.id
+                : legendSeriesId === model.line.series.id
+            }
+            muted={
+              directIndex !== null
+                ? readings[directIndex]?.seriesId !== model.line.series.id
+                : legendSeriesId !== undefined && legendSeriesId !== model.line.series.id
+            }
+          />
+        ) : null}
         {pointRows.map(({index, point, reading}) => {
           const radius = pointRadius(model, point, presentation, maximum);
           return (
@@ -1514,7 +1649,7 @@ function StatisticalMarks<Datum extends object>({
               data-series-id={point.series.id}
               data-series-index={point.series.shape}
               data-wcl-statistical-mark=""
-              key={point.id}
+              key={pointKey(point)}
             >
               <PointShape
                 cx={reading.x}
@@ -1675,7 +1810,7 @@ function StatisticalTable<Datum extends object>({
         </thead>
         <tbody>
           {model.points.map((point) => (
-            <tr key={point.id}>
+            <tr key={pointKey(point)}>
               <th scope="row">{point.label}</th>
               <td>
                 {point.series.label}
@@ -1892,6 +2027,9 @@ function StatisticalFrame<Datum extends object>({
             ...fullModel,
             series: fullModel.series.filter((s) => !hiddenIds.includes(s.id)),
             points: fullModel.points.filter((p) => !hiddenIds.includes(p.series.id)),
+            ...(fullModel.line
+              ? {line: hiddenIds.includes(fullModel.line.series.id) ? undefined : fullModel.line}
+              : {}),
           };
   const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
   useEffect(() => {
@@ -1970,7 +2108,9 @@ function StatisticalFrame<Datum extends object>({
       ? {
           ...visiblePointModel,
           points: visiblePointModel.points.filter(
-            (point) => navigation.x.contains(point.x) && navigation.y.contains(point.y),
+            (point) =>
+              point.series.line ||
+              (navigation.x.contains(point.x) && navigation.y.contains(point.y)),
           ),
         }
       : histogramExploration && visibleModel.kind === 'histogram'
@@ -1997,8 +2137,9 @@ function StatisticalFrame<Datum extends object>({
       : projectionsFor(sizingModel, {left: 0, right: 1, top: 0, bottom: 1}).xNumber!.ticks.map(
           (tick) => axisTickLabel(tick, sizingModel.xAxis),
         );
+  const sidePan = !!exploration && fullModel.kind === 'scatter' && !!fullModel.line;
   const basePresentation = presentationMetrics(
-    availableWidth ?? minimumSize.width,
+    (availableWidth ?? minimumSize.width) - (sidePan ? 38 : 0),
     minimumSize.width,
     categoryLabels,
   );
@@ -2008,10 +2149,13 @@ function StatisticalFrame<Datum extends object>({
         ...basePresentation,
         canvasWidth: explorationWidth,
         viewScale: explorationWidth / viewWidth,
-        staggerLabels: false,
+        staggerLabels: sidePan && basePresentation.staggerLabels,
       }
     : basePresentation;
-  const initialPlot = plotForPresentation(presentation);
+  const basePlot = plotForPresentation(presentation);
+  const initialPlot = sidePan
+    ? {...basePlot, right: basePlot.right - 38 / presentation.viewScale}
+    : basePlot;
   const initialProjections = projectionsFor(viewportModel, initialPlot);
   const yAxis = visibleModel.yAxis;
   const visibleHasData =
@@ -2079,11 +2223,16 @@ function StatisticalFrame<Datum extends object>({
   const pointModel = model.kind === 'scatter' || model.kind === 'bubble' ? model : undefined;
   const fullPointModel =
     fullModel.kind === 'scatter' || fullModel.kind === 'bubble' ? fullModel : undefined;
+  const lineData = fullPointModel?.line?.data;
+  const sourceData = useMemo<readonly object[]>(
+    () => (lineData ? [common.data, lineData] : common.data),
+    [common.data, lineData],
+  );
   const interactionRows = fullPointModel
     ? fullPointModel.points.map((point) => ({
         id: point.id,
         category: point.x,
-        datum: common.data[point.sourceIndex]!,
+        datum: point.datum ?? common.data[point.sourceIndex]!,
         values: [
           {
             seriesId: point.series.id,
@@ -2100,19 +2249,29 @@ function StatisticalFrame<Datum extends object>({
         values: [{seriesId: '', label: reading.label, value: 0, hidden: false}],
       }));
   const configuration:
-    Pick<ChartInteraction<object, number>, 'target' | 'selection' | 'onActivate'> | undefined =
-    interaction
+    | (Pick<ChartInteraction<object, number>, 'target' | 'selection' | 'onActivate'> & {
+        readonly canActivate?: (item: ChartSelectionItem) => boolean;
+      })
+    | undefined =
+    interaction || fullPointModel?.line?.canActivate
       ? {
           target: 'point',
-          ...(interaction.selection ? {selection: interaction.selection} : {}),
-          ...(interaction.onActivate
+          canActivate: (item) =>
+            item.seriesId === fullPointModel?.line?.series.id
+              ? !!fullPointModel?.line?.canActivate
+              : !!interaction?.onActivate,
+          ...(interaction?.selection ? {selection: interaction.selection} : {}),
+          ...(interaction?.onActivate || fullPointModel?.line?.canActivate
             ? {
                 onActivate: (activation) => {
                   const point = pointModel?.points.find(
-                    (item) => item.id === activation.item.rowId,
+                    (item) =>
+                      item.id === activation.item.rowId &&
+                      item.series.id === activation.item.seriesId,
                   );
-                  if (point)
-                    interaction.onActivate?.({
+                  if (point?.series.line) point.activate?.(activation.input);
+                  else if (point)
+                    interaction?.onActivate?.({
                       item: activation.item,
                       datum: common.data[point.sourceIndex]!,
                       input: activation.input,
@@ -2139,7 +2298,7 @@ function StatisticalFrame<Datum extends object>({
     configuration,
     interactionRows,
     JSON.stringify([readingGeometry, status.kind, hiddenIds]),
-    common.data,
+    sourceData,
   );
   const maximumMagnitude = ((exploration ? visiblePointModel : pointModel)?.points ?? []).reduce(
     (max, point) => Math.max(max, point.magnitude ?? 1),
@@ -2215,9 +2374,9 @@ function StatisticalFrame<Datum extends object>({
     document.addEventListener('pointerdown', dismiss);
     return () => document.removeEventListener('pointerdown', dismiss);
   }, [rootElement, touchReadingId]);
-  const [navigationSource, setNavigationSource] = useState({data: common.data, revision: 0});
-  if (navigationSource.data !== common.data)
-    setNavigationSource({data: common.data, revision: navigationSource.revision + 1});
+  const [navigationSource, setNavigationSource] = useState({data: sourceData, revision: 0});
+  if (navigationSource.data !== sourceData)
+    setNavigationSource({data: sourceData, revision: navigationSource.revision + 1});
   const navigationVersion = JSON.stringify([
     navigationSource.revision,
     statisticalModelGeometry(fullModel),
@@ -2275,6 +2434,7 @@ function StatisticalFrame<Datum extends object>({
     };
   };
   const hasData = allReadings.length > 0;
+  const noSourceData = common.data.length === 0 && !fullPointModel?.line?.samples.length;
   const indexForReadingId = (id: string | null): number | null => {
     if (id === null) return null;
     const index = readings.findIndex((reading) => reading.id === id);
@@ -2301,6 +2461,7 @@ function StatisticalFrame<Datum extends object>({
   const emphasizedSeriesId = directReading?.seriesId ?? legendSeriesId ?? activeReading?.seriesId;
   const frameStyle: StatisticalFrameStyles = {
     '--wcl-chart-aspect-ratio': aspectRatio,
+    '--wcl-chart-line-width': `${presentation.pointStrokeWidth}px`,
     '--wcl-chart-axis-font-size': `${presentation.fontSize / presentation.viewScale}px`,
     '--wcl-chart-grid-width': `${presentation.gridWidth}px`,
     '--wcl-chart-minimum-height': `${minimumSize.height}px`,
@@ -2316,11 +2477,42 @@ function StatisticalFrame<Datum extends object>({
   const pointFromPointer = (event: PointerEvent<SVGSVGElement>): InteractionPoint | undefined => {
     const {x, y} = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
     if (!inPlot(x, y)) return undefined;
-    const hits = points.filter((point) =>
+    const hits = (pointModel?.line ? selectablePoints : points).filter((point) =>
       point.kind === 'point'
         ? containsPointShape(point.shape, point.radius, x - point.x, y - point.y)
         : hitsDistribution(point, x, y, 2 / presentation.viewScale),
     );
+    const line = pointModel?.line;
+    if (line) {
+      let nearest: {distance: number; point: DistributionPoint} | undefined;
+      for (let index = 1; index < line.samples.length; index += 1) {
+        const a = line.samples[index - 1],
+          b = line.samples[index];
+        if (!a || !b) continue;
+        const ax = projections.xNumber!.position(a.x)!,
+          ay = projections.y.position(a.y)!;
+        const bx = projections.xNumber!.position(b.x)!,
+          by = projections.y.position(b.y)!;
+        const dx = bx - ax,
+          dy = by - ay;
+        const t = clamp(0, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy || 1), 1);
+        const distance = Math.hypot(x - ax - t * dx, y - ay - t * dy);
+        if (distance > 8 / presentation.viewScale || (nearest && nearest.distance <= distance))
+          continue;
+        const point = selectablePoints
+          .filter(
+            (candidate) =>
+              candidate.seriesId === line.series.id &&
+              (candidate.item.rowId === a.id || candidate.item.rowId === b.id),
+          )
+          .sort(
+            (first, second) =>
+              Math.hypot(x - first.x, y - first.y) - Math.hypot(x - second.x, y - second.y),
+          )[0];
+        if (point) nearest = {distance, point};
+      }
+      if (nearest && !hits.includes(nearest.point)) hits.push(nearest.point);
+    }
     const preferred =
       hits.length > 1 ? hits.find((point) => point.seriesId === legendSeriesId) : undefined;
     return (
@@ -2385,7 +2577,7 @@ function StatisticalFrame<Datum extends object>({
       keyboardReadingId === null &&
       readings.length > 0
     ) {
-      setKeyboardReadingId(readings[0]!.id);
+      setKeyboardReadingId(readings.find((reading) => inPlot(reading.x, reading.y))?.id ?? null);
     }
   };
   const blurChart = (event: FocusEvent<HTMLDivElement>): void => {
@@ -2416,7 +2608,29 @@ function StatisticalFrame<Datum extends object>({
       return;
     const current = indexForReadingId(keyboardReadingId) ?? activeIndex ?? 0;
     let next = current;
-    if (model.kind === 'scatter' || model.kind === 'bubble') {
+    if (model.kind === 'scatter' && model.line && exploration) {
+      const visible = readings
+        .map((reading, index) => ({reading, index}))
+        .filter(({reading}) => inPlot(reading.x, reading.y));
+      const position = Math.max(
+        0,
+        visible.findIndex(({index}) => index === current),
+      );
+      let nextPosition = position;
+      if (event.key === 'Home') nextPosition = 0;
+      else if (event.key === 'End') nextPosition = visible.length - 1;
+      else if (interactive && event.key === 'ArrowLeft') nextPosition = Math.max(0, position - 1);
+      else if (interactive && event.key === 'ArrowRight')
+        nextPosition = Math.min(visible.length - 1, position + 1);
+      else
+        nextPosition = spatialTarget(
+          visible.map(({reading}) => reading),
+          position,
+          event.key,
+          interactive,
+        );
+      next = visible[nextPosition]?.index ?? current;
+    } else if (model.kind === 'scatter' || model.kind === 'bubble') {
       if (interactive && event.key === 'Home') next = 0;
       else if (interactive && event.key === 'End') next = readings.length - 1;
       else if (interactive && event.key === 'ArrowLeft') next = Math.max(0, current - 1);
@@ -2499,11 +2713,9 @@ function StatisticalFrame<Datum extends object>({
   } else if (!hasData) {
     content = (
       <EmptyState
-        description={
-          common.data.length === 0 ? common.emptyState.description : common.invalidData.description
-        }
-        kind={common.data.length === 0 ? 'no-data' : 'unavailable'}
-        title={common.data.length === 0 ? common.emptyState.title : common.invalidData.title}
+        description={noSourceData ? common.emptyState.description : common.invalidData.description}
+        kind={noSourceData ? 'no-data' : 'unavailable'}
+        title={noSourceData ? common.emptyState.title : common.invalidData.title}
       />
     );
   } else {
@@ -2671,6 +2883,7 @@ function StatisticalFrame<Datum extends object>({
                   <ChartExplorationLayer svg={svgElement} plot={plot}>
                     <ChartRectangularExplorationControls
                       version={navigationVersion}
+                      verticalPan={sidePan ? 'beside' : 'below'}
                       window={navigation.normalized}
                       minimumSpan={navigation.minimumSpan}
                       labels={exploration.labels}
@@ -2687,6 +2900,13 @@ function StatisticalFrame<Datum extends object>({
                           aria-hidden="true"
                         >
                           <g data-wcl-chart-marks="">
+                            {visiblePointModel.line ? (
+                              <SuppliedLine
+                                line={visiblePointModel.line}
+                                x={(value) => navigation.x.position(value) * plotWidth(plot)}
+                                y={(value) => (1 - navigation.y.position(value)) * plotHeight(plot)}
+                              />
+                            ) : null}
                             {visiblePointModel.points.map((point) => {
                               const x = navigation.x.position(point.x) * plotWidth(plot);
                               const y = (1 - navigation.y.position(point.y)) * plotHeight(plot);
@@ -2698,7 +2918,7 @@ function StatisticalFrame<Datum extends object>({
                               );
                               return (
                                 <g
-                                  key={point.id}
+                                  key={pointKey(point)}
                                   data-wcl-statistical-mark=""
                                   data-color={point.series.color}
                                 >
@@ -2753,14 +2973,14 @@ function StatisticalFrame<Datum extends object>({
                     navigationGesture.pointerEnd(event, true);
                     stripGesture.pointerEnd(event, true);
                   }}
-                  onPointerDown={interactive ? beginItem : readTouch}
+                  onPointerDown={interactive ? beginItem : pointModel?.line ? readItem : readTouch}
                   onPointerUp={
                     interactive ? (event) => actions.end(event, pointFromPointer(event)) : undefined
                   }
                   onPointerCancel={interactive ? () => actions.cancel() : undefined}
                   onLostPointerCapture={interactive ? () => actions.cancel() : undefined}
                   onPointerLeave={clearPointer}
-                  onPointerMove={interactive ? moveItem : readPointer}
+                  onPointerMove={interactive ? moveItem : pointModel?.line ? readItem : readPointer}
                   ref={setSvgElement}
                   viewBox={`0 0 ${viewWidth} ${viewHeight}`}
                 >
@@ -2846,7 +3066,7 @@ function StatisticalFrame<Datum extends object>({
                         pointerEvents="none"
                       >
                         {points.map((point) => (
-                          <g key={point.item.rowId}>
+                          <g key={selectionKey(point.item)}>
                             {selectedKeys.has(selectionKey(point.item)) ? (
                               point.kind === 'bin' || point.kind === 'summary' ? (
                                 <DistributionCue
@@ -3045,6 +3265,7 @@ function statisticalModelGeometry<Datum extends object>(model: StatisticalModel<
   if (model.kind === 'scatter' || model.kind === 'bubble') {
     return {
       kind: model.kind,
+      line: model.line?.samples.map((point) => (point ? pointKey(point) : null)),
       points: model.points.map((point) => [
         point.id,
         point.series.id,
@@ -3077,8 +3298,13 @@ function statisticalModelGeometry<Datum extends object>(model: StatisticalModel<
   };
 }
 
-export function ScatterChart<Datum extends object>(props: ScatterChartProps<Datum>): ReactElement {
-  const model = preparePoints(props, 'scatter');
+export function ScatterChart<Datum extends object, LineDatum extends object = Datum>(
+  props: ScatterChartProps<Datum, LineDatum>,
+): ReactElement {
+  const observations = preparePoints(props, 'scatter');
+  const model = props.line
+    ? withSuppliedLine(observations, props.series, props.line, props.legend)
+    : observations;
   return (
     <StatisticalFrame
       common={props}

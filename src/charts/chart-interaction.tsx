@@ -124,7 +124,10 @@ interface Gesture {
 
 export function useChartInteraction<Datum extends object, Category extends ChartDomainValue>(
   configuration:
-    Pick<ChartInteraction<Datum, Category>, 'target' | 'selection' | 'onActivate'> | undefined,
+    | (Pick<ChartInteraction<Datum, Category>, 'target' | 'selection' | 'onActivate'> & {
+        readonly canActivate?: (item: ChartSelectionItem) => boolean;
+      })
+    | undefined,
   rows: readonly InteractionRow<Datum, Category>[],
   version: string,
   data: readonly object[],
@@ -229,8 +232,15 @@ export function useChartInteraction<Datum extends object, Category extends Chart
       return;
     }
     const callback = activationCallback.current;
-    if (!callback) return;
-    const row = rows.find((value) => value.id === item.rowId);
+    if (!callback || configuration?.canActivate?.(item) === false) return;
+    const row = rows.find(
+      (value) =>
+        value.id === item.rowId &&
+        (item.seriesId === undefined ||
+          [...value.values, ...(value.ranges ?? [])].some(
+            (entry) => entry.seriesId === item.seriesId,
+          )),
+    );
     if (!row) return;
     clearTimeout(pulseTimer.current);
     setPulse({item, sequence: ++sequence.current});
@@ -286,7 +296,13 @@ export function useChartInteraction<Datum extends object, Category extends Chart
       activated: false,
     };
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    if (point && event.pointerType === 'touch' && selection && configuration?.onActivate) {
+    if (
+      point &&
+      event.pointerType === 'touch' &&
+      selection &&
+      configuration?.onActivate &&
+      configuration.canActivate?.(point.item) !== false
+    ) {
       holdTimer.current = setTimeout(() => {
         if (gesture.current === null || gesture.current.moved) return;
         gesture.current.activated = true;

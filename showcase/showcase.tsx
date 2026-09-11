@@ -1,4 +1,5 @@
 import {RangeChartExample} from './range-chart-example.js';
+import {ScatterLineExample} from './scatter-line-example.js';
 import {DistributionExplorationExample} from './distribution-exploration-examples.js';
 import {HeatmapExplorationExample} from './heatmap-exploration-examples.js';
 import {PointExplorationExample} from './point-exploration-examples.js';
@@ -3831,6 +3832,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Pin a legend group to give it priority where points overlap. ${statisticalVisibilityGuidance}`}
         name="ScatterChart"
       >
+        <Example label="Scatter with a supplied line">
+          <ScatterLineExample />
+        </Example>
         <Example label="Explore scatter and bubble charts">
           <PointExplorationExample />
         </Example>

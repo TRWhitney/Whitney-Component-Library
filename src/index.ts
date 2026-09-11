@@ -131,6 +131,7 @@ export {
   type SparklineProps,
   type SparklineValue,
   type ScatterChartProps,
+  type ScatterChartLine,
   type StatisticalChartSeries,
   type TimeChartScale,
 } from './charts/index.js';

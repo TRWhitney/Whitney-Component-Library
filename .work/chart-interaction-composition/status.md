@@ -6,16 +6,37 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-[Ticket 32](tickets/32-line-range.md) delivers supplied ranges with independent selection and callbacks, paired endpoint rings, shared navigation and a complete production example. Scatter with a supplied line is approved in the [combined plan](decisions/02-combined-chart-plan.md) and follows as a separate delivery.
+The approved combined charts are delivered. [Ticket 32](tickets/32-line-range.md) adds supplied ranges to CartesianChart. [Ticket 33](tickets/33-scatter-line.md) adds a separate supplied dataset to ScatterChart. Both preserve established behavior outside the reviewed paired range markers and vertical pan placement. No prototype approval is pending.
+
+## Progress
+
+- Visibility, selection and activation are delivered across the chart families, with stable identities, shared motion and production showcase examples.
+- Tickets 22–25 deliver compact label fitting and exploration layout prerequisites.
+- Tickets 26–30 deliver pan and zoom across Cartesian, point, distribution and heatmap charts. The mobile heatmap correction is delivered in `9baab9c`.
+- The combined production implementation, public types, complete examples and canonical contracts are current. Browser inspection corrected crowded numeric labels beside the new vertical controls. Per-series callback availability suppresses false activation pulses. Crossing lines retain visible geometry without targeting offscreen samples.
 
 ## Frontier
 
-The [decision map](map.md) records the remaining work. General data-change animation and responsiveness budgets remain open after the combined charts.
+The [decision map](map.md) indexes remaining parent-ticket work. General data-change animation and responsiveness budgets remain separate outcomes.
+
+## Accepted sources
+
+- [Production combined-chart boundary](spec.md#production-combined-chart-boundary)
+- [Approved combinations and precedence](prototypes/combined-charts.md#acceptance-contract)
+- [Production exploration boundary](spec.md#production-exploration-boundary)
+- [Modal overview](prototypes/modal-overview.md#accepted-behavior)
 
 ## Verification
 
-The integrated combined work passes 867 tests and all configured checks, packed React 18/19 verification, native compact/wide light/dark inspection and independent intent/engineering reviews. The range-only commit snapshot separately passes source types, generated-guide checking and 22 range/showcase tests.
+Focused range and scatter-line regressions pass. Native 390px and 1280px checks cover paired range rings, month underlines and drag preview, independent eyes, callbacks, touch hold without selection changes, pinch, vertical pan, modal overview dragging and fixed chart dimensions. Light/dark markers and reduced-motion static pulses were inspected. All 867 tests and configured repository checks pass. Packed React 18.3.1 and 19.2.8 SSR, hydration, types and browser builds pass. The production showcase builds. Independent intent and engineering reviews pass after the four admitted gesture/identity/targeting corrections. Seven new regressions cover those failures.
+
+## Out of scope
+
+Scatter with adjacent distributions, application layouts, implicit statistical calculations, and changes to accepted cross-chart behavior not reviewed in the combined study.
 
 ## Continuation
 
-Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`. Branch `main`, preceding delivery `9baab9c`. Deliver the reviewed scatter outcome next, then refresh the public production showcase.
+- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
+- Branch `main`. Range delivery is `bd706ce`; the following scatter delivery commits the rest of this accepted outcome.
+- Both deliveries include public exports, canonical contracts and guides, complete production examples, regression/type/package coverage and the accepted effort record.
+- Plan the remaining general data-change animation and responsiveness-budget work. The combined charts need no further prototype approval; do not reopen accepted behavior.

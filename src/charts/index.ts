@@ -100,6 +100,7 @@ export type {
   SparklineProps,
   SparklineValue,
   ScatterChartProps,
+  ScatterChartLine,
   StatisticalChartSeries,
   TimeChartScale,
 } from './chart-types.js';

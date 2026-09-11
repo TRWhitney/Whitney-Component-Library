@@ -47,6 +47,7 @@ export interface ChartRectangularExplorationControlsProps {
   readonly overview: ReactNode;
   readonly aspectRatio: number;
   readonly yIncreasesDown?: boolean;
+  readonly verticalPan?: 'below' | 'beside';
 }
 
 interface Gesture {
@@ -82,6 +83,7 @@ export function ChartRectangularExplorationControls({
   overview,
   aspectRatio,
   yIncreasesDown = false,
+  verticalPan = 'below',
 }: ChartRectangularExplorationControlsProps): ReactElement {
   const instructionId = useId();
   const navigator = useRef<HTMLDivElement>(null);
@@ -246,6 +248,28 @@ export function ChartRectangularExplorationControls({
     }
     onChange({x: range('x'), y: range('y')}, 'end');
   }
+  const upButton = (
+    <IconButton
+      variant="quiet"
+      size="compact"
+      label={labels.panUp}
+      isDisabled={yIncreasesDown ? window.y[0] <= 0 : window.y[1] >= 1}
+      onPress={() => pan('y', -directionY)}
+    >
+      <Glyph kind="up" />
+    </IconButton>
+  );
+  const downButton = (
+    <IconButton
+      variant="quiet"
+      size="compact"
+      label={labels.panDown}
+      isDisabled={yIncreasesDown ? window.y[1] >= 1 : window.y[0] <= 0}
+      onPress={() => pan('y', directionY)}
+    >
+      <Glyph kind="down" />
+    </IconButton>
+  );
   const top = yIncreasesDown ? window.y[0] : 1 - window.y[1];
   return (
     <>
@@ -389,6 +413,17 @@ export function ChartRectangularExplorationControls({
           </IconButton>
         </div>
       </div>
+      {verticalPan === 'beside' ? (
+        <div
+          data-wcl-chart-exploration-vertical-pan=""
+          onClick={stopPropagation}
+          onPointerDown={stopPropagation}
+          onKeyDown={stopPropagation}
+        >
+          {upButton}
+          {downButton}
+        </div>
+      ) : null}
       <div
         data-wcl-chart-exploration-pan=""
         onClick={stopPropagation}
@@ -404,24 +439,12 @@ export function ChartRectangularExplorationControls({
         >
           <Glyph kind="back" />
         </IconButton>
-        <IconButton
-          variant="quiet"
-          size="compact"
-          label={labels.panDown}
-          isDisabled={yIncreasesDown ? window.y[1] >= 1 : window.y[0] <= 0}
-          onPress={() => pan('y', directionY)}
-        >
-          <Glyph kind="down" />
-        </IconButton>
-        <IconButton
-          variant="quiet"
-          size="compact"
-          label={labels.panUp}
-          isDisabled={yIncreasesDown ? window.y[0] <= 0 : window.y[1] >= 1}
-          onPress={() => pan('y', -directionY)}
-        >
-          <Glyph kind="up" />
-        </IconButton>
+        {verticalPan === 'below' ? (
+          <>
+            {downButton}
+            {upButton}
+          </>
+        ) : null}
         <IconButton
           variant="quiet"
           size="compact"

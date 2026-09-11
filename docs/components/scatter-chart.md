@@ -19,6 +19,7 @@ Compare two quantitative measurements across distinct recorded observations.
 - Render ScatterChart inside AppearanceProvider in consumer-owned layout. Provide one record per point, separate id and label accessors, two quantitative axes, and one to six declared series. Supply visible title, description, axis labels, units, state copy, and a localized dataTableLabel. Multiple point groups require a visible legend.
 - Supply optional visibilityLabels: ChartVisibilityLabels and a named visible legend to enable an eye after each group name, including for a single group.
 - Supply optional PointChartInteraction<Datum> through interaction. selection and onActivate are independent. Existing idAccessor supplies stable observation IDs; each selection item has rowId and seriesId. There is no category target or second identity accessor. Consumers own details and may share controlled selection across charts with matching observation identities.
+- ScatterChart<Datum, LineDatum> accepts an optional ScatterChartLine<LineDatum> through line. Supply its id, label, data, idAccessor, labelAccessor, xAccessor and yAccessor. Observation and line data types, sample counts and x positions may differ. The line joins its own samples in input order on the observation axes; the library does not calculate a fit or join observations. Line and observation series together use at most six identities and require a visible legend.
 - ScatterChart contains a named figure, visible caption, optional feedback, a group legend when multiple groups exist, interactive SVG plot, quantitative axes, translucent shaped points, shared tooltip, polite announcement, and generated native data table.
 - Optional visibility adds separate legend eyes and an all-hidden recovery control. The complete native table retains every valid group and identifies hidden groups.
 - Optional interaction adds shape-following selection outlines, circular rings joined to the current mark border, filled reading centers, finite activation feedback, a drag rectangle, and a localized selection summary with a clear control.
@@ -50,10 +51,13 @@ Compare two quantitative measurements across distinct recorded observations.
 - With selection enabled, click or tap a mark toggles that observation. Control/Command-click activates without changing selection. Touch press-and-hold activates and suppresses selection on release. Without selection, click or tap activates when onActivate is supplied. Empty space has no click target.
 - Drag from empty plot space to select observations whose centers are inside the rectangle. A drag replaces selection; Shift or Control/Command adds and Alt removes. Bubble edges alone do not qualify. Escape, pointer cancellation, or a data or geometry change cancels the pending gesture without committing it.
 - Shared ChartSelection supports controlled selectedItems with onSelectionChange, or uncontrolled defaultSelectedItems. Supply labels for instructions, clear, empty, summary, item, and hidden. Selected state remains separate from the current reading and activation feedback. Neither selection nor activation changes records, scales, or domains.
+- Both datasets participate in shared selection and automatic axis fitting. Segments crossing the viewport remain visible. A click near a line segment resolves to a visible supplied endpoint, never a fabricated interpolated record. A crossing segment with both endpoints outside the viewport remains context until a sample becomes visible. Legend priority resolves only actual overlaps. Drag selection includes visible sample centers inside the rectangle, retaining the shared preview, modifiers, keyboard, touch hold and two-finger navigation behavior.
 - Group visibility remains internal and never mutates consumer data. Stable group IDs retain visibility across data updates. Removing a group ID drops its hidden state; new group IDs begin visible.
 - interaction.onActivate receives PointChartActivation<Datum> with item containing rowId and seriesId, the original datum, label, raw numeric x and y, optional raw magnitude for bubbles, and input of pointer, keyboard, or touch. onSelectionChange receives the next selection items. Readings and legend emphasis remain internal; callbacks expose no renderer objects.
+- Observation activation uses interaction.onActivate. Supplied sample activation uses line.onActivate with PointChartActivation<LineDatum>, including the original line datum and its supplied coordinates. Both use the shared selection state from interaction.selection. Public items retain rowId and seriesId; identical row IDs in different datasets remain distinct.
 - TypeScript requires numeric axis accessors and string id, label, and series accessors. Runtime preparation rejects duplicate point ids, unknown series, invalid domains, missing or non-finite coordinates, and out-of-domain values. Multiple series require seriesAccessor and a legend.
 - visibilityLabels requires a named visible legend. Validation uses the full supplied dataset before visibility, so hiding groups does not suppress invalid-data feedback.
+- Line sample IDs must be stable, nonempty and unique within the line dataset. Duplicate coordinates are allowed. Missing or invalid line coordinates break the line without joining across the gap. Nonfinite, invalid-scale or out-of-domain values use invalidData feedback. Complete source readings remain in the data table when series are hidden or the viewport changes.
 - Charts are not form controls and do not submit, validate, or reset values. Place filters and range controls beside the chart in consumer-owned composition.
 
 ## Accessibility
@@ -75,6 +79,7 @@ Compare two quantitative measurements across distinct recorded observations.
 
 - Each point has a translucent group-color fill and a stronger edge. Shape distinguishes groups when color is unavailable or points overlap. Direct reading dims every other point.
 - Interactive reading uses a small filled center. Selection outlines follow the full symbol; activation gives finite feedback. All six symbol shapes and bubble magnitude remain unchanged, and interaction cues stay inside the plot.
+- The supplied line has a line swatch and circular sample markers. Its eye removes the line and its samples from both plot and rectangular modal Overview. With a supplied line and exploration, Up sits above Down in a reserved gutter beside the plot; Left and Right stay below.
 - Horizontal axes consider formatted labels on categorical, time and numeric scales, using staggered rows before local scrolling. Complete vertical titles reserve space and wrap when needed. The production chart frame scales type, strokes, and plot geometry from measured space. Scatter points keep a bounded readable rendered size as the plot narrows. minimumSize and overflow retain the established local-scroll behavior.
 
 ## Accent, forced colors, and reduced motion
@@ -162,6 +167,33 @@ export function SelectableScatterChart({onOpenDetails}: {readonly onOpenDetails:
         title="Temperature and demand observations"
         xAxis={{accessor: "temperature", label: "Temperature", unit: "°F", scale: {type: "linear"}}}
         yAxis={{accessor: "demand", label: "Thermal demand", unit: "MWh", scale: {type: "linear"}}}
+      />
+    </AppearanceProvider>
+  );
+}
+```
+
+### Observations with a supplied target
+
+Observation records and supplied target samples have separate types and callbacks. The rendered showcase demonstrates shared selection, both eyes and the rectangular Overview.
+
+```tsx
+import '@trwhitney/component-library/styles.css';
+import {AppearanceProvider, ScatterChart} from '@trwhitney/component-library';
+
+export function ScatterTargetExample() {
+  return (
+    <AppearanceProvider appearance="dark" accent="#2878ff">
+      <ScatterChart
+        data={[{id: "observed", label: "Monday", temperature: 12, energy: 60}]}
+        idAccessor="id" labelAccessor="label" series={[{id: "observations", label: "Observations"}]}
+        line={{id: "target", label: "Target", data: [{key: "low", name: "Cool target", x: 5, y: 85}, {key: "high", name: "Mild target", x: 20, y: 45}], idAccessor: "key", labelAccessor: "name", xAccessor: "x", yAccessor: "y", onActivate: event => console.log(event.datum)}}
+        legend={{label: "Energy series"}} title="Temperature and energy" description="Observed energy and supplied targets."
+        dataTableLabel="Energy readings"
+        emptyState={{title: "No readings", description: "Add readings."}}
+        invalidData={{title: "Invalid readings", description: "Check supplied coordinates."}}
+        xAxis={{label: "Temperature", accessor: "temperature", unit: "°C", scale: {type: "linear"}}}
+        yAxis={{label: "Energy", accessor: "energy", unit: "kWh", scale: {type: "linear"}}}
       />
     </AppearanceProvider>
   );

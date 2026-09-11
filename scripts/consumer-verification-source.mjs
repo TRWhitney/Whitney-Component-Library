@@ -556,6 +556,8 @@ const view = React.createElement(
           labelAccessor: 'label',
           series: [{id: 'observations', label: 'Observations'}],
           title: 'Packed temperature and demand',
+          legend: {label: 'Demand series'},
+          line: {id: 'target', label: 'Target', data: [{key: 'a', name: 'Cool', x: 12, y: 20}, {key: 'b', name: 'Warm', x: 60, y: 75}], idAccessor: 'key', labelAccessor: 'name', xAccessor: 'x', yAccessor: 'y'},
           xAxis: {accessor: 'x', label: 'Temperature', scale: {type: 'linear'}, unit: '°F'},
           yAxis: {accessor: 'y', label: 'Demand', scale: {type: 'linear'}, unit: 'MWh'},
         }),
@@ -1012,6 +1014,7 @@ if (
   throw new Error('Packed Cartesian chart did not preserve its plotted and tabular meaning.');
 }
 if (
+  !document.querySelector('[data-wcl-scatter-chart] [data-wcl-chart-line]') ||
   !document.querySelector('[data-wcl-cartesian-chart] [data-wcl-chart-area]') ||
   !document.querySelector('[data-wcl-scatter-chart] [data-wcl-statistical-point]') ||
   !document.querySelector('[data-wcl-bubble-chart] [data-wcl-statistical-point]') ||
