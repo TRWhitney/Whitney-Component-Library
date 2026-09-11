@@ -11,6 +11,7 @@ import type {
 } from './chart-rectangular-exploration-types.js';
 import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
+import {useChartDataMotion} from './use-chart-data-motion.js';
 import {ChartActivationOutline, chartActivationOutset} from './chart-activation.js';
 import {bin as createBins, quantileSorted} from 'd3-array';
 import {line as createLine} from 'd3-shape';
@@ -142,6 +143,8 @@ interface PreparedPoint {
   readonly id: string;
   readonly label: string;
   readonly magnitude?: number;
+  /** Display-only bubble area fraction, interpolated independently of departing maxima. */
+  readonly magnitudeRatio?: number;
   readonly series: InternalSeries;
   readonly sourceIndex: number;
   readonly x: number;
@@ -1573,7 +1576,8 @@ function pointRadius<Datum extends object>(
   if (model.kind === 'scatter')
     return clamp(7.25, presentation.canvasWidth * 0.011, 11.25) / presentation.viewScale;
   const radius =
-    (Math.sqrt((point.magnitude ?? 0) / maximum) * clamp(24, presentation.canvasWidth * 0.04, 42)) /
+    (Math.sqrt(point.magnitudeRatio ?? (point.magnitude ?? 0) / maximum) *
+      clamp(24, presentation.canvasWidth * 0.04, 42)) /
     presentation.viewScale;
   return radiusForEquivalentCircleArea(radius, point.series.shape);
 }
@@ -1588,7 +1592,9 @@ function StatisticalMarks<Datum extends object>({
   presentation,
   projections,
   readings,
+  opacityById,
 }: {
+  readonly opacityById?: ReadonlyMap<string, number>;
   readonly maximumMagnitude?: number;
   readonly activeIndex: number | null;
   readonly directIndex: number | null;
@@ -1650,6 +1656,7 @@ function StatisticalMarks<Datum extends object>({
               data-series-index={point.series.shape}
               data-wcl-statistical-mark=""
               key={pointKey(point)}
+              opacity={opacityById?.get(pointKey(point))}
             >
               <PointShape
                 cx={reading.x}
@@ -2129,6 +2136,67 @@ function StatisticalFrame<Datum extends object>({
               boxes: visibleModel.boxes.filter((box) => boxNavigation.contains(box.series.id)),
             }
           : visibleModel;
+  const targetMaximumMagnitude =
+    visiblePointModel?.points.reduce(
+      (maximum, point) => Math.max(maximum, point.magnitude ?? 1),
+      0,
+    ) ?? 1;
+  const motionConfiguration = [
+    status.kind,
+    availableWidth,
+    aspectRatio,
+    minimumSize,
+    overflow,
+    visiblePointModel?.xAxis.scale,
+    visiblePointModel?.yAxis.scale,
+    fullModel.kind === 'scatter' || fullModel.kind === 'bubble' ? fullModel.series : null,
+    (fullModel.kind === 'scatter' || fullModel.kind === 'bubble') &&
+    fullModel.line?.samples.some((point) => point === null)
+      ? fullModel.line.samples.map((point) => (point ? pointKey(point) : null))
+      : null,
+  ];
+  const domainResetKey = visiblePointModel ? JSON.stringify(motionConfiguration) : undefined;
+  const navigationKey = exploration ? navigation.normalized : null;
+  const motionResetKey = JSON.stringify([hiddenIds, motionConfiguration, navigationKey]);
+  const plotResetKey = JSON.stringify([motionConfiguration, navigationKey]);
+  const motionEnabled =
+    !!visiblePointModel &&
+    visiblePointModel.points.length > 0 &&
+    status.kind !== 'loading' &&
+    status.kind !== 'error';
+  const dataMotion = useChartDataMotion(
+    visiblePointModel?.points.map((point) => ({
+      id: pointKey(point),
+      value: {
+        ...point,
+        magnitudeRatio: (point.magnitude ?? 0) / targetMaximumMagnitude,
+      },
+    })) ?? [],
+    {
+      version: JSON.stringify(
+        visiblePointModel ? statisticalModelGeometry(visiblePointModel) : null,
+      ),
+      resetKey: motionResetKey,
+      enabled: motionEnabled,
+      interpolate: (from, to, progress) => ({
+        ...to,
+        x: from.x + (to.x - from.x) * progress,
+        y: from.y + (to.y - from.y) * progress,
+        magnitudeRatio: from.magnitudeRatio + (to.magnitudeRatio - from.magnitudeRatio) * progress,
+        ...(to.magnitude === undefined
+          ? {}
+          : {
+              magnitude:
+                (from.magnitude ?? to.magnitude) +
+                (to.magnitude - (from.magnitude ?? to.magnitude)) * progress,
+            }),
+      }),
+    },
+  );
+  const liveMotion = new Map(
+    dataMotion.filter((item) => !item.exiting).map((item) => [item.id, item]),
+  );
+  const opacityById = new Map(dataMotion.map((item) => [item.id, item.opacity]));
   // Source labels determine the fixed canvas and axis gutters throughout navigation.
   const sizingModel = explores ? fullModel : visibleModel;
   const categoryLabels =
@@ -2153,10 +2221,12 @@ function StatisticalFrame<Datum extends object>({
       }
     : basePresentation;
   const basePlot = plotForPresentation(presentation);
-  const initialPlot = sidePan
+  const targetInitialPlot = sidePan
     ? {...basePlot, right: basePlot.right - 38 / presentation.viewScale}
     : basePlot;
+  const initialPlot = targetInitialPlot;
   const initialProjections = projectionsFor(viewportModel, initialPlot);
+  const targetInitialProjections = projectionsFor(viewportModel, targetInitialPlot);
   const yAxis = visibleModel.yAxis;
   const visibleHasData =
     visibleModel.kind === 'box'
@@ -2165,7 +2235,10 @@ function StatisticalFrame<Datum extends object>({
         ? !!visibleModel.bins.length
         : !!visibleModel.points.length;
   const animate =
-    !!visibilityLabels && visibleHasData && status.kind !== 'loading' && status.kind !== 'error';
+    (!!visibilityLabels || !!visiblePointModel) &&
+    visibleHasData &&
+    status.kind !== 'loading' &&
+    status.kind !== 'error';
   const xScale = visibleModel.kind === 'box' ? undefined : visibleModel.xAxis.scale;
   const xDomain = useAnimatedChartDomain(
     exploration
@@ -2180,6 +2253,7 @@ function StatisticalFrame<Datum extends object>({
       ? !navigationDragging
       : animate && xScale !== undefined && xScale.domain === undefined,
     xScale?.type === 'logarithmic',
+    domainResetKey,
   );
   const yDomain = useAnimatedChartDomain(
     exploration
@@ -2189,24 +2263,73 @@ function StatisticalFrame<Datum extends object>({
       ? !navigationDragging
       : (explores ? !navigationDragging : animate) && yAxis.scale.domain === undefined,
     yAxis.scale.type === 'logarithmic',
+    domainResetKey,
   );
   const model = modelWithDomains(viewportModel, xDomain, yDomain);
-  const yLabels = projectionsFor(explores ? fullModel : model, initialPlot).y.ticks.map((tick) =>
-    axisTickLabel(tick, yAxis),
-  );
-  const plot = plotForYAxisLabels(
+  const yLabels = projectionsFor(
+    explores ? fullModel : visiblePointModel ? viewportModel : model,
+    initialPlot,
+  ).y.ticks.map((tick) => axisTickLabel(tick, yAxis));
+  const targetPlot = plotForYAxisLabels(
     yLabels,
     presentation.fontSize / presentation.viewScale / 16,
     initialPlot,
     `${yAxis.label}${yAxis.unit === undefined ? '' : ` (${yAxis.unit})`}`,
   );
+  const plotMotion = useChartDataMotion([{id: 'plot', value: targetPlot}], {
+    version: JSON.stringify(targetPlot),
+    resetKey: plotResetKey,
+    enabled: motionEnabled,
+    interpolate: (from, to, progress) => ({
+      left: from.left + (to.left - from.left) * progress,
+      right: from.right + (to.right - from.right) * progress,
+      top: from.top + (to.top - from.top) * progress,
+      bottom: from.bottom + (to.bottom - from.bottom) * progress,
+    }),
+  });
+  const plot = plotMotion[0]!.value;
   const projections = projectionsFor(model, plot);
-  const readings = readingTargets(model, projections);
+  const displayedPoint = (point: PreparedPoint): PreparedPoint => {
+    const displayed = liveMotion.get(pointKey(point))?.value;
+    return displayed
+      ? {...point, x: displayed.x, y: displayed.y, magnitudeRatio: displayed.magnitudeRatio}
+      : point;
+  };
+  const displayModel =
+    model.kind === 'scatter' || model.kind === 'bubble'
+      ? {
+          ...model,
+          points: model.points.map(displayedPoint),
+          ...(model.line
+            ? {
+                line: {
+                  ...model.line,
+                  samples: model.line.samples.map((point) =>
+                    point ? displayedPoint(point) : null,
+                  ),
+                },
+              }
+            : {}),
+        }
+      : model;
+  const targetReadings = readingTargets(model, projections);
+  const readings = readingTargets(displayModel, projections).map((reading, index) => ({
+    ...targetReadings[index]!,
+    x: reading.x,
+    y: reading.y,
+  }));
+  const departureModel = visiblePointModel
+    ? {
+        ...visiblePointModel,
+        line: undefined,
+        points: dataMotion.filter((item) => item.exiting).map((item) => item.value),
+      }
+    : undefined;
   const allReadings = readingTargets(fullModel, projectionsFor(fullModel, initialPlot));
   const distributionGeometry = distributionPoints(model, projections, readings, presentation);
   const readingIdentity = JSON.stringify(readings.map((reading) => reading.id));
   const readingGeometry = JSON.stringify({
-    model: statisticalModelGeometry(model),
+    model: statisticalModelGeometry(visiblePointModel ? viewportModel : model),
     distribution: distributionGeometry.map((point) => [point.bounds, point.whiskers]),
     presentation: [
       aspectRatio,
@@ -2218,7 +2341,10 @@ function StatisticalFrame<Datum extends object>({
       presentation.pointStrokeWidth,
       presentation.viewScale,
     ],
-    readings: readings.map((reading) => [reading.id, reading.x, reading.y]),
+    readings: (visiblePointModel
+      ? readingTargets(viewportModel, targetInitialProjections)
+      : readings
+    ).map((reading) => [reading.id, reading.x, reading.y]),
   });
   const pointModel = model.kind === 'scatter' || model.kind === 'bubble' ? model : undefined;
   const fullPointModel =
@@ -2300,10 +2426,7 @@ function StatisticalFrame<Datum extends object>({
     JSON.stringify([readingGeometry, status.kind, hiddenIds]),
     sourceData,
   );
-  const maximumMagnitude = ((exploration ? visiblePointModel : pointModel)?.points ?? []).reduce(
-    (max, point) => Math.max(max, point.magnitude ?? 1),
-    0,
-  );
+  const maximumMagnitude = targetMaximumMagnitude;
   const points: DistributionPoint[] = pointModel
     ? pointModel.points.map((point, index) => ({
         kind: 'point' as const,
@@ -2313,7 +2436,12 @@ function StatisticalFrame<Datum extends object>({
         categoryPosition: readings[index]!.x,
         seriesId: point.series.id,
         item: {rowId: point.id, seriesId: point.series.id},
-        radius: pointRadius(pointModel, point, presentation, maximumMagnitude),
+        radius: pointRadius(
+          pointModel,
+          liveMotion.get(pointKey(point))?.value ?? point,
+          presentation,
+          maximumMagnitude,
+        ),
         shape: point.series.shape,
       }))
     : distributionGeometry;
@@ -2386,7 +2514,7 @@ function StatisticalFrame<Datum extends object>({
     status.kind,
     availableWidth,
     aspectRatio,
-    plot,
+    visiblePointModel ? targetInitialPlot : plot,
   ]);
   const [previousNavigationVersion, setPreviousNavigationVersion] = useState(navigationVersion);
   if (previousNavigationVersion !== navigationVersion) {
@@ -2482,7 +2610,7 @@ function StatisticalFrame<Datum extends object>({
         ? containsPointShape(point.shape, point.radius, x - point.x, y - point.y)
         : hitsDistribution(point, x, y, 2 / presentation.viewScale),
     );
-    const line = pointModel?.line;
+    const line = displayModel.kind === 'scatter' ? displayModel.line : undefined;
     if (line) {
       let nearest: {distance: number; point: DistributionPoint} | undefined;
       for (let index = 1; index < line.samples.length; index += 1) {
@@ -3047,12 +3175,29 @@ function StatisticalFrame<Datum extends object>({
                   </defs>
                   <>
                     <g clipPath={visibilityLabels || explores ? `url(#${marksClipId})` : undefined}>
+                      {departureModel?.points.length ? (
+                        <g pointerEvents="none" aria-hidden="true" data-wcl-chart-departures="">
+                          <StatisticalMarks
+                            activeIndex={null}
+                            directIndex={null}
+                            legendSeriesId={undefined}
+                            maximumMagnitude={maximumMagnitude}
+                            model={departureModel}
+                            pinnedSeriesId={null}
+                            presentation={presentation}
+                            projections={projections}
+                            readings={readingTargets(departureModel, projections)}
+                            opacityById={opacityById}
+                          />
+                        </g>
+                      ) : null}
                       <StatisticalMarks
                         activeIndex={activeIndex}
                         directIndex={directIndex}
                         legendSeriesId={legendSeriesId}
                         maximumMagnitude={maximumMagnitude}
-                        model={model}
+                        model={displayModel}
+                        opacityById={opacityById}
                         pinnedSeriesId={validPinnedSeriesId}
                         presentation={presentation}
                         projections={projections}

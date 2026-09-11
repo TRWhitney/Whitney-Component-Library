@@ -4,7 +4,7 @@
 
 **Blocked by:** None. Shared motion support is integrated with ticket 34.
 
-**Status:** ready-to-commit
+**Status:** complete
 
 - [x] Implement the accepted motion with interruption, reduced motion and deterministic first render.
 - [x] Preserve actual source readings/callbacks, visible-geometry interaction, identity and established chart behavior.

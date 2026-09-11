@@ -1289,13 +1289,13 @@ function statisticalChartContract({
               ? 'Hiding a group hides its summary and every outlier together. Remaining categories use declared group order. The numeric axis fits visible summaries and outliers without recomputing statistics across groups.'
               : 'Hiding a series hides all its observations. Both numeric axes fit visible observations. Bubble areas retain their magnitude interpretation within the visible dataset.',
             'Automatic numeric bounds fit visible groups with interruptible animation. Explicit consumer domains remain fixed and logarithmic bounds remain positive. Readings retain exact values throughout animation.',
-            'Selections remain attached to hidden items and use the localized hidden selection label. Hidden items cannot be read, selected by dragging, or activated. Visibility, data, or geometry changes cancel pending gestures and stale readings; removed data still prunes selection.',
+            `Selections remain attached to hidden items and use the localized hidden selection label. Hidden items cannot be read, selected by dragging, or activated. ${name === 'BoxPlot' ? 'Visibility, data, or geometry changes cancel pending gestures and stale readings;' : 'Visibility, source-data, or configuration changes cancel pending gestures and stale readings; animation frames preserve active gestures;'} removed data still prunes selection.`,
           ]
         : []),
       ...(pointInteraction
         ? [
             'With selection enabled, click or tap a mark toggles that observation. Control/Command-click activates without changing selection. Touch press-and-hold activates and suppresses selection on release. Without selection, click or tap activates when onActivate is supplied. Empty space has no click target.',
-            'Drag from empty plot space to select observations whose centers are inside the rectangle. A drag replaces selection; Shift or Control/Command adds and Alt removes. Bubble edges alone do not qualify. Escape, pointer cancellation, or a data or geometry change cancels the pending gesture without committing it.',
+            'Drag from empty plot space to select observations whose centers are inside the rectangle. A drag replaces selection; Shift or Control/Command adds and Alt removes. Bubble edges alone do not qualify. Escape, pointer cancellation, or a source-data or configuration change cancels the pending gesture without committing it.',
             'Shared ChartSelection supports controlled selectedItems with onSelectionChange, or uncontrolled defaultSelectedItems. Supply labels for instructions, clear, empty, summary, item, and hidden. Selected state remains separate from the current reading and activation feedback. Neither selection nor activation changes records, scales, or domains.',
           ]
         : [
@@ -1410,6 +1410,11 @@ function statisticalChartContract({
       activationTiming,
       outlineMotion,
       guidance.reducedMotion,
+      ...(pointInteraction
+        ? [
+            'Source point coordinates and bubble areas animate over 240ms with cubic ease-out. Stable observation IDs retain identity through reordering. Arrivals and departures fade; departing points cannot receive interaction. Automatic axes and selection follow displayed geometry, while readings and callbacks report supplied values immediately. Repeated updates start at the current display and reduced motion settles immediately. Initial, empty, configuration and missing-sample topology changes remain immediate. Supplied-line values move with their sample marks; adding or removing samples updates line adjacency immediately while the sample marks fade.',
+          ]
+        : []),
       ...(groupVisibility
         ? [
             'Reduced motion settles automatic scale changes immediately, including when the preference changes during an animation. Otherwise axes and marks share the animated scale.',

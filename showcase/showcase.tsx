@@ -1,4 +1,5 @@
 import {CartesianDataMotionExample} from './cartesian-data-motion-example.js';
+import {StatisticalDataMotionExample} from './statistical-data-motion-example.js';
 import {RangeChartExample} from './range-chart-example.js';
 import {ScatterLineExample} from './scatter-line-example.js';
 import {DistributionExplorationExample} from './distribution-exploration-examples.js';
@@ -3848,6 +3849,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Pin a legend group to give it priority where points overlap. ${statisticalVisibilityGuidance}`}
         name="ScatterChart"
       >
+        <Example label="Updated observations">
+          <StatisticalDataMotionExample kind="scatter" />
+        </Example>
         <Example label="Scatter with a supplied line">
           <ScatterLineExample />
         </Example>
@@ -3866,6 +3870,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Add one positive measurement through proportional mark area. Bubble areas express magnitude within the visible dataset; tooltips and the full table retain exact source values. ${statisticalVisibilityGuidance}`}
         name="BubbleChart"
       >
+        <Example label="Updated observations">
+          <StatisticalDataMotionExample kind="bubble" />
+        </Example>
         <p>
           <a href="#scatter-chart">Compare pan and zoom for scatter and bubble charts.</a>
         </p>
