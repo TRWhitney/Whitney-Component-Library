@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {chartDataMotionDuration, chartDataMotionEase} from './use-chart-data-motion.js';
 
 type Domain = readonly [number, number];
 
@@ -7,10 +8,11 @@ export function useAnimatedChartDomain(
   target: Domain,
   enabled: boolean,
   logarithmic: boolean,
+  resetKey = '',
 ): Domain {
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [domain, setDomain] = useState(target);
-  const current = useRef({domain: target, enabled});
+  const [domain, setDomain] = useState({value: target, resetKey});
+  const current = useRef({domain: target, enabled, resetKey});
   const [lower, upper] = target;
   const animate = enabled && !reducedMotion;
 
@@ -26,13 +28,21 @@ export function useAnimatedChartDomain(
   useEffect(() => {
     const next: Domain = [lower, upper];
     const previous = current.current;
+    if (
+      previous.domain[0] === lower &&
+      previous.domain[1] === upper &&
+      previous.enabled === animate &&
+      previous.resetKey === resetKey
+    )
+      return;
     const publish = (value: Domain): void => {
-      current.current = {domain: value, enabled: animate};
-      setDomain(value);
+      current.current = {domain: value, enabled: animate, resetKey};
+      setDomain({value, resetKey});
     };
     if (
       !animate ||
       !previous.enabled ||
+      previous.resetKey !== resetKey ||
       typeof requestAnimationFrame === 'undefined' ||
       (previous.domain[0] === lower && previous.domain[1] === upper)
     ) {
@@ -46,8 +56,8 @@ export function useAnimatedChartDomain(
         ? Math.exp((1 - progress) * Math.log(from) + progress * Math.log(to))
         : (1 - progress) * from + progress * to;
     const step = (timestamp: number): void => {
-      const progress = Math.max(0, Math.min(1, (timestamp - started) / 240));
-      const eased = 1 - (1 - progress) ** 3;
+      const progress = Math.max(0, Math.min(1, (timestamp - started) / chartDataMotionDuration));
+      const eased = chartDataMotionEase(progress);
       const value: Domain = [
         interpolate(previous.domain[0], lower, eased),
         interpolate(previous.domain[1], upper, eased),
@@ -59,7 +69,7 @@ export function useAnimatedChartDomain(
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [animate, logarithmic, lower, upper]);
+  }, [animate, logarithmic, lower, upper, resetKey]);
 
-  return animate ? domain : target;
+  return animate && domain.resetKey === resetKey ? domain.value : target;
 }

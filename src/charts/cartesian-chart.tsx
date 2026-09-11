@@ -49,6 +49,7 @@ import {
   type InteractionPoint,
 } from './chart-interaction.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
+import {useChartDataMotion} from './use-chart-data-motion.js';
 import type {
   AreaChartProps,
   BarChartProps,
@@ -158,6 +159,10 @@ interface PreparedRow<Datum extends object, Category extends ChartDomainValue> {
   readonly index: number;
   readonly values: readonly number[];
   readonly lowerValues?: readonly number[];
+  readonly source?: PreparedRow<Datum, Category>;
+  readonly motionId?: string;
+  readonly opacity?: number;
+  readonly exiting?: boolean;
 }
 
 interface ChartReading {
@@ -822,6 +827,7 @@ function formatSeriesReading<Datum extends object, Category extends ChartDomainV
   axis: ChartValueAxis,
   includeUnit = true,
 ): string {
+  row = row.source ?? row;
   const value = displayedValues(row, layout)[seriesIndex];
   if (value === undefined || !Number.isFinite(value)) return '—';
   const format = (n: number) =>
@@ -1206,12 +1212,14 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
   categoryPlacement,
   categoryProjection,
   emphasizedSeriesId,
+  departures = false,
   layout,
   plot,
   rows,
   series,
   valueProjection,
 }: {
+  readonly departures?: boolean;
   readonly categoryPlacement: 'x' | 'y';
   readonly categoryProjection: Projection<Category>;
   readonly emphasizedSeriesId: string | undefined;
@@ -1231,6 +1239,7 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
   return (
     <g data-wcl-chart-marks="">
       {orderedSeries.map(({item, seriesIndex}) => {
+        if (departures && item.kind !== 'bar' && item.kind !== 'column') return null;
         const color = item.color;
         if (item.kind === 'line') {
           const path = createLine<PreparedRow<Datum, Category>>()
@@ -1263,10 +1272,11 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
                       <circle
                         cx={categoryProjection.position(row.category)}
                         cy={valueProjection.position(row.values[seriesIndex] ?? 0)}
-                        data-row-index={rowIndex}
+                        data-row-index={row.exiting ? undefined : rowIndex}
+                        opacity={row.opacity}
                         data-series={item.id}
                         data-wcl-chart-point=""
-                        key={`${item.id}-${row.index}`}
+                        key={`${item.id}-${row.motionId ?? row.index}`}
                         r="3.25"
                       />
                     ),
@@ -1346,11 +1356,13 @@ function Marks<Datum extends object, Category extends ChartDomainValue>({
               });
               return (
                 <rect
-                  data-row-index={rowIndex}
+                  data-row-index={row.exiting ? undefined : rowIndex}
                   data-series={item.id}
-                  data-wcl-chart-bar=""
+                  data-wcl-chart-bar={row.exiting ? undefined : ''}
+                  data-wcl-chart-departing-bar={row.exiting ? '' : undefined}
+                  opacity={row.opacity}
                   {...rect}
-                  key={`${item.id}-${row.index}`}
+                  key={`${item.id}-${row.motionId ?? row.index}`}
                 />
               );
             })}
@@ -1890,7 +1902,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   );
   const series = allSeries.filter((item) => !hiddenIds.includes(item.id));
   const allPrepared = prepareRows(data, categoryAxis, allSeries, valueAxis, layout);
-  const prepared = {
+  const supplied = {
     invalidCount: allPrepared.invalidCount,
     rows: allPrepared.rows.map((row) => ({
       ...row,
@@ -1946,6 +1958,139 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   ) {
     throw new Error('Chart selection cannot combine selectedItems and defaultSelectedItems.');
   }
+  // Source rows own identity, readings and callbacks. Only this display model moves.
+  const usesBars = series.some((item) => item.kind === 'bar' || item.kind === 'column');
+  const categoryKey = (category: Category): string =>
+    JSON.stringify([category instanceof Date ? 'date' : typeof category, category]);
+  const motionIds = supplied.rows.map((row) =>
+    interaction ? rowIds[row.index]! : categoryKey(row.category),
+  );
+  const uniqueMotionIds = new Set(motionIds).size === motionIds.length;
+  const categorical = categoryAxis.scale.type === 'categorical';
+  const motionProjection = createProjection(
+    exploration ? displayedCategoryScale : categoryAxis.scale,
+    supplied.rows.map((row) => row.category),
+    [0, 1],
+    categoryAxis.tickCount ?? 6,
+    usesBars,
+  );
+  const motionConfiguration = [
+    allSeries.map((item) => [item.id, item.kind, item.curve]),
+    layout,
+    categoryPlacement,
+    categoryAxis.scale,
+    valueAxis.scale,
+    status.kind,
+    uniqueMotionIds,
+    // A gap changes path topology; marks, axes and gutters must settle together.
+    allPrepared.rows.some((row) => row.values.some((value) => !Number.isFinite(value)))
+      ? allPrepared.rows.map((row) => [categoryKey(row.category), row.values.map(Number.isFinite)])
+      : null,
+    categorical ? null : allPrepared.rows.map((row) => categoryKey(row.category)),
+  ];
+  const domainResetKey = JSON.stringify(motionConfiguration);
+  const motionResetKey = JSON.stringify([motionConfiguration, hiddenIds, windowKey]);
+  const motionTargets = supplied.rows.map((row, index) => ({
+    id: motionIds[index]!,
+    value: {
+      row,
+      position: motionProjection.position(row.category),
+      bandwidth: motionProjection.bandwidth,
+    },
+  }));
+  const movingRows = useChartDataMotion(motionTargets, {
+    enabled:
+      uniqueMotionIds &&
+      supplied.rows.length > 0 &&
+      status.kind !== 'loading' &&
+      status.kind !== 'error',
+    version: JSON.stringify(
+      motionTargets.map(({id, value}) => [
+        id,
+        value.row.category,
+        value.row.values,
+        value.row.lowerValues,
+        value.position,
+        value.bandwidth,
+      ]),
+    ),
+    resetKey: motionResetKey,
+    interpolate: (from, to, progress) => ({
+      ...to,
+      position:
+        from.position !== undefined && to.position !== undefined
+          ? from.position + (to.position - from.position) * progress
+          : to.position,
+      bandwidth: from.bandwidth + (to.bandwidth - from.bandwidth) * progress,
+      row: {
+        ...to.row,
+        values: to.row.values.map((value, index) =>
+          Number.isFinite(value) && Number.isFinite(from.row.values[index])
+            ? from.row.values[index]! + (value - from.row.values[index]!) * progress
+            : value,
+        ),
+        ...(to.row.lowerValues
+          ? {
+              lowerValues: to.row.lowerValues.map((value, index) => {
+                const old = from.row.lowerValues?.[index];
+                return old !== undefined && Number.isFinite(old) && Number.isFinite(value)
+                  ? old + (value - old) * progress
+                  : value;
+              }),
+            }
+          : {}),
+      },
+    }),
+  });
+  const motionById = new Map(movingRows.map((item) => [item.id, item]));
+  const prepared = {
+    ...supplied,
+    rows: supplied.rows.map((row, index) => {
+      const id = motionIds[index]!;
+      const displayed = uniqueMotionIds ? motionById.get(id) : undefined;
+      return {
+        ...row,
+        values: displayed?.value.row.values ?? row.values,
+        ...(row.lowerValues
+          ? {lowerValues: displayed?.value.row.lowerValues ?? row.lowerValues}
+          : {}),
+        source: row,
+        motionId: uniqueMotionIds ? id : String(row.index),
+        opacity: displayed?.opacity ?? 1,
+      };
+    }),
+  };
+  const departingRows = movingRows
+    .filter((item) => item.exiting)
+    .map((item) => ({
+      ...item.value.row,
+      motionId: item.id,
+      opacity: item.opacity,
+      exiting: true,
+    }));
+  const categoryMotion = new Map(
+    movingRows.map((item) => [categoryKey(item.target.row.category), item.value]),
+  );
+  const projectCategories = (
+    projection: Projection<Category>,
+    range: readonly [number, number],
+  ): Projection<Category> => {
+    if (!categorical || !uniqueMotionIds) return projection;
+    const width = range[1] - range[0];
+    const displayed = movingRows.find((item) => !item.exiting);
+    return {
+      ...projection,
+      bandwidth: (displayed?.value.bandwidth ?? motionProjection.bandwidth) * width,
+      position: (category) => {
+        const value = categoryMotion.get(categoryKey(category));
+        return value
+          ? value.position === undefined
+            ? undefined
+            : range[0] + value.position * width
+          : projection.position(category);
+      },
+    };
+  };
   const interactionRows = (interaction ? allPrepared.rows : []).map((row) => ({
     id: rowIds[row.index] ?? '',
     category: row.category,
@@ -2139,8 +2284,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     return () => document.removeEventListener('pointerdown', dismissTouchReading);
   }, [rootElement, touchReading]);
 
-  const fullValueDomain = valueDomain(prepared.rows, layout, series);
-  const usesBars = series.some((item) => item.kind === 'bar' || item.kind === 'column');
+  const fullValueDomain = valueDomain(supplied.rows, layout, series);
   const categoryValues = prepared.rows.map((row) => row.category);
   // Full-source labels keep the plot bounds stable while fitting the viewport's values.
   const explorationPlot = exploration
@@ -2220,13 +2364,13 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   const visibleValueDomain = exploration
     ? categoryAxis.scale.type === 'categorical'
       ? valueDomain(
-          prepared.rows.filter((row) => navigation.contains(row.category)),
+          supplied.rows.filter((row) => navigation.contains(row.category)),
           layout,
           series,
         )
       : [
           ...explorationValueDomain(
-            prepared.rows,
+            supplied.rows,
             series,
             layout,
             navigation.position,
@@ -2235,7 +2379,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
           ),
           ...[...barCrossings].flatMap(([rowIndex, indexes]) =>
             indexes.flatMap((index) => {
-              const {start, end} = coordinates(prepared.rows[rowIndex]!, index, layout);
+              const {start, end} = coordinates(supplied.rows[rowIndex]!, index, layout);
               return [start, end];
             }),
           ),
@@ -2255,7 +2399,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   ];
   const animatedDomain = useAnimatedChartDomain(
     targetDomain,
-    (hasVisibilityControls || exploration !== undefined) &&
+    uniqueMotionIds &&
       !navigationDragging &&
       !isLoading &&
       !isError &&
@@ -2264,11 +2408,61 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       valueAxis.scale.type !== 'normalized' &&
       valueAxis.scale.domain === undefined,
     valueAxis.scale.type === 'logarithmic',
+    domainResetKey,
   );
   const animatedScale =
     valueAxis.scale.type === 'normalized'
       ? valueAxis.scale
       : {...valueAxis.scale, domain: animatedDomain};
+
+  const createPlotProjections = (bounds: PlotBounds) => ({
+    categoryProjection: projectCategories(
+      createProjection(
+        exploration ? displayedCategoryScale : categoryAxis.scale,
+        categoryValues,
+        categoryPlacement === 'x' ? [bounds.left, bounds.right] : [bounds.top, bounds.bottom],
+        exploration ? navigationTickCount : (categoryAxis.tickCount ?? 6),
+        usesBars,
+      ),
+      categoryPlacement === 'x' ? [bounds.left, bounds.right] : [bounds.top, bounds.bottom],
+    ),
+    valueProjection: createProjection(
+      animatedScale,
+      rawDomain,
+      categoryPlacement === 'x' ? [bounds.bottom, bounds.top] : [bounds.left, bounds.right],
+      valueAxis.tickCount ?? 5,
+      false,
+    ),
+  });
+  const preliminaryProjections = createPlotProjections(presentationPlot);
+  const yAxisLabels =
+    categoryPlacement === 'x'
+      ? targetProjection.ticks.map((tick) => axisTickLabel(tick, valueAxis))
+      : preliminaryProjections.categoryProjection.ticks.map((tick) => {
+          const label = axisTickLabel(tick, categoryAxis);
+          return categoryAxis.scale.type === 'categorical' ? truncateTickLabel(label, 14) : label;
+        });
+  const targetPlot =
+    explorationPlot ??
+    plotForYAxisLabels(
+      yAxisLabels,
+      presentation.fontSize / presentation.viewScale / 16,
+      presentationPlot,
+      axisTitle(categoryPlacement === 'x' ? valueAxis : categoryAxis),
+      canvasHeight,
+    );
+  const plotMotion = useChartDataMotion([{id: 'plot', value: targetPlot}], {
+    version: JSON.stringify(targetPlot),
+    resetKey: JSON.stringify([motionResetKey, availableWidth, aspectRatio, minimumSize, overflow]),
+    enabled: uniqueMotionIds && hasData && !isLoading && !isError,
+    interpolate: (from, to, progress) => ({
+      left: from.left + (to.left - from.left) * progress,
+      right: from.right + (to.right - from.right) * progress,
+      top: from.top + (to.top - from.top) * progress,
+      bottom: from.bottom + (to.bottom - from.bottom) * progress,
+    }),
+  });
+  const plot = plotMotion[0]!.value;
 
   let content: ReactNode;
   if (isLoading) {
@@ -2309,39 +2503,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       </>
     );
   } else {
-    const createPlotProjections = (bounds: PlotBounds) => ({
-      categoryProjection: createProjection(
-        exploration ? displayedCategoryScale : categoryAxis.scale,
-        categoryValues,
-        categoryPlacement === 'x' ? [bounds.left, bounds.right] : [bounds.top, bounds.bottom],
-        exploration ? navigationTickCount : (categoryAxis.tickCount ?? 6),
-        usesBars,
-      ),
-      valueProjection: createProjection(
-        animatedScale,
-        rawDomain,
-        categoryPlacement === 'x' ? [bounds.bottom, bounds.top] : [bounds.left, bounds.right],
-        valueAxis.tickCount ?? 5,
-        false,
-      ),
-    });
-    const preliminaryProjections = createPlotProjections(presentationPlot);
-    const yAxisLabels =
-      categoryPlacement === 'x'
-        ? targetProjection.ticks.map((tick) => axisTickLabel(tick, valueAxis))
-        : preliminaryProjections.categoryProjection.ticks.map((tick) => {
-            const label = axisTickLabel(tick, categoryAxis);
-            return categoryAxis.scale.type === 'categorical' ? truncateTickLabel(label, 14) : label;
-          });
-    const plot =
-      explorationPlot ??
-      plotForYAxisLabels(
-        yAxisLabels,
-        presentation.fontSize / presentation.viewScale / 16,
-        presentationPlot,
-        axisTitle(categoryPlacement === 'x' ? valueAxis : categoryAxis),
-        canvasHeight,
-      );
     const {categoryProjection, valueProjection} = createPlotProjections(plot);
     const references = readingReferences(annotations, categoryPlacement);
     const readingRow = activeReading === null ? undefined : prepared.rows[activeReading.index];
@@ -2941,6 +3102,21 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                   series={series}
                   valueProjection={valueProjection}
                 />
+                {usesBars && departingRows.length > 0 ? (
+                  <g aria-hidden="true" pointerEvents="none" data-wcl-chart-departures="">
+                    <Marks
+                      categoryPlacement={categoryPlacement}
+                      categoryProjection={categoryProjection}
+                      emphasizedSeriesId={emphasizedSeriesId}
+                      layout={layout}
+                      plot={plot}
+                      rows={departingRows}
+                      series={series}
+                      departures
+                      valueProjection={valueProjection}
+                    />
+                  </g>
+                ) : null}
               </g>
               <g clipPath={exploration ? `url(#${plotClipId})` : undefined}>
                 <Annotations

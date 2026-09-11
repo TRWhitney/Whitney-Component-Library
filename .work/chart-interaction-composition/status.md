@@ -6,7 +6,7 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-The approved combined charts are delivered. [Ticket 32](tickets/32-line-range.md) adds supplied ranges to CartesianChart. [Ticket 33](tickets/33-scatter-line.md) adds a separate supplied dataset to ScatterChart. Both preserve established behavior outside the reviewed paired range markers and vertical pan placement. No prototype approval is pending.
+The combined charts are delivered in `bd706ce` and `f3087f9`. [Value-change motion](prototypes/value-motion.md#acceptance-contract) is approved across all five examples. The [data-transition study](prototypes/data-transitions.md) now shows additions, removals, reordering and automatic axis fitting in columns, bubbles and a donut. Whitney approved it. Tickets 34–37 carry the reviewed transitions into production; other renderer cases remain on the parent frontier.
 
 ## Progress
 
@@ -21,6 +21,8 @@ The [decision map](map.md) indexes remaining parent-ticket work. General data-ch
 
 ## Accepted sources
 
+- [Value-change motion](prototypes/value-motion.md#acceptance-contract)
+
 - [Production combined-chart boundary](spec.md#production-combined-chart-boundary)
 - [Approved combinations and precedence](prototypes/combined-charts.md#acceptance-contract)
 - [Production exploration boundary](spec.md#production-exploration-boundary)
@@ -28,7 +30,7 @@ The [decision map](map.md) indexes remaining parent-ticket work. General data-ch
 
 ## Verification
 
-Focused range and scatter-line regressions pass. Native 390px and 1280px checks cover paired range rings, month underlines and drag preview, independent eyes, callbacks, touch hold without selection changes, pinch, vertical pan, modal overview dragging and fixed chart dimensions. Light/dark markers and reduced-motion static pulses were inspected. All 867 tests and configured repository checks pass. Packed React 18.3.1 and 19.2.8 SSR, hydration, types and browser builds pass. The production showcase builds. Independent intent and engineering reviews pass after the four admitted gesture/identity/targeting corrections. Seven new regressions cover those failures.
+Production motion passes all 904 tests and `npm run check`, including formatting, code/style lint, generated guidance, all three TypeScript versions and chart isolation. `npm run verify:package` passes packed React 18.3.1 and 19.2.8 SSR, hydration, types and browser builds. The production showcase builds. Native compact/wide, dark/light, reduced-motion, retained-selection, current callback and touch-hold flows pass. Fitted axis gutters now move with data. The new heatmap example uses the approved exploration layout; the Cartesian example fits a 308px mobile container. Independent full reviews identified axis reset exceptions and a second heatmap color transition. Those issues are corrected with six regressions and renewed repository/package/native evidence. Independent intent and engineering correction reviews pass with no findings. All admitted blockers are resolved. Per-family evidence is in tickets 34–37.
 
 ## Out of scope
 
@@ -36,7 +38,7 @@ Scatter with adjacent distributions, application layouts, implicit statistical c
 
 ## Continuation
 
-- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work planning`.
-- Branch `main`. Range delivery is `bd706ce`; the following scatter delivery commits the rest of this accepted outcome.
+- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
+- Branch `main`, production base `f3087f9`. Uncommitted work is production motion in the four reviewed renderer families, shared motion support, public regressions, rendered examples, canonical/generated guidance, and both accepted prototypes with their effort records.
 - Both deliveries include public exports, canonical contracts and guides, complete production examples, regression/type/package coverage and the accepted effort record.
-- Plan the remaining general data-change animation and responsiveness-budget work. The combined charts need no further prototype approval; do not reopen accepted behavior.
+- Commit each reviewed renderer outcome with its documentation and examples, then plan one combined motion study for radar, Sparkline, histogram and box plot. Preserve immediate behavior for unreviewed topology/state changes. Whitney explicitly requested proceeding automatically after approval until new input is necessary.

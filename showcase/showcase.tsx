@@ -1,3 +1,4 @@
+import {CartesianDataMotionExample} from './cartesian-data-motion-example.js';
 import {RangeChartExample} from './range-chart-example.js';
 import {ScatterLineExample} from './scatter-line-example.js';
 import {DistributionExplorationExample} from './distribution-exploration-examples.js';
@@ -3607,6 +3608,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference. Tab into the plot and use the arrow keys for keyboard readings; mouse readings clear when the pointer leaves the plot. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
         name="LineChart"
       >
+        <Example label="Update chart data">
+          <CartesianDataMotionExample />
+        </Example>
         <Example label="Pan, zoom and overview">
           <LineExplorationExample />
         </Example>
@@ -3725,6 +3729,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         name="AreaChart"
       >
         <p>
+          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
+        </p>
+        <p>
           <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
         </p>
         <Example label="AreaChart with selection and details">
@@ -3737,6 +3744,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         name="ColumnChart"
       >
         <p>
+          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
+        </p>
+        <p>
           <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
         </p>
         <Example label="ColumnChart with selection and details">
@@ -3748,6 +3758,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Compare discrete categories on a horizontal plot. Up and Down move through its vertical category axis when the plot has keyboard focus. Bars retain a zero baseline as visibility changes. ${visibilityGuidance}`}
         name="BarChart"
       >
+        <p>
+          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
+        </p>
         <p>
           <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
         </p>
@@ -3817,6 +3830,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Combine compatible line, range, area, and column series only when they share one domain, numeric scale, and comparison question. Restored series keep their original colors and patterns. ${visibilityGuidance}`}
         name="CartesianChart"
       >
+        <p>
+          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
+        </p>
         <p>
           <a href="#line-chart">Compare pan and zoom for mixed charts.</a>
         </p>

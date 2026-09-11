@@ -6136,6 +6136,7 @@
     vector-effect: non-scaling-stroke;
   }
 
+  [data-wcl-chart-departing-bar],
   [data-wcl-chart-bar] {
     fill: color-mix(in oklch, var(--wcl-chart-series-color) 30%, var(--wcl-surface));
     stroke: var(--wcl-chart-series-color);
@@ -6228,7 +6229,7 @@
     [data-wcl-chart-line],
     [data-wcl-chart-point],
     [data-wcl-chart-area],
-    [data-wcl-chart-bar],
+    :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
     [data-wcl-chart-reading-node]
   ) {
     transition: stroke-width 120ms ease;
@@ -6323,7 +6324,11 @@
   :is(
     [data-series-index='1'][data-wcl-chart-area],
     [data-series-index='1']
-      :is([data-wcl-chart-line], [data-wcl-chart-bar], [data-wcl-chart-legend-line])
+      :is(
+        [data-wcl-chart-line],
+        :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
+        [data-wcl-chart-legend-line]
+      )
   ) {
     stroke-dasharray: 6 3;
   }
@@ -6331,7 +6336,11 @@
   :is(
     [data-series-index='2'][data-wcl-chart-area],
     [data-series-index='2']
-      :is([data-wcl-chart-line], [data-wcl-chart-bar], [data-wcl-chart-legend-line])
+      :is(
+        [data-wcl-chart-line],
+        :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
+        [data-wcl-chart-legend-line]
+      )
   ) {
     stroke-dasharray: 2 2;
   }
@@ -6339,7 +6348,11 @@
   :is(
     [data-series-index='3'][data-wcl-chart-area],
     [data-series-index='3']
-      :is([data-wcl-chart-line], [data-wcl-chart-bar], [data-wcl-chart-legend-line])
+      :is(
+        [data-wcl-chart-line],
+        :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
+        [data-wcl-chart-legend-line]
+      )
   ) {
     stroke-dasharray: 8 3 2 3;
   }
@@ -6347,7 +6360,11 @@
   :is(
     [data-series-index='4'][data-wcl-chart-area],
     [data-series-index='4']
-      :is([data-wcl-chart-line], [data-wcl-chart-bar], [data-wcl-chart-legend-line])
+      :is(
+        [data-wcl-chart-line],
+        :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
+        [data-wcl-chart-legend-line]
+      )
   ) {
     stroke-dasharray: 1 3;
   }
@@ -6355,28 +6372,32 @@
   :is(
     [data-series-index='5'][data-wcl-chart-area],
     [data-series-index='5']
-      :is([data-wcl-chart-line], [data-wcl-chart-bar], [data-wcl-chart-legend-line])
+      :is(
+        [data-wcl-chart-line],
+        :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
+        [data-wcl-chart-legend-line]
+      )
   ) {
     stroke-dasharray: 10 3;
   }
 
-  [data-series-index='1'] [data-wcl-chart-bar] {
+  [data-series-index='1'] :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]) {
     fill-opacity: 0.76;
   }
 
-  [data-series-index='2'] [data-wcl-chart-bar] {
+  [data-series-index='2'] :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]) {
     fill-opacity: 0.6;
   }
 
-  [data-series-index='3'] [data-wcl-chart-bar] {
+  [data-series-index='3'] :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]) {
     fill-opacity: 0.86;
   }
 
-  [data-series-index='4'] [data-wcl-chart-bar] {
+  [data-series-index='4'] :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]) {
     fill-opacity: 0.52;
   }
 
-  [data-series-index='5'] [data-wcl-chart-bar] {
+  [data-series-index='5'] :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]) {
     fill-opacity: 0.68;
   }
 
@@ -6396,7 +6417,8 @@
     stroke-width: var(--wcl-chart-line-width);
   }
 
-  [data-wcl-chart-series][data-emphasized] [data-wcl-chart-bar] {
+  [data-wcl-chart-series][data-emphasized]
+    :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]) {
     stroke-width: calc(var(--wcl-chart-line-width) * 1.1);
   }
 
@@ -7757,7 +7779,7 @@
       [data-wcl-chart-line],
       [data-wcl-chart-point],
       [data-wcl-chart-area],
-      [data-wcl-chart-bar],
+      :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
       [data-wcl-statistical-mark],
       [data-wcl-chart-legend] > li
     ) {
@@ -8616,7 +8638,7 @@
 
     :is(
       [data-wcl-chart-area],
-      [data-wcl-chart-bar],
+      :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
       [data-wcl-chart-point],
       [data-wcl-statistical-point],
       [data-wcl-histogram-bin],
@@ -8765,7 +8787,7 @@
     [data-color='accent']
       :is(
         [data-wcl-chart-line],
-        [data-wcl-chart-bar],
+        :is([data-wcl-chart-bar], [data-wcl-chart-departing-bar]),
         [data-wcl-chart-point],
         [data-wcl-chart-legend-line]
       ),

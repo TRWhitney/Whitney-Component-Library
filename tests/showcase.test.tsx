@@ -246,18 +246,23 @@ describe('component showcase', () => {
   });
 
   it('toggles a three-card scroll viewport for the same notification controls', () => {
-    const {getByRole} = render(<Showcase />);
-    const capToggle = getByRole('button', {name: 'Cap stack at three'});
+    const {container} = render(<Showcase />);
+    const specimen = container.querySelector<HTMLElement>(
+      '[data-showcase-component="NotificationProvider"]',
+    )!;
+    const controls = within(specimen);
+    const capToggle = controls.getByRole('button', {name: 'Cap stack at three'});
 
     fireEvent.click(capToggle);
-    const selectedCapToggle = getByRole('button', {name: 'Cap stack at three'});
-    const generalTrigger = getByRole('button', {name: 'Show general notification'});
+    const selectedCapToggle = controls.getByRole('button', {name: 'Cap stack at three'});
+    const generalTrigger = controls.getByRole('button', {name: 'Show general notification'});
     for (let message = 0; message < 5; message += 1) {
       fireEvent.click(generalTrigger);
     }
 
     expect(selectedCapToggle.getAttribute('aria-pressed')).toBe('true');
-    const region = getByRole('region', {name: 'Showcase notifications'});
+    const region = document.querySelector<HTMLElement>('[data-wcl-notification-region]')!;
+    expect(region.getAttribute('aria-label')).toBe('Showcase notifications');
     expect(region.getAttribute('data-count')).toBe('5');
     expect(within(region).getAllByRole('alertdialog')).toHaveLength(5);
     expect(within(region).getAllByText('Draft saved')).toHaveLength(5);
@@ -283,13 +288,17 @@ describe('component showcase', () => {
         }),
       );
       fireEvent.click(trigger);
-      const drawer = await screen.findByRole('dialog');
+      const drawer = await waitFor(() => {
+        const overlay = document.querySelector<HTMLElement>('[data-wcl-overlay]');
+        if (!overlay) throw new Error('The drawer overlay is missing.');
+        return within(overlay).getByRole('dialog');
+      });
       expect(drawer.closest('[data-wcl-overlay]')?.getAttribute('data-placement')).toBe(placement);
 
       const close = drawer.querySelector('[data-wcl-overlay-close]');
       if (!(close instanceof HTMLElement)) throw new Error('The Drawer close action is missing.');
       fireEvent.click(close);
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeNull());
     }
 
     const dockControl = within(specimen).getByRole('radiogroup', {name: 'Dock behavior'});
@@ -298,7 +307,11 @@ describe('component showcase', () => {
     expect(document.querySelector('[data-wcl-drawer-dock]')).toBeNull();
     fireEvent.click(within(dockControl).getByRole('radio', {name: 'Grip only'}));
     expect(document.querySelector('[data-wcl-drawer-preview]')).toBeNull();
-    expect(screen.getByRole('button', {name: 'Move result inspector'})).toBeTruthy();
+    expect(
+      within(document.querySelector<HTMLElement>('[data-wcl-drawer-dock]')!).getByRole('button', {
+        name: 'Move result inspector',
+      }),
+    ).toBeTruthy();
     fireEvent.click(within(dockControl).getByRole('radio', {name: 'Preview strip'}));
     expect(document.querySelector('[data-wcl-drawer-preview]')).toBeTruthy();
     const handleSwitch = within(specimen).getByRole('switch', {name: 'Show drag handle'});
@@ -314,7 +327,11 @@ describe('component showcase', () => {
       expect(document.querySelector('[data-wcl-drawer-preview]')).toBeTruthy();
     }
     fireEvent.click(handleSwitch);
-    expect(screen.queryByRole('button', {name: 'Move result inspector'})).toBeNull();
+    expect(
+      within(document.querySelector<HTMLElement>('[data-wcl-drawer-dock]')!).queryByRole('button', {
+        name: 'Move result inspector',
+      }),
+    ).toBeNull();
     expect(document.querySelector('[data-wcl-drawer-preview]')).toBeTruthy();
   });
 });

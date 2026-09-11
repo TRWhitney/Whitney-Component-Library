@@ -1,0 +1,14 @@
+.transition-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.change-status {
+  font: 0.85rem var(--wcl-font-utility);
+  color: var(--wcl-text-muted);
+  min-height: 1.25rem;
+  margin: 1rem 0;
+}
+[data-study-departure] {
+  pointer-events: none;
+}

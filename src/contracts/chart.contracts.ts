@@ -145,7 +145,7 @@ function chartContract({
     ],
     purpose,
     reducedMotionBehavior: [
-      'Reduced motion removes series-emphasis and scrollbar-fade transitions while preserving the same reading, focus, legend, and native scrolling states. Automatic scale changes settle immediately when reduced motion is requested, including when that preference changes during an animation. Otherwise axes and marks share the animated scale while readings retain exact values. Initial geometry appears immediately; general data-shape animation is not provided.',
+      'Reduced motion removes series-emphasis and scrollbar-fade transitions while preserving the same reading, focus, legend, and native scrolling states. Automatic scale changes settle immediately when reduced motion is requested, including when that preference changes during an animation. Otherwise axes and marks share the animated scale while readings retain exact values. Initial geometry appears immediately. Data values and range limits move over 240ms with cubic ease-out, retargeting from the current display. Stable row IDs retain identity; without interaction IDs, only unambiguous category values can identify rows. Categorical columns and bars move with their labels on reorder; arriving and departing bars fade, and departing bars cannot be targeted. Line and area adjacency, missing-value topology, configuration changes and empty states update immediately. Continuous category-domain changes retain their existing behavior. Source readings and callbacks always report supplied values; selection and hit testing follow displayed geometry.',
     ],
     relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
     responsiveBehavior: [
