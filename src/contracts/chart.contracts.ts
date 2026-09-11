@@ -543,7 +543,7 @@ export const heatmapContract: ComponentContract = {
   reducedMotionBehavior: [
     activationTiming,
     outlineMotion,
-    'Visibility changes briefly animate remaining cells and their colors as the grid and automatic range refit. Reduced motion removes visibility, active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same.',
+    'Numeric readings animate cell colors and the fitted color key together over 240ms with cubic ease-out, including charts without visibility controls. Repeated updates retarget the current display; text, tables and callbacks immediately use supplied readings. Changes to row/column membership, missing-cell topology or configuration settle immediately. Visibility changes briefly animate remaining cells and their colors as the grid and automatic range refit. Reduced motion removes visibility, active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same.',
   ],
   relatedExports: ['AppearanceProvider', ...chartNames.filter((name) => name !== 'Heatmap')],
   responsiveBehavior: [

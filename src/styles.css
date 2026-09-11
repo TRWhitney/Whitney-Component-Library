@@ -9410,9 +9410,7 @@
   }
 
   [data-wcl-heatmap][data-visibility] [data-wcl-heatmap-cell] {
-    transition:
-      background-color 240ms ease,
-      border-color 240ms ease;
+    transition: border-color 240ms ease;
   }
 
   [data-wcl-heatmap][data-visibility] [data-wcl-chart-all-hidden] {

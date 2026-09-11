@@ -71,7 +71,7 @@ Show one numeric measure across the complete intersections of two ordered domain
 - Forced colors preserve numeric cells, missing patterns, active boundaries, labels, and the complete table in system colors. The table remains the exact non-color representation.
 - Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
 - Outline pulses use a four-pixel stroke, a five-pixel outset, and three pixels of outward travel per edge at every rendered size. Degenerate lines retain their zero dimension. Selection and value-bearing geometry do not move.
-- Visibility changes briefly animate remaining cells and their colors as the grid and automatic range refit. Reduced motion removes visibility, active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same.
+- Numeric readings animate cell colors and the fitted color key together over 240ms with cubic ease-out, including charts without visibility controls. Repeated updates retarget the current display; text, tables and callbacks immediately use supplied readings. Changes to row/column membership, missing-cell topology or configuration settle immediately. Visibility changes briefly animate remaining cells and their colors as the grid and automatic range refit. Reduced motion removes visibility, active-cell and scrollbar-fade transitions. Reading, focus, and native scrolling behavior stays the same.
 
 ## Examples
 

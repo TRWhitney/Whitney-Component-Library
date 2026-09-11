@@ -105,6 +105,16 @@ describe('static appearance styles', () => {
     );
   });
 
+  it('paints heatmap data colors without adding a second transition', async () => {
+    const styles = await readFile('src/styles.css', 'utf8');
+    const cellRules = [...styles.matchAll(/[^{}]*\[data-wcl-heatmap-cell\][^{}]*\{([^{}]*)\}/g)];
+    expect(cellRules.length).toBeGreaterThan(0);
+    for (const rule of cellRules) {
+      const transition = rule[1]!.match(/transition:\s*([^;]*);/)?.[1] ?? '';
+      expect(transition).not.toMatch(/background|\ball\b/);
+    }
+  });
+
   it('keeps a heatmap reading inside its cell bounds', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const activeCell = styles.match(

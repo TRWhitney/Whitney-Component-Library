@@ -18,6 +18,7 @@ import {useChartRectangularExplorationGesture} from './use-chart-rectangular-exp
 import type {ChartRectangularWindow} from './chart-rectangular-exploration-types.js';
 import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {HeatmapRestore, type HeatmapAxis} from './heatmap-visibility.js';
+import {useChartDataMotion} from './use-chart-data-motion.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {
   heatmapKey,
@@ -507,7 +508,57 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
   );
   const values = visibleCells.flatMap((cell) => (cell.value === undefined ? [] : [cell.value]));
   const targetDomain = derivedDomain(values, props.scale);
-  const domain = useAnimatedChartDomain(targetDomain, !!visibility, false);
+  // Source values and their fitted key share a clock. Supplied cells remain canonical
+  // for interaction and text; only their color encoding uses the displayed values.
+  const motionConfiguration = JSON.stringify([
+    domainIdentity,
+    sourceProps.scale,
+    sourceProps.status?.kind ?? 'ready',
+    fullModel.invalidCount,
+    fullModel.cells.map((cell) => cell.value !== undefined),
+  ]);
+  const cellColorId = (cell: PreparedCell) =>
+    heatmapKey({
+      rowId: sourceProps.rows[cell.rowIndex]!.id,
+      columnId: sourceProps.columns[cell.columnIndex]!.id,
+    });
+  const colorTargets = [
+    ...fullModel.cells.flatMap((cell) =>
+      cell.value === undefined ? [] : [{id: cellColorId(cell), value: cell.value}],
+    ),
+    {id: 'domain:lower', value: targetDomain[0]},
+    {id: 'domain:upper', value: targetDomain[1]},
+  ];
+  const colorVersion = JSON.stringify(colorTargets);
+  const colorMotion = useChartDataMotion(colorTargets, {
+    version: colorVersion,
+    resetKey: JSON.stringify([motionConfiguration, hiddenRows, hiddenColumns, exploration.window]),
+    enabled:
+      (sourceProps.status === undefined ||
+        sourceProps.status.kind === 'ready' ||
+        sourceProps.status.kind === 'partial') &&
+      values.length > 0,
+    interpolate: (from, to, progress) => (1 - progress) * from + progress * to,
+  });
+  const displayedColors = new Map(colorMotion.map((item) => [item.id, item.value]));
+  const sourceDomain: readonly [number, number] = [
+    displayedColors.get('domain:lower') ?? targetDomain[0],
+    displayedColors.get('domain:upper') ?? targetDomain[1],
+  ];
+  const visibilityDomain = useAnimatedChartDomain(
+    targetDomain,
+    !!visibility,
+    false,
+    motionConfiguration,
+  );
+  const domain =
+    sourceDomain[0] !== targetDomain[0] || sourceDomain[1] !== targetDomain[1]
+      ? sourceDomain
+      : visibilityDomain;
+  const displayEncoding = (cell: PreparedCell) =>
+    cell.value === undefined
+      ? {range: cell.range, ratio: cell.ratio}
+      : valueEncoding(displayedColors.get(cellColorId(cell)) ?? cell.value, domain, props.scale);
   const midpoint = props.scale.type === 'two-sided' ? props.scale.midpoint : domain[0];
   const model: HeatmapModel = {
     ...fullModel,
@@ -526,7 +577,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
         index,
         rowIndex: Math.floor(index / columns.length),
         columnIndex: index % columns.length,
-        ...(cell.value === undefined ? {} : valueEncoding(cell.value, domain, props.scale)),
+        ...displayEncoding(cell),
       })),
   };
   const hiddenRowItems = sourceProps.rows.filter((r) => hiddenRows.includes(r.id));
@@ -731,7 +782,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
       clearDirectReading();
       setKeyboardIndex(null);
     },
-    version: JSON.stringify([domainIdentity, visibilityVersion, status.kind]),
+    version: JSON.stringify([domainIdentity, visibilityVersion, status.kind, colorVersion]),
   });
   const explorationCoordinate = (event: PointerEvent<HTMLDivElement>) => {
     const grid = gridRef.current;
@@ -964,7 +1015,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
             {explorationConfig ? (
               <ChartRectangularExplorationControls
                 largeStepMultiplier={2}
-                version={JSON.stringify([domainIdentity, visibilityVersion])}
+                version={JSON.stringify([domainIdentity, visibilityVersion, colorVersion])}
                 window={exploration.normalized}
                 minimumSpan={exploration.minimumSpan}
                 step={{
@@ -993,10 +1044,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
                     }}
                   >
                     {visibleCells.map((cell) => {
-                      const encoding =
-                        cell.value === undefined
-                          ? cell
-                          : valueEncoding(cell.value, domain, props.scale);
+                      const encoding = displayEncoding(cell);
                       const intensity =
                         props.scale.type === 'two-sided'
                           ? encoding.ratio * 84

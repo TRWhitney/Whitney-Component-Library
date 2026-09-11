@@ -6,7 +6,7 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-The combined charts are delivered in `bd706ce` and `f3087f9`. [Value-change motion](prototypes/value-motion.md#acceptance-contract) is approved across all five examples. The [data-transition study](prototypes/data-transitions.md) now shows additions, removals, reordering and automatic axis fitting in columns, bubbles and a donut. Whitney approved it. Tickets 34–37 carry the reviewed transitions into production; other renderer cases remain on the parent frontier.
+The combined charts are delivered in `bd706ce` and `f3087f9`. [Value-change motion](prototypes/value-motion.md#acceptance-contract) is approved across all five examples. The [data-transition study](prototypes/data-transitions.md) now shows additions, removals, reordering and automatic axis fitting in columns, bubbles and a donut. Whitney approved it. Tickets 34–37 deliver the reviewed transitions in production; other renderer cases remain on the parent frontier.
 
 ## Progress
 
@@ -39,6 +39,5 @@ Scatter with adjacent distributions, application layouts, implicit statistical c
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
-- Branch `main`, production base `f3087f9`. Uncommitted work is production motion in the four reviewed renderer families, shared motion support, public regressions, rendered examples, canonical/generated guidance, and both accepted prototypes with their effort records.
-- Both deliveries include public exports, canonical contracts and guides, complete production examples, regression/type/package coverage and the accepted effort record.
-- Commit each reviewed renderer outcome with its documentation and examples, then plan one combined motion study for radar, Sparkline, histogram and box plot. Preserve immediate behavior for unreviewed topology/state changes. Whitney explicitly requested proceeding automatically after approval until new input is necessary.
+- Branch `main`. Cartesian motion is delivered in `223447e`, scatter/bubble motion in `08a7054`, and pie/donut motion in the commit named `[Feature] Animate pie and donut data`. Ticket 37 accompanies `[Feature] Animate heatmap data changes`.
+- Move to planning for one combined motion study for radar, Sparkline, histogram and box plot. Preserve immediate behavior for unreviewed topology/state changes. Whitney explicitly requested proceeding automatically after approval until new input is necessary.

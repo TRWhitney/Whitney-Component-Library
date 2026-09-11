@@ -1,4 +1,5 @@
 import {CartesianDataMotionExample} from './cartesian-data-motion-example.js';
+import {HeatmapDataMotionExample} from './heatmap-data-motion-example.js';
 import {RadialDataMotionExample} from './radial-data-motion-example.js';
 import {StatisticalDataMotionExample} from './statistical-data-motion-example.js';
 import {RangeChartExample} from './range-chart-example.js';
@@ -3814,6 +3815,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show one numeric measure across two ordered domains. Zero is colored as a real value; patterned cells have no data. Use a two-sided scale only when its midpoint has a clear meaning. Dense grids hide inline values before moving into a labeled local scroll region."
         name="Heatmap"
       >
+        <Example label="Updated readings">
+          <HeatmapDataMotionExample />
+        </Example>
         <Example label="Explore rows and columns">
           <HeatmapExplorationExample />
         </Example>
