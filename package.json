@@ -42,6 +42,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "typecheck:matrix": "npm run build && node ./scripts/typecheck-matrix.mjs",
+    "verify:chart-performance": "node ./scripts/verify-chart-performance.mjs",
     "verify:chart-isolation": "npm run build && node ./scripts/verify-chart-isolation.mjs",
     "verify:package": "node ./scripts/verify-package.mjs"
   },

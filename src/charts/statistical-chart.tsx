@@ -1043,12 +1043,16 @@ function projectionsFor<Datum extends object>(
 function readingTargets<Datum extends object>(
   model: StatisticalModel<Datum>,
   projections: StatisticalProjections,
+  sourceReadings?: ReadonlyMap<string, ReadingTarget>,
 ): ReadingTarget[] {
   if (model.kind === 'scatter' || model.kind === 'bubble') {
     return model.points.flatMap((point) => {
       const x = projections.xNumber?.position(point.x);
       const y = projections.y.position(point.y);
       if (x === undefined || y === undefined) return [];
+      const id = model.line ? pointKey(point) : point.id;
+      const sourceReading = sourceReadings?.get(id);
+      if (sourceReading) return [{...sourceReading, x, y}];
       const magnitudeRows =
         model.kind === 'bubble' && point.magnitude !== undefined && model.magnitude !== undefined
           ? [
@@ -1060,7 +1064,7 @@ function readingTargets<Datum extends object>(
           : [];
       return [
         {
-          id: model.line ? pointKey(point) : point.id,
+          id,
           kind: 'point' as const,
           label: point.label,
           rows: [
@@ -1582,6 +1586,62 @@ function pointRadius<Datum extends object>(
   return radiusForEquivalentCircleArea(radius, point.series.shape);
 }
 
+function StatisticalPointOverview<Datum extends object>({
+  model,
+  plot,
+  presentation,
+  maximumMagnitude,
+  selectedKeys,
+  xPosition,
+  yPosition,
+}: {
+  readonly model: PointModel<Datum, 'scatter' | 'bubble'>;
+  readonly plot: PlotBounds;
+  readonly presentation: PresentationMetrics;
+  readonly maximumMagnitude: number;
+  readonly selectedKeys: ReadonlySet<string>;
+  readonly xPosition: (value: number) => number;
+  readonly yPosition: (value: number) => number;
+}): ReactElement {
+  return (
+    <svg viewBox={`0 0 ${plotWidth(plot)} ${plotHeight(plot)}`} aria-hidden="true">
+      <g data-wcl-chart-marks="">
+        {model.line ? (
+          <SuppliedLine
+            line={model.line}
+            x={(value) => xPosition(value) * plotWidth(plot)}
+            y={(value) => (1 - yPosition(value)) * plotHeight(plot)}
+          />
+        ) : null}
+        {model.points.map((point) => {
+          const x = xPosition(point.x) * plotWidth(plot);
+          const y = (1 - yPosition(point.y)) * plotHeight(plot);
+          const radius = pointRadius(
+            model,
+            point,
+            {...presentation, canvasWidth: viewWidth, viewScale: 1},
+            maximumMagnitude,
+          );
+          return (
+            <g key={pointKey(point)} data-wcl-statistical-mark="" data-color={point.series.color}>
+              <PointShape cx={x} cy={y} radius={radius} shape={point.series.shape} />
+              {selectedKeys.has(selectionKey({rowId: point.id, seriesId: point.series.id})) ? (
+                <PointShape
+                  cx={x}
+                  cy={y}
+                  radius={radius + 3 / presentation.viewScale}
+                  shape={point.series.shape}
+                  cue="selection"
+                />
+              ) : null}
+            </g>
+          );
+        })}
+      </g>
+    </svg>
+  );
+}
+
 function StatisticalMarks<Datum extends object>({
   activeIndex,
   directIndex,
@@ -2082,26 +2142,44 @@ function StatisticalFrame<Datum extends object>({
     }
   }
   const [hiddenSeriesIds, setHiddenSeriesIds] = useState<readonly string[]>([]);
-  const hiddenIds = visibilityLabels
-    ? hiddenSeriesIds.filter((id) => availableSeriesIds.includes(id))
-    : [];
-  const visibleModel =
-    fullModel.kind === 'histogram'
-      ? fullModel
-      : fullModel.kind === 'box'
-        ? {
-            ...fullModel,
-            series: fullModel.series.filter((s) => !hiddenIds.includes(s.id)),
-            boxes: fullModel.boxes.filter((b) => !hiddenIds.includes(b.series.id)),
-          }
-        : {
-            ...fullModel,
-            series: fullModel.series.filter((s) => !hiddenIds.includes(s.id)),
-            points: fullModel.points.filter((p) => !hiddenIds.includes(p.series.id)),
-            ...(fullModel.line
-              ? {line: hiddenIds.includes(fullModel.line.series.id) ? undefined : fullModel.line}
-              : {}),
-          };
+  const hiddenIds = useMemo(
+    () =>
+      visibilityLabels && fullModel.kind !== 'histogram'
+        ? hiddenSeriesIds.filter((id) => fullModel.series.some((series) => series.id === id))
+        : [],
+    [visibilityLabels, hiddenSeriesIds, fullModel],
+  );
+  const dataTable = useMemo(
+    () => (
+      <StatisticalTable
+        dataTableLabel={common.dataTableLabel}
+        model={fullModel}
+        hiddenIds={hiddenIds}
+        hiddenLabel={visibilityLabels?.hidden}
+      />
+    ),
+    [common.dataTableLabel, fullModel, hiddenIds, visibilityLabels?.hidden],
+  );
+  const visibleModel = useMemo(
+    () =>
+      fullModel.kind === 'histogram'
+        ? fullModel
+        : fullModel.kind === 'box'
+          ? {
+              ...fullModel,
+              series: fullModel.series.filter((s) => !hiddenIds.includes(s.id)),
+              boxes: fullModel.boxes.filter((b) => !hiddenIds.includes(b.series.id)),
+            }
+          : {
+              ...fullModel,
+              series: fullModel.series.filter((s) => !hiddenIds.includes(s.id)),
+              points: fullModel.points.filter((p) => !hiddenIds.includes(p.series.id)),
+              ...(fullModel.line
+                ? {line: hiddenIds.includes(fullModel.line.series.id) ? undefined : fullModel.line}
+                : {}),
+            },
+    [fullModel, hiddenIds],
+  );
   const scrollbarActivityProps = useScrollbarActivity<HTMLDivElement>();
   useEffect(() => {
     if (frameElement === null) return;
@@ -2236,35 +2314,39 @@ function StatisticalFrame<Datum extends object>({
         : visibleModel.points.length > 0) &&
     status.kind !== 'loading' &&
     status.kind !== 'error';
-  const dataMotion = useChartDataMotion(
-    visiblePointModel?.points.map((point) => ({
-      id: pointKey(point),
-      value: {
-        ...point,
-        magnitudeRatio: (point.magnitude ?? 0) / targetMaximumMagnitude,
-      },
-    })) ?? [],
-    {
-      version: JSON.stringify(
-        visiblePointModel ? statisticalModelGeometry(visiblePointModel) : null,
-      ),
-      resetKey: motionResetKey,
-      enabled: motionEnabled,
-      interpolate: (from, to, progress) => ({
-        ...to,
-        x: from.x + (to.x - from.x) * progress,
-        y: from.y + (to.y - from.y) * progress,
-        magnitudeRatio: from.magnitudeRatio + (to.magnitudeRatio - from.magnitudeRatio) * progress,
-        ...(to.magnitude === undefined
-          ? {}
-          : {
-              magnitude:
-                (from.magnitude ?? to.magnitude) +
-                (to.magnitude - (from.magnitude ?? to.magnitude)) * progress,
-            }),
-      }),
-    },
+  const pointMotionTargets = useMemo(
+    () =>
+      visiblePointModel?.points.map((point) => ({
+        id: pointKey(point),
+        value: {
+          ...point,
+          magnitudeRatio: (point.magnitude ?? 0) / targetMaximumMagnitude,
+        },
+      })) ?? [],
+    [visiblePointModel, targetMaximumMagnitude],
   );
+  const pointMotionVersion = useMemo(
+    () => JSON.stringify(visiblePointModel ? statisticalModelGeometry(visiblePointModel) : null),
+    [visiblePointModel],
+  );
+  const dataMotion = useChartDataMotion(pointMotionTargets, {
+    version: pointMotionVersion,
+    resetKey: motionResetKey,
+    enabled: motionEnabled,
+    interpolate: (from, to, progress) => ({
+      ...to,
+      x: from.x + (to.x - from.x) * progress,
+      y: from.y + (to.y - from.y) * progress,
+      magnitudeRatio: from.magnitudeRatio + (to.magnitudeRatio - from.magnitudeRatio) * progress,
+      ...(to.magnitude === undefined
+        ? {}
+        : {
+            magnitude:
+              (from.magnitude ?? to.magnitude) +
+              (to.magnitude - (from.magnitude ?? to.magnitude)) * progress,
+          }),
+    }),
+  });
   const distributionMotion = useChartDataMotion([{id: 'distribution', value: visibleModel}], {
     version: JSON.stringify(visiblePointModel ? null : statisticalModelGeometry(visibleModel)),
     resetKey: motionResetKey,
@@ -2424,12 +2506,31 @@ function StatisticalFrame<Datum extends object>({
               boxes: model.boxes.map((box) => displayedBoxes.get(box.series.id) ?? box),
             }
           : model;
-  const targetReadings = readingTargets(model, projections);
-  const readings = readingTargets(displayModel, projections).map((reading, index) => ({
-    ...targetReadings[index]!,
-    x: reading.x,
-    y: reading.y,
-  }));
+  // Values and labels follow source data; only coordinates change during motion.
+  const sourceReadingById = useMemo(
+    () =>
+      new Map(
+        readingTargets(
+          fullModel,
+          projectionsFor(fullModel, {left: 0, right: 1, top: 0, bottom: 1}),
+        ).map((reading) => [reading.id, reading]),
+      ),
+    [fullModel],
+  );
+  const allReadings = readingTargets(
+    fullModel,
+    projectionsFor(fullModel, initialPlot),
+    sourceReadingById,
+  );
+  const targetReadings = visiblePointModel ? [] : readingTargets(model, projections);
+  const displayedReadings = readingTargets(displayModel, projections, sourceReadingById);
+  const readings = visiblePointModel
+    ? displayedReadings
+    : displayedReadings.map((reading, index) => ({
+        ...targetReadings[index]!,
+        x: reading.x,
+        y: reading.y,
+      }));
   const departureModel = visiblePointModel
     ? {
         ...visiblePointModel,
@@ -2437,14 +2538,13 @@ function StatisticalFrame<Datum extends object>({
         points: dataMotion.filter((item) => item.exiting).map((item) => item.value),
       }
     : undefined;
-  const allReadings = readingTargets(fullModel, projectionsFor(fullModel, initialPlot));
   const distributionGeometry = distributionPoints(
     displayModel,
     projections,
     readings,
     presentation,
   );
-  const sourceReadings = readingTargets(viewportModel, targetInitialProjections);
+  const sourceReadings = readingTargets(viewportModel, targetInitialProjections, sourceReadingById);
   const readingIdentity = JSON.stringify(readings.map((reading) => reading.id));
   const readingGeometry = JSON.stringify({
     model: statisticalModelGeometry(viewportModel),
@@ -2474,8 +2574,9 @@ function StatisticalFrame<Datum extends object>({
     () => (lineData ? [common.data, lineData] : common.data),
     [common.data, lineData],
   );
-  const interactionRows = fullPointModel
-    ? fullPointModel.points.map((point) => ({
+  const pointInteractionRows = useMemo(
+    () =>
+      fullPointModel?.points.map((point) => ({
         id: point.id,
         category: point.x,
         datum: point.datum ?? common.data[point.sourceIndex]!,
@@ -2487,13 +2588,17 @@ function StatisticalFrame<Datum extends object>({
             hidden: hiddenIds.includes(point.series.id),
           },
         ],
-      }))
-    : allReadings.map((reading) => ({
-        id: reading.id,
-        category: reading.x,
-        datum: reading,
-        values: [{seriesId: '', label: reading.label, value: 0, hidden: false}],
-      }));
+      })),
+    [fullPointModel, common.data, hiddenIds],
+  );
+  const interactionRows =
+    pointInteractionRows ??
+    allReadings.map((reading) => ({
+      id: reading.id,
+      category: reading.x,
+      datum: reading,
+      values: [{seriesId: '', label: reading.label, value: 0, hidden: false}],
+    }));
   const configuration:
     | (Pick<ChartInteraction<object, number>, 'target' | 'selection' | 'onActivate'> & {
         readonly canActivate?: (item: ChartSelectionItem) => boolean;
@@ -2690,6 +2795,12 @@ function StatisticalFrame<Datum extends object>({
   };
   const activeReadingId = pointerReadingId ?? touchReadingId ?? keyboardReadingId;
   const activeIndex = indexForReadingId(activeReadingId);
+  const cuePoints = points.filter(
+    (point) =>
+      selectedKeys.has(selectionKey(point.item)) ||
+      activeIndex === point.index ||
+      (actions.pulse && selectionKey(actions.pulse.item) === selectionKey(point.item)),
+  );
   const activeReading = activeIndex === null ? undefined : readings[activeIndex];
   const directIndex = indexForReadingId(pointerReadingId ?? touchReadingId);
   const directReading = directIndex === null ? undefined : readings[directIndex];
@@ -3143,55 +3254,15 @@ function StatisticalFrame<Datum extends object>({
                       onChange={changeWindow}
                       aspectRatio={plotWidth(plot) / plotHeight(plot)}
                       overview={
-                        <svg
-                          viewBox={`0 0 ${plotWidth(plot)} ${plotHeight(plot)}`}
-                          aria-hidden="true"
-                        >
-                          <g data-wcl-chart-marks="">
-                            {visiblePointModel.line ? (
-                              <SuppliedLine
-                                line={visiblePointModel.line}
-                                x={(value) => navigation.x.position(value) * plotWidth(plot)}
-                                y={(value) => (1 - navigation.y.position(value)) * plotHeight(plot)}
-                              />
-                            ) : null}
-                            {visiblePointModel.points.map((point) => {
-                              const x = navigation.x.position(point.x) * plotWidth(plot);
-                              const y = (1 - navigation.y.position(point.y)) * plotHeight(plot);
-                              const radius = pointRadius(
-                                visiblePointModel,
-                                point,
-                                {...presentation, canvasWidth: viewWidth, viewScale: 1},
-                                maximumMagnitude,
-                              );
-                              return (
-                                <g
-                                  key={pointKey(point)}
-                                  data-wcl-statistical-mark=""
-                                  data-color={point.series.color}
-                                >
-                                  <PointShape
-                                    cx={x}
-                                    cy={y}
-                                    radius={radius}
-                                    shape={point.series.shape}
-                                  />
-                                  {selectedKeys.has(
-                                    selectionKey({rowId: point.id, seriesId: point.series.id}),
-                                  ) ? (
-                                    <PointShape
-                                      cx={x}
-                                      cy={y}
-                                      radius={radius + 3 / presentation.viewScale}
-                                      shape={point.series.shape}
-                                      cue="selection"
-                                    />
-                                  ) : null}
-                                </g>
-                              );
-                            })}
-                          </g>
-                        </svg>
+                        <StatisticalPointOverview
+                          model={visiblePointModel}
+                          plot={plot}
+                          presentation={presentation}
+                          maximumMagnitude={maximumMagnitude}
+                          selectedKeys={selectedKeys}
+                          xPosition={navigation.x.position}
+                          yPosition={navigation.y.position}
+                        />
                       }
                     />
                   </ChartExplorationLayer>
@@ -3330,7 +3401,7 @@ function StatisticalFrame<Datum extends object>({
                         data-wcl-chart-interaction-overlay=""
                         pointerEvents="none"
                       >
-                        {points.map((point) => (
+                        {cuePoints.map((point) => (
                           <g key={selectionKey(point.item)}>
                             {selectedKeys.has(selectionKey(point.item)) ? (
                               point.kind === 'bin' || point.kind === 'summary' ? (
@@ -3456,12 +3527,7 @@ function StatisticalFrame<Datum extends object>({
             </div>
           </>
         )}
-        <StatisticalTable
-          dataTableLabel={common.dataTableLabel}
-          model={fullModel}
-          hiddenIds={hiddenIds}
-          hiddenLabel={visibilityLabels?.hidden}
-        />
+        {dataTable}
       </>
     );
   }

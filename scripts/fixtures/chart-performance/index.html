@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chart performance fixture</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+      }
+      [data-perf-fixture] {
+        width: min(960px, calc(100vw - 32px));
+        margin: 16px auto;
+      }
+      .perf-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding: 8px 0;
+        background: white;
+      }
+      .perf-counters {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

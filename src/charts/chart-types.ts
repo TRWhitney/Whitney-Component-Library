@@ -358,6 +358,8 @@ export interface HeatmapLabels {
 }
 
 export interface HeatmapVisibilityLabels {
+  /** Names the compact visibility manager. Defaults to the supplied row and column headings. */
+  readonly manage?: string;
   readonly hideRow: (label: string) => string;
   readonly showRow: (label: string) => string;
   readonly hideColumn: (label: string) => string;

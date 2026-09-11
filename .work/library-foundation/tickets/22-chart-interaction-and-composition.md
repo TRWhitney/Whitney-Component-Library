@@ -7,8 +7,7 @@ mixed-chart combinations.
 **Blocked by:** none. [Statistical Chart Family](20-statistical-chart-family.md) and
 [Radial, Heatmap, and Compact Charts](21-radial-heatmap-and-compact-charts.md) are complete.
 
-**Status:** active; delivered foundation complete, remaining work in
-[active implementation effort](../../chart-interaction-composition/status.md)
+**Status:** complete. Whitney signed off on the measured timings and closure.
 
 ## Delivered foundation
 
@@ -50,7 +49,7 @@ mixed-chart combinations.
 - [x] Exploration and selection controls are intuitive, visually restrained, and consistent with
       the chart. Their gestures do not accidentally interfere with value reading, activation, or
       legend emphasis. Working examples demonstrate both appearance and operation before acceptance.
-- [ ] Brief, purposeful animations explain data and scale changes, remain responsive to further
+- [x] Brief, purposeful animations explain data and scale changes, remain responsive to further
       input, never loop idly, and settle immediately under reduced motion.
 - [x] Scatter points can share a chart with a supplied trend, target, or other compatible line.
 - [x] A line can share a chart with a supplied lower/upper range band that changes along the domain,
@@ -60,8 +59,8 @@ mixed-chart combinations.
 - [x] Accessible names, readings, focus, and structured data alternatives remain accurate as
       visibility, filters, selection, and the displayed domain change. Selection is distinguishable
       without color alone, and the complete-data alternative remains available.
-- [ ] Representative datasets meet a recorded responsiveness budget covering reading, selection,
-      visibility changes, exploration, and animation.
+- [x] Representative datasets have recorded responsiveness measurements covering reading, selection,
+      visibility changes, exploration and animation. Whitney accepted the measured timings.
 - [x] Public contracts, generated guidance, showcase examples, and focused interaction, type,
       accessibility, reduced-motion, server-rendering, hydration, and package checks cover the
       delivered additions.
@@ -79,9 +78,7 @@ charts is excluded from this composition work because it is an arrangement of se
 General coordination between separate charts remains in scope; no dashboard or prescribed layout
 is added.
 
-Implementation planning still needs to settle exact controls and gestures, selection multiplicity,
-visibility semantics for the other chart families, and the interaction between visibility fitting, zoom, and explicit
-consumer domains. This reconciliation records requirements, not a finished interface design.
+The accepted controls, gestures, selection rules and visibility behavior are implemented across the chart families. Numeric value changes use the approved shared motion; unreviewed structural changes settle immediately. Individual delivery records and their accepted prototypes remain in the [implementation effort](../../chart-interaction-composition/status.md).
 
 ## Accepted sources
 
@@ -94,126 +91,12 @@ consumer domains. This reconciliation records requirements, not a finished inter
 
 ## Completion evidence
 
-The delivered foundation is recorded in `d8cce02` for Cartesian interaction, `2d35b1f` for
-statistical charts, `9780036` for pie and donut, `d9ddcd5` for radar, `6680a5c` for heatmap, and
-`554be1e` for sparkline. Their effort records describe focused tests, browser operation, package
-validation, and review corrections. The later chart effort records independent intent and
-engineering reviews.
+The [implementation effort](../../chart-interaction-composition/status.md) records the public chart additions and their individual tests, native inspections, package checks and production reviews. Tickets 01–24 deliver consistent visibility, selection, activation and compact sizing. Tickets 25–30 deliver exploration. Tickets 32–33 implement the supplied scatter/line and line/range combinations. Tickets 34–40 deliver all approved numeric animations, including the corrected Sparkline extrema handoff. Approved immediate structural updates are part of that completed boundary.
 
-The reconciliation checked public chart types, implementations, tests, accepted specifications,
-and ticket history. The old Ticket 22 checklist had not been reconciled with those deliveries.
-A focused test rerun during this review could not start because `vitest` was not installed in the
-checkout; the historical validation above is not a fresh test result.
+Current repository checks pass 938 tests, formatting, lint, generated guidance, TypeScript 5/6/7 and chart isolation. Packed React 18.3.1/19.2.8 SSR, hydration, types and browser builds pass. The production showcase is current.
 
-The remaining checks span chart families and capabilities beyond the delivered portions below.
-They remain unchecked until that broader scope is complete.
+The crowded-axis correction in [Ticket 42](../../chart-interaction-composition/tickets/42-crowded-heatmap-visibility.md) preserves the full heatmap grid and replaces overlapping eyes with the existing corner eye and a list of all tracks. Public regression and native dark/light, narrow/wide and touch checks pass.
 
-The first [Cartesian visibility implementation](../../chart-interaction-composition/tickets/01-cartesian-visibility.md) is complete with passing checks and independent intent and engineering reviews. It delivers eye controls, animated automatic scale fitting, and all-hidden recovery for five Cartesian charts. Visibility for other chart families, exploration, general data animation, and the two added compositions remain open.
+[Ticket 41](../../chart-interaction-composition/tickets/41-chart-responsiveness.md) records the full measurement matrix and the original diagnostic target misses. Whitney accepted those timings and explicitly signed off on closing this issue. All desktop cases passed the original targets; the slower-browser dense-data timings were accepted as sufficient.
 
-Whitney approved the final [activation and selection prototype](../../chart-interaction-composition/prototypes/activation-selection.md#accepted-convention)
-on 2026-09-08, including the reviewed gestures, targeting, indicator meanings, pulse feedback, and
-light/dark marker spacing. The [LineChart production slice](../../chart-interaction-composition/tickets/03-line-chart-activation-selection.md)
-is complete, including touch tap to select and press-and-hold to activate without changing selection.
-It delivers independent callbacks, stable category/point identities, controlled or internal selection,
-range/rectangle dragging, accepted indicators, and activation feedback. The
-[pointer-focus fix](../../chart-interaction-composition/tickets/02-pointer-reading-focus.md)
-also prevents mouse input from restoring a January keyboard reading.
-
-Production contracts, generated guidance, and the rendered showcase are updated. All 591 tests,
-repository checks, showcase build, and packed React 18/19 verification pass. Independent intent and
-engineering reviews pass after two focused rendering/announcement corrections. Activation and
-selection for other chart families remain open; the accepted LineChart behavior is the convention
-for their planning.
-
-Whitney chose Frame for individual bars after accepting continuous category contours and corrected
-shared edges. The [bar/column production portion](../../chart-interaction-composition/tickets/05-bar-column-interaction.md)
-is complete with 607 passing tests, repository/build/package checks, and independent intent and
-engineering reviews. Other chart families and compositions stay open.
-
-Whitney chose Value marker for areas after clarifying overlap-only legend priority. The
-[area/mixed production portion](../../chart-interaction-composition/tickets/06-area-mixed-interaction.md)
-is complete with 614 passing tests, repository/build/package checks, and passing independent
-intent and engineering production reviews. Statistical/radial/compact interaction, exploration, data-change animation,
-and the new scatter/range compositions remain open.
-
-Whitney approved Centers inside for scatter/bubble rectangle selection. The
-[observation interaction portion](../../chart-interaction-composition/tickets/07-scatter-bubble-interaction.md)
-is complete with 622 passing tests, repository/build/package checks, and passing independent
-intent and engineering production reviews after the recorded corrections. It also separates showcase segmented controls into their
-own rows. Visibility for non-Cartesian families, other reading units, exploration, data-change
-animation, and added compositions remain open.
-
-Histogram and box-plot interaction is delivered in
-[distribution ticket 08](../../chart-interaction-composition/tickets/08-distribution-interaction.md).
-It preserves approved frames and Box touched selection, separate outlier targets, independent
-activation and touch hold, and requires stable application IDs for interactive outliers. All 634 tests, repository/build/package checks and independent production reviews pass after the
-recorded geometry-cancellation correction. This parent stays open for the remaining families,
-exploration and compositions.
-
-Pie and donut selection and activation is delivered in
-[radial ticket 09](../../chart-interaction-composition/tickets/09-pie-donut-interaction.md).
-It delivers the approved outer-edge selection and expansion asterisk, a visible sweep trail,
-independent activation, touch hold, and selection across pages. All 645 tests and repository,
-showcase, and package checks pass. Independent intent and engineering production reviews pass after the recorded corrections. Radar, heatmap,
-compact interaction, remaining visibility, exploration, animations and compositions stay open.
-
-[Ticket 10](../../chart-interaction-composition/tickets/10-marker-ring-spacing.md) corrects statistical
-circle selection spacing and scale-aware radar reading fills. All 649 tests, repository/package
-checks and independent intent/engineering review pass. Radar selection and activation remains next.
-
-[Radar ticket 11](../../chart-interaction-composition/tickets/11-radar-interaction.md) implements
-point and dimension selection, independent activation, visible rectangle selection and keyboard
-access to zero values. Public contracts and regular/sparse examples are current. The 671 tests,
-repository/build/package checks and native production inspection pass. Independent production
-reviews pass after the recorded keyboard continuity correction. Heatmap and compact interaction, remaining visibility, exploration,
-data-change animation and compositions stay open.
-
-[Shared activation ticket 12](../../chart-interaction-composition/tickets/12-shared-activation-motion.md)
-standardizes pulse timing and screen-space sizes across the implemented chart families. The
-heatmap study uses the same animation and the accepted Cell frames. Dashed inner hover is approved. Public heatmap selection and activation is tracked in
-[Ticket 13](../../chart-interaction-composition/tickets/13-heatmap-interaction.md).
-
-[Heatmap ticket 13](../../chart-interaction-composition/tickets/13-heatmap-interaction.md) implements
-cell selection, independent activation, Box touched dragging, stable row/column identity for missing
-cells, dashed hover and solid selection frames. Its public examples, contracts and guide are current.
-All 686 tests and repository/build/package checks pass. Independent intent and engineering reviews
-pass after correcting keyboard tooltip continuity when the grid scrolls.
-Compact chart interaction, remaining visibility, exploration, data-change animation and compositions
-remain open.
-
-[Sparkline ticket 14](../../chart-interaction-composition/tickets/14-sparkline-interaction.md) implements
-the approved compact selection rings, horizontal range dragging, independent activation and touch
-hold. Missing readings remain readable gaps; stable application IDs preserve record identity.
-Public types, contracts, guide and rendered showcase are updated. All 697 tests and repository,
-build and package checks pass. Independent intent and engineering production reviews pass with no findings. Remaining visibility,
-exploration, data-change animation and the accepted added compositions keep this parent open.
-
-[Statistical visibility ticket 15](../../chart-interaction-composition/tickets/15-statistical-visibility.md)
-implements group eyes, automatic animated visible-data fitting, retained hidden selection and
-all-hidden recovery for ScatterChart, BubbleChart and BoxPlot. Its public contracts, guides and
-examples are current, and all 708 tests and repository/build/package checks pass. Independent
-intent and engineering production reviews pass, including the restoration-animation correction. Radar visibility follows. Histogram and Sparkline visibility are
-excluded; pie/donut percentages and heatmap row/column controls need their remaining decisions.
-
-[Radar visibility ticket 16](../../chart-interaction-composition/tickets/16-radar-visibility.md)
-adds profile eyes, shared animated fitting, retained hidden selections and full-table recovery.
-Its contract, guide and showcase are current. All 716 tests and repository/package checks pass;
-independent intent and engineering production reviews pass with no findings. Pie/donut percentages and heatmap
-row/column visibility remain unresolved slices.
-
-[Legend release ticket 17](../../chart-interaction-composition/tickets/17-legend-release.md)
-corrects repeated tap/click/keyboard activation so the legend entry and chart visibly release.
-The fix applies to all four legend renderers, with current guides and rendered examples. All 724
-tests and repository checks pass. Independent production review passes on intent and engineering axes with no findings.
-
-Pie/donut visibility is implemented in [Ticket 18](../../chart-interaction-composition/tickets/18-pie-donut-visibility.md), with passing repository/package/browser checks and independent intent and engineering reviews. Individual category eyes preserve ranked pages and colors. Visible categories refill the chart and determine percentages and donut totals; expansion remains navigation without a bulk eye. Heatmap visibility remains the next decision.
-
-[Ticket 19](../../chart-interaction-composition/tickets/19-radial-page-refill.md) updates pie/donut paging so hiding fills freed slots from expansion. Hidden categories remain restorable and their colors and selections follow them between pages.
-
-[Ticket 20](../../chart-interaction-composition/tickets/20-expansion-hidden-marker.md) extends the pie/donut expansion asterisk to hidden members, including when selection is off.
-
-The remaining delivered chart behavior is indexed in the [active effort](../../chart-interaction-composition/status.md). Tickets 21–30 and the mobile heatmap correction cover visibility, compact fitting and navigation. [Ticket 32](../../chart-interaction-composition/tickets/32-line-range.md) and [Ticket 33](../../chart-interaction-composition/tickets/33-scatter-line.md) implement the approved supplied combinations with public examples, original-data callbacks and established shared interactions. Repository checks pass 867 tests; packed React 18/19 and native compact/wide checks pass. Independent intent and engineering production reviews pass after bounded correction reviews. General data-change animation and a recorded responsiveness budget keep this parent open.
-
-[Production data motion](../../chart-interaction-composition/spec.md#production-data-transition-boundary) is implemented for the reviewed Cartesian, scatter/bubble, pie/donut and heatmap families in tickets 34–37. Shared 240ms motion retains actual readings and identities, supports interruption and reduced motion, and preserves established interaction. The 904-test repository check, packed React 18/19 validation and native compact/wide checks pass; independent production reviews pass. The remaining numeric families are delivered below.
-
-The remaining numeric animations are implemented for radar, Sparkline, histogram and box plot in child tickets 38–40. Whitney approved them including the corrected Sparkline minimum/maximum marker handoff. Integrated checks pass 937 tests and both packed React versions; native compact/wide operation passes. Independent intent and engineering reviews pass after correcting the distribution navigation-version finding. Changes to unreviewed source topology remain immediate; responsiveness budgets remain on the parent frontier.
+A proposed heatmap experiment would paint numeric cell backgrounds on one canvas while retaining DOM borders, values and interaction. Its appearance and performance were unconfirmed, and it was not adopted. Whitney signed off on closure with this experiment unconfirmed. The existing CSS heatmap rendering remains in production. No further optimization is required for this ticket.

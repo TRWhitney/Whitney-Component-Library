@@ -20,6 +20,17 @@ const buildings = [
 ];
 type Building = (typeof buildings)[number];
 const initial = buildings.slice(0, 4);
+const largerDataset: Building[] = [
+  ...buildings,
+  ...Array.from({length: 494}, (_, index) => ({
+    id: `building-${index + 7}`,
+    label: `Building ${index + 7}`,
+    group: index % 2 ? 'office' : 'lab',
+    x: 10 + ((index * 73) % 260) / 10,
+    y: 30 + ((index * 37) % 1300) / 10,
+    size: 65 + ((index * 31) % 260),
+  })),
+];
 const targets = [
   {id: 'cool', label: 'Cool target', x: 12, y: 36},
   {id: 'mild', label: 'Mild target', x: 22, y: 60},
@@ -102,6 +113,7 @@ export function StatisticalDataMotionExample({kind}: {readonly kind: 'scatter' |
       <p>
         Select a building, then change its values or the building list. Selection follows the
         building. The data table and details report the current supplied values while marks move.
+        Load 500 buildings to try the same controls with a larger dataset.
       </p>
       <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
       <InlineGroup gap="tight" wrap>
@@ -127,7 +139,7 @@ export function StatisticalDataMotionExample({kind}: {readonly kind: 'scatter' |
         </Button>
         <Button
           variant="secondary"
-          isDisabled={data.length === buildings.length}
+          isDisabled={buildings.every((building) => data.some((row) => row.id === building.id))}
           onPress={() => {
             const incoming = buildings.find(
               (building) => !data.some((row) => row.id === building.id),
@@ -149,6 +161,16 @@ export function StatisticalDataMotionExample({kind}: {readonly kind: 'scatter' |
         </Button>
         <Button variant="secondary" onPress={() => setData((rows) => [...rows].reverse())}>
           Reverse order
+        </Button>
+        <Button
+          variant="secondary"
+          onPress={() => {
+            setData(largerDataset);
+            setRevision(0);
+            setDetails('');
+          }}
+        >
+          Load 500 buildings
         </Button>
         <Button
           variant="quiet"

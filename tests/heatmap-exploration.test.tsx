@@ -1,4 +1,4 @@
-import {cleanup, fireEvent, render, screen, within} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen, within, waitFor} from '@testing-library/react';
 import {afterEach, expect, it, vi} from 'vitest';
 import {Heatmap, type HeatmapSelectionItem, type ChartRectangularWindow} from '../src/index.js';
 const data = [
@@ -284,4 +284,45 @@ it('moves the overview by two whole tracks with Shift', () => {
     shiftKey: true,
   });
   expect(changed.mock.lastCall![0].y).toEqual(['c', 'c']);
+});
+
+it('manages crowded axes without restricting the full heatmap window', async () => {
+  const rows = Array.from({length: 24}, (_, index) => ({id: `r${index}`, label: `R${index}`}));
+  const columns = Array.from({length: 24}, (_, index) => ({id: `c${index}`, label: `C${index}`}));
+  const {container} = render(
+    <Heatmap
+      {...common}
+      rows={rows}
+      columns={columns}
+      data={rows.flatMap((row) =>
+        columns.map((column) => ({row: row.id, column: column.id, value: 20})),
+      )}
+      minimumSize={{width: 320, height: 300}}
+      visibilityLabels={{...visibilityLabels, manage: 'Manage visibility'}}
+      exploration={{labels: explorationLabels}}
+    />,
+  );
+  expect(container.querySelectorAll('[data-wcl-heatmap-cell]')).toHaveLength(576);
+  expect(screen.queryByRole('button', {name: 'Hide column C0'})).toBeNull();
+  const manager = screen.getByRole('button', {name: 'Manage visibility'});
+  manager.focus();
+  fireEvent.click(manager);
+  const dialog = await screen.findByRole('dialog', {name: 'Manage visibility'});
+  const firstColumn = within(dialog).getByRole('button', {name: 'Hide column C0'});
+  firstColumn.focus();
+  fireEvent.click(firstColumn);
+  expect(document.activeElement).toBe(firstColumn);
+  expect(container.querySelectorAll('[data-wcl-heatmap-cell]')).toHaveLength(552);
+  expect(within(dialog).getByRole('button', {name: 'Show column C0'})).toBeTruthy();
+  fireEvent.click(within(dialog).getByRole('button', {name: 'Hide row R0'}));
+  expect(container.querySelectorAll('[data-wcl-heatmap-cell]')).toHaveLength(529);
+  fireEvent.click(within(dialog).getByRole('button', {name: 'Show column C0'}));
+  fireEvent.click(within(dialog).getByRole('button', {name: 'Show row R0'}));
+  expect(container.querySelectorAll('[data-wcl-heatmap-cell]')).toHaveLength(576);
+  expect(
+    container.querySelector('[data-wcl-chart-table]')!.querySelectorAll('tbody td'),
+  ).toHaveLength(576);
+  expect(screen.getByRole('dialog', {name: 'Manage visibility'})).toBeTruthy();
+  fireEvent.click(within(dialog).getByRole('button', {name: 'Close restore list'}));
+  await waitFor(() => expect(document.activeElement).toBe(manager));
 });

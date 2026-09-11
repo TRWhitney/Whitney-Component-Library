@@ -1,8 +1,16 @@
 import {useState} from 'react';
 import {Button, Heatmap, Stack, Switch} from '../src/index.js';
 
-const rows = ['North', 'South', 'Studio', 'Office'].map((label) => ({id: label, label}));
-const columns = ['Morning', 'Noon', 'Night'].map((label) => ({id: label, label}));
+const originalRows = ['North', 'South', 'Studio', 'Office'].map((label) => ({id: label, label}));
+const originalColumns = ['Morning', 'Noon', 'Night'].map((label) => ({id: label, label}));
+const denseRows = Array.from({length: 24}, (_, index) => ({
+  id: `room-${index + 1}`,
+  label: `Room ${index + 1}`,
+}));
+const denseColumns = Array.from({length: 24}, (_, index) => ({
+  id: `hour-${index + 1}`,
+  label: `Hour ${index + 1}`,
+}));
 const readings = [
   [16, 24, 18, 21, 27, 20, 14, 22, 17, 19, 26, 23],
   [22, 19, 25, 16, 24, 28, 20, 30, 18, 26, 21, 15],
@@ -12,6 +20,9 @@ const readings = [
 export function HeatmapDataMotionExample() {
   const [update, setUpdate] = useState(0);
   const [compact, setCompact] = useState(false);
+  const [dense, setDense] = useState(false);
+  const rows = dense ? denseRows : originalRows;
+  const columns = dense ? denseColumns : originalColumns;
   const [details, setDetails] = useState('');
   const values = readings[update % readings.length]!;
   const data = rows.flatMap((row, rowIndex) =>
@@ -22,7 +33,9 @@ export function HeatmapDataMotionExample() {
             {
               row: row.id,
               column: column.id,
-              value: values[rowIndex * columns.length + columnIndex]!,
+              value: dense
+                ? 5 + ((rowIndex * 17 + columnIndex * 7 + update * 11) % 28)
+                : values[rowIndex * columns.length + columnIndex]!,
             },
           ],
     ),
@@ -31,11 +44,13 @@ export function HeatmapDataMotionExample() {
     <Stack gap="regular">
       <p>
         Update the readings to change cell colors and their fitted scale. Select a cell to keep its
-        frame through the update. Details and the table show the latest recorded temperature.
+        frame through the update. Details and the table show the latest recorded temperature. In the
+        dense grid, use the corner eye to hide or restore rows and columns.
       </p>
       <Button variant="secondary" onPress={() => setUpdate((previous) => previous + 1)}>
         Update temperatures
       </Button>
+      <Switch label="Dense grid, 24 rooms by 24 hours" isSelected={dense} onChange={setDense} />
       <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
       <div style={{maxWidth: compact ? '22rem' : undefined}}>
         <Heatmap
@@ -45,7 +60,11 @@ export function HeatmapDataMotionExample() {
           rowAccessor="row"
           columnAccessor="column"
           title="Updated room temperatures"
-          description="Four rooms across three times. The Studio has no night reading."
+          description={
+            dense
+              ? 'Temperatures for 24 rooms across 24 hours.'
+              : 'Four rooms across three times. The Studio has no night reading.'
+          }
           dataTableLabel="Updated temperature records"
           minimumSize={{width: 260, height: 300}}
           labels={{
@@ -60,6 +79,7 @@ export function HeatmapDataMotionExample() {
           emptyState={{title: 'No rooms', description: 'Add rooms and readings.'}}
           invalidData={{title: 'Invalid readings', description: 'Correct the affected readings.'}}
           visibilityLabels={{
+            manage: 'Manage rooms and times',
             hideRow: (label) => `Hide room ${label}`,
             showRow: (label) => `Show room ${label}`,
             hideColumn: (label) => `Hide time ${label}`,

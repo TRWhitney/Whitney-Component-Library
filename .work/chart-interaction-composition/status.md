@@ -6,7 +6,7 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-Production data motion is delivered for Cartesian, scatter/bubble, pie/donut and heatmap charts in tickets 34–37. Tickets 38–40 complete the approved radar, Sparkline, histogram and box-plot numeric animations, including the smooth Sparkline minimum/maximum marker handoff. The [accepted study](prototypes/remaining-motion.md) records the behavior.
+Complete. Whitney accepted the measured timings and signed off on closing Ticket 22. Tickets 41 and 42 record the performance results and compact heatmap visibility correction. The proposed heatmap canvas-background experiment remained unconfirmed and was not adopted. No further optimization is required.
 
 ## Progress
 
@@ -17,7 +17,7 @@ Production data motion is delivered for Cartesian, scatter/bubble, pie/donut and
 
 ## Frontier
 
-The [decision map](map.md) indexes remaining parent-ticket work. Unreviewed membership/topology animation and responsiveness budgets remain separate outcomes.
+No remaining work for Ticket 22. The [decision map](map.md) and [performance report](research/chart-responsiveness.md) retain the accepted boundaries and measurements.
 
 ## Accepted sources
 
@@ -30,14 +30,14 @@ The [decision map](map.md) indexes remaining parent-ticket work. Unreviewed memb
 
 ## Verification
 
-The integrated animations pass all 937 tests and `npm run check`, including formatting, code/style lint, generated guidance, TypeScript 5/6/7 and chart isolation. `npm run verify:package` passes packed React 18.3.1 and 19.2.8 SSR, hydration, types and browser builds. Production showcase build and native compact/wide dark/light checks pass. At 390px, every new canvas fits its 308px container. Selections follow displayed geometry, activation reports supplied values, eyes remain usable, and Sparkline extrema crossfade with the moving line. Reduced motion settles cues immediately. Independent intent and engineering reviews pass with no findings after correcting navigation cancellation during distribution gutter motion. The correction passes a public regression and native two-touch operation.
+Current repository checks pass 938 tests, formatting, code/style lint, generated guidance, TypeScript 5/6/7 and chart isolation. Packed React 18.3.1 and 19.2.8 SSR, hydration, types and browser builds pass. The final bounded heatmap refactoring passes all 54 heatmap tests and TypeScript. The production showcase builds and is refreshed.
+
+Native production checks at 390px and 1280px cover dark/light density, touch hide/restore, list focus, focus return and the original readable inline controls. Hiding one track changes 576 cells to 552; restoring returns 576. The new scatter/bubble examples load 500 buildings. Whitney separately accepted the recorded performance results.
 
 ## Out of scope
 
 Scatter with adjacent distributions, application layouts, implicit statistical calculations, and changes to accepted cross-chart behavior not reviewed in the combined study.
 
-## Continuation
+## Delivery
 
-- Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
-- Branch `main`. Cartesian motion is delivered in `223447e`, scatter/bubble motion in `08a7054`, pie/donut motion in `e842a7a`, and heatmap motion in `a67c678`. Sparkline motion is delivered in `761d1cd` and radar motion in `02e2a0b`. Distribution motion, its regressions and the final completion record are delivered together in `[Feature] Animate distribution data changes`. No task-owned implementation remains uncommitted after that outcome.
-- Tickets 38–40 are complete. The next work is to reconcile the remaining parent animation and responsiveness criteria against the delivered behavior. Preserve immediate behavior for unreviewed topology/state changes. Whitney explicitly requested proceeding automatically after approval until new input is necessary.
+The approved compact heatmap manager, retained renderer caching and benchmark records complete this effort. The parent and child tickets record Whitney's explicit sign-off and the unconfirmed, unadopted canvas experiment. No rendering experiment is included in production.

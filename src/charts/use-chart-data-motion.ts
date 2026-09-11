@@ -35,11 +35,11 @@ export function useChartDataMotion<Value>(
 ): readonly ChartMotionItem<Value>[] {
   const [reduced, setReduced] = useState(false);
   const animate = enabled && !reduced;
-  const [goal, setGoal] = useState({version, resetKey, animate, targets, interpolate});
-  if (goal.version !== version || goal.resetKey !== resetKey || goal.animate !== animate) {
-    setGoal({version, resetKey, animate, targets, interpolate});
-  }
-  const [state, setState] = useState({version, resetKey, animate, items: settled(targets)});
+  const latest = useRef({targets, interpolate});
+  useEffect(() => {
+    latest.current = {targets, interpolate};
+  }, [targets, interpolate]);
+  const [state, setState] = useState(() => ({version, resetKey, animate, items: settled(targets)}));
   const current = useRef(state);
 
   useEffect(() => {
@@ -52,6 +52,7 @@ export function useChartDataMotion<Value>(
   }, []);
 
   useEffect(() => {
+    const goal = {version, resetKey, animate, ...latest.current};
     const previous = current.current;
     if (
       previous.version === goal.version &&
@@ -103,7 +104,8 @@ export function useChartDataMotion<Value>(
         exiting: true,
       })),
     ];
-    publish(display(0));
+    // The render already retains the current geometry and introduces arrivals at zero
+    // opacity. Publish only when the clock advances, avoiding a duplicate full chart render.
     const step = (time: number): void => {
       const progress = Math.max(0, Math.min(1, (time - started) / chartDataMotionDuration));
       publish(progress === 1 ? next : display(chartDataMotionEase(progress)));
@@ -111,7 +113,7 @@ export function useChartDataMotion<Value>(
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [goal]);
+  }, [version, resetKey, animate]);
 
   if (!animate || !state.animate || state.resetKey !== resetKey) return settled(targets);
   const supplied = new Map(targets.map((item) => [item.id, item.value]));

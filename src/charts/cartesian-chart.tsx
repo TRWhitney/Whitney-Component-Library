@@ -25,6 +25,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -480,13 +481,13 @@ function explorationValueDomain<Datum extends object, Category extends ChartDoma
   return values;
 }
 
+const numberFormatter = new Intl.NumberFormat('en-US', {maximumFractionDigits: 2});
+
 function formatValue(value: ChartDomainValue, scale: ChartScale<ChartDomainValue>): string {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
   if (typeof value === 'number') {
     if (scale.type === 'normalized') return `${Math.round(value * 100)}%`;
-    return Number.isInteger(value)
-      ? String(value)
-      : value.toLocaleString('en-US', {maximumFractionDigits: 2});
+    return Number.isInteger(value) ? String(value) : numberFormatter.format(value);
   }
   return value;
 }
@@ -1489,6 +1490,20 @@ function DataTable<Datum extends object, Category extends ChartDomainValue>({
   readonly series: readonly InternalSeries<Datum>[];
   readonly valueAxis: ChartValueAxis;
 }): ReactElement {
+  const body = useMemo(
+    () =>
+      rows.map((row) => (
+        <tr key={row.index}>
+          <th scope="row">{axisTickLabel(row.category, categoryAxis)}</th>
+          {row.values.map((_, index) => (
+            <td key={series[index]?.id ?? index}>
+              {formatSeriesReading(row, index, series[index]!, layout, valueAxis, false)}
+            </td>
+          ))}
+        </tr>
+      )),
+    [rows, series, layout, categoryAxis, valueAxis],
+  );
   const categoryUnit = categoryAxis.unit === undefined ? '' : ` (${categoryAxis.unit})`;
   const unit = valueAxis.unit === undefined ? '' : ` (${valueAxis.unit})`;
   return (
@@ -1508,18 +1523,7 @@ function DataTable<Datum extends object, Category extends ChartDomainValue>({
           ))}
         </tr>
       </thead>
-      <tbody>
-        {rows.map((row) => (
-          <tr key={row.index}>
-            <th scope="row">{axisTickLabel(row.category, categoryAxis)}</th>
-            {row.values.map((_, index) => (
-              <td key={series[index]?.id ?? index}>
-                {formatSeriesReading(row, index, series[index]!, layout, valueAxis, false)}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
+      <tbody>{body}</tbody>
     </table>
   );
 }
@@ -1896,22 +1900,59 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       current !== null && !ids.includes(current) ? null : current,
     );
   }
-  const hiddenIds = visibilityLabels === undefined ? [] : hiddenSeriesIds;
-  const visibleIndexes = allSeries.flatMap((item, index) =>
-    hiddenIds.includes(item.id) ? [] : [index],
+  const hiddenIds = useMemo(
+    () => (visibilityLabels === undefined ? [] : hiddenSeriesIds),
+    [visibilityLabels, hiddenSeriesIds],
   );
-  const series = allSeries.filter((item) => !hiddenIds.includes(item.id));
-  const allPrepared = prepareRows(data, categoryAxis, allSeries, valueAxis, layout);
-  const supplied = {
-    invalidCount: allPrepared.invalidCount,
-    rows: allPrepared.rows.map((row) => ({
-      ...row,
-      values: visibleIndexes.map((index) => row.values[index] ?? 0),
-      ...(row.lowerValues
-        ? {lowerValues: visibleIndexes.map((index) => row.lowerValues![index]!)}
-        : {}),
-    })),
-  };
+  const visibleIndexes = useMemo(
+    () => allSeries.flatMap((item, index) => (hiddenIds.includes(item.id) ? [] : [index])),
+    [allSeries, hiddenIds],
+  );
+  const series = useMemo(
+    () => allSeries.filter((item) => !hiddenIds.includes(item.id)),
+    [allSeries, hiddenIds],
+  );
+  const allPrepared = useMemo(
+    () => prepareRows(data, categoryAxis, allSeries, valueAxis, layout),
+    [data, categoryAxis, allSeries, valueAxis, layout],
+  );
+  const dataTable = useMemo(
+    () => (
+      <DataTable
+        categoryAxis={categoryAxis}
+        dataTableLabel={dataTableLabel}
+        hiddenIds={hiddenIds}
+        {...(visibilityLabels === undefined ? {} : {hiddenLabel: visibilityLabels.hidden})}
+        layout={layout}
+        rows={allPrepared.rows}
+        series={allSeries}
+        valueAxis={valueAxis}
+      />
+    ),
+    [
+      categoryAxis,
+      dataTableLabel,
+      hiddenIds,
+      visibilityLabels,
+      layout,
+      allPrepared.rows,
+      allSeries,
+      valueAxis,
+    ],
+  );
+  const supplied = useMemo(
+    () => ({
+      invalidCount: allPrepared.invalidCount,
+      rows: allPrepared.rows.map((row) => ({
+        ...row,
+        values: visibleIndexes.map((index) => row.values[index] ?? 0),
+        ...(row.lowerValues
+          ? {lowerValues: visibleIndexes.map((index) => row.lowerValues![index]!)}
+          : {}),
+      })),
+    }),
+    [allPrepared, visibleIndexes],
+  );
   const navigation = useChartExploration(
     exploration,
     categoryAxis.scale,
@@ -1942,7 +1983,10 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
     setPointerReading(null);
     setTouchReading(null);
   }
-  const rowIds = interaction === undefined ? [] : data.map(interaction.getRowId);
+  const rowIds = useMemo(
+    () => (interaction === undefined ? [] : data.map(interaction.getRowId)),
+    [interaction, data],
+  );
   if (
     interaction &&
     (rowIds.some((id) => typeof id !== 'string' || id.trim() === '') ||
@@ -2091,40 +2135,44 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       },
     };
   };
-  const interactionRows = (interaction ? allPrepared.rows : []).map((row) => ({
-    id: rowIds[row.index] ?? '',
-    category: row.category,
-    datum: row.datum,
-    ...(allSeries.some((s) => s.kind === 'range')
-      ? {
-          ranges: allSeries.flatMap((item, index) =>
-            item.kind === 'range' && Number.isFinite(row.values[index])
-              ? [
-                  {
-                    seriesId: item.id,
-                    label: item.label,
-                    lower: row.lowerValues![index]!,
-                    upper: row.values[index]!,
-                    hidden: hiddenIds.includes(item.id),
-                  },
-                ]
-              : [],
-          ),
-        }
-      : {}),
-    values: allSeries.flatMap((item, index) =>
-      item.kind === 'range' || !Number.isFinite(row.values[index])
-        ? []
-        : [
-            {
-              seriesId: item.id,
-              label: item.label,
-              value: row.values[index]!,
-              hidden: hiddenIds.includes(item.id),
-            },
-          ],
-    ),
-  }));
+  const interactionRows = useMemo(
+    () =>
+      (interaction ? allPrepared.rows : []).map((row) => ({
+        id: rowIds[row.index] ?? '',
+        category: row.category,
+        datum: row.datum,
+        ...(allSeries.some((s) => s.kind === 'range')
+          ? {
+              ranges: allSeries.flatMap((item, index) =>
+                item.kind === 'range' && Number.isFinite(row.values[index])
+                  ? [
+                      {
+                        seriesId: item.id,
+                        label: item.label,
+                        lower: row.lowerValues![index]!,
+                        upper: row.values[index]!,
+                        hidden: hiddenIds.includes(item.id),
+                      },
+                    ]
+                  : [],
+              ),
+            }
+          : {}),
+        values: allSeries.flatMap((item, index) =>
+          item.kind === 'range' || !Number.isFinite(row.values[index])
+            ? []
+            : [
+                {
+                  seriesId: item.id,
+                  label: item.label,
+                  value: row.values[index]!,
+                  hidden: hiddenIds.includes(item.id),
+                },
+              ],
+        ),
+      })),
+    [interaction, allPrepared.rows, rowIds, allSeries, hiddenIds],
+  );
   const interactionVersion = JSON.stringify([
     interactionRows.map((row) => [row.id, domainValueKey(row.category), row.values, row.ranges]),
     status.kind,
@@ -3442,16 +3490,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       ) : null}
       {!isLoading && !isError && hasData ? (
         <>
-          <DataTable
-            categoryAxis={categoryAxis}
-            dataTableLabel={dataTableLabel}
-            hiddenIds={hiddenIds}
-            {...(visibilityLabels === undefined ? {} : {hiddenLabel: visibilityLabels.hidden})}
-            layout={layout}
-            rows={allPrepared.rows}
-            series={allSeries}
-            valueAxis={valueAxis}
-          />
+          {dataTable}
           <AnnotationSummary
             annotations={annotations}
             categoryAxis={categoryAxis}
