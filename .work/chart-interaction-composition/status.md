@@ -6,7 +6,7 @@ Deliver the remaining behavior in [Ticket 22](../library-foundation/tickets/22-c
 
 ## Current state
 
-The combined charts are delivered in `bd706ce` and `f3087f9`. [Value-change motion](prototypes/value-motion.md#acceptance-contract) is approved across all five examples. The [data-transition study](prototypes/data-transitions.md) now shows additions, removals, reordering and automatic axis fitting in columns, bubbles and a donut. Whitney approved it. Tickets 34–37 deliver the reviewed transitions in production; other renderer cases remain on the parent frontier.
+Production data motion is delivered for Cartesian, scatter/bubble, pie/donut and heatmap charts in tickets 34–37. Tickets 38–40 complete the approved radar, Sparkline, histogram and box-plot numeric animations, including the smooth Sparkline minimum/maximum marker handoff. The [accepted study](prototypes/remaining-motion.md) records the behavior.
 
 ## Progress
 
@@ -17,7 +17,7 @@ The combined charts are delivered in `bd706ce` and `f3087f9`. [Value-change moti
 
 ## Frontier
 
-The [decision map](map.md) indexes remaining parent-ticket work. General data-change animation and responsiveness budgets remain separate outcomes.
+The [decision map](map.md) indexes remaining parent-ticket work. Unreviewed membership/topology animation and responsiveness budgets remain separate outcomes.
 
 ## Accepted sources
 
@@ -30,7 +30,7 @@ The [decision map](map.md) indexes remaining parent-ticket work. General data-ch
 
 ## Verification
 
-Production motion passes all 904 tests and `npm run check`, including formatting, code/style lint, generated guidance, all three TypeScript versions and chart isolation. `npm run verify:package` passes packed React 18.3.1 and 19.2.8 SSR, hydration, types and browser builds. The production showcase builds. Native compact/wide, dark/light, reduced-motion, retained-selection, current callback and touch-hold flows pass. Fitted axis gutters now move with data. The new heatmap example uses the approved exploration layout; the Cartesian example fits a 308px mobile container. Independent full reviews identified axis reset exceptions and a second heatmap color transition. Those issues are corrected with six regressions and renewed repository/package/native evidence. Independent intent and engineering correction reviews pass with no findings. All admitted blockers are resolved. Per-family evidence is in tickets 34–37.
+The integrated animations pass all 937 tests and `npm run check`, including formatting, code/style lint, generated guidance, TypeScript 5/6/7 and chart isolation. `npm run verify:package` passes packed React 18.3.1 and 19.2.8 SSR, hydration, types and browser builds. Production showcase build and native compact/wide dark/light checks pass. At 390px, every new canvas fits its 308px container. Selections follow displayed geometry, activation reports supplied values, eyes remain usable, and Sparkline extrema crossfade with the moving line. Reduced motion settles cues immediately. Independent intent and engineering reviews pass with no findings after correcting navigation cancellation during distribution gutter motion. The correction passes a public regression and native two-touch operation.
 
 ## Out of scope
 
@@ -39,5 +39,5 @@ Scatter with adjacent distributions, application layouts, implicit statistical c
 ## Continuation
 
 - Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
-- Branch `main`. Cartesian motion is delivered in `223447e`, scatter/bubble motion in `08a7054`, and pie/donut motion in the commit named `[Feature] Animate pie and donut data`. Ticket 37 accompanies `[Feature] Animate heatmap data changes`.
-- Move to planning for one combined motion study for radar, Sparkline, histogram and box plot. Preserve immediate behavior for unreviewed topology/state changes. Whitney explicitly requested proceeding automatically after approval until new input is necessary.
+- Branch `main`. Cartesian motion is delivered in `223447e`, scatter/bubble motion in `08a7054`, pie/donut motion in `e842a7a`, and heatmap motion in `a67c678`. Uncommitted work is production radar, Sparkline and distribution data motion, regression tests, native showcase examples, canonical/generated guidance and the accepted remaining-chart study.
+- Preserve tickets 38–40 in renderer-specific commits with their examples, guidance and accepted artifacts. Preserve immediate behavior for unreviewed topology/state changes. Whitney explicitly requested proceeding automatically after approval until new input is necessary.

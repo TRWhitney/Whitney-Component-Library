@@ -60,8 +60,9 @@ Show one compact ordered trend with exact current and observed-range context.
 
 - The application accent identifies the single line, directional observed-range cues, and hollow current cue. Filling the upper half for highs and lower half for lows separates the extrema without implying semantic good or bad.
 - Forced colors preserve the line, directional half-filled low and high cues, hollow current cue, completed cue readings, ordinary foreground reading point, reading needle, selection rings and drag region in system colors. The current reading indicates keyboard focus without a whole-chart outline. The summary and table retain exact non-color meaning.
+- Source values animate over 240ms with cubic ease-out. Stable interactive row IDs, or unique positions without interaction, retain identity. Selection follows the displayed line; text, tables and callbacks use supplied readings immediately. Minimum and maximum cues stay attached to their readings and crossfade when the extreme changes identity. Repeated updates retarget the current display. Reduced motion settles values and cues immediately; initial, position/order, gap, configuration and empty-state changes settle directly.
 - Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
-- Static current and observed-range cues do not animate. Reduced motion removes reading transitions while pointer, touch, keyboard, focus, tooltip, summary, and table behavior stays the same.
+- Current and observed-range cues remain still until their data changes. Reduced motion removes reading transitions while pointer, touch, keyboard, focus, tooltip, summary, and table behavior stays the same.
 
 ## Examples
 

@@ -1,3 +1,4 @@
+import {SparklineDataMotionExample} from './sparkline-data-motion-example.js';
 import {CartesianDataMotionExample} from './cartesian-data-motion-example.js';
 import {HeatmapDataMotionExample} from './heatmap-data-motion-example.js';
 import {RadialDataMotionExample} from './radial-data-motion-example.js';
@@ -3833,6 +3834,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description="Show one compact ordered trend with a standard caption, honest gaps, exact current and observed-range cues, and a complete reading that names lows and highs. Use LineChart when visible axes or multiple series matter."
         name="Sparkline"
       >
+        <Example label="Updated readings">
+          <SparklineDataMotionExample />
+        </Example>
         <Example label="Fixed-range Sparkline with selection, details, a gap and tied extremes">
           <SparklineInteractionExample />
         </Example>

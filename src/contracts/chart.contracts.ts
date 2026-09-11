@@ -645,8 +645,9 @@ export const sparklineContract: ComponentContract = {
   ],
   purpose: 'Show one compact ordered trend with exact current and observed-range context.',
   reducedMotionBehavior: [
+    'Source values animate over 240ms with cubic ease-out. Stable interactive row IDs, or unique positions without interaction, retain identity. Selection follows the displayed line; text, tables and callbacks use supplied readings immediately. Minimum and maximum cues stay attached to their readings and crossfade when the extreme changes identity. Repeated updates retarget the current display. Reduced motion settles values and cues immediately; initial, position/order, gap, configuration and empty-state changes settle directly.',
     activationTiming,
-    'Static current and observed-range cues do not animate. Reduced motion removes reading transitions while pointer, touch, keyboard, focus, tooltip, summary, and table behavior stays the same.',
+    'Current and observed-range cues remain still until their data changes. Reduced motion removes reading transitions while pointer, touch, keyboard, focus, tooltip, summary, and table behavior stays the same.',
   ],
   relatedExports: ['AppearanceProvider', ...chartNames.filter((name) => name !== 'Sparkline')],
   responsiveBehavior: [

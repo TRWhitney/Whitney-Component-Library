@@ -1,3 +1,5 @@
+import {useChartDataMotion} from './use-chart-data-motion.js';
+import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {curveLinear, line as createLine} from 'd3-shape';
 import {
   useEffect,
@@ -453,7 +455,7 @@ function SparklineTable<Datum extends object, Position extends ChartDomainValue>
 export function Sparkline<Datum extends object, Position extends ChartDomainValue>(
   props: SparklineProps<Datum, Position>,
 ): ReactElement {
-  const model = prepareModel(props);
+  const sourceModel = prepareModel(props);
   const status = props.status ?? {kind: 'ready'};
   const minimumSize = props.minimumSize ?? {height: 48, width: 240};
   const aspectRatio = props.aspectRatio ?? 6;
@@ -469,10 +471,10 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
   const [touchReading, setTouchReading] = useState<Reading | null>(null);
   const modelIdentity = JSON.stringify([
     status.kind,
-    model.invalidCount,
+    sourceModel.invalidCount,
     props.position.scale,
     props.valueRange,
-    model.rows.map((row) => [positionKey(row.position), row.value ?? null]),
+    sourceModel.rows.map((row) => [positionKey(row.position), row.value ?? null]),
   ]);
   const [retainedModelIdentity, setRetainedModelIdentity] = useState(modelIdentity);
   if (retainedModelIdentity !== modelIdentity) {
@@ -482,7 +484,6 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
     setTouchReading(null);
   }
   const activeReading = pointerReading ?? touchReading ?? keyboardReading;
-  const activeRow = activeReading === null ? undefined : model.rows[activeReading.index];
   const renderedWidth = availableWidth ?? minimumSize.width;
   const renderedHeight = Math.max(minimumSize.height, renderedWidth / aspectRatio);
   const viewScale = Math.max(
@@ -491,7 +492,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
   );
   const interaction = props.interaction;
   const rowIds = interaction
-    ? model.rows.map((row) => interaction.getRowId(props.data[row.index]!))
+    ? sourceModel.rows.map((row) => interaction.getRowId(props.data[row.index]!))
     : [];
   if (
     rowIds.some((id) => typeof id !== 'string' || !id.trim()) ||
@@ -501,6 +502,77 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
       'Sparkline interaction getRowId must return a unique nonempty string for every prepared record.',
     );
   }
+  const motionIds = sourceModel.rows.map((row, index) =>
+    interaction ? rowIds[index]! : positionKey(row.position),
+  );
+  const uniqueMotionIds = new Set(motionIds).size === motionIds.length;
+  const motionResetKey = JSON.stringify([
+    status.kind,
+    sourceModel.invalidCount,
+    props.position.scale,
+    props.valueRange,
+    renderedWidth,
+    renderedHeight,
+    uniqueMotionIds,
+    sourceModel.rows.map((row, index) => [motionIds[index], row.position, row.value === undefined]),
+  ]);
+  const motionEnabled =
+    uniqueMotionIds &&
+    sourceModel.firstIndex !== null &&
+    status.kind !== 'loading' &&
+    status.kind !== 'error';
+  const targets = sourceModel.rows.map((row, index) => {
+    const current = index === sourceModel.lastIndex;
+    const lowest = row.value !== undefined && row.value === sourceModel.lowest;
+    const highest = row.value !== undefined && row.value === sourceModel.highest;
+    return {
+      id: uniqueMotionIds ? motionIds[index]! : String(index),
+      value: {
+        value: row.value,
+        current: current ? 1 : 0,
+        lowest: !current && lowest && !highest ? 1 : 0,
+        highest: !current && highest && !lowest ? 1 : 0,
+        range: !current && lowest && highest ? 1 : 0,
+      },
+    };
+  });
+  const motion = useChartDataMotion(targets, {
+    version: JSON.stringify(targets),
+    resetKey: motionResetKey,
+    enabled: motionEnabled,
+    interpolate: (from, to, progress) => ({
+      value:
+        from.value === undefined || to.value === undefined
+          ? to.value
+          : (1 - progress) * from.value + progress * to.value,
+      current: from.current + (to.current - from.current) * progress,
+      lowest: from.lowest + (to.lowest - from.lowest) * progress,
+      highest: from.highest + (to.highest - from.highest) * progress,
+      range: from.range + (to.range - from.range) * progress,
+    }),
+  });
+  const displayById = new Map(
+    motion.filter((item) => !item.exiting).map((item) => [item.id, item.value]),
+  );
+  const model = {
+    ...sourceModel,
+    rows: sourceModel.rows.map((row, index) => ({
+      ...row,
+      ...displayById.get(targets[index]!.id),
+    })),
+  };
+  const displayValueDomain = useAnimatedChartDomain(
+    props.valueRange ??
+      numericExtent(
+        sourceModel.rows.flatMap((row) => (row.value === undefined ? [] : [row.value])),
+      ),
+    motionEnabled,
+    false,
+    motionResetKey,
+  );
+  const activeRow = activeReading === null ? undefined : model.rows[activeReading.index];
+  const sourceActiveRow =
+    activeReading === null ? undefined : sourceModel.rows[activeReading.index];
   const actions = useChartInteraction(
     interaction
       ? {
@@ -527,7 +599,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
             : {}),
         }
       : undefined,
-    model.rows.flatMap((row, index) =>
+    sourceModel.rows.flatMap((row, index) =>
       row.value === undefined || !interaction
         ? []
         : [
@@ -609,7 +681,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
           kind="unavailable"
           title={props.invalidData.title}
         />
-        {model.rows.length === 0 ? null : <SparklineTable model={model} props={props} />}
+        {model.rows.length === 0 ? null : <SparklineTable model={sourceModel} props={props} />}
       </>
     );
   } else {
@@ -646,8 +718,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
               props.position.scale.domain[1].getTime(),
             ] as const)
         : undefined;
-    const numericValues = model.rows.flatMap((row) => (row.value === undefined ? [] : [row.value]));
-    const valueDomain = props.valueRange ?? numericExtent(numericValues);
+    const valueDomain = displayValueDomain;
     const projectPosition = (row: PreparedRow<Position>): number => {
       if (positionDomain !== undefined && typeof row.position === 'number') {
         return stableLinearPosition(row.position, positionDomain, [
@@ -686,10 +757,10 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
     const cueRadius = clamp(4.5, renderedWidth / 90, 6) / viewScale;
     const cueFillInset = 0.75 / viewScale;
     const isolatedRadius = clamp(2.5, renderedWidth / 150, 3.25) / viewScale;
-    const cueFor = (row: PreparedRow<Position>, index: number): SparklineCue | undefined => {
+    const cueFor = (index: number): SparklineCue | undefined => {
       if (index === model.lastIndex) return 'current';
-      const isLowest = row.value === model.lowest;
-      const isHighest = row.value === model.highest;
+      const isLowest = sourceModel.rows[index]!.value === sourceModel.lowest;
+      const isHighest = sourceModel.rows[index]!.value === sourceModel.highest;
       if (isLowest && isHighest) return 'range';
       if (isLowest) return 'lowest';
       if (isHighest) return 'highest';
@@ -789,19 +860,19 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
       setPointerReading(null);
       setTouchReading(null);
     };
-    const firstRow = model.rows[model.firstIndex]!;
-    const lastRow = model.rows[model.lastIndex!]!;
+    const firstRow = sourceModel.rows[sourceModel.firstIndex!]!;
+    const lastRow = sourceModel.rows[sourceModel.lastIndex!]!;
     const readingAnnouncement =
       activeRow === undefined
         ? ''
         : `${formatPosition(activeRow.position, props.position)}. ${props.value.label}: ${
             activeRow.value === undefined
               ? props.labels.missing
-              : formatValue(activeRow.value, props.value)
+              : formatValue(sourceActiveRow!.value!, props.value)
           }`;
     const renderReadingNode = (): ReactNode => {
       if (actions.box || activeReading === null || activeRow?.value === undefined) return null;
-      const activeCue = cueFor(activeRow, activeReading.index);
+      const activeCue = cueFor(activeReading.index);
       if (activeCue === 'range') return null;
       const centerX = projectPosition(activeRow);
       const centerY = projectValue(activeRow.value)!;
@@ -939,11 +1010,13 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
                 <path d={path ?? undefined} data-wcl-chart-line="" data-wcl-sparkline-line="" />
                 {model.rows.map((row, index) => {
                   if (row.value === undefined) return null;
-                  const cue = cueFor(row, index);
+                  const cues = (['current', 'lowest', 'highest', 'range'] as const).filter(
+                    (cue) => (row[cue] ?? 0) > 0,
+                  );
                   const isIsolated =
                     model.rows[index - 1]?.value === undefined &&
                     model.rows[index + 1]?.value === undefined;
-                  if (cue === undefined) {
+                  if (cues.length === 0) {
                     if (!isIsolated) return null;
                     return (
                       <circle
@@ -958,8 +1031,13 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
                   }
                   const centerX = projectPosition(row);
                   const centerY = projectValue(row.value)!;
-                  return (
-                    <g data-row-index={index} data-wcl-sparkline-cue={cue} key={row.index}>
+                  return cues.map((cue) => (
+                    <g
+                      data-row-index={index}
+                      data-wcl-sparkline-cue={cue}
+                      key={`${row.index}-${cue}`}
+                      opacity={row[cue]}
+                    >
                       <circle
                         cx={centerX}
                         cy={centerY}
@@ -992,7 +1070,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
                         r={cueRadius}
                       />
                     </g>
-                  );
+                  ));
                 })}
               </g>
               {actions.box || activeReading === null || activeRow === undefined ? null : (
@@ -1012,7 +1090,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
                   ? points
                       .filter((point) => selectedIds.has(point.item.rowId))
                       .map((point) => {
-                        const cue = cueFor(model.rows[point.index]!, point.index);
+                        const cue = cueFor(point.index);
                         const radius = cue ? cueRadius : 4.5 / viewScale;
                         return (
                           <g key={point.item.rowId} data-row-id={point.item.rowId}>
@@ -1068,7 +1146,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
                 lowest={model.lowest!}
                 portalTarget={rootElement?.closest('[data-wcl-provider]') ?? rootElement}
                 props={props}
-                row={activeRow}
+                row={sourceActiveRow!}
               />
             )}
           </div>
@@ -1094,7 +1172,7 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
         <p aria-atomic="true" aria-live="polite" data-wcl-chart-reading-announcement="">
           {readingAnnouncement}
         </p>
-        <SparklineTable model={model} props={props} />
+        <SparklineTable model={sourceModel} props={props} />
       </>
     );
   }
