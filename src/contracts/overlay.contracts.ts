@@ -623,6 +623,7 @@ export const contextMenuContract = {
     'Render inside AppearanceProvider so the target focus, command surface, threshold, and items share the active theme and application accent.',
     'Pass target content, a targetLabel, and the same library-owned item model used by Menu. ContextMenu owns the focusable target region and rendered command parts.',
     'Targets may contain Tree, Table, and nested actions. Opening the menu does not set descendant pressed, selected, or focused state or replace their IDs and labels.',
+    'For row-specific commands, prefer the public contextMenu prop on Tree or Table. getItems(rowId) and getLabel(rowId) associate commands with stable row identity without inspecting DOM nodes or replacing ordinary selection.',
   ],
   contentRules: [
     'Include only actions that apply to the named target and keep every important action available through a visible or otherwise discoverable path.',
@@ -686,7 +687,15 @@ export const contextMenuContract = {
     'Pair ContextMenu with a visible Menu or ordinary Button path when actions must remain readily discoverable.',
   ],
   purpose: 'ContextMenu presents secondary commands for one named object at its invocation point.',
-  relatedExports: ['AlertDialog', 'AppearanceProvider', 'Button', 'Menu', 'Popover'],
+  relatedExports: [
+    'AlertDialog',
+    'AppearanceProvider',
+    'Button',
+    'Menu',
+    'Popover',
+    'Table',
+    'Tree',
+  ],
   states: [
     'Closed and open may be controlled or uncontrolled. Invocation may come from pointer, touch, or keyboard, and item states match Menu.',
   ],

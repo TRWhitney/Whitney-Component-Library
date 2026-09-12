@@ -1,7 +1,13 @@
 import type {ReactNode} from 'react';
 
+import type {MenuItems} from '../overlays/overlay-types.js';
 import type {EmptyStateProps} from '../feedback/feedback-types.js';
 import type {CollectionSelectionProps, CollectionStatusProps} from './collection-types.js';
+
+export interface CollectionContextMenuProps<RowId extends string = string> {
+  readonly getLabel: (id: RowId) => string;
+  readonly getItems: (id: RowId) => MenuItems;
+}
 
 export type TableColumnAlignment = 'start' | 'end';
 export type TableSortDirection = 'ascending' | 'descending';
@@ -73,22 +79,26 @@ export type TableSortingProps<ColumnId extends string = string> =
       readonly sortDescriptor?: TableSortDescriptor<NoInfer<ColumnId>> | null;
     };
 
-type TableBaseProps<ColumnId extends string> = CollectionStatusProps &
+type TableBaseProps<RowId extends string, ColumnId extends string> = CollectionStatusProps &
   TableSortingProps<ColumnId> & {
     readonly ariaLabel: string;
     readonly columns: TableColumns<ColumnId>;
+    readonly contextMenu?: CollectionContextMenuProps<NoInfer<RowId>>;
     readonly emptyState: EmptyStateProps;
   };
 
-type StaticTableProps<RowId extends string, ColumnId extends string> = TableBaseProps<ColumnId> &
+type StaticTableProps<RowId extends string, ColumnId extends string> = TableBaseProps<
+  RowId,
+  ColumnId
+> &
   Extract<CollectionSelectionProps<RowId>, {readonly selectionMode: 'none'}> & {
     readonly rows: TableRows<RowId, NoInfer<ColumnId>>;
   };
 
-type SelectableTableProps<
-  RowId extends string,
-  ColumnId extends string,
-> = TableBaseProps<ColumnId> &
+type SelectableTableProps<RowId extends string, ColumnId extends string> = TableBaseProps<
+  RowId,
+  ColumnId
+> &
   Exclude<CollectionSelectionProps<RowId>, {readonly selectionMode: 'none'}> & {
     readonly rows: SelectableTableRows<RowId, NoInfer<ColumnId>>;
   };
@@ -134,6 +144,7 @@ export type TreeProps<ItemId extends string = string> = CollectionStatusProps &
   TreeExpansionProps<ItemId> & {
     readonly ariaLabel: string;
     readonly collapseLabel: string;
+    readonly contextMenu?: CollectionContextMenuProps<NoInfer<ItemId>>;
     readonly emptyState: EmptyStateProps;
     readonly expandLabel: string;
     readonly items: TreeItems<ItemId>;

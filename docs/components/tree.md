@@ -38,9 +38,11 @@ Tree navigates keyed hierarchical information with explicit expansion and option
 
 - Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.
 - Expansion and selection are separate controlled or uncontrolled typed states.
+- Optional contextMenu.getLabel and contextMenu.getItems receive the invoked item ID. Disabled items do not open context menus; an empty item list also suppresses the menu.
 - Stable ids preserve focused items through insertion and reordering. Removing a row that still owns focus moves focus to a nearby remaining item or the named empty feedback group.
 - External filtering never reclaims focus from Search, filters, overlays, or another pane. Moving focus out cancels pending row recovery.
 - onExpandedChange and onSelectionChange report ids in depth-first item order. Nested controls own their own events.
+- Secondary click, Shift+F10, the Context Menu key, and supported touch long press open commands for the invoked row without changing selection. Nested context-menu controls keep their own commands.
 - Every item id must be a nonempty stable string and unique across the full hierarchy.
 - Disabled items cannot contain active nested actions. Virtualization and asynchronous per-level loading are not public APIs.
 - Tree does not serialize expansion or selection. Nested form controls retain their own behavior.
@@ -54,6 +56,7 @@ Tree navigates keyed hierarchical information with explicit expansion and option
 ## Keyboard, labeling, localization, and direction
 
 - Up and Down move between visible items. Logical Right and Left expand, collapse, or move between parent and child. Home, End, typeahead, and selection keys follow tree-grid behavior.
+- When contextMenu is present, Shift+F10 and the Context Menu key open the focused row commands from its row, cell, or nested control. Dismissal restores the invoking control or a nearby surviving row.
 - ariaLabel names the tree grid. Item labels name rows and support typeahead. expandLabel and collapseLabel localize chevron commands.
 - Consumers localize the tree name, item labels and descriptions, expansion labels, action labels, empty copy, and status copy.
 - Indentation, chevrons, expansion keys, nested actions, and selection rails follow inherited writing direction.

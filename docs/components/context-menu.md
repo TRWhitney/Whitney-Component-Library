@@ -19,6 +19,7 @@ ContextMenu presents secondary commands for one named object at its invocation p
 - Render inside AppearanceProvider so the target focus, command surface, threshold, and items share the active theme and application accent.
 - Pass target content, a targetLabel, and the same library-owned item model used by Menu. ContextMenu owns the focusable target region and rendered command parts.
 - Targets may contain Tree, Table, and nested actions. Opening the menu does not set descendant pressed, selected, or focused state or replace their IDs and labels.
+- For row-specific commands, prefer the public contextMenu prop on Tree or Table. getItems(rowId) and getLabel(rowId) associate commands with stable row identity without inspecting DOM nodes or replacing ordinary selection.
 - ContextMenu owns a focusable target region, invocation-point anchor, command surface, items, groups, separators, and submenus.
 
 ## Preferred higher-level compositions

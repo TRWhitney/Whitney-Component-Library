@@ -39,9 +39,11 @@ Table compares keyed records across typed columns with optional application-owne
 ## Control, events, validation, and forms
 
 - Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.
+- Optional contextMenu.getLabel and contextMenu.getItems receive the invoked row ID. An empty command list suppresses its menu. Selection-disabled rows may still offer context commands, just as their visible actions remain available.
 - selectionMode explicitly chooses none, single, or multiple row selection through typed controlled or uncontrolled props.
 - Sortable columns require onSortChange. Table reports a typed descriptor and never mutates or sorts consumer rows.
 - Stable row ids preserve focus through insertion and reordering. Removing the focused row moves focus through the grid behavior.
+- Row context commands preserve selection and nested visible actions. Dismissal restores the invoking control or a nearby surviving row when an action removes its target.
 - onSortChange reports a column id and ascending or descending direction. Selection callbacks report row ids in current row order.
 - Controls inside action cells own their own events and do not trigger row selection.
 - Column and row ids must be nonempty and unique. Every row provides exactly one cell for every declared column.
@@ -56,6 +58,7 @@ Table compares keyed records across typed columns with optional application-owne
 
 ## Keyboard, labeling, localization, and direction
 
+- With contextMenu, Shift+F10 and the Context Menu key open commands for the focused row, cell, or nested control. Secondary click and supported touch long press use the same row ID. Headers and blank space never reuse a previous row target.
 - Arrow keys move through rows and cells, Home and End reach row boundaries, typeahead finds row headers, Enter sorts headers, and Space or Enter changes selection.
 - Focusable controls in cells retain their own keyboard operation without becoming row activation.
 - ariaLabel names the grid. isRowHeader marks the columns that name each row. Column and row text values support announcements and typeahead.

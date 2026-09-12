@@ -9,7 +9,9 @@ import {
   TableHeader as AriaTableHeader,
 } from 'react-aria-components/Table';
 import type {Key} from 'react-aria-components/Table';
-import type {ReactElement} from 'react';
+import {useRef, type ReactElement} from 'react';
+
+import {useCollectionContextMenu} from './collection-context-menu.js';
 
 import {
   CollectionFeedback,
@@ -90,6 +92,12 @@ export function Table<const RowId extends string, const ColumnId extends string>
 ): ReactElement {
   const {ariaLabel, columns, emptyState, rows, status = 'ready', statusMessage} = props;
   validateTable(props);
+  const collectionRef = useRef<HTMLTableElement>(null);
+  const context = useCollectionContextMenu(
+    props.contextMenu,
+    rows.map((row) => row.id),
+    collectionRef,
+  );
   const selectionRows = rows.map((row) => ({
     id: row.id,
     isDisabled: 'isSelectionDisabled' in row && row.isSelectionDisabled,
@@ -101,6 +109,7 @@ export function Table<const RowId extends string, const ColumnId extends string>
     <div data-status={status} data-wcl-collection="" data-wcl-table="">
       <div data-wcl-table-scroll="">
         <AriaTable
+          ref={collectionRef}
           aria-busy={collectionBusy(status)}
           aria-label={ariaLabel}
           data-wcl-table-grid=""
@@ -143,6 +152,7 @@ export function Table<const RowId extends string, const ColumnId extends string>
           >
             {(row) => (
               <AriaRow
+                {...context.getRowProps(row.id)}
                 columns={columns}
                 data-wcl-table-row=""
                 id={row.id}
@@ -162,6 +172,7 @@ export function Table<const RowId extends string, const ColumnId extends string>
           </AriaTableBody>
         </AriaTable>
       </div>
+      {context.overlay}
       <CollectionFeedback
         emptyState={emptyState}
         hasItems={rows.length > 0}

@@ -468,6 +468,7 @@ export const tableContract = {
   ],
   controlBehavior: [
     'Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.',
+    'Optional contextMenu.getLabel and contextMenu.getItems receive the invoked row ID. An empty command list suppresses its menu. Selection-disabled rows may still offer context commands, just as their visible actions remain available.',
     'selectionMode explicitly chooses none, single, or multiple row selection through typed controlled or uncontrolled props.',
     'Sortable columns require onSortChange. Table reports a typed descriptor and never mutates or sorts consumer rows.',
     'Stable row ids preserve focus through insertion and reordering. Removing the focused row moves focus through the grid behavior.',
@@ -492,6 +493,7 @@ export const tableContract = {
     'Column order, start and end alignment, selection rails, and horizontal overflow follow inherited writing direction.',
   ],
   events: [
+    'Row context commands preserve selection and nested visible actions. Dismissal restores the invoking control or a nearby surviving row when an action removes its target.',
     'onSortChange reports a column id and ascending or descending direction. Selection callbacks report row ids in current row order.',
     'Controls inside action cells own their own events and do not trigger row selection.',
   ],
@@ -530,6 +532,7 @@ export const tableContract = {
     'spreadsheet editing, layout grids, hierarchical records, prose, menus, or collections without meaningful columns',
   ],
   keyboardBehavior: [
+    'With contextMenu, Shift+F10 and the Context Menu key open commands for the focused row, cell, or nested control. Secondary click and supported touch long press use the same row ID. Headers and blank space never reuse a previous row target.',
     'Arrow keys move through rows and cells, Home and End reach row boundaries, typeahead finds row headers, Enter sorts headers, and Space or Enter changes selection.',
     'Focusable controls in cells retain their own keyboard operation without becoming row activation.',
   ],
@@ -606,6 +609,7 @@ export const treeContract = {
   controlBehavior: [
     'Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.',
     'Expansion and selection are separate controlled or uncontrolled typed states.',
+    'Optional contextMenu.getLabel and contextMenu.getItems receive the invoked item ID. Disabled items do not open context menus; an empty item list also suppresses the menu.',
     'Stable ids preserve focused items through insertion and reordering. Removing a row that still owns focus moves focus to a nearby remaining item or the named empty feedback group.',
     'External filtering never reclaims focus from Search, filters, overlays, or another pane. Moving focus out cancels pending row recovery.',
   ],
@@ -630,6 +634,7 @@ export const treeContract = {
   ],
   events: [
     'onExpandedChange and onSelectionChange report ids in depth-first item order. Nested controls own their own events.',
+    'Secondary click, Shift+F10, the Context Menu key, and supported touch long press open commands for the invoked row without changing selection. Nested context-menu controls keep their own commands.',
   ],
   examples: [
     {
@@ -665,6 +670,7 @@ export const treeContract = {
   ],
   keyboardBehavior: [
     'Up and Down move between visible items. Logical Right and Left expand, collapse, or move between parent and child. Home, End, typeahead, and selection keys follow tree-grid behavior.',
+    'When contextMenu is present, Shift+F10 and the Context Menu key open the focused row commands from its row, cell, or nested control. Dismissal restores the invoking control or a nearby surviving row.',
   ],
   kind: 'component',
   labeling: [

@@ -148,6 +148,7 @@ export {
   type CardCollectionProps,
   type CardHeadingLevel,
   type CollectionFilterBarProps,
+  type CollectionContextMenuProps,
   type CollectionFilterDefinition,
   type CollectionFilterDefinitions,
   type CollectionFilterOption,

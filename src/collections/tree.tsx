@@ -10,6 +10,8 @@ import {
 import type {Key} from 'react-aria-components/Tree';
 import {useEffect, useMemo, useRef, type ReactElement} from 'react';
 
+import {useCollectionContextMenu} from './collection-context-menu.js';
+
 import {
   CollectionCopy,
   CollectionFeedback,
@@ -80,6 +82,11 @@ export function Tree<const ItemId extends string>(props: TreeProps<ItemId>): Rea
   const selection = ariaSelectionProps(props, flattened);
   const disabledKeys = flattened.filter((item) => item.isDisabled).map((item) => item.id);
   const treeRef = useRef<HTMLDivElement>(null);
+  const context = useCollectionContextMenu(
+    props.contextMenu,
+    flattened.map((item) => item.id),
+    treeRef,
+  );
   const focusedId = useRef<ItemId | null>(null);
   const previousVisibleIds = useRef<readonly ItemId[]>([]);
 
@@ -115,6 +122,7 @@ export function Tree<const ItemId extends string>(props: TreeProps<ItemId>): Rea
 
   const renderItem = (item: TreeItem<ItemId>): ReactElement => (
     <AriaTreeItem
+      {...context.getRowProps(item.id, item.isDisabled)}
       data-item-id={item.id}
       data-wcl-tree-item=""
       id={item.id}
@@ -189,6 +197,7 @@ export function Tree<const ItemId extends string>(props: TreeProps<ItemId>): Rea
           {...(statusMessage === undefined ? {} : {statusMessage})}
         />
       </div>
+      {context.overlay}
     </div>
   );
 }

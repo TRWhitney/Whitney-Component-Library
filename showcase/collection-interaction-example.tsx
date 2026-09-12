@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {Button, SearchField, Stack, Tree} from '../src/index.js';
+import {Button, SearchField, Stack, Table, Tree} from '../src/index.js';
 
 const buildings = [
   {id: 'elm', label: 'Elm Hall'},
@@ -28,8 +28,9 @@ export function SearchableTreeExample() {
   return (
     <Stack gap="tight">
       <p>
-        Search keeps focus through empty results. Expansion and selection stay controlled, and
-        visible actions inspect each building.
+        Search keeps focus through empty results. Right-click a campus for expansion commands or a
+        building for inspection. Shift+F10 opens the same row commands. Visible actions stay
+        independent.
       </p>
       <SearchField
         clearLabel="Clear building search"
@@ -39,6 +40,37 @@ export function SearchableTreeExample() {
       />
       <Tree
         ariaLabel="Campus buildings"
+        contextMenu={{
+          getLabel: (id) =>
+            `${id === 'central' ? 'Central campus' : buildings.find((building) => building.id === id)?.label} actions`,
+          getItems: (id) =>
+            id === 'central'
+              ? [
+                  {
+                    id: 'expand',
+                    type: 'action',
+                    label: 'Expand campus',
+                    onAction: () => setExpanded(['central']),
+                  },
+                  {
+                    id: 'collapse',
+                    type: 'action',
+                    label: 'Collapse campus',
+                    onAction: () => setExpanded([]),
+                  },
+                ]
+              : [
+                  {
+                    id: 'inspect',
+                    type: 'action',
+                    label: 'Inspect building',
+                    onAction: () =>
+                      setMessage(
+                        `Inspecting ${buildings.find((building) => building.id === id)?.label}.`,
+                      ),
+                  },
+                ],
+        }}
         collapseLabel="Collapse campus"
         emptyState={emptyState}
         expandedIds={query.trim() ? ['central'] : expanded}
@@ -66,6 +98,57 @@ export function SearchableTreeExample() {
         selectedId={selected}
         selectionMode="single"
       />
+      <p role="status">{message}</p>
+    </Stack>
+  );
+}
+
+export function CollectionContextMenuExample() {
+  const [message, setMessage] = useState('No export requested.');
+  return (
+    <Stack gap="tight">
+      <p>
+        Right-click any part of a reading row to inspect that building. The menu also opens from a
+        focused cell or button with Shift+F10. Opening it preserves row selection.
+      </p>
+      <Table
+        ariaLabel="Building readings"
+        contextMenu={{
+          getLabel: (id) => `${buildings.find((building) => building.id === id)?.label} actions`,
+          getItems: (id) => [
+            {
+              id: 'inspect',
+              type: 'action',
+              label: 'Inspect building',
+              onAction: () =>
+                setMessage(
+                  `Inspecting ${buildings.find((building) => building.id === id)?.label}.`,
+                ),
+            },
+          ],
+        }}
+        columns={[
+          {id: 'building', isRowHeader: true, label: 'Building'},
+          {id: 'actions', kind: 'actions', label: 'Actions'},
+        ]}
+        defaultSelectedId="elm"
+        emptyState={emptyState}
+        onSortChange={() => {}}
+        rows={buildings.map((building) => ({
+          id: building.id,
+          textValue: building.label,
+          cells: {
+            building: building.label,
+            actions: (
+              <Button onPress={() => setMessage(`Inspecting ${building.label}.`)}>
+                Inspect {building.label}
+              </Button>
+            ),
+          },
+        }))}
+        selectionMode="single"
+      />
+      <Button onPress={() => setMessage('Readings exported.')}>Export readings</Button>
       <p role="status">{message}</p>
     </Stack>
   );

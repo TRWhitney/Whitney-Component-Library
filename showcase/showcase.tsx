@@ -1,5 +1,5 @@
 import {ContextMenuExample} from './context-menu-example.js';
-import {SearchableTreeExample} from './collection-interaction-example.js';
+import {SearchableTreeExample, CollectionContextMenuExample} from './collection-interaction-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
 import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
 import {RadarDataMotionExample} from './radar-data-motion-example.js';
@@ -1193,6 +1193,9 @@ function CollectionSpecimens() {
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
         />
+        <Example label="Independent row context actions">
+          <CollectionContextMenuExample />
+        </Example>
         <p>
           <a href="#appearance-provider">
             Compare rounded final-row feedback and compact application controls.
@@ -1233,7 +1236,7 @@ function CollectionSpecimens() {
           ]}
           selectionMode="single"
         />
-        <Example label="Search and empty results">
+        <Example label="Search, empty results, and row context commands">
           <SearchableTreeExample />
         </Example>
       </Specimen>

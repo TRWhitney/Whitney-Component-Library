@@ -7,6 +7,7 @@ export {Table} from './table.js';
 export {Tree} from './tree.js';
 export type {
   CollectionFilterBarProps,
+  CollectionContextMenuProps,
   CollectionFilterDefinition,
   CollectionFilterDefinitions,
   CollectionFilterOption,
