@@ -26,6 +26,25 @@ fixtures exist.
 - [ ] No accepted responsive layout clips, overflows, loses focus, or introduces arbitrary dividers
       and decorative hard stops.
 - [ ] Findings are fixed at the owning component seam and do not become test-only exceptions.
+- [ ] Increase scrollbar size slightly across scroll regions. Whitney reported that the current
+      scrollbars have become too subtle; verify their visibility in both themes and compact layouts.
+- [ ] Audit the AppearanceProvider area in the component showcase. Whitney reported that its
+      controls do not respect the selected accent and appear bespoke. Use library components where
+      appropriate and verify that controls and selected states follow the active accent.
+- [ ] Move the AppearanceProvider options into the sidebar beside the accent selector so the
+      appearance controls are together. Whitney identified the current placement as poor UX.
+- [ ] Rework hierarchy and spacing in the showcase's chart section. Make section and subsection
+      boundaries clear and separate distinct concepts with space; compact density must not erase
+      these relationships.
+- [ ] Add the vertical dashed hover guide to area charts and verify it in the rendered examples.
+- [ ] Give the pie-chart explanation a readable width independent of the chart width. Its current
+      narrow wrapping adds excessive vertical space.
+- [ ] Make regular and compact chart examples meaningfully representative. Whitney reported that
+      the current sizing controls only change small charts to slightly smaller charts.
+- [ ] Standardize shared chart options throughout the showcase, including compact sizing, so
+      comparable examples expose consistent controls.
+- [ ] Remove the repeated "Try compact density and optional..." links from every showcase area.
+      Whitney finds these prompts unnecessary and distracting.
 
 ## Accepted sources
 

@@ -33,3 +33,9 @@ consumer-owned layout and persistence state.
 ## Completion evidence
 
 Pending implementation.
+
+## Markdown cleanup
+
+- [ ] Give read-only and collaboratively locked editors a visible treatment on the editor itself
+      that makes their non-editable state clear without relying on the support text below.
+      Whitney requested this cleanup after the Markdown tickets; retain the explanatory text.
