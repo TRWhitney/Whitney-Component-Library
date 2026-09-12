@@ -9,7 +9,9 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 21, including the intervening Ticket 03A accent correction, are complete.
+Tickets 01 through 23, including the intervening Ticket 03A accent correction, are complete.
+Ticket 23 delivers the accepted [Energy desk prototype](../data-analysis-prototype/status.md)
+and all thirteen library fixes verified in that packed-consumer application.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
 contracts, direct reading, pinned overlap priority, and Whitney's selected translucent marks.
 The future-ticket audit is complete. Ticket 18 delivers ProcessTracker and a non-exported
@@ -288,11 +290,10 @@ type, and contract conventions while adding only the behavior its data unit requ
 
 ## Frontier
 
-See the [decision map](map.md). Ticket 21 is complete. The
-[reconciled Ticket 22](tickets/22-chart-interaction-and-composition.md) credits delivered reading,
-emphasis, sizing, tables, and mixed Cartesian support. Its prerequisites are complete; remaining
-work is ready for planning around visibility, activation callbacks, selection and coordination,
-domain exploration, animation, scatter with a line, and a line with a changing range band.
+See the [decision map](map.md). [Ticket 22](tickets/22-chart-interaction-and-composition.md) is
+complete and signed off. [Ticket 23](tickets/23-data-analysis-prerelease.md) now exercises the
+completed library in a packed-package client. Its [prototype effort](../data-analysis-prototype/status.md)
+owns the app, direct inspection evidence, and resulting library deficiency tickets.
 
 ## Accepted sources
 
@@ -529,12 +530,13 @@ domain exploration, animation, scatter with a line, and a line with a changing r
 
 ## Continuation
 
-- Branch: `master`
+- Branch: `main`
 - Ticket 19 is delivered in `5e47062` (`[Feature] Add Cartesian chart foundation`). The current
   chart baseline includes the later role-aware palette and reading-interaction commits through
   `d8cce02` (`[Feature] Make charts readable and interactive`).
 - Ticket 20 is implemented and validated as one delivery change; no follow-up correction remains.
 - Ticket 21 is delivered through `9780036`, `d9ddcd5`, `6680a5c`, and the current Sparkline commit.
-- Start a new `novel-work` effort before taking up the next ticket.
-- Next action: plan Ticket 22's chart interaction and composition work against the completed chart
-  family.
+- Ticket 22 is complete through `19a050f`. Its accepted performance results and delivery evidence
+  remain in the [chart effort](../chart-interaction-composition/status.md).
+- Ticket 23 and all thirteen library fixes are complete. See the [delivery and verification record](../data-analysis-prototype/status.md).
+- Next planned foundation work is Ticket 24. It has not begun.

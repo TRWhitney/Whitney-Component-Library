@@ -37,6 +37,8 @@
     "lint:code": "eslint . --max-warnings 0",
     "lint:styles": "stylelint \"**/*.css\" --max-warnings 0",
     "prepack": "npm run build",
+    "prototype:analysis": "node ./scripts/data-analysis-prototype.mjs",
+    "prototype:analysis:build": "node ./scripts/data-analysis-prototype.mjs --build",
     "showcase": "vite showcase",
     "showcase:build": "vite build showcase --outDir ../.showcase-dist --emptyOutDir",
     "test": "vitest run",

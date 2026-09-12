@@ -1,0 +1,10 @@
+{
+  "name": "data-analysis-prototype",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@trwhitney/component-library": "file:./component-library.tgz",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  }
+}
