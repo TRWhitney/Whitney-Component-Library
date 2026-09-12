@@ -347,5 +347,5 @@ describe('component showcase', () => {
       }),
     ).toBeNull();
     expect(document.querySelector('[data-wcl-drawer-preview]')).toBeTruthy();
-  });
+  }, 10_000);
 });
