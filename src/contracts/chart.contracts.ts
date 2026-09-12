@@ -32,6 +32,8 @@ const selectionPresentation =
   'selection.presentation chooses one selection view: panel by default or controls for a compact count and clear action. The two views never render together. Both share the same selection and clear behavior; opening the count reveals localized interaction help. The panel keeps item names visible, while compact controls reveal them with the help.';
 const plotProportions =
   'aspectRatio changes the plot geometry used by axes, marks, clipping, hit testing, and navigation. Wide or square plots use the available canvas instead of letterboxing a fixed 640-by-360 SVG. minimumSize and overflow still control the legibility limit.';
+const retainedActivation =
+  'Activation feedback survives consumer updates to the current reading, callback identity, or selection props. A stable observation keeps its click acknowledgment when promoted to the current series; repeated activation restarts feedback.';
 
 const activationTiming =
   'Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.';
@@ -154,6 +156,7 @@ function chartContract({
     ],
     purpose,
     reducedMotionBehavior: [
+      retainedActivation,
       'Reduced motion removes series-emphasis and scrollbar-fade transitions while preserving the same reading, focus, legend, and native scrolling states. Automatic scale changes settle immediately when reduced motion is requested, including when that preference changes during an animation. Otherwise axes and marks share the animated scale while readings retain exact values. Initial geometry appears immediately. Data values and range limits move over 240ms with cubic ease-out, retargeting from the current display. Stable row IDs retain identity; without interaction IDs, only unambiguous category values can identify rows. Categorical columns and bars move with their labels on reorder; arriving and departing bars fade, and departing bars cannot be targeted. Line and area adjacency, missing-value topology, configuration changes and empty states update immediately. Continuous category-domain changes retain their existing behavior. Source readings and callbacks always report supplied values; selection and hit testing follow displayed geometry.',
     ],
     relatedExports: ['AppearanceProvider', ...chartNames.filter((chartName) => chartName !== name)],
@@ -1429,6 +1432,7 @@ function statisticalChartContract({
     ],
     purpose,
     reducedMotionBehavior: [
+      retainedActivation,
       activationTiming,
       outlineMotion,
       guidance.reducedMotion,

@@ -9,10 +9,20 @@ const readings = [
 
 export function ChartApplicationGeometryExample({kind}: {readonly kind: 'line' | 'scatter'}) {
   const [aspectRatio, setAspectRatio] = useState(3);
+  const [current, setCurrent] = useState('elm');
+  const [inspection, setInspection] = useState('Activate a reading to inspect its building.');
+  const [count, setCount] = useState(0);
+  const inspect = (id: string) => {
+    const reading = readings.find((row) => row.id === id)!;
+    setCurrent(id);
+    setCount((value) => value + 1);
+    setInspection(`${reading.name}: ${reading.energy} kWh/m². Inspection ${count + 1}.`);
+  };
   const common = {
     data: readings,
     aspectRatio,
-    description: 'Changing proportions reshapes the plot.',
+    description:
+      'Changing proportions reshapes the plot. Activating a reading inspects it immediately.',
     dataTableLabel: 'Building readings',
     emptyState: {title: 'No readings', description: 'Add a building reading.'},
     invalidData: {title: 'Invalid readings', description: 'Check the supplied building readings.'},
@@ -28,19 +38,30 @@ export function ChartApplicationGeometryExample({kind}: {readonly kind: 'line' |
       {kind === 'scatter' ? (
         <ScatterChart
           {...common}
-          title="Building energy proportions"
+          title="Inspect building energy"
           idAccessor="id"
           labelAccessor="name"
           legend={{label: 'Building status'}}
-          series={[{id: 'buildings', label: 'Buildings'}]}
+          seriesAccessor={(row) => (row.id === current ? 'current' : 'buildings')}
+          series={[
+            {id: 'buildings', label: 'Buildings'},
+            {id: 'current', label: 'Current'},
+          ]}
+          interaction={{onActivate: (event) => inspect(event.item.rowId)}}
         />
       ) : (
         <LineChart
           {...common}
-          title="Energy reading proportions"
+          title="Inspect energy readings"
           series={[{id: 'energy', label: 'Energy', accessor: 'energy', showPoints: true}]}
+          interaction={{
+            target: 'point',
+            getRowId: (row) => row.id,
+            onActivate: (event) => inspect(event.item.rowId),
+          }}
         />
       )}
+      <p role="status">{inspection}</p>
     </Stack>
   );
 }

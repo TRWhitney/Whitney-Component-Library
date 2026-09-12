@@ -72,6 +72,7 @@ Show a numeric distribution through contiguous intervals and an explicit ordinat
 
 - Application accent colors the histogram bins. Count, proportion, or density remains explicit in the axis, tooltip, and generated table rather than depending on color.
 - Forced colors preserve axes and bin boundaries in system colors. Interval and ordinate values remain complete in the generated table.
+- Activation feedback survives consumer updates to the current reading, callback identity, or selection props. A stable observation keeps its click acknowledgment when promoted to the current series; repeated activation restarts feedback.
 - Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.
 - Outline pulses use a four-pixel stroke, a five-pixel outset, and three pixels of outward travel per edge at every rendered size. Degenerate lines retain their zero dimension. Selection and value-bearing geometry do not move.
 - Counts, proportions and densities animate over 240ms with cubic ease-out when exact bin intervals remain unchanged. Automatic bounds and selected frames follow displayed bars; readings, tables and callbacks report supplied statistics. Changed bin boundaries, configuration and empty states settle directly. Repeated updates retarget the current display. Reduced motion settles values and bounds immediately and removes bin-emphasis and scrollbar transitions.

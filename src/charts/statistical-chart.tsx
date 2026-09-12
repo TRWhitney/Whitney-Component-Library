@@ -2605,11 +2605,13 @@ function StatisticalFrame<Datum extends object>({
   const configuration:
     | (Pick<ChartInteraction<object, number>, 'target' | 'selection' | 'onActivate'> & {
         readonly canActivate?: (item: ChartSelectionItem) => boolean;
+        readonly activationIdentity?: 'row' | 'point';
       })
     | undefined =
     interaction || fullPointModel?.line?.canActivate
       ? {
           target: 'point',
+          activationIdentity: 'row',
           canActivate: (item) =>
             item.seriesId === fullPointModel?.line?.series.id
               ? !!fullPointModel?.line?.canActivate

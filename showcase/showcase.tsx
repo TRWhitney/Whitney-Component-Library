@@ -3791,7 +3791,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         <Example label="Selection panel or compact chart controls">
           <ChartSelectionPresentationExample />
         </Example>
-        <Example label="Wide and square plot proportions">
+        <Example label="Plot proportions and retained activation feedback">
           <ChartApplicationGeometryExample kind="line" />
         </Example>
       </Specimen>
@@ -3950,7 +3950,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         <Example label="Crowded numeric labels">
           <CompactAxisExample kind="numeric" />
         </Example>
-        <Example label="Resize the building energy plot">
+        <Example label="Resize the plot and inspect a different building">
           <ChartApplicationGeometryExample kind="scatter" />
         </Example>
       </Specimen>

@@ -126,6 +126,7 @@ export function useChartInteraction<Datum extends object, Category extends Chart
   configuration:
     | (Pick<ChartInteraction<Datum, Category>, 'target' | 'selection' | 'onActivate'> & {
         readonly canActivate?: (item: ChartSelectionItem) => boolean;
+        readonly activationIdentity?: 'row' | 'point';
       })
     | undefined,
   rows: readonly InteractionRow<Datum, Category>[],
@@ -198,19 +199,36 @@ export function useChartInteraction<Datum extends object, Category extends Chart
     setBox(null);
     setSweepTrail([]);
     setPreview(null);
-    setPulse(null);
+  }
+  // Feedback follows the executed activation, independently of gesture geometry.
+  // Point charts give each observation a stable row identity across series changes.
+  if (pulse) {
+    const row = rows.find((candidate) => candidate.id === pulse.item.rowId);
+    const values = row
+      ? [...row.values, ...(row.ranges ?? [])].filter((value) => !value.hidden)
+      : [];
+    const value =
+      values.find((candidate) => candidate.seriesId === pulse.item.seriesId) ??
+      (configuration?.activationIdentity === 'row' && values.length === 1 ? values[0] : undefined);
+    if (
+      !configuration?.onActivate ||
+      configuration.canActivate?.(pulse.item) === false ||
+      !row ||
+      (pulse.item.seriesId !== undefined && !value)
+    )
+      setPulse(null);
+    else if (value && value.seriesId !== pulse.item.seriesId) {
+      setPulse({...pulse, item: {...pulse.item, seriesId: value.seriesId}});
+    }
   }
   useEffect(() => {
     // Identity, geometry, and visibility changes invalidate an in-flight gesture.
     release();
-    clearTimeout(pulseTimer.current);
-    return () => {
-      release();
-      clearTimeout(pulseTimer.current);
-    };
+    return release;
     // The serialized version describes data/visibility, not callback identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gestureVersion, data]);
+  useEffect(() => () => clearTimeout(pulseTimer.current), []);
 
   const change = (items: readonly ChartSelectionItem[]) => {
     if (!selection) return;
