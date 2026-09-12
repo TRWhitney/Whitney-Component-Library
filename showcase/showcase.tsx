@@ -1,4 +1,5 @@
 import {ContextMenuExample} from './context-menu-example.js';
+import {SearchableTreeExample} from './collection-interaction-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
 import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
 import {RadarDataMotionExample} from './radar-data-motion-example.js';
@@ -1232,6 +1233,9 @@ function CollectionSpecimens() {
           ]}
           selectionMode="single"
         />
+        <Example label="Search and empty results">
+          <SearchableTreeExample />
+        </Example>
       </Specimen>
     </>
   );

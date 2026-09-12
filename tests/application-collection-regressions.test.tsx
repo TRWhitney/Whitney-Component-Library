@@ -1,6 +1,7 @@
 import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {afterEach, expect, it, vi} from 'vitest';
-import {AppearanceProvider, Button, ContextMenu, Table, Tree} from '../src/index.js';
+import {useState} from 'react';
+import {AppearanceProvider, Button, ContextMenu, SearchField, Table, Tree} from '../src/index.js';
 
 if (!globalThis.CSS)
   Object.defineProperty(globalThis, 'CSS', {
@@ -30,6 +31,26 @@ const tree = (data = items) => (
     emptyState={empty}
   />
 );
+it('keeps search focus when external filtering removes the previously focused row', async () => {
+  const view = (filtered: boolean) => (
+    <>
+      <input aria-label="Search" />
+      {tree(filtered ? [] : items)}
+    </>
+  );
+  const result = render(view(false));
+  act(() => screen.getByRole('row', {name: 'A'}).focus());
+  const search = screen.getByRole('textbox', {name: 'Search'});
+  act(() => search.focus());
+  result.rerender(view(true));
+  await new Promise((resolve) => setTimeout(resolve, 40));
+  expect(document.activeElement).toBe(search);
+});
+it('renders the empty state without an empty tree grid', () => {
+  render(tree([]));
+  expect(screen.getByText('No records')).toBeTruthy();
+  expect(screen.queryByRole('treegrid')).toBeNull();
+});
 it('does not press nested collection rows and buttons when a context menu is open', async () => {
   const {container} = render(
     <AppearanceProvider appearance="dark" accent="#538dff">
@@ -51,6 +72,34 @@ it('does not press nested collection rows and buttons when a context menu is ope
   expect(container.querySelector('button[aria-label="Expand"][data-pressed]')).toBeNull();
 });
 
+it('does not reclaim focus on a scheduled frame after focus moves to another control', async () => {
+  const result = render(
+    <>
+      <input aria-label="Search" />
+      {tree()}
+    </>,
+  );
+  act(() => screen.getByRole('row', {name: 'B'}).focus());
+  result.rerender(
+    <>
+      <input aria-label="Search" />
+      {tree([{...items[0]!, children: [{id: 'a', label: 'A'}]}])}
+    </>,
+  );
+  const search = screen.getByRole('textbox', {name: 'Search'});
+  act(() => search.focus());
+  await act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+  expect(document.activeElement).toBe(search);
+});
+it('recovers a removed final row to its named feedback region', async () => {
+  const result = render(tree());
+  act(() => screen.getByRole('row', {name: 'A'}).focus());
+  result.rerender(tree([]));
+  await waitFor(() =>
+    expect(document.activeElement).toBe(screen.getByRole('group', {name: 'Buildings'})),
+  );
+  expect(screen.queryByRole('treegrid')).toBeNull();
+});
 it('opens from a focused descendant with Shift+F10 without changing nested control identities', async () => {
   const inspect = vi.fn();
   const pin = vi.fn();
@@ -129,6 +178,55 @@ it('opens touch context actions from a nested row without pressing unrelated row
     platform.mockRestore();
     vi.unstubAllGlobals();
   }
+});
+
+it('keeps controlled search, selection, and expansion through composition and no results', async () => {
+  function SearchableTree() {
+    const [query, setQuery] = useState('');
+    return (
+      <>
+        <SearchField
+          label="Search buildings"
+          clearLabel="Clear search"
+          value={query}
+          onChange={setQuery}
+        />
+        <Tree
+          ariaLabel="Buildings"
+          items={items
+            .map((item) => ({
+              ...item,
+              children: item.children.filter((child) => child.label.includes(query)),
+            }))
+            .filter((item) => item.children.length > 0)}
+          expandLabel="Expand"
+          collapseLabel="Collapse"
+          expandedIds={['campus']}
+          onExpandedChange={() => {}}
+          selectedId="a"
+          onSelectionChange={() => {}}
+          selectionMode="single"
+          emptyState={empty}
+        />
+      </>
+    );
+  }
+  render(<SearchableTree />);
+  act(() => screen.getByRole('row', {name: 'A'}).focus());
+  const search = screen.getByRole<HTMLInputElement>('searchbox', {name: 'Search buildings'});
+  act(() => search.focus());
+  fireEvent.compositionStart(search);
+  for (const value of ['A', 'Az', 'Azx', 'A']) {
+    fireEvent.change(search, {target: {value}});
+    search.setSelectionRange(value.length, value.length);
+    await act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+    expect(document.activeElement).toBe(search);
+    expect(search.value).toBe(value);
+    expect(search.selectionStart).toBe(value.length);
+  }
+  fireEvent.compositionEnd(search, {data: 'A'});
+  expect(screen.getByRole('row', {name: 'A'}).getAttribute('aria-selected')).toBe('true');
+  expect(screen.getByRole('row', {name: /Campus/}).getAttribute('aria-expanded')).toBe('true');
 });
 
 it('isolates a table and its nested action buttons when opening and dismissing context actions', async () => {

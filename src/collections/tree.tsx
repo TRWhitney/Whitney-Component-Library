@@ -84,6 +84,14 @@ export function Tree<const ItemId extends string>(props: TreeProps<ItemId>): Rea
   const previousVisibleIds = useRef<readonly ItemId[]>([]);
 
   useEffect(() => {
+    const clearExternalFocus = (event: FocusEvent) => {
+      if (!treeRef.current?.contains(event.target as Node)) focusedId.current = null;
+    };
+    document.addEventListener('focusin', clearExternalFocus, true);
+    return () => document.removeEventListener('focusin', clearExternalFocus, true);
+  }, []);
+
+  useEffect(() => {
     const recoverFocus = () => {
       const visibleRows = [
         ...(treeRef.current?.querySelectorAll<HTMLElement>('[data-item-id]') ?? []),
@@ -94,7 +102,7 @@ export function Tree<const ItemId extends string>(props: TreeProps<ItemId>): Rea
         const previousIndex = previousVisibleIds.current.indexOf(previousFocusedId);
         const fallback = visibleRows[Math.min(Math.max(previousIndex, 0), visibleRows.length - 1)];
         const treeGrid = treeRef.current?.querySelector<HTMLElement>('[data-wcl-tree-grid]');
-        (fallback ?? treeGrid)?.focus();
+        (fallback ?? treeGrid ?? treeRef.current)?.focus();
         focusedId.current = (fallback?.dataset.itemId as ItemId | undefined) ?? null;
       }
       previousVisibleIds.current = currentIds;
@@ -141,7 +149,14 @@ export function Tree<const ItemId extends string>(props: TreeProps<ItemId>): Rea
   return (
     <div data-status={status} data-wcl-collection="" data-wcl-tree="">
       <div
+        aria-label={items.length === 0 ? ariaLabel : undefined}
+        aria-busy={items.length === 0 ? collectionBusy(status) : undefined}
+        role={items.length === 0 ? 'group' : undefined}
+        tabIndex={items.length === 0 ? -1 : undefined}
         data-wcl-tree-focus-scope=""
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) focusedId.current = null;
+        }}
         onFocusCapture={(event) => {
           const row = (event.target as Element).closest<HTMLElement>('[data-item-id]');
           if (row) {
@@ -153,25 +168,27 @@ export function Tree<const ItemId extends string>(props: TreeProps<ItemId>): Rea
         }}
         ref={treeRef}
       >
-        <AriaTree<TreeItem<ItemId>>
-          aria-busy={collectionBusy(status)}
-          aria-label={ariaLabel}
-          data-wcl-tree-grid=""
-          disabledKeys={disabledKeys}
-          items={items}
-          selectionBehavior="toggle"
-          {...selection}
-          {...expansionProps(props, flattened)}
-        >
-          {renderItem}
-        </AriaTree>
+        {items.length === 0 ? null : (
+          <AriaTree<TreeItem<ItemId>>
+            aria-busy={collectionBusy(status)}
+            aria-label={ariaLabel}
+            data-wcl-tree-grid=""
+            disabledKeys={disabledKeys}
+            items={items}
+            selectionBehavior="toggle"
+            {...selection}
+            {...expansionProps(props, flattened)}
+          >
+            {renderItem}
+          </AriaTree>
+        )}
+        <CollectionFeedback
+          emptyState={emptyState}
+          hasItems={items.length > 0}
+          status={status}
+          {...(statusMessage === undefined ? {} : {statusMessage})}
+        />
       </div>
-      <CollectionFeedback
-        emptyState={emptyState}
-        hasItems={items.length > 0}
-        status={status}
-        {...(statusMessage === undefined ? {} : {statusMessage})}
-      />
     </div>
   );
 }

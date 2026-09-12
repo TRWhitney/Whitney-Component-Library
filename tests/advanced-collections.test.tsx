@@ -437,7 +437,8 @@ describe('table, tree, and filter family', () => {
         statusMessage="Studies could not be loaded"
       />,
     );
-    expect(screen.getByRole('treegrid', {name: 'Study hierarchy'})).toBeTruthy();
+    expect(screen.getByRole('group', {name: 'Study hierarchy'})).toBeTruthy();
+    expect(screen.queryByRole('treegrid')).toBeNull();
     expect(screen.getByRole('alert').textContent).toContain('Studies could not be loaded');
   });
 
@@ -465,7 +466,8 @@ describe('table, tree, and filter family', () => {
         selectionMode="none"
       />,
     );
-    expect(screen.getByRole('treegrid', {name: 'Study hierarchy'})).toBeTruthy();
+    expect(screen.getByRole('group', {name: 'Study hierarchy'})).toBeTruthy();
+    expect(screen.queryByRole('treegrid')).toBeNull();
     expect(screen.getByText('No matching runs')).toBeTruthy();
   });
 

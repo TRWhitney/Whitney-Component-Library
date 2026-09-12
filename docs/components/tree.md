@@ -38,7 +38,8 @@ Tree navigates keyed hierarchical information with explicit expansion and option
 
 - Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.
 - Expansion and selection are separate controlled or uncontrolled typed states.
-- Stable ids preserve focused items through insertion and reordering. Removing the focused item moves focus to a nearby remaining item.
+- Stable ids preserve focused items through insertion and reordering. Removing a row that still owns focus moves focus to a nearby remaining item or the named empty feedback group.
+- External filtering never reclaims focus from Search, filters, overlays, or another pane. Moving focus out cancels pending row recovery.
 - onExpandedChange and onSelectionChange report ids in depth-first item order. Nested controls own their own events.
 - Every item id must be a nonempty stable string and unique across the full hierarchy.
 - Disabled items cannot contain active nested actions. Virtualization and asynchronous per-level loading are not public APIs.
@@ -48,6 +49,7 @@ Tree navigates keyed hierarchical information with explicit expansion and option
 
 - Tree owns a labeled tree grid with hierarchical levels, positions, expansion state, disabled items, and optional selection.
 - Every expandable item includes a named chevron control. Nested actions remain separate named controls.
+- With no items, a named feedback group preserves the collection context without an empty tree grid.
 
 ## Keyboard, labeling, localization, and direction
 
