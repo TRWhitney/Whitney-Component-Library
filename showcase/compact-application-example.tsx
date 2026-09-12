@@ -10,6 +10,7 @@ import {
   Stack,
   Switch,
   TextField,
+  Table,
   InlineGroup,
   Tree,
 } from '../src/index.js';
@@ -30,6 +31,8 @@ export function CompactApplicationExample() {
   const [reserve, setReserve] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [query, setQuery] = useState('');
+  const [selectedBuilding, setSelectedBuilding] = useState<string | null>('chemistry');
+  const [oneRow, setOneRow] = useState(false);
   const buildings = [
     {id: 'elm', label: 'Elm Hall', description: 'Office · 188 kWh/m²'},
     {id: 'chemistry', label: 'Chemistry Lab', description: 'Laboratory · 279 kWh/m²'},
@@ -44,7 +47,8 @@ export function CompactApplicationExample() {
         Density applies to the fields, portaled menu options, and tree below. Empty support rows
         disappear by default. Reserve space to keep a form steady as validation messages change.
         Touch input retains larger targets in both densities. The filter form keeps a relaxed gap
-        between controls without reserving empty support rows.
+        between controls without reserving empty support rows. Table feedback sits inside its
+        neutral frame, including the rounded corners.
       </p>
       <AppearanceProvider
         appearance="dark"
@@ -113,6 +117,50 @@ export function CompactApplicationExample() {
               kind: 'no-results',
               title: 'No matching buildings',
               description: 'Try another building name.',
+            }}
+          />
+          <Switch label="Show a one-row table" isSelected={oneRow} onChange={setOneRow} />
+          <p>
+            Select or hover the last row, then move focus with the keyboard. Its outer feedback
+            border follows both bottom corners. Selectable rows use a pointer cursor; the disabled
+            record and fields retain their disabled cursor. This paragraph remains selectable text.
+          </p>
+          <Table
+            ariaLabel="Building readings and rounded state borders"
+            selectionMode="single"
+            selectedId={selectedBuilding}
+            onSelectionChange={setSelectedBuilding}
+            columns={[
+              {id: 'building', label: 'Building', isRowHeader: true},
+              {id: 'use', label: 'Use'},
+              {id: 'energy', label: 'kWh/m²', align: 'end'},
+            ]}
+            rows={[
+              ...(!oneRow
+                ? [
+                    {
+                      id: 'archive',
+                      textValue: 'Archive Library',
+                      isSelectionDisabled: true,
+                      cells: {building: 'Archive Library', use: 'Library', energy: '116'},
+                    },
+                    {
+                      id: 'elm',
+                      textValue: 'Elm Hall',
+                      cells: {building: 'Elm Hall', use: 'Office', energy: '188'},
+                    },
+                  ]
+                : []),
+              {
+                id: 'chemistry',
+                textValue: 'Chemistry Lab',
+                cells: {building: 'Chemistry Lab', use: 'Laboratory', energy: '279'},
+              },
+            ]}
+            emptyState={{
+              kind: 'no-data',
+              title: 'No readings',
+              description: 'No building readings are available.',
             }}
           />
         </Stack>

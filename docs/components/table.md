@@ -70,6 +70,7 @@ Table compares keyed records across typed columns with optional application-owne
 
 ## Accent, forced colors, and reduced motion
 
+- Final-row cell backgrounds and hover, pressed, and focus borders follow the logical lower table corners, including one-row tables and RTL. Feedback sits one pixel inside the neutral frame so the curved accent stroke keeps the same contrast as its straight edges.
 - Selected rows use the established leading accent rail. Focus uses the active accent focus color without tinting ordinary data.
 - Headers, cells, boundaries, focus, selection, disabled rows, and overflow use system colors.
 - The selection rail and sort indicator settle without transition. Table adds no continuous motion.

@@ -446,6 +446,7 @@ export const cardCollectionContract = {
 
 export const tableContract = {
   accentBehavior: [
+    'Final-row cell backgrounds and hover, pressed, and focus borders follow the logical lower table corners, including one-row tables and RTL. Feedback sits one pixel inside the neutral frame so the curved accent stroke keeps the same contrast as its straight edges.',
     'Selected rows use the established leading accent rail. Focus uses the active accent focus color without tinting ordinary data.',
   ],
   accessibility: [

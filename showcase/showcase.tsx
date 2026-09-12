@@ -1192,6 +1192,11 @@ function CollectionSpecimens() {
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
         />
+        <p>
+          <a href="#appearance-provider">
+            Compare rounded final-row feedback and compact application controls.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen

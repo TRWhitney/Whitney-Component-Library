@@ -5751,6 +5751,18 @@
     content: '';
   }
 
+  [data-wcl-table-cell]:first-child::after {
+    inset-inline-start: 1px;
+  }
+
+  [data-wcl-table-cell]:last-child::after {
+    inset-inline-end: 1px;
+  }
+
+  [data-wcl-table-row]:last-child [data-wcl-table-cell]::after {
+    inset-block-end: 1px;
+  }
+
   [data-wcl-table-row]:last-child [data-wcl-table-cell] {
     border-block-end: 0;
   }
@@ -5784,6 +5796,22 @@
     border-inline-end: 2px solid var(--wcl-accent-focus);
   }
 
+  [data-wcl-table-row]:last-child [data-wcl-table-cell]:first-child {
+    border-end-start-radius: calc(var(--wcl-radius) - 1px);
+  }
+
+  [data-wcl-table-row]:last-child [data-wcl-table-cell]:last-child {
+    border-end-end-radius: calc(var(--wcl-radius) - 1px);
+  }
+
+  [data-wcl-table-row]:last-child [data-wcl-table-cell]:first-child::after {
+    border-end-start-radius: calc(var(--wcl-radius) - 2px);
+  }
+
+  [data-wcl-table-row]:last-child [data-wcl-table-cell]:last-child::after {
+    border-end-end-radius: calc(var(--wcl-radius) - 2px);
+  }
+
   [data-wcl-table-row][data-selected] [data-wcl-table-cell]:first-child::before {
     position: absolute;
     inset-block: calc(var(--wcl-space) * 0.5);
@@ -5792,6 +5820,10 @@
     border-radius: 0 3px 3px 0;
     background: var(--wcl-accent-rail);
     content: '';
+  }
+
+  [data-wcl-table-row]:last-child[data-selected] [data-wcl-table-cell]:first-child::before {
+    inset-block-end: calc(var(--wcl-radius) - 1px);
   }
 
   [data-wcl-table-cell][data-kind='actions'] {
