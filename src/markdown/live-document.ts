@@ -4,12 +4,36 @@ import remarkGfm from 'remark-gfm';
 import type {Nodes, Root, Definition, FootnoteDefinition, RootContent} from 'mdast';
 import type {ChangeSet} from '@codemirror/state';
 
+import {remarkExtensionSyntax, emptyMarkdownSyntax} from './extension-syntax.js';
+import type {MarkdownSyntax} from './extension-types.js';
+
 import {remarkWikiLinks} from './wiki-syntax.js';
 
-const parser = unified().use(remarkParse).use(remarkGfm).use(remarkWikiLinks).freeze();
+function createParser(syntax: readonly MarkdownSyntax[]) {
+  return unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkWikiLinks)
+    .use(remarkExtensionSyntax, syntax)
+    .freeze();
+}
+const parsers = new WeakMap<readonly MarkdownSyntax[], ReturnType<typeof createParser>>();
+function parserFor(syntax: readonly MarkdownSyntax[]) {
+  let parser = parsers.get(syntax);
+  if (!parser) {
+    parser = createParser(syntax);
+    parsers.set(syntax, parser);
+  }
+  return parser;
+}
+function parse(value: string, syntax: readonly MarkdownSyntax[]): Root {
+  const parser = parserFor(syntax);
+  return parser.runSync(parser.parse(value));
+}
 
 export interface LiveDocument {
   readonly tree: Root;
+  readonly syntax: readonly MarkdownSyntax[];
   readonly value: string;
   readonly definitions: readonly Definition[];
   readonly footnotes: ReadonlyMap<string, number>;
@@ -17,7 +41,13 @@ export interface LiveDocument {
   readonly referenceKey: string;
 }
 
-function describe(tree: Root, value: string): LiveDocument {
+export function isLiveSourceBlock(node: Nodes): boolean {
+  return ['table', 'code', 'wclExtensionFence', 'thematicBreak', 'footnoteDefinition'].includes(
+    node.type,
+  );
+}
+
+function describe(tree: Root, value: string, syntax: readonly MarkdownSyntax[]): LiveDocument {
   const definitions: Definition[] = [];
   const footnotes = new Map<string, number>();
   const footnoteDefinitions = new Map<string, FootnoteDefinition>();
@@ -52,6 +82,7 @@ function describe(tree: Root, value: string): LiveDocument {
   const referenceSource = sources.join('\n\n');
   return {
     tree,
+    syntax,
     value,
     definitions,
     footnotes,
@@ -60,8 +91,11 @@ function describe(tree: Root, value: string): LiveDocument {
   };
 }
 
-export function parseLiveDocument(value: string): LiveDocument {
-  return describe(parser.parse(value), value);
+export function parseLiveDocument(
+  value: string,
+  syntax: readonly MarkdownSyntax[] = emptyMarkdownSyntax,
+): LiveDocument {
+  return describe(parse(value, syntax), value, syntax);
 }
 
 // A one-line edit inside an existing top-level paragraph cannot change an earlier block.
@@ -82,7 +116,7 @@ export function updateLiveDocument(
     !edit ||
     /[\r\n]/.test(edit.insert + previous.value.slice(edit.from, edit.to))
   ) {
-    return parseLiveDocument(value);
+    return parseLiveDocument(value, previous.syntax);
   }
   const blocks = previous.tree.children;
   let index = blocks.findIndex(
@@ -110,7 +144,7 @@ export function updateLiveDocument(
       (last && !/^\n\s*\n$/.test(gap)) ||
       /^[ \t]/.test(edit.insert)
     )
-      return parseLiveDocument(value);
+      return parseLiveDocument(value, previous.syntax);
     from = to = edit.from;
     index = blocks.length;
     baseLine = previous.value.split('\n').length;
@@ -118,14 +152,14 @@ export function updateLiveDocument(
   }
   const delta = edit.insert.length - (edit.to - edit.from);
   const text = value.slice(from, to + delta);
-  const parsed = parser.parse(`${text}\n\n${previous.referenceSource}`);
+  const parsed = parse(`${text}\n\n${previous.referenceSource}`, previous.syntax);
   const local = parsed.children.filter((node) => sourceRange(node).from < text.length);
   if (
     local.length !== 1 ||
     local[0]?.type !== 'paragraph' ||
     sourceRange(local[0]).to > text.length
   ) {
-    return parseLiveDocument(value);
+    return parseLiveDocument(value, previous.syntax);
   }
   function positionNode<T extends Nodes>(node: T, offset: number, line: number, column: number): T {
     const position = node.position;
@@ -148,7 +182,7 @@ export function updateLiveDocument(
     updated,
     ...blocks.slice(index + (original ? 1 : 0)).map((node) => positionNode(node, delta, 0, 0)),
   ];
-  return describe({type: 'root', children}, value);
+  return describe({type: 'root', children}, value, previous.syntax);
 }
 
 export function sourceRange(node: Nodes): {from: number; to: number} {

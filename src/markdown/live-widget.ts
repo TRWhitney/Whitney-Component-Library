@@ -10,6 +10,7 @@ import {liveFootnotes} from './live-footnotes.js';
 
 import {liveFocus} from './live-effects.js';
 import {safeUrl} from './markdown-url.js';
+import {validatedRgba} from './rgba-color.js';
 import {footnoteContent, type LiveDocument} from './live-document.js';
 
 // Only the private parser supplies this tree. Raw HTML becomes a text node; URL properties
@@ -45,9 +46,22 @@ function appendTree(
       element.setAttribute('start', String(value));
     } else if (key === 'ariaLabel' && typeof value === 'string') {
       element.setAttribute('aria-label', value);
+    } else if (key === 'data-wcl-markdown-rgba') {
+      const color = validatedRgba(value);
+      if (color) {
+        element.dataset.wclMarkdownRgba = color;
+        element.style.color = color;
+      }
     } else if ((key === 'dataFootnotes' || key === 'data-wcl-footnote-continuation') && value) {
       element.setAttribute(key === 'dataFootnotes' ? 'data-footnotes' : key, '');
-    } else if (key === 'alt' || key === 'title' || key === 'type' || key === 'align') {
+    } else if (
+      key === 'alt' ||
+      key === 'title' ||
+      key === 'type' ||
+      key === 'align' ||
+      key === 'role' ||
+      key === 'data-wcl-markdown-treatment'
+    ) {
       if (typeof value === 'string') element.setAttribute(key, value);
     } else if ((key === 'checked' || key === 'disabled') && value) {
       element.setAttribute(key, '');
@@ -91,6 +105,7 @@ export class LiveWidget extends WidgetType {
 
   override eq(other: LiveWidget): boolean {
     return (
+      this.document.syntax === other.document.syntax &&
       this.wikiLinks === other.wikiLinks &&
       this.disabled === other.disabled &&
       this.from === other.from &&

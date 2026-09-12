@@ -17,6 +17,8 @@ export const markdownEditorContract = {
   ],
   preferredAlternatives: ['Use TextArea for plain multiline text and TextField for a single line.'],
   composition: [
+    'extensions accepts stable MarkdownExtension declarations with id, syntax, commands, decorate, and links. Keep declaration arrays stable between value updates, for example with useMemo. The library owns parsing and rendering; no editor engine objects, DOM callbacks, arbitrary HTML, or plugin lifecycle are exposed.',
+    'Compose custom command buttons with controls.canExecuteExtension(id) and controls.executeExtension(id). Unknown or unavailable commands return false. These controls use the retained source selection and the same noneditable and composition guards as built-in commands.',
     'Render inside AppearanceProvider. The parent owns width, layout, and mode controls; compose SegmentedControl to switch between live-preview, source, and preview.',
     'mode defaults to live-preview. Source exposes the complete Markdown text; preview provides a read-only document.',
     'Supply renderToolbar to compose Toolbar, Button, and ToggleButton between the field label and document. No toolbar appears by default. The callback receives MarkdownEditorControls with execute, canExecute, and isActive; all accept a MarkdownCommand identifier and return a boolean.',
@@ -32,6 +34,10 @@ export const markdownEditorContract = {
     'Use ToggleButton for formatting toggles and Button for insertion, undo, and redo inside a labeled Toolbar.',
   ],
   contentRules: [
+    'Inline extension syntax declares {id, kind: inline, delimiter, treatment}. Delimiters are two to four repeats of one =, +, %, or ^ character. Content is nonempty plain text without surrounding whitespace, nested delimiter runs, Markdown markup, escapes, entities, or newlines. Unmatched text retains ordinary Markdown parsing. Built-in code and escapes remain literal.',
+    'Fenced extension syntax declares {id, kind: fence, name, treatment: note or warning}. A matching named code fence without metadata renders a semantic note containing preformatted literal text. Its complete source reveals for editing. Other fence names retain built-in code rendering. Rich code-block renderers are outside this initial contract.',
+    'Inline syntax and source decorations use highlight, accent, or muted treatments. For per-passage color, declare {id, kind: color, delimiter}. The Markdown form is %%rgba(180, 35, 24, 0.85) north boundary%% for a %% delimiter. RGB channels accept numbers from 0 through 255, alpha from 0 through 1, and a space separates the value from plain text. Only comma-separated rgba() is accepted; arbitrary CSS and invalid values stay literal.',
+    'RGBA values remain in canonical Markdown and retain their exact color across appearances. Source mode and exposed Live Preview syntax show a checker-backed swatch beside the value without adding text. Forced colors use readable system text while the swatch previews the authored color.',
     'The canonical value is Markdown text. Supported syntax is CommonMark plus tables, task lists, strikethrough, autolinks, footnotes, and simple double-bracket wiki links.',
     'Raw HTML displays as literal text. Links accept safe web, mail, and relative destinations; images accept web and relative destinations. Wiki targets are visibly distinct. Supply wikiLinks to resolve simple targets; unresolved or unsafe destinations remain inert. Wiki targets inside an ordinary Markdown link label remain part of that outer link and do not create another navigation target.',
     'Incomplete and unsupported syntax remains editable source. There is no public parser, renderer, plugin, or document-tree API.',
@@ -53,6 +59,10 @@ export const markdownEditorContract = {
     'execute returns false without changing the document for an unsupported or unavailable command. Preview, disabled, read-only, pending, and locked states reject editing commands.',
   ],
   events: [
+    'An extension command declares {id, execute, isEnabled?, shortcut?}. execute receives a frozen {value, selection: {anchor, head}} snapshot and returns null or {edits, selection?}. Each edit is {from, to, insert}; offsets are UTF-16 positions in the original string. Edits must be ordered and disjoint. Returned selection positions refer to the resulting string. Each accepted command is one undoable transaction.',
+    'decorate receives the same frozen snapshot in editing modes and returns {from, to, treatment} ranges. It may mark source text but cannot hide, replace, or create document content. Decorations do not change the reading preview. Callbacks must be synchronous and pure; invalid returned ranges throw TypeError before the transaction commits.',
+    'Extension links declare {prefix, resolve, onNavigate} using the wiki callback contract. A matching prefix owns resolution before wikiLinks; null or unsafe results stay inert without falling through. Prefixes must not overlap, so declaration order cannot change ownership.',
+    'Extension, syntax, and command identifiers must be unique across the editor and start with a lowercase letter, followed by lowercase letters, digits, dots, or hyphens. Duplicate identifiers, overlapping delimiters or prefixes, duplicate fence names, invalid ranges, and unsupported properties throw TypeError without changing canonical Markdown.',
     'assets.insert receives {files, source, signal} and returns {markdown} or {error}, synchronously or as a Promise. source is paste or drop. The application owns storage and URLs; the editor inserts only returned Markdown and never uploads files.',
     'assets accepts acceptedFileTypes, allowsMultiple, and maxFileSize using the shared file acceptance rules. One file is allowed by default. Rejected files produce associated feedback without entering the callback. File paste and drop are consumed even when no asset callback is supplied; ordinary text paste remains available.',
     'One asset insertion can run at a time. Typing remains available while it is pending. The captured range follows unrelated edits, and completion preserves a caret moved elsewhere. Edits inside the captured selection, external value replacement, reset, noneditable state, or unmount cancel insertion. Late results are ignored even if the callback ignores its AbortSignal.',
@@ -74,6 +84,7 @@ export const markdownEditorContract = {
     'Mode and source cursor position are associated with the field alongside its description, validation, pending, and lock feedback.',
   ],
   keyboardBehavior: [
+    'Custom shortcuts accept Mod-Shift plus an uppercase letter, excluding B, C, I, K, U, X, Y, and Z to preserve reserved commands. Duplicate shortcuts are rejected. The application owns command labels and any instructions for its shortcuts.',
     'Live Preview and source support text entry, selection, composition input, newline entry, plain-text clipboard operations, and undo/redo. Copying preserves the selected Markdown source. Tab and Shift+Tab leave the editor.',
     'In Live Preview and source, Mod+B applies bold, Mod+I italic, Mod+Shift+X strikethrough, Mod+Shift+C inline code, and Mod+K a link. Mod+Alt+1 through Mod+Alt+6 choose heading levels; Mod+Alt+0 restores paragraphs. Mod is Command on macOS and Control elsewhere.',
     'Enter continues a nonempty Markdown list or quotation and exits an empty item. New task-list items start unchecked. Literal code, composition input, and paste do not trigger Markdown continuation.',

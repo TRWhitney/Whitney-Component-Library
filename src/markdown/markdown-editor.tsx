@@ -20,8 +20,11 @@ import {MarkdownPreview} from './markdown-preview.js';
 import type {MarkdownEditorProps, MarkdownEditorControls} from './markdown-types.js';
 
 import {englishLabels} from './markdown-labels.js';
+import {compileExtensions, extensionWikiLinks} from './extension-registry.js';
 
 const unavailableControls: MarkdownEditorControls = {
+  executeExtension: () => false,
+  canExecuteExtension: () => false,
   execute: () => false,
   canExecute: () => false,
   isActive: () => false,
@@ -33,6 +36,7 @@ export function MarkdownEditor({
   renderToolbar,
   wikiLinks,
   assets,
+  extensions,
   defaultValue = '',
   value,
   onChange,
@@ -57,6 +61,11 @@ export function MarkdownEditor({
   validationBehavior = 'native',
 }: MarkdownEditorProps): ReactElement {
   if (assets) assertFileAcceptanceProps(assets);
+  const registry = useMemo(() => compileExtensions(extensions), [extensions]);
+  const resolvedWikiLinks = useMemo(
+    () => extensionWikiLinks(registry, wikiLinks),
+    [registry, wikiLinks],
+  );
   const inheritedDisabled = useFieldGroupDisabled();
   const disabled = isDisabled || inheritedDisabled;
   const readonly = isReadOnly || isPending || isLocked;
@@ -135,7 +144,8 @@ export function MarkdownEditor({
         attributes: {},
         ...(renderToolbar ? {onControls: setCommandControls} : {}),
         labels,
-        ...(wikiLinks ? {wikiLinks} : {}),
+        ...(resolvedWikiLinks ? {wikiLinks: resolvedWikiLinks} : {}),
+        registry,
         ...(assets ? {assets} : {}),
         onAssetState: setAssetState,
         livePreview: mode === 'live-preview',
@@ -152,7 +162,7 @@ export function MarkdownEditor({
     session.current = editor;
     setMounted(true);
     if (active && latest.current.mode !== 'preview') editor.focus();
-  }, [mode, labels, renderToolbar, wikiLinks, assets]);
+  }, [mode, labels, renderToolbar, resolvedWikiLinks, assets, registry]);
   useEffect(
     () => () => {
       session.current?.destroy();
@@ -165,14 +175,25 @@ export function MarkdownEditor({
       attributes,
       ...(renderToolbar ? {onControls: setCommandControls} : {}),
       labels,
-      ...(wikiLinks ? {wikiLinks} : {}),
+      ...(resolvedWikiLinks ? {wikiLinks: resolvedWikiLinks} : {}),
+      registry,
       ...(assets ? {assets} : {}),
       onAssetState: setAssetState,
       livePreview: mode === 'live-preview',
       isDisabled: disabled,
       isReadOnly: readonly || mode === 'preview',
     });
-  }, [attributes, renderToolbar, labels, mode, disabled, readonly, wikiLinks, assets]);
+  }, [
+    attributes,
+    renderToolbar,
+    labels,
+    mode,
+    disabled,
+    readonly,
+    resolvedWikiLinks,
+    assets,
+    registry,
+  ]);
   useEffect(() => {
     session.current?.replace(currentValue);
   }, [currentValue, reconcileVersion]);
@@ -228,6 +249,8 @@ export function MarkdownEditor({
 
   const editable = mounted && mode !== 'preview' && !readonly && !disabled;
   const controls: MarkdownEditorControls = {
+    executeExtension: (id) => editable && commandControls.executeExtension(id),
+    canExecuteExtension: (id) => editable && commandControls.canExecuteExtension(id),
     execute: (command) => editable && commandControls.execute(command),
     canExecute: (command) => editable && commandControls.canExecute(command),
     isActive: (command) => mounted && commandControls.isActive(command),
@@ -333,7 +356,8 @@ export function MarkdownEditor({
               prefix={`wcl-${baseId}-`}
               labels={labels}
               isDisabled={disabled}
-              {...(wikiLinks ? {wikiLinks} : {})}
+              {...(resolvedWikiLinks ? {wikiLinks: resolvedWikiLinks} : {})}
+              syntax={registry.syntax}
             />
           </div>
         ) : null}

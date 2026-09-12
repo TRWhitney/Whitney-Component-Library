@@ -85,8 +85,8 @@ declarations fail deterministically before changing the canonical document. Exte
 cannot install engine extensions, supply HTML, or run a plugin lifecycle. Unsupported document
 text remains editable literal Markdown.
 
-The examples requested from Whitney may refine the custom syntax boundary. In their absence,
-use the bounded inline/fence forms above and document their limits explicitly.
+Whitney selected stored RGBA text colors and identified richer code blocks as future work.
+The initial syntax limits and stored color form are specified below.
 
 ### Visual direction
 
@@ -117,3 +117,24 @@ states and accessibility structure. Retain the existing 100KB interaction budget
 
 Uploads, persistence, vaults, backlink indexes, route ownership, arbitrary parser/renderer plugins,
 collaboration transport, and a plugin runtime. Tickets 27 and 30 retain the recorded UI cleanup.
+
+### RGBA text colors and initial declaration limits
+
+Whitney requires RGBA values in canonical Markdown, with a visible color preview when the syntax
+is exposed. Applications declare a color delimiter, for example %%: the stored form is
+`%%rgba(180, 35, 24, 0.85) north boundary%%`. RGB channels accept numbers from 0 through 255 and
+alpha from 0 through 1. The value applies to plain inline text; invalid or incomplete syntax
+remains literal. Source mode and active Live Preview syntax show a small checker-backed swatch
+beside the RGBA value without inserting source characters. Rendering never accepts arbitrary CSS.
+The exact stored color remains the same across themes; forced colors preserve readable text.
+
+Inline/color delimiters are two to four repeated =, +, %, or ^ characters. Contents are plain text,
+without leading/trailing whitespace, newlines, nested markers, built-in markup, escapes, or
+entities. This keeps the initial tokenizer boundary explicit. Declared fences render literal
+preformatted note/warning content. Rich code-block rendering remains a later extension of that
+declaration, not a public parser or DOM renderer callback.
+
+Custom commands use separate executeExtension/canExecuteExtension controls and immutable snapshots.
+Decorations mark source in editing modes; reading preview uses document syntax. All contribution
+identifiers share a namespace in one editor. Declared link prefixes own matching wiki targets
+without falling through after an unresolved or unsafe result.

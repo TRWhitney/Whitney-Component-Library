@@ -4,6 +4,7 @@ import type {Nodes} from 'mdast';
 import type {MarkdownWikiLink, MarkdownWikiLinks} from './markdown-types.js';
 import {parseLiveDocument, updateLiveDocument, sourceRange} from './live-document.js';
 import {resolveWikiLink} from './wiki-resolution.js';
+import {markdownSyntax} from './extension-syntax.js';
 import {liveComposition} from './live-effects.js';
 
 export const wikiLinks = Facet.define<MarkdownWikiLinks | undefined, MarkdownWikiLinks | undefined>(
@@ -16,11 +17,13 @@ export const wikiDisabled = Facet.define<boolean, boolean>({
 });
 
 export const wikiDocument = StateField.define({
-  create: (state) => parseLiveDocument(state.doc.toString()),
+  create: (state) => parseLiveDocument(state.doc.toString(), state.facet(markdownSyntax)),
   update: (document, transaction) =>
-    transaction.docChanged
-      ? updateLiveDocument(document, transaction.changes, transaction.state.doc.toString())
-      : document,
+    transaction.startState.facet(markdownSyntax) !== transaction.state.facet(markdownSyntax)
+      ? parseLiveDocument(transaction.state.doc.toString(), transaction.state.facet(markdownSyntax))
+      : transaction.docChanged
+        ? updateLiveDocument(document, transaction.changes, transaction.state.doc.toString())
+        : document,
 });
 
 const composing = StateField.define({
@@ -39,7 +42,9 @@ interface WikiRange {
 const wikiRanges = StateField.define<readonly WikiRange[]>({
   create: (state) => collect(state.field(wikiDocument).tree),
   update: (previous, transaction) =>
-    transaction.docChanged ? collect(transaction.state.field(wikiDocument).tree) : previous,
+    transaction.state.field(wikiDocument) !== transaction.startState.field(wikiDocument)
+      ? collect(transaction.state.field(wikiDocument).tree)
+      : previous,
 });
 function collect(tree: Nodes): WikiRange[] {
   const ranges: WikiRange[] = [];

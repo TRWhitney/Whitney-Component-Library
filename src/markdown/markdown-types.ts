@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react';
+import type {MarkdownExtension} from './extension-types.js';
 import type {FileAcceptanceProps, RejectedFile} from '../files/file-types.js';
 
 import type {
@@ -32,6 +33,8 @@ export type MarkdownCommand =
   | 'redo';
 
 export interface MarkdownEditorControls {
+  readonly executeExtension: (id: string) => boolean;
+  readonly canExecuteExtension: (id: string) => boolean;
   readonly execute: (command: MarkdownCommand) => boolean;
   readonly canExecute: (command: MarkdownCommand) => boolean;
   readonly isActive: (command: MarkdownCommand) => boolean;
@@ -105,6 +108,7 @@ export type MarkdownEditorProps = FieldStateProps &
     readonly renderToolbar?: (controls: MarkdownEditorControls) => ReactNode;
     readonly wikiLinks?: MarkdownWikiLinks;
     readonly assets?: MarkdownAssetOptions;
+    readonly extensions?: readonly MarkdownExtension[];
     readonly form?: string;
     readonly name?: string;
     readonly mode?: MarkdownEditorMode;

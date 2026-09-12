@@ -14,10 +14,12 @@ import {
   parseLiveDocument,
   updateLiveDocument,
   sourceRange,
+  isLiveSourceBlock,
   type LiveDocument,
 } from './live-document.js';
 import {LiveWidget, MarkerWidget} from './live-widget.js';
 import {wikiDocument, wikiLinks, wikiDisabled} from './wiki-navigation.js';
+import {markdownSyntax} from './extension-syntax.js';
 import {resolveWikiLink} from './wiki-resolution.js';
 
 import {liveFocus, liveComposition, liveLabels} from './live-effects.js';
@@ -82,12 +84,13 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
     const {from, to} = sourceRange(node);
     if (from === to) return;
     const editing = active(from, to);
-    if (['table', 'code', 'thematicBreak', 'footnoteDefinition'].includes(node.type)) {
+    if (isLiveSourceBlock(node)) {
       if (!editing) replace(node as RootContent, true);
       else wrap(from, to, 'div', 50, {'data-wcl-live-source-block': node.type});
       return;
     }
     if (
+      node.type === 'wclExtensionInline' ||
       node.type === 'image' ||
       node.type === 'imageReference' ||
       node.type === 'inlineCode' ||
@@ -191,7 +194,9 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
 
 const liveState = StateField.define<LiveState>({
   create(state) {
-    const document = state.field(wikiDocument, false) ?? parseLiveDocument(state.doc.toString());
+    const document =
+      state.field(wikiDocument, false) ??
+      parseLiveDocument(state.doc.toString(), state.facet(markdownSyntax));
     return {document, focused: false, composing: false, ...present(state, document, false)};
   },
   update(previous, transaction) {
@@ -213,6 +218,7 @@ const liveState = StateField.define<LiveState>({
     if (
       !transaction.docChanged &&
       !transaction.selection &&
+      transaction.startState.facet(markdownSyntax) === transaction.state.facet(markdownSyntax) &&
       transaction.startState.facet(liveLabels) === transaction.state.facet(liveLabels) &&
       transaction.startState.facet(wikiLinks) === transaction.state.facet(wikiLinks) &&
       transaction.startState.facet(wikiDisabled) === transaction.state.facet(wikiDisabled) &&
@@ -222,8 +228,12 @@ const liveState = StateField.define<LiveState>({
       return previous;
     const document =
       transaction.state.field(wikiDocument, false) ??
-      (previous.composing
-        ? parseLiveDocument(transaction.state.doc.toString())
+      (previous.composing ||
+      transaction.startState.facet(markdownSyntax) !== transaction.state.facet(markdownSyntax)
+        ? parseLiveDocument(
+            transaction.state.doc.toString(),
+            transaction.state.facet(markdownSyntax),
+          )
         : transaction.docChanged
           ? updateLiveDocument(
               previous.document,

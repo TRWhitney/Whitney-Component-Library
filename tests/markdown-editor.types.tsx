@@ -155,22 +155,28 @@ export const conflictingValues = (
 export const unexplainedLock = <MarkdownEditor label="Document" isLocked />;
 // @ts-expect-error Arbitrary modes are not supported.
 export const arbitraryMode = <MarkdownEditor label="Document" mode="rich-text" />;
-// @ts-expect-error Arbitrary engine extensions are private.
-export const engineExtensions = <MarkdownEditor label="Document" extensions={[]} />;
+export const declaredExtensions = (
+  <MarkdownEditor
+    label="Document"
+    extensions={[
+      {
+        id: 'review',
+        syntax: [{id: 'highlight', kind: 'inline', delimiter: '==', treatment: 'highlight'}],
+      },
+    ]}
+  />
+);
+export const engineExtensions = (
+  // @ts-expect-error Engine extension objects are not declared Markdown contributions.
+  <MarkdownEditor label="Document" extensions={[{extension: []}]} />
+);
 // @ts-expect-error Arbitrary rendering plugins are private.
 export const unsafeRenderer = <MarkdownEditor label="Document" remarkPlugins={[]} />;
 // @ts-expect-error General styling does not enter the public component contract.
 export const styling = <MarkdownEditor label="Document" className="custom" />;
 
 type PrivateKeys =
-  | 'editorState'
-  | 'editorView'
-  | 'state'
-  | 'view'
-  | 'dispatch'
-  | 'extensions'
-  | 'plugins'
-  | 'renderHTML';
+  'editorState' | 'editorView' | 'state' | 'view' | 'dispatch' | 'plugins' | 'renderHTML';
 export const publicTypesKeepEnginePrivate: Extract<
   keyof MarkdownEditorProps,
   PrivateKeys

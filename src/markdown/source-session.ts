@@ -1,4 +1,4 @@
-import {Compartment, EditorState, Transaction} from '@codemirror/state';
+import {Compartment, EditorSelection, EditorState, Transaction} from '@codemirror/state';
 import {EditorView, keymap} from '@codemirror/view';
 import {defaultKeymap, history, historyKeymap, insertNewline} from '@codemirror/commands';
 import {markdown, markdownLanguage} from '@codemirror/lang-markdown';
@@ -19,6 +19,15 @@ import type {
   MarkdownAssetOptions,
 } from './markdown-types.js';
 import {createAssetSession, type AssetState} from './asset-session.js';
+import type {MarkdownRegistry} from './extension-registry.js';
+import {markdownSyntax} from './extension-syntax.js';
+import {colorLiveMode, colorSwatches} from './color-swatches.js';
+import {
+  declaredExtensions,
+  configureExtensions,
+  executeExtension,
+  extensionCommandStatus,
+} from './extension-session.js';
 import {
   wikiLinks,
   wikiDisabled,
@@ -28,6 +37,7 @@ import {
 } from './wiki-navigation.js';
 
 interface SourceConfiguration {
+  readonly registry: MarkdownRegistry;
   readonly onControls?: (controls: MarkdownEditorControls) => void;
   readonly wikiLinks?: MarkdownWikiLinks;
   readonly assets?: MarkdownAssetOptions;
@@ -71,10 +81,13 @@ export function createSourceSession(
     if (!currentConfiguration.onControls) return;
     const {available, active} = markdownCommandStatus(view);
     const link = currentWikiLink(view);
-    const signature = JSON.stringify([available, active, link]);
+    const custom = extensionCommandStatus(view);
+    const signature = JSON.stringify([available, active, link, custom]);
     if (signature === commandSignature) return;
     commandSignature = signature;
     currentConfiguration.onControls({
+      executeExtension: (id) => executeExtension(view, id),
+      canExecuteExtension: (id) => custom.includes(id),
       execute: (command) => runMarkdownCommand(view, command),
       canExecute: (command) => available.includes(command),
       isActive: (command) => active.includes(command),
@@ -83,6 +96,9 @@ export function createSourceSession(
     });
   };
   const configure = (next: SourceConfiguration) => [
+    configureExtensions(next.registry),
+    markdownSyntax.of(next.registry.syntax),
+    colorLiveMode.of(next.livePreview),
     liveLabels.of(next.labels),
     wikiLinks.of(next.wikiLinks),
     wikiDisabled.of(next.isDisabled),
@@ -97,9 +113,12 @@ export function createSourceSession(
       extensions: [
         // Only LF is structural. CR characters remain in the canonical text unchanged.
         EditorState.lineSeparator.of('\n'),
+        normalizeReplacedSelection,
         EditorView.lineWrapping,
         EditorView.perLineTextDirection.of(true),
         wikiNavigation,
+        declaredExtensions,
+        colorSwatches,
         assets.extension,
         presentation.of(showingLive ? livePreview : []),
         settings.of(configure(configuration)),
@@ -194,3 +213,22 @@ export function createSourceSession(
 
 import {Annotation} from '@codemirror/state';
 const externalChange = Annotation.define<boolean>();
+
+const normalizeReplacedSelection = EditorState.transactionFilter.of((transaction) => {
+  const selection = transaction.newSelection;
+  if (!selection.ranges.some((range) => range.from > range.to)) return transaction;
+  // Replacing an entire selected passage can cross the dependency's mapped endpoints.
+  // Collapse the removed selection at the end of its replacement before state is computed.
+  return [
+    transaction,
+    {
+      selection: EditorSelection.create(
+        selection.ranges.map((range) =>
+          range.from > range.to ? EditorSelection.cursor(range.from) : range,
+        ),
+        selection.mainIndex,
+      ),
+      sequential: true,
+    },
+  ];
+});

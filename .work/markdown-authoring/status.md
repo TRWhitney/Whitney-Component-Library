@@ -6,9 +6,8 @@ Complete [Ticket 26](../library-foundation/tickets/26-markdown-commands-links-as
 
 ## Current state
 
-Commands are delivered in f25e80a and wiki navigation in 367ab77. Asset acquisition is complete, validated, and reviewed; extensions remain.
-[Specification](spec.md) records the implementation boundary. The optional question about expected
-custom syntax is pending; the documented inline/fence boundary applies in its absence.
+Commands are delivered in f25e80a and wiki navigation in 367ab77. Asset acquisition is delivered in e64b7ca. Declared extensions and stored RGBA text colors are complete. Both independent review axes pass.
+[Specification](spec.md) records the accepted boundary, including RGBA stored in Markdown with a source swatch.
 
 ## Accepted sources
 
@@ -17,11 +16,10 @@ custom syntax is pending; the documented inline/fence boundary applies in its ab
 
 ## Verification
 
-[Current verification](verification.md) covers commands, navigation, and asset acquisition.
+[Current verification](verification.md) covers commands, navigation, assets, declared extensions, and stored RGBA. All 1165 tests, package checks, native browser flows, and performance checks pass.
 
-## Continuation
+## Handoff
 
-Branch main, current baseline 367ab77. The current outcome delivers asset acquisition. This effort owns Ticket 26 authoring behavior,
-showcase, tests, contracts, and effort records. Deferred cleanup remains separate.
-Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
-Next action: implement declared extensions after this asset delivery.
+Ticket 26 is complete on main. [Ticket 27](../library-foundation/tickets/27-markdown-authoring-prerelease.md)
+is ready for the packed-package authoring integration proof. Deferred cleanup remains in Tickets
+27 and 30. Rich code-block rendering remains future work beyond the initial declared note/warning fences.

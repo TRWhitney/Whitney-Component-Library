@@ -353,11 +353,12 @@ const view = React.createElement(
                 React.createElement(Button, {isDisabled: !controls.canExecute('bold'), onPress: () => controls.execute('bold')}, 'Bold')),
             }),
             React.createElement(MarkdownEditor, {
-              defaultValue: '# Packed reading\\n\\nA note[^one].\\n\\n[^one]: Packed evidence.\\n\\n[[Packed note]]',
+              defaultValue: '# Packed reading\\n\\nA note[^one].\\n\\n[^one]: Packed evidence.\\n\\n[[Packed note]] %%rgba(180,35,24,0.85) colored%%',
               label: 'Packed Markdown preview',
               mode: 'preview',
               wikiLinks: {resolve: (target) => ({href: '/notes/' + encodeURIComponent(target)}), onNavigate: () => {}},
               assets: {acceptedFileTypes: ['image/png'], insert: ({source, signal}) => ({markdown: signal.aborted ? '' : '![Packed ' + source + '](/asset.png)'})},
+              extensions: [{id: 'packed', syntax: [{id:'packed-color',kind:'color',delimiter:'%%'}]}],
             }),
             React.createElement(TextArea, {
               label: 'Notes',

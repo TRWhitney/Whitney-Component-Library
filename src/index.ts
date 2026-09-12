@@ -463,3 +463,15 @@ export {
   type SurfaceProps,
   type SurfaceVariant,
 } from './layout/index.js';
+export type {
+  MarkdownExtension,
+  MarkdownSyntax,
+  MarkdownTreatment,
+  MarkdownSelection,
+  MarkdownSnapshot,
+  MarkdownTextEdit,
+  MarkdownCommandResult,
+  MarkdownExtensionCommand,
+  MarkdownDecoration,
+  MarkdownLinkResolver,
+} from './markdown/extension-types.js';

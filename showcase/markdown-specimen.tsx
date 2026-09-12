@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {
   Button,
@@ -12,12 +12,15 @@ import {
   ToggleButton,
   type MarkdownEditorMode,
   type MarkdownEditorSize,
+  type MarkdownExtension,
 } from '../src/index.js';
 
 const reviewNotes = [
   '# Boundary review',
   '',
   'The **north boundary** needs a second pass. Keep the _balanced_ profile and replace the ~~old~~ threshold with `0.0025 K`.[^1]',
+  '',
+  'Mark %%rgba(180, 35, 24, 0.85) north boundary%% for follow-up and ==check convergence==. TODO: compare [[run:0285]].',
   '',
   '## Review checklist',
   '',
@@ -40,6 +43,10 @@ const reviewNotes = [
   '```text',
   'tolerance = 0.0025',
   'profile = balanced',
+  '```',
+  '',
+  '```review-note',
+  'Compare the final two runs before accepting the boundary.',
   '```',
   '',
   'Read the [CommonMark guide](https://commonmark.org/help/) or visit https://commonmark.org.',
@@ -65,6 +72,49 @@ export function MarkdownSpecimen() {
   const [isLocked, setLocked] = useState(false);
   const [openedWiki, setOpenedWiki] = useState('');
   const [assetUnavailable, setAssetUnavailable] = useState(false);
+  const extensions = useMemo<readonly MarkdownExtension[]>(
+    () => [
+      {
+        id: 'review-extensions',
+        syntax: [
+          {
+            id: 'review-color',
+            kind: 'color',
+            delimiter: '%%',
+          },
+          {id: 'review-highlight', kind: 'inline', delimiter: '==', treatment: 'highlight'},
+          {id: 'review-callout', kind: 'fence', name: 'review-note', treatment: 'note'},
+        ],
+        commands: [
+          {
+            id: 'color-selection',
+            shortcut: 'Mod-Shift-E',
+            execute: ({value, selection}) => {
+              const from = Math.min(selection.anchor, selection.head),
+                to = Math.max(selection.anchor, selection.head);
+              const prefix = '%%rgba(180, 35, 24, 0.85) ';
+              return {
+                edits: [{from, to, insert: `${prefix}${value.slice(from, to)}%%`}],
+                selection: {anchor: from + prefix.length, head: to + prefix.length},
+              };
+            },
+          },
+        ],
+        decorate: ({value}) => {
+          const from = value.indexOf('TODO');
+          return from < 0 ? [] : [{from, to: from + 4, treatment: 'accent'}];
+        },
+        links: [
+          {
+            prefix: 'run:',
+            resolve: (target) => ({href: '#markdown-editor', label: `Run ${target.slice(4)}`}),
+            onNavigate: ({label}) => setOpenedWiki(label),
+          },
+        ],
+      },
+    ],
+    [],
+  );
 
   return (
     <Stack gap="regular">
@@ -105,6 +155,7 @@ export function MarkdownSpecimen() {
       </InlineGroup>
       <MarkdownEditor
         label="Markdown review notes"
+        extensions={extensions}
         renderToolbar={(controls) => (
           <Toolbar label="Markdown formatting">
             {(
@@ -135,6 +186,13 @@ export function MarkdownSpecimen() {
               onPress={() => controls.execute('link')}
             >
               Link
+            </Button>
+            <Button
+              size="compact"
+              isDisabled={!controls.canExecuteExtension('color-selection')}
+              onPress={() => controls.executeExtension('color-selection')}
+            >
+              Text color
             </Button>
             <Menu
               trigger={
@@ -288,6 +346,13 @@ export function MarkdownSpecimen() {
         bundled boundary mesh. Turn on Asset service unavailable to try failure and retry. Typing
         remains available while insertion is pending. Applications handle file storage and return
         the Markdown to insert; this example does not upload your file.
+      </p>
+      <p>
+        Text color stores an RGBA value with the selected plain text. Source mode and exposed Live
+        Preview syntax show a checker-backed swatch beside it. Edit the RGBA numbers to change the
+        color and opacity. This extension also adds ==highlighted text==, a review-note fenced
+        block, a TODO annotation in editing modes, and run: wiki destinations. Source keeps the
+        exact Markdown. Applications register these declarations without parser plugins or HTML.
       </p>
     </Stack>
   );

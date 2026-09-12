@@ -4,11 +4,15 @@ import remarkGfm from 'remark-gfm';
 import type {Plugin} from 'unified';
 import type {Root} from 'hast';
 
+import {remarkExtensionSyntax, emptyMarkdownSyntax} from './extension-syntax.js';
+import type {MarkdownSyntax} from './extension-types.js';
+
 import {remarkWikiLinks} from './wiki-syntax.js';
 import type {MarkdownEditorLabels, MarkdownWikiLinks} from './markdown-types.js';
 import {resolveWikiLink} from './wiki-resolution.js';
 
 import {safeUrl} from './markdown-url.js';
+import {validatedRgba} from './rgba-color.js';
 
 // mdast's footnote heading uses a fixed ID. Scope every generated ID and local fragment to
 // this mounted field so multiple documents and server hydration agree.
@@ -38,12 +42,14 @@ export const MarkdownPreview = memo(function MarkdownPreview({
   labels,
   isDisabled,
   wikiLinks,
+  syntax = emptyMarkdownSyntax,
 }: {
   readonly value: string;
   readonly prefix: string;
   readonly labels: MarkdownEditorLabels;
   readonly isDisabled: boolean;
   readonly wikiLinks?: MarkdownWikiLinks;
+  readonly syntax?: readonly MarkdownSyntax[];
 }): ReactElement {
   if (!value.trim()) return <p data-wcl-markdown-empty="">{labels.emptyPreview}</p>;
   return (
@@ -51,6 +57,13 @@ export const MarkdownPreview = memo(function MarkdownPreview({
       components={{
         ...(isDisabled ? {a: DisabledLink} : {}),
         span: ({node, children, ...props}) => {
+          const color = validatedRgba(node?.properties['data-wcl-markdown-rgba']);
+          if (color)
+            return (
+              <span {...props} data-wcl-markdown-rgba={color} style={{color}}>
+                {children}
+              </span>
+            );
           const target = node?.properties['data-wcl-wiki-target'];
           if (typeof target !== 'string') return <span {...props}>{children}</span>;
           const link = resolveWikiLink(target, wikiLinks);
@@ -77,7 +90,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
           );
         },
       }}
-      remarkPlugins={[remarkGfm, remarkWikiLinks]}
+      remarkPlugins={[remarkGfm, remarkWikiLinks, [remarkExtensionSyntax, syntax]]}
       rehypePlugins={[[scopeFootnotes, prefix]]}
       remarkRehypeOptions={{
         clobberPrefix: prefix,

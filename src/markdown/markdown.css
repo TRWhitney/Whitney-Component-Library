@@ -1,4 +1,29 @@
 @layer wcl.components {
+  [data-wcl-markdown-color-swatch] {
+    display: inline-block;
+    position: relative;
+    inline-size: 0.85em;
+    block-size: 0.85em;
+    margin-inline: 0.2em;
+    vertical-align: -0.05em;
+    border: 1px solid var(--wcl-border);
+    border-radius: 0.125rem;
+    background: conic-gradient(#bbb 25%, #fff 0 50%, #bbb 0 75%, #fff 0) 0 0 / 0.5em 0.5em;
+    overflow: hidden;
+  }
+
+  [data-wcl-markdown-color-swatch] > span {
+    position: absolute;
+    inset: 0;
+  }
+
+  @media (forced-colors: active) {
+    [data-wcl-markdown-color-swatch] {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+    }
+  }
+
   [data-wcl-markdown-editor] {
     --wcl-markdown-height: 24rem;
 
@@ -407,5 +432,42 @@ div[data-wcl-live-widget] {
   [data-wcl-live-link],
   [data-wcl-live-widget] [role='link'] {
     color: LinkText;
+  }
+}
+
+@layer wcl.components {
+  [data-wcl-markdown-treatment='highlight'] {
+    color: var(--wcl-text);
+    background: var(--wcl-accent-soft);
+  }
+
+  [data-wcl-markdown-treatment='accent'] {
+    color: var(--wcl-accent-focus);
+  }
+
+  [data-wcl-markdown-treatment='muted'] {
+    color: var(--wcl-text-muted);
+  }
+
+  [data-wcl-markdown-treatment='note'],
+  [data-wcl-markdown-treatment='warning'] {
+    padding-inline-start: 1rem;
+    border-inline-start: 0.1875rem solid var(--wcl-accent-focus);
+  }
+
+  [data-wcl-markdown-treatment='warning'] {
+    border-inline-start-color: var(--wcl-warning);
+  }
+
+  @media (forced-colors: active) {
+    [data-wcl-markdown-treatment] {
+      color: CanvasText;
+      border-color: CanvasText;
+    }
+
+    [data-wcl-markdown-treatment='highlight'] {
+      background: Mark;
+      color: MarkText;
+    }
   }
 }

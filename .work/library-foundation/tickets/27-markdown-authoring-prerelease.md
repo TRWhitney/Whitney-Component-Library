@@ -4,11 +4,9 @@
 fields, file handling, commands, overlays, feedback, and application structure under
 consumer-owned layout and persistence state.
 
-**Blocked by:** [Markdown Commands, Links, Assets, and Extensions](26-markdown-commands-links-assets-and-extensions.md),
-[Application Structure](17-application-structure.md), [Popover, Tooltip, and Menu Overlays](13-popover-tooltip-and-menu-overlays.md),
-[Loading, Empty, and Notification Feedback](11-loading-empty-and-notification-feedback.md)
+**Blocked by:** none. Markdown authoring, application structure, overlays, and feedback prerequisites are complete.
 
-**Status:** blocked
+**Status:** ready
 
 - [ ] The fixture coordinates editor, metadata fields, toolbar/commands, link navigation, asset
       state, and preview through public component APIs.

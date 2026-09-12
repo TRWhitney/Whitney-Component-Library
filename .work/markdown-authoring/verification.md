@@ -160,3 +160,59 @@ Final `npm run check` passes all 1127 tests in 79 files after the drag correctio
 linters, generated contracts, declaration matrix, and bundle isolation.
 
 Bounded independent intent and engineering correction reviews both pass with no findings.
+
+## Declared extensions
+
+Public extension tests cover shared Preview/Live Preview syntax, literal code and escapes,
+validated custom commands and decorations, controlled authority, composition, noneditable states,
+link-prefix ownership, conflicts, and malformed declarations. RGBA tests prove the exact authored
+value remains in Markdown, renders in both preview modes, and has a source swatch without adding
+characters. Invalid color values remain literal. Public regressions caught adjacent-edit rejection,
+non-array declarations, reserved shortcuts, and native lowercase shortcut events before correction.
+
+Native Chromium and Firefox checks operate the showcase through inline and fence source reveal,
+RGBA rendering, source swatches, the Text color toolbar action and Mod-Shift-E, undo, custom link
+navigation, restored documents, narrow layout, appearance changes, and forced colors. Both pass
+without page errors. Screenshots of dark/wide, light/390px, forced colors, and selected source are
+inspected for wrapping, containment, readable system colors, and source swatches.
+
+The restored-document flow exposed invalid dependency selection mapping when an application or
+custom command replaces an entire selected passage. Three public regressions first failed with
+crossed endpoints, then passed after transaction filtering collapsed removed selections at the
+end of their replacement. Valid selections retain normal mapping. Direct collaborative-browser
+operation selected `north`, ran Mod-Shift-E, inspected the RGBA source and swatch, restored the
+1046-character example, and confirmed editing controls and rendered color remained usable.
+
+The final full-suite run repeatedly exceeded the existing five-second limit in the showcase test
+that exercises eight Drawer placements. Its assertions remained intact; the individual test now
+has a ten-second limit. A JavaScript availability callback returning null also has a public failing
+regression and correction, so only a boolean is accepted.
+
+Final `npm run check` passes all 1163 tests in 82 files, formatting, both linters, strict types,
+generated guidance, the TypeScript 5.9/6/7 declaration matrix, and chart/editor isolation.
+`npm run verify:package` passes packed React 18.3.1 and 19.2.8 SSR, hydration, types, and browser
+builds. `npm run showcase:build` and `git diff --check` pass.
+
+The isolated 115392-character run measures Chromium input at 58–109 ms, selection at 16–34 ms,
+and mode switching at 102 ms. Firefox measures input at 19–69 ms, selection at 33–36 ms, and mode
+switching at 153 ms. Both stay inside the accepted 200 ms input/selection and two-second mode
+budgets, with no page errors. A discarded run overlapped the full test suite and exceeded the
+input budget once; the final performance check runs without concurrent quality workloads.
+
+Both independent extension review axes identified the same missing swatch: entering a table or
+footnote exposes the complete block source, but swatches only followed the individual color range.
+Two public regressions failed before correction. Source visibility now shares the block definition
+with Live Preview and propagates exposed-block state to child colors. All 76 focused extension,
+Live Preview, and wiki tests pass. Direct browser operation confirms a swatch with the caret at
+the start of both a table and a footnote, with unchanged canonical Markdown.
+
+After correction, `npm run check` passes all 1165 tests in 82 files and all configured checks.
+The native table/footnote swatch flow passes in Chromium and Firefox with no errors. Screenshots
+confirm visible swatches while the caret remains outside the colored passage. The repeated
+115392-character workload measures Chromium input at 60–109 ms, selection at 16–30 ms, and mode
+switching at 99 ms; Firefox input at 19–55 ms, selection at 33–51 ms, and mode switching at 141 ms.
+All budgets pass. Package evidence remains applicable: the correction changes client-side source
+swatch visibility and shares the existing block classification, without changing public types,
+SSR output, Preview rendering, CSS, or dependencies.
+
+Both bounded independent correction reviews pass with no findings. Screenshots were removed after inspection.
