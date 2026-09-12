@@ -8,6 +8,17 @@ import {Showcase} from '../showcase/showcase.js';
 afterEach(cleanup);
 
 describe('component showcase', () => {
+  it('runs context commands on the named object', async () => {
+    render(<Showcase />);
+    const target = screen.getByRole('group', {name: 'Boundary condition BC-12'});
+    fireEvent.contextMenu(target, {clientX: 120, clientY: 180});
+    fireEvent.click(await screen.findByRole('menuitem', {name: 'Mark reviewed'}));
+    expect(within(target).getByText('Reviewed')).toBeTruthy();
+    fireEvent.contextMenu(target, {clientX: 120, clientY: 180});
+    fireEvent.click(await screen.findByRole('menuitem', {name: 'Reset review'}));
+    expect(within(target).getByText('Not reviewed')).toBeTruthy();
+  });
+
   it('renders exactly one documented specimen for every contracted public component', () => {
     const {container} = render(<Showcase />);
     const specimenNames = [...container.querySelectorAll('[data-showcase-component]')].map(

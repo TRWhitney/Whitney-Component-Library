@@ -622,6 +622,7 @@ export const contextMenuContract = {
   composition: [
     'Render inside AppearanceProvider so the target focus, command surface, threshold, and items share the active theme and application accent.',
     'Pass target content, a targetLabel, and the same library-owned item model used by Menu. ContextMenu owns the focusable target region and rendered command parts.',
+    'Targets may contain Tree, Table, and nested actions. Opening the menu does not set descendant pressed, selected, or focused state or replace their IDs and labels.',
   ],
   contentRules: [
     'Include only actions that apply to the named target and keep every important action available through a visible or otherwise discoverable path.',
@@ -665,7 +666,7 @@ export const contextMenuContract = {
     'the only path to an important action, primary navigation, value selection, arbitrary interactive content, or an unlabeled region',
   ],
   keyboardBehavior: [
-    'Shift+F10 opens from the focused target. Arrow keys, typeahead, Home, End, Enter, Space, submenu keys, and Escape match Menu behavior.',
+    'Shift+F10 and the Context Menu key open from the focused target or a descendant control. Arrow keys, typeahead, Home, End, Enter, Space, submenu keys, and Escape match Menu behavior.',
   ],
   kind: 'component',
   labeling: [

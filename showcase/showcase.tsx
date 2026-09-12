@@ -1,3 +1,4 @@
+import {ContextMenuExample} from './context-menu-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
 import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
 import {RadarDataMotionExample} from './radar-data-motion-example.js';
@@ -44,7 +45,6 @@ import {
   ComboBox,
   CollectionFilterBar,
   ColumnChart,
-  ContextMenu,
   DateField,
   DatePicker,
   DateRangePicker,
@@ -4111,31 +4111,10 @@ function OverlaySpecimens() {
       </Specimen>
 
       <Specimen
-        description="Attach secondary commands to one named object. Right-click, touch long press, or focus and press Shift+F10 to open the same command model and whole-row highlights as Menu."
+        description="Right-click the boundary, touch and hold, or focus it and press Shift+F10 to open its actions. Choose a command to change its review status. A list displays items; a context menu offers commands for its target."
         name="ContextMenu"
       >
-        <ContextMenu
-          items={[
-            {
-              id: 'inspect-boundary',
-              label: 'Inspect boundary',
-              onAction: () => undefined,
-              type: 'action',
-            },
-            {
-              id: 'duplicate-boundary',
-              label: 'Duplicate boundary',
-              onAction: () => undefined,
-              type: 'action',
-            },
-          ]}
-          targetLabel="Boundary condition BC-12"
-        >
-          <div className="showcase-context-target">
-            <strong>BC-12</strong>
-            <span>Insulated north wall</span>
-          </div>
-        </ContextMenu>
+        <ContextMenuExample />
       </Specimen>
     </>
   );

@@ -690,7 +690,7 @@
 .showcase-context-target {
   display: grid;
   gap: 0.25rem;
-  min-inline-size: min(100%, 18rem);
+  inline-size: min(100%, 24rem);
   padding: 0.875rem 1rem;
   border: 1px solid var(--wcl-border);
   border-radius: var(--wcl-control-radius);
