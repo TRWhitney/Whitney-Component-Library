@@ -7,6 +7,7 @@ import type {} from 'remark-parse';
 interface WikiLink extends Literal {
   type: 'wclWikiLink';
   value: string;
+  isLinkLabel: boolean;
 }
 declare module 'mdast' {
   interface PhrasingContentMap {
@@ -64,13 +65,20 @@ const treeExtension: MarkdownExtension = {
   enter: {
     wclWikiLink(token) {
       const value = this.sliceSerialize(token).slice(2, -2);
+      const isLinkLabel = this.stack.some(
+        (node) => node.type === 'link' || node.type === 'linkReference',
+      );
       this.enter(
         {
           type: 'wclWikiLink',
           value,
+          isLinkLabel,
           data: {
             hName: 'span',
-            hProperties: {'data-wcl-wiki-link': ''},
+            hProperties: {
+              'data-wcl-wiki-link': 'unresolved',
+              ...(!isLinkLabel ? {'data-wcl-wiki-target': value} : {}),
+            },
             hChildren: [{type: 'text', value}],
           },
         },

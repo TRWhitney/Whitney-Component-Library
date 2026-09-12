@@ -181,6 +181,12 @@
     text-underline-offset: 0.2em;
   }
 
+  [data-wcl-wiki-link='resolved'] {
+    color: var(--wcl-accent-hover-contrast);
+    text-decoration-style: solid;
+    cursor: pointer;
+  }
+
   [data-wcl-markdown-empty] {
     color: var(--wcl-text-muted);
   }
@@ -290,6 +296,10 @@
   }
 
   [data-wcl-markdown-preview] a[href] {
+    color: LinkText;
+  }
+
+  [data-wcl-wiki-link='resolved'] {
     color: LinkText;
   }
 }

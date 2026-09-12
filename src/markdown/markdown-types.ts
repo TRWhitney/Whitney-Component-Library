@@ -34,6 +34,24 @@ export interface MarkdownEditorControls {
   readonly execute: (command: MarkdownCommand) => boolean;
   readonly canExecute: (command: MarkdownCommand) => boolean;
   readonly isActive: (command: MarkdownCommand) => boolean;
+  readonly canOpenLink: boolean;
+  readonly openLink: () => boolean;
+}
+
+export interface MarkdownWikiDestination {
+  readonly href: string;
+  readonly label?: string;
+}
+
+export interface MarkdownWikiLink {
+  readonly target: string;
+  readonly href: string;
+  readonly label: string;
+}
+
+export interface MarkdownWikiLinks {
+  readonly resolve: (target: string) => MarkdownWikiDestination | null;
+  readonly onNavigate: (link: MarkdownWikiLink) => void;
 }
 
 export type MarkdownEditorSize = 'compact' | 'regular' | 'expanded';
@@ -59,6 +77,7 @@ export type MarkdownEditorProps = FieldStateProps &
   StringValueProps &
   MarkdownEditorLockProps & {
     readonly renderToolbar?: (controls: MarkdownEditorControls) => ReactNode;
+    readonly wikiLinks?: MarkdownWikiLinks;
     readonly form?: string;
     readonly name?: string;
     readonly mode?: MarkdownEditorMode;

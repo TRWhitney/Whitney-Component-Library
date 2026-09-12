@@ -3,7 +3,9 @@ import {toHast} from 'mdast-util-to-hast';
 import type {Nodes as HastNodes} from 'hast';
 import type {RootContent, Root, FootnoteReference} from 'mdast';
 
-import type {MarkdownEditorLabels} from './markdown-types.js';
+import type {MarkdownEditorLabels, MarkdownWikiLinks} from './markdown-types.js';
+import {openWikiTarget} from './wiki-navigation.js';
+import {resolveWikiLink} from './wiki-resolution.js';
 import {liveFootnotes} from './live-footnotes.js';
 
 import {liveFocus} from './live-effects.js';
@@ -12,17 +14,27 @@ import {footnoteContent, type LiveDocument} from './live-document.js';
 
 // Only the private parser supplies this tree. Raw HTML becomes a text node; URL properties
 // use the same allowlist as reading preview. No HTML string is inserted into the document.
-function appendTree(parent: Node, tree: HastNodes, owner: Document, origin: number): void {
+function appendTree(
+  parent: Node,
+  tree: HastNodes,
+  owner: Document,
+  origin: number,
+  wikiLinks: MarkdownWikiLinks | undefined,
+  disabled: boolean,
+): void {
   if (tree.type === 'text' || tree.type === 'raw') {
     parent.appendChild(owner.createTextNode(tree.value));
     return;
   }
   if (tree.type === 'root') {
-    tree.children.forEach((child) => appendTree(parent, child, owner, origin));
+    tree.children.forEach((child) => appendTree(parent, child, owner, origin, wikiLinks, disabled));
     return;
   }
   if (tree.type !== 'element') return;
-  const element = owner.createElement(tree.tagName);
+  const target = tree.properties['data-wcl-wiki-target'];
+  const wiki = typeof target === 'string';
+  const link = wiki ? resolveWikiLink(target, wikiLinks) : null;
+  const element = owner.createElement(wiki ? (link ? 'a' : 'span') : tree.tagName);
   const offset = tree.position?.start.offset;
   if (offset !== undefined) element.dataset.markdownOffset = String(Math.max(0, offset - origin));
   for (const [key, value] of Object.entries(tree.properties)) {
@@ -41,13 +53,25 @@ function appendTree(parent: Node, tree: HastNodes, owner: Document, origin: numb
       element.setAttribute(key, '');
     } else if (key === 'className' && Array.isArray(value)) {
       element.className = value.join(' ');
-    } else if (key === 'data-wcl-wiki-link') {
-      element.setAttribute(key, '');
     }
   }
   // Editing links select their Markdown source; reading-mode links retain navigation.
   if (tree.tagName === 'a') element.setAttribute('role', 'link');
-  tree.children.forEach((child) => appendTree(element, child, owner, origin));
+  if (wiki) {
+    element.dataset.wclWikiLink = link ? 'resolved' : 'unresolved';
+    element.dataset.wclWikiTarget = target;
+    element.textContent = link?.label ?? target;
+    if (link) {
+      element.setAttribute('role', 'link');
+      element.tabIndex = -1;
+      if (disabled) element.setAttribute('aria-disabled', 'true');
+      else element.setAttribute('href', link.href);
+    }
+  } else {
+    tree.children.forEach((child) =>
+      appendTree(element, child, owner, origin, wikiLinks, disabled),
+    );
+  }
   parent.appendChild(element);
 }
 
@@ -59,12 +83,16 @@ export class LiveWidget extends WidgetType {
     readonly source: string,
     readonly block: boolean,
     readonly labels: MarkdownEditorLabels,
+    readonly wikiLinks: MarkdownWikiLinks | undefined,
+    readonly disabled: boolean,
   ) {
     super();
   }
 
   override eq(other: LiveWidget): boolean {
     return (
+      this.wikiLinks === other.wikiLinks &&
+      this.disabled === other.disabled &&
       this.from === other.from &&
       this.source === other.source &&
       this.document.referenceKey === other.document.referenceKey &&
@@ -123,14 +151,32 @@ export class LiveWidget extends WidgetType {
         }),
       owner,
       this.from,
+      this.wikiLinks,
+      this.disabled,
     );
-    element.addEventListener('mousedown', (event) => {
-      if (
-        !(event instanceof MouseEvent) ||
-        event.button !== 0 ||
-        view.state.facet(EditorView.editable) === false
-      )
-        return;
+    element.addEventListener('click', (event) => {
+      if (!(event instanceof MouseEvent)) return;
+      const wiki =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>('[data-wcl-wiki-target]')
+          : null;
+      if (!wiki) return;
+      event.preventDefault();
+      if (event.button === 0 && (event.ctrlKey || event.metaKey))
+        openWikiTarget(view, wiki.dataset.wclWikiTarget!);
+    });
+    element.addEventListener('auxclick', (event) => {
+      if (!(event instanceof MouseEvent) || event.button !== 1) return;
+      const wiki =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>('[data-wcl-wiki-target]')
+          : null;
+      if (!wiki) return;
+      event.preventDefault();
+      openWikiTarget(view, wiki.dataset.wclWikiTarget!);
+    });
+    const revealSource = (event: MouseEvent | TouchEvent) => {
+      if (view.composing || view.state.facet(EditorView.editable) === false) return;
       const target =
         event.target instanceof Element
           ? event.target.closest<HTMLElement>('[data-markdown-offset]')
@@ -146,6 +192,58 @@ export class LiveWidget extends WidgetType {
         userEvent: 'select.pointer',
       });
       view.focus();
+    };
+    element.addEventListener('mousedown', (event) => {
+      if (!(event instanceof MouseEvent)) return;
+      if (event.ctrlKey || event.metaKey) {
+        // Keep the rendered target mounted until its intentional click is dispatched.
+        event.preventDefault();
+        return;
+      }
+      if (event.button === 0) revealSource(event);
+    });
+    let touchStart: {x: number; y: number} | null = null;
+    element.addEventListener(
+      'touchstart',
+      (event) => {
+        if (!(event instanceof TouchEvent)) return;
+        const touch = event.touches.length === 1 ? event.touches[0] : undefined;
+        touchStart = touch ? {x: touch.clientX, y: touch.clientY} : null;
+      },
+      {passive: true},
+    );
+    element.addEventListener(
+      'touchmove',
+      (event) => {
+        if (!(event instanceof TouchEvent)) return;
+        const touch = event.touches[0];
+        if (
+          !touch ||
+          !touchStart ||
+          Math.hypot(touch.clientX - touchStart.x, touch.clientY - touchStart.y) > 8
+        )
+          touchStart = null;
+      },
+      {passive: true},
+    );
+    element.addEventListener(
+      'touchend',
+      (event) => {
+        if (!(event instanceof TouchEvent)) return;
+        const touch = event.changedTouches[0];
+        const tap =
+          touchStart &&
+          touch &&
+          event.touches.length === 0 &&
+          Math.hypot(touch.clientX - touchStart.x, touch.clientY - touchStart.y) <= 8;
+        touchStart = null;
+        // Resolve the original widget target before a synthesized mouse event can hit its revealed source.
+        if (tap) revealSource(event);
+      },
+      {passive: false},
+    );
+    element.addEventListener('touchcancel', () => {
+      touchStart = null;
     });
     for (const image of element.querySelectorAll('img')) {
       image.addEventListener('load', () => view.requestMeasure());

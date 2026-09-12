@@ -353,9 +353,10 @@ const view = React.createElement(
                 React.createElement(Button, {isDisabled: !controls.canExecute('bold'), onPress: () => controls.execute('bold')}, 'Bold')),
             }),
             React.createElement(MarkdownEditor, {
-              defaultValue: '# Packed reading\\n\\nA note[^one].\\n\\n[^one]: Packed evidence.',
+              defaultValue: '# Packed reading\\n\\nA note[^one].\\n\\n[^one]: Packed evidence.\\n\\n[[Packed note]]',
               label: 'Packed Markdown preview',
               mode: 'preview',
+              wikiLinks: {resolve: (target) => ({href: '/notes/' + encodeURIComponent(target)}), onNavigate: () => {}},
             }),
             React.createElement(TextArea, {
               label: 'Notes',

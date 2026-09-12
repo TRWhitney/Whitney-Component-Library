@@ -17,6 +17,8 @@ import {
   type LiveDocument,
 } from './live-document.js';
 import {LiveWidget, MarkerWidget} from './live-widget.js';
+import {wikiDocument, wikiLinks, wikiDisabled} from './wiki-navigation.js';
+import {resolveWikiLink} from './wiki-resolution.js';
 
 import {liveFocus, liveComposition, liveLabels} from './live-effects.js';
 
@@ -69,6 +71,8 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
           value.slice(from, to),
           block,
           state.facet(liveLabels),
+          state.facet(wikiLinks),
+          state.facet(wikiDisabled),
         ),
       }).range(from, to),
     );
@@ -125,10 +129,13 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
         hide(last, to);
       }
     } else if (node.type === 'wclWikiLink') {
-      mark(from + 2, to - 2, 'span', {'data-wcl-wiki-link': ''});
-      if (!editing) {
-        hide(from, from + 2);
-        hide(to - 2, to);
+      if (!editing) replace(node, false);
+      else {
+        const link = !node.isLinkLabel && resolveWikiLink(node.value, state.facet(wikiLinks));
+        mark(from + 2, to - 2, 'span', {
+          'data-wcl-wiki-link': link ? 'resolved' : 'unresolved',
+          ...(!node.isLinkLabel ? {'data-wcl-wiki-target': node.value} : {}),
+        });
       }
     } else if (node.type === 'list') {
       wrap(from, to, 'div', 90 - depth, {role: 'list', 'data-wcl-live-list': ''});
@@ -184,7 +191,7 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
 
 const liveState = StateField.define<LiveState>({
   create(state) {
-    const document = parseLiveDocument(state.doc.toString());
+    const document = state.field(wikiDocument, false) ?? parseLiveDocument(state.doc.toString());
     return {document, focused: false, composing: false, ...present(state, document, false)};
   },
   update(previous, transaction) {
@@ -207,19 +214,23 @@ const liveState = StateField.define<LiveState>({
       !transaction.docChanged &&
       !transaction.selection &&
       transaction.startState.facet(liveLabels) === transaction.state.facet(liveLabels) &&
+      transaction.startState.facet(wikiLinks) === transaction.state.facet(wikiLinks) &&
+      transaction.startState.facet(wikiDisabled) === transaction.state.facet(wikiDisabled) &&
       focused === previous.focused &&
       composing === previous.composing
     )
       return previous;
-    const document = previous.composing
-      ? parseLiveDocument(transaction.state.doc.toString())
-      : transaction.docChanged
-        ? updateLiveDocument(
-            previous.document,
-            transaction.changes,
-            transaction.state.doc.toString(),
-          )
-        : previous.document;
+    const document =
+      transaction.state.field(wikiDocument, false) ??
+      (previous.composing
+        ? parseLiveDocument(transaction.state.doc.toString())
+        : transaction.docChanged
+          ? updateLiveDocument(
+              previous.document,
+              transaction.changes,
+              transaction.state.doc.toString(),
+            )
+          : previous.document);
     return {document, focused, composing, ...present(transaction.state, document, focused)};
   },
   provide: (field) => [
@@ -274,15 +285,6 @@ export const livePreview: Extension = [
     },
     blur(_event, view) {
       view.dispatch({effects: liveFocus.of(false)});
-    },
-    compositionstart(_event, view) {
-      view.dispatch({effects: liveComposition.of(true)});
-    },
-    compositionend(_event, view) {
-      // Let CodeMirror commit the final DOM input before recalculating presentation.
-      queueMicrotask(() => {
-        if (view.state.field(liveState, false)) view.dispatch({effects: liveComposition.of(false)});
-      });
     },
   }),
 ];

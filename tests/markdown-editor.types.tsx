@@ -167,3 +167,38 @@ type ControlPrivateKeys = Extract<
   'editorView' | 'editorState' | 'dispatch' | 'plugins'
 >;
 export const privateCommandStateIsAbsent: ControlPrivateKeys extends never ? true : false = true;
+
+export const wikiNavigation = (
+  <MarkdownEditor
+    label="Document"
+    defaultValue="[[Boundary]]"
+    wikiLinks={{
+      resolve: (target) => ({href: `/notes/${encodeURIComponent(target)}`}),
+      onNavigate: (link) => {
+        const target: string = link.target;
+        return target;
+      },
+    }}
+    renderToolbar={(controls) => (
+      <Button
+        isDisabled={!controls.canOpenLink}
+        onPress={() => {
+          const opened: boolean = controls.openLink();
+          return opened;
+        }}
+      >
+        Open link
+      </Button>
+    )}
+  />
+);
+export const asynchronousWikiResolution = (
+  <MarkdownEditor
+    label="Document"
+    wikiLinks={{
+      // @ts-expect-error Wiki resolution is synchronous; applications supply current destinations.
+      resolve: () => Promise.resolve({href: '/note'}),
+      onNavigate: () => undefined,
+    }}
+  />
+);

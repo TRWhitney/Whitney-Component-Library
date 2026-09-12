@@ -12,10 +12,22 @@ import {
 } from './markdown-commands.js';
 import {liveFocus, liveLabels} from './live-effects.js';
 import {livePreview} from './live-preview.js';
-import type {MarkdownEditorLabels, MarkdownEditorControls} from './markdown-types.js';
+import type {
+  MarkdownEditorLabels,
+  MarkdownEditorControls,
+  MarkdownWikiLinks,
+} from './markdown-types.js';
+import {
+  wikiLinks,
+  wikiDisabled,
+  wikiNavigation,
+  currentWikiLink,
+  openWikiLink,
+} from './wiki-navigation.js';
 
 interface SourceConfiguration {
   readonly onControls?: (controls: MarkdownEditorControls) => void;
+  readonly wikiLinks?: MarkdownWikiLinks;
   readonly labels: MarkdownEditorLabels;
   readonly livePreview: boolean;
   readonly attributes: Record<string, string>;
@@ -48,17 +60,22 @@ export function createSourceSession(
   const reportCommands = (view: EditorView) => {
     if (!currentConfiguration.onControls) return;
     const {available, active} = markdownCommandStatus(view);
-    const signature = JSON.stringify([available, active]);
+    const link = currentWikiLink(view);
+    const signature = JSON.stringify([available, active, link]);
     if (signature === commandSignature) return;
     commandSignature = signature;
     currentConfiguration.onControls({
       execute: (command) => runMarkdownCommand(view, command),
       canExecute: (command) => available.includes(command),
       isActive: (command) => active.includes(command),
+      canOpenLink: !!link,
+      openLink: () => openWikiLink(view),
     });
   };
   const configure = (next: SourceConfiguration) => [
     liveLabels.of(next.labels),
+    wikiLinks.of(next.wikiLinks),
+    wikiDisabled.of(next.isDisabled),
     EditorState.readOnly.of(next.isReadOnly || next.isDisabled),
     EditorView.editable.of(!next.isDisabled),
     EditorView.contentAttributes.of(next.attributes),
@@ -72,6 +89,7 @@ export function createSourceSession(
         EditorState.lineSeparator.of('\n'),
         EditorView.lineWrapping,
         EditorView.perLineTextDirection.of(true),
+        wikiNavigation,
         presentation.of(showingLive ? livePreview : []),
         settings.of(configure(configuration)),
         undoHistory.of(history()),

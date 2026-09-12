@@ -13,13 +13,14 @@ export const markdownEditorContract = {
   appropriateUses: ['a user authors Markdown and needs formatted content with editable syntax'],
   inappropriateUses: [
     'plain multiline text with no Markdown meaning',
-    'uploads, wiki-link navigation, or custom syntax and commands, which are not delivered in this milestone',
+    'uploads or custom syntax and commands, which are not delivered in this milestone',
   ],
   preferredAlternatives: ['Use TextArea for plain multiline text and TextField for a single line.'],
   composition: [
     'Render inside AppearanceProvider. The parent owns width, layout, and mode controls; compose SegmentedControl to switch between live-preview, source, and preview.',
     'mode defaults to live-preview. Source exposes the complete Markdown text; preview provides a read-only document.',
     'Supply renderToolbar to compose Toolbar, Button, and ToggleButton between the field label and document. No toolbar appears by default. The callback receives MarkdownEditorControls with execute, canExecute, and isActive; all accept a MarkdownCommand identifier and return a boolean.',
+    'Compose an Open link Button using controls.canOpenLink and controls.openLink(). These use the retained source selection and work in read-only, pending, and locked editing modes; disabled and reading-preview modes disable this toolbar action.',
     'Bind action availability to canExecute and toggle selection to isActive. Execute commands through these controls so toolbar actions use the retained source selection. The application owns toolbar labels and action choices.',
     'Import the shared stylesheet once. Bundlers can omit the editor engine when only ordinary components are used; editor engine types remain private.',
   ],
@@ -32,7 +33,7 @@ export const markdownEditorContract = {
   ],
   contentRules: [
     'The canonical value is Markdown text. Supported syntax is CommonMark plus tables, task lists, strikethrough, autolinks, footnotes, and simple double-bracket wiki links.',
-    'Raw HTML displays as literal text. Links accept safe web, mail, and relative destinations; images accept web and relative destinations. Wiki targets are visibly distinct and inert.',
+    'Raw HTML displays as literal text. Links accept safe web, mail, and relative destinations; images accept web and relative destinations. Wiki targets are visibly distinct. Supply wikiLinks to resolve simple targets; unresolved or unsafe destinations remain inert. Wiki targets inside an ordinary Markdown link label remain part of that outer link and do not create another navigation target.',
     'Incomplete and unsupported syntax remains editable source. There is no public parser, renderer, plugin, or document-tree API.',
   ],
   states: [
@@ -43,7 +44,7 @@ export const markdownEditorContract = {
   ],
   controlBehavior: [
     'Live Preview renders Markdown in place. A cursor or selection reveals the intersected inline syntax; tables and fenced code reveal their complete source for editing. Moving out of a construct restores its rendered form.',
-    'Click rendered content or move the cursor into it with the keyboard to edit its source. A selection across constructs exposes every crossed source range. Editing-mode links enter source editing; safe-link navigation is available in preview.',
+    'Click rendered content or move the cursor into it with the keyboard to edit its source. A selection across constructs exposes every crossed source range. Ordinary clicks on editing-mode links enter source editing. Resolved wiki links also support intentional navigation; safe ordinary-link navigation is available in preview.',
     'Mode, theme, and field-state changes retain source selection and undo history. Switching modes does not rewrite the Markdown string.',
     'Ordinary controlled-value echoes preserve the session. An external value replacement maps the selection into the changed text without adding a local undo entry.',
     'Built-in MarkdownCommand identifiers are bold, italic, strikethrough, inline-code, link, heading-1 through heading-6, paragraph, blockquote, bullet-list, ordered-list, task-list, code-block, horizontal-rule, undo, and redo.',
@@ -52,6 +53,7 @@ export const markdownEditorContract = {
     'execute returns false without changing the document for an unsupported or unavailable command. Preview, disabled, read-only, pending, and locked states reject editing commands.',
   ],
   events: [
+    'wikiLinks.resolve synchronously receives a target string and returns {href, label?} or null. wikiLinks.onNavigate receives the resolved {target, href, label}. The application owns routes and navigation; the editor prevents default wiki-link navigation and never rewrites the Markdown target.',
     'onChange receives the complete Markdown string after an accepted edit. No engine state or syntax tree crosses the public API.',
   ],
   validation: [
@@ -71,7 +73,8 @@ export const markdownEditorContract = {
     'Live Preview and source support text entry, selection, composition input, newline entry, plain-text clipboard operations, and undo/redo. Copying preserves the selected Markdown source. Tab and Shift+Tab leave the editor.',
     'In Live Preview and source, Mod+B applies bold, Mod+I italic, Mod+Shift+X strikethrough, Mod+Shift+C inline code, and Mod+K a link. Mod+Alt+1 through Mod+Alt+6 choose heading levels; Mod+Alt+0 restores paragraphs. Mod is Command on macOS and Control elsewhere.',
     'Enter continues a nonempty Markdown list or quotation and exits an empty item. New task-list items start unchecked. Literal code, composition input, and paste do not trigger Markdown continuation.',
-    'Preview supports ordinary document reading and safe-link keyboard navigation. Task checkboxes and wiki targets are inert.',
+    'Ctrl/Cmd-click on a resolved wiki link navigates without editing. Middle-click on a rendered wiki link also delegates to the application callback. With the cursor inside a resolved target, Mod+Enter or the composed Open link action calls the application navigation callback. Ordinary clicks reveal its Markdown source. Preview exposes resolved wiki links as native links for keyboard, pointer, and touch activation.',
+    'Preview supports ordinary document reading and safe-link keyboard navigation. Task checkboxes and unresolved wiki targets are inert.',
   ],
   labeling: [
     'label is required and visible. The field creates its own description, error, mode, and position relationships.',

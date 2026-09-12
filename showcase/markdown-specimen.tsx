@@ -44,7 +44,7 @@ const reviewNotes = [
   '',
   'Read the [CommonMark guide](https://commonmark.org/help/) or visit https://commonmark.org.',
   '',
-  'The wiki target [[Boundary review]] is visible but does not navigate.',
+  'Open [[Boundary review]] or review the unresolved [[Mesh annotations]].',
   '',
   '<strong>This HTML remains literal text.</strong>',
   '',
@@ -63,6 +63,7 @@ export function MarkdownSpecimen() {
   const [isDisabled, setDisabled] = useState(false);
   const [isPending, setPending] = useState(false);
   const [isLocked, setLocked] = useState(false);
+  const [openedWiki, setOpenedWiki] = useState('');
 
   return (
     <Stack gap="regular">
@@ -197,6 +198,13 @@ export function MarkdownSpecimen() {
             >
               Redo
             </Button>
+            <Button
+              size="compact"
+              isDisabled={!controls.canOpenLink}
+              onPress={() => controls.openLink()}
+            >
+              Open link
+            </Button>
           </Toolbar>
         )}
         description="Edit formatted text in Live Preview. Move the cursor into a construct to reveal its Markdown; select across constructs to edit their source. Tab leaves the editor."
@@ -213,6 +221,13 @@ export function MarkdownSpecimen() {
         size={size}
         value={value}
         onChange={setValue}
+        wikiLinks={{
+          resolve: (target) =>
+            target === 'Boundary review'
+              ? {href: '#markdown-editor', label: 'Boundary review'}
+              : null,
+          onNavigate: ({label}) => setOpenedWiki(label),
+        }}
       />
       <InlineGroup gap="regular" wrap>
         <Button variant="secondary" onPress={() => setValue('')}>
@@ -222,6 +237,7 @@ export function MarkdownSpecimen() {
           Restore example
         </Button>
       </InlineGroup>
+      {openedWiki ? <p role="status">Opened note: {openedWiki}.</p> : null}
       <p>
         Click the table or move into it with the keyboard to edit its complete pipe-delimited
         source. Fenced code also reveals its complete source. Move outside the construct to see its
@@ -235,9 +251,11 @@ export function MarkdownSpecimen() {
         item exits it. Each formatting action can be undone. Literal code keeps ordinary newlines.
       </p>
       <p>
-        Links reveal their source while editing; use Preview to follow safe links. HTML stays
-        literal and wiki targets stay inert. Asset callbacks and wiki-link navigation are the next
-        part of Ticket 26.
+        Click a wiki link to edit its source. Ctrl/Cmd-click follows a resolved target; with the
+        cursor inside it, use Ctrl/Cmd+Enter or Open link. Preview supports ordinary link
+        activation. This example reports the selected note below the editor. Unresolved wiki targets
+        stay inert, and HTML stays literal. The application supplies wiki destinations and handles
+        navigation.
       </p>
     </Stack>
   );

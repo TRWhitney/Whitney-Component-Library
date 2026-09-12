@@ -5,7 +5,8 @@ import type {Plugin} from 'unified';
 import type {Root} from 'hast';
 
 import {remarkWikiLinks} from './wiki-syntax.js';
-import type {MarkdownEditorLabels} from './markdown-types.js';
+import type {MarkdownEditorLabels, MarkdownWikiLinks} from './markdown-types.js';
+import {resolveWikiLink} from './wiki-resolution.js';
 
 import {safeUrl} from './markdown-url.js';
 
@@ -36,16 +37,46 @@ export const MarkdownPreview = memo(function MarkdownPreview({
   prefix,
   labels,
   isDisabled,
+  wikiLinks,
 }: {
   readonly value: string;
   readonly prefix: string;
   readonly labels: MarkdownEditorLabels;
   readonly isDisabled: boolean;
+  readonly wikiLinks?: MarkdownWikiLinks;
 }): ReactElement {
   if (!value.trim()) return <p data-wcl-markdown-empty="">{labels.emptyPreview}</p>;
   return (
     <Markdown
-      {...(isDisabled ? {components: {a: DisabledLink}} : {})}
+      components={{
+        ...(isDisabled ? {a: DisabledLink} : {}),
+        span: ({node, children, ...props}) => {
+          const target = node?.properties['data-wcl-wiki-target'];
+          if (typeof target !== 'string') return <span {...props}>{children}</span>;
+          const link = resolveWikiLink(target, wikiLinks);
+          if (!link) return <span data-wcl-wiki-link="unresolved">{target}</span>;
+          return (
+            <a
+              data-wcl-wiki-link="resolved"
+              href={isDisabled ? undefined : link.href}
+              role="link"
+              aria-disabled={isDisabled || undefined}
+              tabIndex={isDisabled ? -1 : undefined}
+              onClick={(event) => {
+                event.preventDefault();
+                if (!isDisabled) wikiLinks?.onNavigate(link);
+              }}
+              onAuxClick={(event) => {
+                if (event.button !== 1) return;
+                event.preventDefault();
+                if (!isDisabled) wikiLinks?.onNavigate(link);
+              }}
+            >
+              {link.label}
+            </a>
+          );
+        },
+      }}
       remarkPlugins={[remarkGfm, remarkWikiLinks]}
       rehypePlugins={[[scopeFootnotes, prefix]]}
       remarkRehypeOptions={{

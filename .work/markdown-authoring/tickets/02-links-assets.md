@@ -5,9 +5,9 @@ callbacks, preserving the Markdown string and editing position.
 
 **Blocked by:** none. [Commands](01-commands.md) are complete.
 
-**Status:** ready
+**Status:** active. Wiki navigation is complete; asset acquisition follows.
 
-- [ ] Resolved wiki targets support safe preview navigation and intentional editing-mode activation.
+- [x] Resolved wiki targets support safe preview navigation and intentional editing-mode activation.
 - [ ] File insertion uses only callback-returned Markdown and shared acceptance rules.
 - [ ] Async insertion maps through unrelated edits, rejects stale completion, and has recoverable
       pending, rejection, and failure states.
@@ -20,4 +20,4 @@ callbacks, preserving the Markdown string and editing position.
 
 ## Completion evidence
 
-Pending implementation.
+[Wiki verification](../verification.md) covers navigation, browser behavior, hydration, safety, and compatibility. Asset acquisition remains.

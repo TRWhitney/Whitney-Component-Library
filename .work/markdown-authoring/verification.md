@@ -59,3 +59,52 @@ afterward. Code lint, strict types, formatting, and diff checks pass. Root direc
 to `path\` and observed `[path\\](https://)` with the destination selected. The previous full
 suite, package, performance, style, and browser evidence remains applicable outside that bounded
 label correction. Both independent correction reviews pass without blocking findings.
+
+## Wiki navigation
+
+`tests/markdown-wiki-links.test.tsx` initially failed five public cases for missing resolution and
+navigation. It now covers callback payloads, safe native reading links, unresolved/literal targets,
+keyboard and toolbar activation, read-only/disabled states, labels inside tables and footnotes,
+resolver refresh, composition, hydration, and touch. The shared editing/reading suites pass.
+
+Native Chromium touch testing exposed intermittent retargeting: synthesized mouse events could
+select text outside the wiki target after its widget revealed source. A public touch-completion
+regression failed before correction. A tap now resolves the original widget target on touchend
+and suppresses the synthesized mouse event. Scrolling gestures preserve the existing selection.
+The 50 tests across wiki, reading/source, and Live Preview pass after this correction.
+
+Direct collaborative-browser inspection confirms resolved targets use a native link with the
+application destination and unresolved targets use inert spans. Clicking Boundary review reveals
+`[[Boundary review]]` and enables Open link. Activating that control reports the selected note
+through the application callback while retaining the source string. Screenshots and DOM inspection
+cover dark/light, compact/wide, forced colors, and the touch interaction.
+
+The native Chromium/Firefox script exercises ordinary click, modified click, Mod-Enter, toolbar
+activation, reading-preview activation, unresolved targets, disabled state, compact layout, forced
+colors, and reduced motion. Chromium also taps the link and Open link in a touch viewport.
+The repeated native touch trace confirms the callback and unchanged Markdown after correction.
+
+The 115,392-character workload passes in both browsers. Chromium input samples are 60–101ms,
+selection samples 19–33ms, and mode switching 118ms. Firefox input samples are 35–57ms, selection
+samples 20–50ms, and mode switching 178ms. No page errors occur. Parsing is shared with Live Preview.
+
+`npm run verify:package` passes SSR, hydration, public types, and browser builds with React 18.3.1
+and 19.2.8. `npm run showcase:build` passes. `npm run check` passes all 1,097 tests across 77 files after the touch correction, including
+formatting, lint, strict types, generated guidance, public declaration matrix, and isolation.
+The final native browser checks pass in Chromium and Firefox. Independent review is pending.
+
+## Wiki review corrections
+
+Independent intent and engineering review admitted nested anchors when wiki syntax appeared in an
+ordinary Markdown link label, and native middle-click navigation bypassing the application
+callback. Four public regressions failed before correction. The tokenizer now records whether a
+wiki target belongs to an ordinary link label; those targets retain the outer link's ownership in
+reading, editing, and navigation controls. Rendered wiki links intercept middle-button activation.
+
+All 56 tests in wiki, reading/source, and Live Preview pass, including inline/reference outer-link
+SSR/hydration, disabled wiki actions inside ordinary labels, and middle-click callback/default
+prevention. Direct browser inspection confirms one native anchor with the original destination for
+`[See [[Boundary review]]](https://example.com)`. Native Chromium/Firefox checks include middle-click
+callbacks with no extra tab and a single reading-preview anchor for the nested example.
+`npm run check` passes all 1,103 tests and all configured checks. The revised native browser
+checks pass in Chromium and Firefox. Both independent correction reviews pass without blocking findings.

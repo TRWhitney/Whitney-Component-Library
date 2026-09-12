@@ -21,10 +21,13 @@ const unavailableControls: MarkdownEditorControls = {
   execute: () => false,
   canExecute: () => false,
   isActive: () => false,
+  canOpenLink: false,
+  openLink: () => false,
 };
 
 export function MarkdownEditor({
   renderToolbar,
+  wikiLinks,
   defaultValue = '',
   value,
   onChange,
@@ -121,6 +124,7 @@ export function MarkdownEditor({
         attributes: {},
         ...(renderToolbar ? {onControls: setCommandControls} : {}),
         labels,
+        ...(wikiLinks ? {wikiLinks} : {}),
         livePreview: mode === 'live-preview',
         isDisabled: latest.current.disabled,
         isReadOnly: latest.current.readonly,
@@ -135,7 +139,7 @@ export function MarkdownEditor({
     session.current = editor;
     setMounted(true);
     if (active && latest.current.mode !== 'preview') editor.focus();
-  }, [mode, labels, renderToolbar]);
+  }, [mode, labels, renderToolbar, wikiLinks]);
   useEffect(
     () => () => {
       session.current?.destroy();
@@ -148,11 +152,12 @@ export function MarkdownEditor({
       attributes,
       ...(renderToolbar ? {onControls: setCommandControls} : {}),
       labels,
+      ...(wikiLinks ? {wikiLinks} : {}),
       livePreview: mode === 'live-preview',
       isDisabled: disabled,
       isReadOnly: readonly || mode === 'preview',
     });
-  }, [attributes, renderToolbar, labels, mode, disabled, readonly]);
+  }, [attributes, renderToolbar, labels, mode, disabled, readonly, wikiLinks]);
   useEffect(() => {
     session.current?.replace(currentValue);
   }, [currentValue, reconcileVersion]);
@@ -211,6 +216,8 @@ export function MarkdownEditor({
     execute: (command) => editable && commandControls.execute(command),
     canExecute: (command) => editable && commandControls.canExecute(command),
     isActive: (command) => mounted && commandControls.isActive(command),
+    canOpenLink: mounted && mode !== 'preview' && !disabled && commandControls.canOpenLink,
+    openLink: () => mounted && mode !== 'preview' && !disabled && commandControls.openLink(),
   };
 
   const preventDisabled = (event: SyntheticEvent) => {
@@ -311,6 +318,7 @@ export function MarkdownEditor({
               prefix={`wcl-${baseId}-`}
               labels={labels}
               isDisabled={disabled}
+              {...(wikiLinks ? {wikiLinks} : {})}
             />
           </div>
         ) : null}
