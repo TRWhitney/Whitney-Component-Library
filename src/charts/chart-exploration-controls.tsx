@@ -15,6 +15,7 @@ import {
 } from 'react';
 
 import {Button} from '../actions/button.js';
+import {useChartCommandInput} from './use-chart-command-input.js';
 import {IconButton} from '../actions/icon-button.js';
 import {Dialog} from '../overlays/dialog.js';
 import {ChartExplorationGlyph as Glyph} from './chart-exploration-glyph.js';
@@ -38,6 +39,7 @@ export interface ChartExplorationControlLabels {
 }
 
 export interface ChartExplorationControlsProps extends ChartExplorationPresentation {
+  readonly canvas?: HTMLElement | null;
   readonly version?: string;
   readonly largeStepMultiplier?: number;
   readonly step?: number;
@@ -77,6 +79,7 @@ function stopPropagation(event: SyntheticEvent): void {
 }
 
 export function ChartExplorationControls({
+  canvas,
   presentation = 'chart',
   renderControls,
   version,
@@ -116,6 +119,17 @@ export function ChartExplorationControls({
   };
 
   const zoomInDisabled = isZoomInDisabled || span <= minimum + Number.EPSILON;
+  useChartCommandInput(
+    commandScope,
+    {
+      ArrowLeft: {run: () => pan(-Math.max(step ?? 0, span / 3)), disabled: window[0] <= 0},
+      ArrowRight: {run: () => pan(Math.max(step ?? 0, span / 3)), disabled: window[1] >= 1},
+      '+': {run: () => zoom(0.5), disabled: zoomInDisabled},
+      '=': {run: () => zoom(0.5), disabled: zoomInDisabled},
+      '-': {run: () => zoom(2), disabled: span >= 1},
+    },
+    canvas,
+  );
   function finish(phase: 'end' | 'cancel'): void {
     const current = gesture.current;
     if (!current) return;

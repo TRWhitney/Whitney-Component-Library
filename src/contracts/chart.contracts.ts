@@ -37,6 +37,8 @@ const retainedActivation =
 
 const explorationCommands =
   'Exploration renders one command set. presentation selects chart-edge controls or a panel. renderControls receives named overview, zoomIn, zoomOut, reset and pan nodes plus rangeLabel for composition in a public Toolbar; it replaces the native command regions and removes their empty margins. Both presentations share window callbacks, domain limits, focus, and responsive target sizing. Rectangular lower-edge controls pair left with up and right with down to leave the axis title clear.';
+const explorationKeyboard =
+  'When exploration is enabled, unmodified arrows pan and plus, equals and minus zoom with focus on the canvas or its command buttons. Shortcuts share the buttons’ steps, bounds and disabled states. Wheel movement over the focused chart or its commands zooms through the same limits; unfocused charts, horizontal gestures and modified wheel input retain normal scrolling or browser zoom. Small trackpad deltas accumulate into a zoom step. With canvas or command-button focus, hold the middle mouse button over the plot and drag to pan with the data following the pointer. The gesture preserves zoom, respects domain limits, captures the pointer until release, and cancels on Escape or pointer cancellation. Shift plus arrows preserves reading navigation; Enter and Space keep reading or button activation. Legends, fields, menus and overview handles retain their own keyboard behavior. Closing overview restores its trigger, and a command that becomes disabled restores canvas focus when needed.';
 
 const activationTiming =
   'Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.';
@@ -491,6 +493,7 @@ export const heatmapContract: ComponentContract = {
   controlBehavior: [
     selectionPresentation,
     explorationCommands,
+    explorationKeyboard,
     'Optional exploration uses ChartRectangularExploration<string, string> with column IDs on x and row IDs on y. Windows include complete ordered tracks. Supply localized navigation, corner and range labels, defaultWindow for internal state, or window with required onWindowChange for controlled state. Live callbacks return one domain rectangle; onWindowChangeEnd reports completed gestures and commands.',
     'A quiet Overview icon opens the complete visible grid in Dialog. Move or resize its rectangular window directly. Two fingers pan and pinch the main grid without selecting or activating. Closing retains the range and restores focus. The main frame reserves height for source rows and the label/eye header within its existing size limit. Its height stays fixed during navigation and hiding; narrow layouts stagger column labels. Viewport changes preserve the color domain, missing cells, zeros and the complete source table.',
     'Hidden rows and columns close their gaps in both views. The restore control remains available when a hidden track is outside the window. Selections retain their row and column IDs outside the viewport, while reading and activation target only visible cells.',
@@ -718,6 +721,7 @@ export const lineChartContract: ComponentContract = {
   controlBehavior: [
     ...lineChartBaseContract.controlBehavior,
     explorationCommands,
+    explorationKeyboard,
     'Opt-in exploration keeps a domain window separate from the complete source and table. Supply labels and optionally defaultWindow for internal state, or window with required onWindowChange for application control. onWindowChange reports live domain values; onWindowChangeEnd reports completed gestures and commands. Date axes return Dates. minimumSpan is a fraction of the complete axis, greater than zero and at most one.',
     'Attached zoom, pan and reset buttons share the window with an Overview IconButton. Overview opens a horizontal full-data strip in Dialog. Move or resize the window directly, including by touch; closing keeps the range and returns focus. Two fingers pan or pinch the main chart and cancel pending selection or hold activation. Ordinary wheel scrolling remains available.',
     'The full window follows data updates. A zoomed window retains its domain values and clamps to updated bounds. Explicit data-axis domains constrain navigation; explicit value-axis limits stay fixed. Automatic values fit visible line geometry, including crossings between recorded points. Outside-window selection stays selected and full data remains in the table. Hidden series leave both plot and overview; their data and selection remain available.',
@@ -781,6 +785,7 @@ const areaChartBaseContract = chartContract({
 
 const cartesianExplorationBehavior = [
   explorationCommands,
+  explorationKeyboard,
   'Optional exploration shares the LineChart domain-window contract: labels, defaultWindow or controlled window with onWindowChange, completion through onWindowChangeEnd, and fractional minimumSpan. Categorical windows use complete bands and stable ordered values. Full source tables and selections outside the window remain available.',
   'Attached zoom, pan and reset controls share an Overview icon. It opens a horizontal full-data strip in Dialog, with the chart’s own area, grouped, stacked or normalized geometry and current series visibility. Horizontal bars transpose their categories into this strip. Closing retains the range and returns focus; navigation and opening the dialog do not resize the main chart.',
   'Two fingers pan and pinch the main chart without selecting or activating. Overview dragging follows immediately; keyboard and reset changes animate unless reduced motion is requested. Automatic values fit visible geometry, including columns crossing a numeric viewport edge. Stacks and normalized shares use the visible series. Application callbacks retain full-source row identities.',
@@ -1301,6 +1306,7 @@ function statisticalChartContract({
       ...(pointInteraction
         ? [
             explorationCommands,
+            explorationKeyboard,
             'Optional exploration uses independent numeric x and y windows through ChartRectangularExploration. Supply labels for navigation, corners and the complete range. Use defaultWindow for internal state, or window with required onWindowChange for application control. onWindowChange emits one rectangle per live change; onWindowChangeEnd reports completed gestures or commands. minimumSpan sets a fractional minimum for each axis.',
             'The Overview icon opens a proportional full-data map in Dialog. Drag the window or its corners directly, or draw a new rectangle. Closing keeps the range and restores focus. Two fingers pan or pinch the main chart and cancel pending selection or hold activation. Pointer navigation follows immediately, keyboard and reset changes animate, and reduced motion removes those transitions.',
             'Navigation keeps the complete source table and selections outside the window. Only visible observations can be read or activated. Empty windows retain axes and navigation. Full valid visible observations define reset bounds, explicit axis limits constrain exploration, and logarithmic windows navigate in log space. Bubble magnitude sizing is independent of the viewport. Hidden groups leave the plot and map together.',
@@ -1311,6 +1317,7 @@ function statisticalChartContract({
       ...(!pointInteraction
         ? [
             explorationCommands,
+            explorationKeyboard,
             'Optional exploration uses the shared ChartExploration labels and controlled or internal window ownership. Histogram windows report original bin boundaries and show complete bins prepared from the full source. Counts, ordinates and boundary inclusivity do not change with navigation. BoxPlot windows report ordered stable group IDs and retain each summary, whisker and outlier.',
             'The Overview icon opens a horizontal distribution strip in Dialog. Zoom, pan, reset and direct window dragging share one range. Two fingers pan and pinch the main chart without selecting or activating. Closing keeps the range and returns focus. Main-chart dimensions remain stable. Full tables and selections outside the window remain available; visible geometry controls automatic value-axis fitting.',
           ]

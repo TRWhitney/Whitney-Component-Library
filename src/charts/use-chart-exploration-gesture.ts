@@ -2,7 +2,7 @@ import type {PointerEvent} from 'react';
 import {useChartRectangularExplorationGesture} from './use-chart-rectangular-exploration-gesture.js';
 
 type Range = readonly [number, number];
-/** Use the shared touch arbitration with movement restricted to the chart's data axis. */
+/** Restrict shared touch and middle-button exploration to the chart's data axis. */
 export function useChartExplorationGesture({
   enabled,
   window,

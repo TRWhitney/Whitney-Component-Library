@@ -391,3 +391,34 @@ it('fits and targets a numeric column crossing the viewport edge', () => {
   fireEvent.keyDown(canvas, {key: 'Enter'});
   expect(activate.mock.calls[0]![0]).toMatchObject({item: {rowId: 'edge', seriesId: 'a'}});
 });
+
+it('pans a focused horizontal bar chart along its vertical category axis', () => {
+  const changed = vi.fn(),
+    activated = vi.fn();
+  const {container} = render(
+    <BarChart
+      {...common}
+      xAxis={vertical.yAxis}
+      yAxis={vertical.xAxis}
+      exploration={{...common.exploration, onWindowChange: changed}}
+      interaction={{target: 'category', getRowId: (row) => row.id, onActivate: activated}}
+    />,
+  );
+  const canvas = screen.getByRole('group', {name: 'Monthly values'});
+  const svg = container.querySelector<SVGSVGElement>('[data-wcl-chart-svg]')!;
+  Object.defineProperty(svg, 'getBoundingClientRect', {value: () => new DOMRect(0, 0, 640, 360)});
+  canvas.focus();
+  const pointer = {
+    pointerType: 'mouse',
+    pointerId: 1,
+    button: 1,
+    buttons: 4,
+    clientX: 250,
+    clientY: 150,
+  };
+  fireEvent.pointerDown(svg, pointer);
+  fireEvent.pointerMove(svg, {...pointer, clientY: -1000});
+  expect(changed.mock.lastCall![0]).toEqual(['Mar', 'May']);
+  fireEvent.pointerUp(svg, {...pointer, buttons: 0});
+  expect(activated).not.toHaveBeenCalled();
+});

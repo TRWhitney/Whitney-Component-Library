@@ -221,6 +221,32 @@ it('retains changes and restores trigger focus when the dialog closes', async ()
   await waitFor(() => expect(document.activeElement).toBe(trigger));
 });
 
+it('explores both axes from a focused chart command', () => {
+  const onChange = vi.fn<ChartRectangularExplorationControlsProps['onChange']>();
+  render(
+    <div data-wcl-chart-canvas="" role="group" tabIndex={0}>
+      <ChartRectangularExplorationControls
+        window={{x: [0.25, 0.75], y: [0.25, 0.75]}}
+        minimumSpan={{x: 0.1, y: 0.1}}
+        labels={labels}
+        rangeLabel="Middle"
+        fullRangeLabel="Full"
+        formatWindow={labels.range}
+        onChange={onChange}
+        overview={<svg />}
+        aspectRatio={2}
+      />
+    </div>,
+  );
+  const zoom = screen.getByRole('button', {name: 'Zoom in'});
+  zoom.focus();
+  fireEvent.keyDown(zoom, {key: 'ArrowUp'});
+  expect(onChange).toHaveBeenCalledOnce();
+  expect(onChange.mock.lastCall![0].y[0]).toBeGreaterThan(0.25);
+  fireEvent.keyDown(zoom, {key: '+'});
+  expect(onChange).toHaveBeenLastCalledWith({x: [0.375, 0.625], y: [0.375, 0.625]}, 'end');
+});
+
 it('groups up with left and down with right away from the axis title', () => {
   renderNavigator();
   fireEvent.click(screen.getByRole('button', {name: 'Done'}));
@@ -233,4 +259,26 @@ it('groups up with left and down with right away from the axis title', () => {
   expect(screen.getByRole('button', {name: 'Left'}).parentElement).not.toBe(
     screen.getByRole('button', {name: 'Right'}).parentElement,
   );
+});
+
+it('does not dispatch keyboard zoom when rounding puts the window at its minimum', () => {
+  const onChange = vi.fn<ChartRectangularExplorationControlsProps['onChange']>();
+  render(
+    <div data-wcl-chart-canvas="" role="group" aria-label="Chart" tabIndex={0}>
+      <ChartRectangularExplorationControls
+        window={{x: [0.45, 0.55], y: [0.45, 0.55]}}
+        minimumSpan={{x: 0.1, y: 0.1}}
+        labels={labels}
+        rangeLabel="Minimum"
+        fullRangeLabel="Full"
+        formatWindow={labels.range}
+        onChange={onChange}
+        overview={<svg />}
+        aspectRatio={2}
+      />
+    </div>,
+  );
+  expect(screen.getByRole('button', {name: labels.zoomIn}).hasAttribute('disabled')).toBe(true);
+  fireEvent.keyDown(screen.getByRole('group', {name: 'Chart'}), {key: '+'});
+  expect(onChange).not.toHaveBeenCalled();
 });

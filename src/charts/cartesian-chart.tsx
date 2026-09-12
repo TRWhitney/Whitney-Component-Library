@@ -2981,6 +2981,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
               >
                 <ChartExplorationControls
                   {...exploration}
+                  canvas={svgElement?.parentElement ?? null}
                   largeStepMultiplier={categoryPlacement === 'y' ? 2 : 3}
                   version={navigationVersion}
                   {...(categoryCount > 0 ? {step: 1 / categoryCount} : {})}

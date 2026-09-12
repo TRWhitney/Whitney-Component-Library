@@ -879,9 +879,11 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
     const bounds = grid?.getBoundingClientRect() ?? event.currentTarget.getBoundingClientRect();
     const left = first?.left ?? bounds.left;
     const top = first?.top ?? bounds.top;
+    const coordinate = (value: number) =>
+      event.pointerType === 'mouse' ? value : clamp(0, value, 1);
     return {
-      x: clamp(0, (event.clientX - left) / Math.max(1, bounds.right - left), 1),
-      y: clamp(0, (event.clientY - top) / Math.max(1, bounds.bottom - top), 1),
+      x: coordinate((event.clientX - left) / Math.max(1, bounds.right - left)),
+      y: coordinate((event.clientY - top) / Math.max(1, bounds.bottom - top)),
     };
   };
   const interactive = props.interaction !== undefined;
@@ -1112,6 +1114,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
             {explorationConfig ? (
               <ChartRectangularExplorationControls
                 {...explorationConfig}
+                canvas={canvasElement}
                 largeStepMultiplier={2}
                 version={JSON.stringify([domainIdentity, visibilityVersion, colorVersion])}
                 window={exploration.normalized}

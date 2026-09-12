@@ -3176,6 +3176,7 @@ function StatisticalFrame<Datum extends object>({
                   <ChartExplorationLayer svg={svgElement} plot={plot} panel={commandsInPanel}>
                     <ChartExplorationControls
                       {...(histogramExploration ?? boxExploration)}
+                      canvas={svgElement?.parentElement ?? null}
                       largeStepMultiplier={2}
                       version={navigationVersion}
                       {...(histogramExploration
@@ -3252,6 +3253,7 @@ function StatisticalFrame<Datum extends object>({
                   <ChartExplorationLayer svg={svgElement} plot={plot} panel={commandsInPanel}>
                     <ChartRectangularExplorationControls
                       {...exploration}
+                      canvas={svgElement?.parentElement ?? null}
                       version={navigationVersion}
                       verticalPan={sidePan ? 'beside' : 'below'}
                       window={navigation.normalized}

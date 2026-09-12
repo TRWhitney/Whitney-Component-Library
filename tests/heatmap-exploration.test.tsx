@@ -326,3 +326,40 @@ it('manages crowded axes without restricting the full heatmap window', async () 
   fireEvent.click(within(dialog).getByRole('button', {name: 'Close restore list'}));
   await waitFor(() => expect(document.activeElement).toBe(manager));
 });
+
+it('pans focused cells to domain limits with a captured middle-button drag', () => {
+  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 300, 180));
+  const changed = vi.fn(),
+    completed = vi.fn(),
+    activated = vi.fn();
+  const {container} = render(
+    <Heatmap
+      {...common}
+      rows={[...common.rows, {id: 'c', label: 'East'}, {id: 'd', label: 'West'}]}
+      columns={[...common.columns, {id: 'z', label: 'Night'}, {id: 'w', label: 'Dawn'}]}
+      exploration={{
+        labels: explorationLabels,
+        defaultWindow: {x: ['x', 'x'], y: ['a', 'a']},
+        onWindowChange: changed,
+        onWindowChangeEnd: completed,
+      }}
+      interaction={{onActivate: activated}}
+    />,
+  );
+  const canvas = container.querySelector<HTMLElement>('[data-wcl-heatmap-canvas]')!;
+  canvas.focus();
+  const pointer = {
+    pointerType: 'mouse',
+    pointerId: 1,
+    button: 1,
+    buttons: 4,
+    clientX: 150,
+    clientY: 90,
+  };
+  fireEvent.pointerDown(canvas, pointer);
+  fireEvent.pointerMove(canvas, {...pointer, clientX: -1000, clientY: -1000});
+  expect(changed.mock.lastCall![0]).toEqual({x: ['w', 'w'], y: ['d', 'd']});
+  fireEvent.pointerUp(canvas, {...pointer, buttons: 0});
+  expect(completed).toHaveBeenCalledOnce();
+  expect(activated).not.toHaveBeenCalled();
+});

@@ -142,3 +142,75 @@ it('completes resizing within the minimum span and recenters clicks outside the 
   expect(next[1]).toBeCloseTo(0.55);
   expect(phase).toBe('end');
 });
+
+it('pans and zooms by default while a chart command owns focus', () => {
+  const onChange = vi.fn();
+  render(
+    <div data-wcl-chart-canvas="" role="group" tabIndex={0}>
+      <ChartExplorationControls
+        window={[0.25, 0.75]}
+        minimumSpan={0.1}
+        labels={labels}
+        rangeLabel="Middle"
+        fullRangeLabels={['First', 'Last']}
+        formatWindow={String}
+        onChange={onChange}
+        overview={<svg />}
+      />
+    </div>,
+  );
+  const zoom = screen.getByRole('button', {name: 'Zoom in'});
+  zoom.focus();
+  fireEvent.keyDown(zoom, {key: 'ArrowRight'});
+  expect(onChange).toHaveBeenLastCalledWith([0.41666666666666663, 0.9166666666666666], 'end');
+  fireEvent.keyDown(zoom, {key: '+'});
+  expect(onChange).toHaveBeenLastCalledWith([0.375, 0.625], 'end');
+});
+
+it('restores the canvas before the next key when a focused command becomes disabled', () => {
+  function Example() {
+    const [window, setWindow] = useState<readonly [number, number]>([0.25, 0.75]);
+    return (
+      <div data-wcl-chart-canvas="" role="group" aria-label="Chart" tabIndex={0}>
+        <ChartExplorationControls
+          window={window}
+          minimumSpan={0.1}
+          labels={labels}
+          rangeLabel="Window"
+          fullRangeLabels={['Start', 'End']}
+          formatWindow={() => 'Window'}
+          onChange={setWindow}
+          overview={<svg />}
+        />
+      </div>
+    );
+  }
+  render(<Example />);
+  const fit = screen.getByRole('button', {name: labels.reset});
+  fit.focus();
+  fireEvent.click(fit);
+  expect(document.activeElement).toBe(screen.getByRole('group', {name: 'Chart'}));
+  fireEvent.keyDown(document.activeElement!, {key: '+'});
+  expect((fit as HTMLButtonElement).disabled).toBe(false);
+});
+
+it('does not dispatch keyboard zoom when rounding puts the window at its minimum', () => {
+  const onChange = vi.fn();
+  render(
+    <div data-wcl-chart-canvas="" role="group" aria-label="Chart" tabIndex={0}>
+      <ChartExplorationControls
+        window={[0.45, 0.55]}
+        minimumSpan={0.1}
+        labels={labels}
+        rangeLabel="Minimum"
+        fullRangeLabels={['Start', 'End']}
+        formatWindow={() => 'Minimum'}
+        onChange={onChange}
+        overview={<svg />}
+      />
+    </div>,
+  );
+  expect(screen.getByRole('button', {name: labels.zoomIn}).hasAttribute('disabled')).toBe(true);
+  fireEvent.keyDown(screen.getByRole('group', {name: 'Chart'}), {key: '='});
+  expect(onChange).not.toHaveBeenCalled();
+});

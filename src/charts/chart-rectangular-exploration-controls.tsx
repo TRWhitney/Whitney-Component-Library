@@ -15,6 +15,7 @@ import {
   type SyntheticEvent,
 } from 'react';
 import {Button} from '../actions/button.js';
+import {useChartCommandInput} from './use-chart-command-input.js';
 import {IconButton} from '../actions/icon-button.js';
 import {Dialog} from '../overlays/dialog.js';
 import {ChartExplorationGlyph as Glyph} from './chart-exploration-glyph.js';
@@ -36,6 +37,7 @@ const corners: readonly ChartExplorationCorner[] = [
 ];
 
 export interface ChartRectangularExplorationControlsProps extends ChartExplorationPresentation {
+  readonly canvas?: HTMLElement | null;
   readonly version?: string;
   readonly largeStepMultiplier?: number;
   readonly step?: {readonly x: number; readonly y: number};
@@ -72,6 +74,7 @@ function stopPropagation(event: SyntheticEvent): void {
 }
 
 export function ChartRectangularExplorationControls({
+  canvas,
   presentation = 'chart',
   renderControls,
   version,
@@ -146,6 +149,25 @@ export function ChartRectangularExplorationControls({
   }
   const zoomInDisabled =
     span.x <= minimum('x') + Number.EPSILON && span.y <= minimum('y') + Number.EPSILON;
+  useChartCommandInput(
+    commandScope,
+    {
+      ArrowLeft: {run: () => pan('x', -1), disabled: window.x[0] <= 0},
+      ArrowRight: {run: () => pan('x', 1), disabled: window.x[1] >= 1},
+      ArrowUp: {
+        run: () => pan('y', -directionY),
+        disabled: yIncreasesDown ? window.y[0] <= 0 : window.y[1] >= 1,
+      },
+      ArrowDown: {
+        run: () => pan('y', directionY),
+        disabled: yIncreasesDown ? window.y[1] >= 1 : window.y[0] <= 0,
+      },
+      '+': {run: () => zoom(0.5), disabled: zoomInDisabled},
+      '=': {run: () => zoom(0.5), disabled: zoomInDisabled},
+      '-': {run: () => zoom(2), disabled: span.x >= 1 && span.y >= 1},
+    },
+    canvas,
+  );
   function finish(phase: 'end' | 'cancel'): void {
     const current = gesture.current;
     if (!current) return;

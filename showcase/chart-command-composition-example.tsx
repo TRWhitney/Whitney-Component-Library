@@ -18,7 +18,7 @@ const labels = {
   panDown: 'Pan down',
   window: 'Visible area',
   instructions:
-    'Drag the window or corners to change the visible range.',
+    'Drag the window or corners. On the chart and command buttons, arrows pan and plus/minus zoom. Shift plus arrows reads values.',
   corner: (corner: string) => `Resize ${corner}`,
   range: (window: ChartRectangularWindow<number, number>) =>
     `${window.x.map((v) => v.toFixed(1)).join(' to ')} area · ${window.y.map((v) => v.toFixed(1)).join(' to ')} energy`,
@@ -44,7 +44,7 @@ export function ChartCommandCompositionExample() {
       />
       <ScatterChart
         title="Building review"
-        description="Choose one command presentation for the same chart range."
+        description="Choose one command presentation. Focus the chart or a command, then use arrows to pan, plus/minus to zoom, or the wheel over the chart to zoom. Hold the middle mouse button over the plot and drag to pan."
         dataTableLabel="Building readings"
         data={points}
         idAccessor="id"

@@ -7699,6 +7699,11 @@
     vector-effect: non-scaling-stroke;
   }
 
+  [data-wcl-chart-panning],
+  [data-wcl-chart-panning] :is(g, path, circle, rect, line, polygon, polyline, ellipse, text, div) {
+    cursor: grabbing;
+  }
+
   [data-wcl-chart-feedback] {
     display: grid;
     place-items: center;

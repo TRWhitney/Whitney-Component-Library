@@ -34,7 +34,7 @@ export const labels = {
   corner: (c: string) => c,
   range: () => 'Window extent',
 };
-it('composes one command set in a public toolbar', () => {
+it('composes one command set in a public toolbar and keeps canvas and button shortcuts', () => {
   const change = vi.fn();
   render(
     <ScatterChart
@@ -58,6 +58,9 @@ it('composes one command set in a public toolbar', () => {
   const toolbar = screen.getByRole('toolbar', {name: 'Explore'});
   expect(screen.getAllByRole('button', {name: 'Zoom in'})).toHaveLength(1);
   const zoom = within(toolbar).getByRole('button', {name: 'Zoom in'});
-  fireEvent.click(zoom);
+  fireEvent.keyDown(zoom, {key: 'ArrowRight'});
   expect(change).toHaveBeenCalledOnce();
+  const canvas = screen.getByRole('group', {name: 'Energy'});
+  fireEvent.keyDown(canvas, {key: '+'});
+  expect(change).toHaveBeenCalledTimes(2);
 });

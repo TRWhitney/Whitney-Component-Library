@@ -10,7 +10,7 @@ interface Gesture {
   readonly distance: number;
   latest: Range;
 }
-/** Arbitrate native touch pointers before chart selection can commit. */
+/** Arbitrate touch exploration and focused middle-button panning before selection. */
 export function useChartRectangularExplorationGesture<Element extends HTMLElement | SVGSVGElement>({
   enabled,
   window,
@@ -28,6 +28,13 @@ export function useChartRectangularExplorationGesture<Element extends HTMLElemen
 }) {
   const points = useRef(new Map<number, Point>());
   const gesture = useRef<Gesture | null>(null);
+  const mouse = useRef<{
+    readonly pointerId: number;
+    readonly start: Coordinate;
+    readonly initial: Range;
+    readonly dispose: () => void;
+    latest: Range;
+  } | null>(null);
   const callbacks = useRef({onChange, onStart});
   useEffect(() => {
     callbacks.current = {onChange, onStart};
@@ -35,7 +42,22 @@ export function useChartRectangularExplorationGesture<Element extends HTMLElemen
   useEffect(() => {
     points.current.clear();
     gesture.current = null;
+    return () => {
+      const current = mouse.current;
+      mouse.current = null;
+      current?.dispose();
+    };
   }, [version, enabled]);
+  const finishMouse = (cancel: boolean) => {
+    const current = mouse.current;
+    if (!current) return;
+    mouse.current = null;
+    current.dispose();
+    callbacks.current.onChange(
+      cancel ? current.initial : current.latest,
+      cancel ? 'cancel' : 'end',
+    );
+  };
   const stop = (event: PointerEvent<Element>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -44,6 +66,47 @@ export function useChartRectangularExplorationGesture<Element extends HTMLElemen
     event: PointerEvent<Element>,
     coordinateAt: (event: PointerEvent<Element>) => Coordinate,
   ) => {
+    if (enabled && event.pointerType === 'mouse' && event.button === 1) {
+      const canvas = event.currentTarget.closest('[data-wcl-chart-canvas]');
+      const active = event.currentTarget.ownerDocument.activeElement;
+      const focused =
+        canvas &&
+        (active === canvas ||
+          (active instanceof HTMLButtonElement &&
+            active.closest('[data-wcl-chart-command-scope]')?.closest('figure') ===
+              canvas.closest('figure')));
+      if (!focused || mouse.current || gesture.current || points.current.size > 0) return;
+      stop(event);
+      callbacks.current.onStart();
+      const element = event.currentTarget;
+      const pointerId = event.pointerId;
+      const document = element.ownerDocument;
+      const cancelKey = (event: KeyboardEvent) => {
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        event.stopPropagation();
+        finishMouse(true);
+      };
+      const blur = () => finishMouse(true);
+      mouse.current = {
+        pointerId,
+        start: coordinateAt(event),
+        initial: window,
+        latest: window,
+        dispose: () => {
+          document.removeEventListener('keydown', cancelKey, true);
+          document.defaultView?.removeEventListener('blur', blur);
+          element.removeAttribute('data-wcl-chart-panning');
+          if (element.hasPointerCapture?.(pointerId)) element.releasePointerCapture(pointerId);
+        },
+      };
+      document.addEventListener('keydown', cancelKey, true);
+      document.defaultView?.addEventListener('blur', blur);
+      element.setAttribute('data-wcl-chart-panning', '');
+      element.setPointerCapture?.(pointerId);
+      return;
+    }
+    if (mouse.current) return;
     if (!enabled || event.pointerType !== 'touch') return;
     const p = coordinateAt(event);
     points.current.set(event.pointerId, {x: event.clientX, y: event.clientY, axis: p});
@@ -66,6 +129,26 @@ export function useChartRectangularExplorationGesture<Element extends HTMLElemen
     event: PointerEvent<Element>,
     coordinateAt: (event: PointerEvent<Element>) => Coordinate,
   ) => {
+    const pan = mouse.current;
+    if (pan && event.pointerId === pan.pointerId) {
+      stop(event);
+      if ((event.buttons & 4) === 0) {
+        finishMouse(false);
+        return;
+      }
+      const point = coordinateAt(event);
+      const nextAxis = (axis: 'x' | 'y'): readonly [number, number] => {
+        const span = pan.initial[axis][1] - pan.initial[axis][0];
+        const start = Math.max(
+          0,
+          Math.min(1 - span, pan.initial[axis][0] - (point[axis] - pan.start[axis]) * span),
+        );
+        return [start, start + span];
+      };
+      pan.latest = {x: nextAxis('x'), y: nextAxis('y')};
+      callbacks.current.onChange(pan.latest, 'change');
+      return;
+    }
     if (!enabled || event.pointerType !== 'touch' || !points.current.has(event.pointerId)) return;
     const p = coordinateAt(event);
     points.current.set(event.pointerId, {x: event.clientX, y: event.clientY, axis: p});
@@ -90,6 +173,11 @@ export function useChartRectangularExplorationGesture<Element extends HTMLElemen
     callbacks.current.onChange(current.latest, 'change');
   };
   const pointerEnd = (event: PointerEvent<Element>, cancel = false) => {
+    if (mouse.current?.pointerId === event.pointerId) {
+      stop(event);
+      finishMouse(cancel);
+      return;
+    }
     if (event.pointerType !== 'touch' || !points.current.has(event.pointerId)) return;
     points.current.delete(event.pointerId);
     const current = gesture.current;
@@ -105,6 +193,7 @@ export function useChartRectangularExplorationGesture<Element extends HTMLElemen
     }
   };
   const cancel = () => {
+    finishMouse(true);
     const current = gesture.current;
     gesture.current = null;
     points.current.clear();
