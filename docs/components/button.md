@@ -54,6 +54,7 @@ Button runs a command with native button and form behavior.
 
 ## Appearance and responsive behavior
 
+- Enabled Button uses a pointer cursor across its glyph, label, and padding. Disabled Button uses not-allowed; pending Button uses progress.
 - Button uses the library control height, rounded shape, type, and secondary, primary, quiet, or danger style.
 - Button keeps its minimum regular or compact control height and wraps long labels instead of clipping them when its container narrows.
 

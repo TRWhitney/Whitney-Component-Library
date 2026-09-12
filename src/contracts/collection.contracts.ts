@@ -216,6 +216,7 @@ export const listBoxContract = {
     'Labels are plain localized strings so locale-aware typeahead remains dependable.',
   ],
   controlBehavior: [
+    'Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.',
     'selectionMode explicitly chooses none, single, or multiple behavior. Controlled and uncontrolled selection use separate typed props.',
     'Dynamic item updates preserve collection focus when the focused stable id remains present.',
   ],
@@ -337,6 +338,7 @@ export const cardCollectionContract = {
     'Keep each card concise. Put commands in actions and declare selectionMode instead of attaching click behavior to the card surface.',
   ],
   controlBehavior: [
+    'Interactive card labels and whitespace use the pointer cursor. Disabled cards use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.',
     'selectionMode none keeps cards static. Single and multiple modes add collection focus and selection through typed controlled or uncontrolled props.',
     'Dynamic item updates preserve collection focus when the focused stable id remains present.',
   ],
@@ -464,6 +466,7 @@ export const tableContract = {
     'Sorting is application-owned. Reorder rows after onSortChange and pass the active descriptor back to Table.',
   ],
   controlBehavior: [
+    'Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.',
     'selectionMode explicitly chooses none, single, or multiple row selection through typed controlled or uncontrolled props.',
     'Sortable columns require onSortChange. Table reports a typed descriptor and never mutates or sorts consumer rows.',
     'Stable row ids preserve focus through insertion and reordering. Removing the focused row moves focus through the grid behavior.',
@@ -599,6 +602,7 @@ export const treeContract = {
     'Use hierarchy only when parent and child relationships change meaning. Keep labels concise and do not imitate indentation with spaces.',
   ],
   controlBehavior: [
+    'Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.',
     'Expansion and selection are separate controlled or uncontrolled typed states.',
     'Stable ids preserve focused items through insertion and reordering. Removing the focused item moves focus to a nearby remaining item.',
   ],

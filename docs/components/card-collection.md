@@ -36,6 +36,7 @@ CardCollection groups keyed summary cards while keeping static content, nested a
 
 ## Control, events, validation, and forms
 
+- Interactive card labels and whitespace use the pointer cursor. Disabled cards use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.
 - selectionMode none keeps cards static. Single and multiple modes add collection focus and selection through typed controlled or uncontrolled props.
 - Dynamic item updates preserve collection focus when the focused stable id remains present.
 - Selection callbacks use the same single or item-ordered multiple id values as ListBox. Nested actions own their own events.

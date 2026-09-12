@@ -52,6 +52,7 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 
 ## Appearance and responsive behavior
 
+- Enabled ToggleButton uses a pointer cursor across its label and padding. Disabled ToggleButton uses not-allowed.
 - ToggleButton uses the library control height, rounded shape, type, and secondary or quiet style with a selection rail.
 - ToggleButton keeps its minimum regular or compact control height and wraps long labels instead of clipping them when its container narrows.
 

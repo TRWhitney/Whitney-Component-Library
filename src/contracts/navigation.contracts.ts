@@ -5,6 +5,7 @@ const commonNavigationGuidance = {
     'The application accent marks focus and active route structure. Current location, selected content, and expanded content retain separate accessibility semantics.',
   ],
   accessibility: [
+    'Enabled links, tab controls, and disclosure triggers use a pointer cursor across their label and padding. Disabled controls use not-allowed; passive headings, current breadcrumb text, and panel content retain normal text selection.',
     'Visible labels, structural relationships, current state, and controlled state remain available to assistive technology without relying on color or motion.',
   ],
   directionality: [

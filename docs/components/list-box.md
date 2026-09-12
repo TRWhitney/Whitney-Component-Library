@@ -36,6 +36,7 @@ ListBox presents a visible keyed option collection with explicit none, single, o
 
 ## Control, events, validation, and forms
 
+- Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.
 - selectionMode explicitly chooses none, single, or multiple behavior. Controlled and uncontrolled selection use separate typed props.
 - Dynamic item updates preserve collection focus when the focused stable id remains present.
 - onSelectionChange reports one id or null in single mode and an item-ordered id array in multiple mode.

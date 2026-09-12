@@ -36,6 +36,7 @@ Tree navigates keyed hierarchical information with explicit expansion and option
 
 ## Control, events, validation, and forms
 
+- Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.
 - Expansion and selection are separate controlled or uncontrolled typed states.
 - Stable ids preserve focused items through insertion and reordering. Removing the focused item moves focus to a nearby remaining item.
 - onExpandedChange and onSelectionChange report ids in depth-first item order. Nested controls own their own events.

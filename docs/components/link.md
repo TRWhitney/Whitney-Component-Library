@@ -52,6 +52,7 @@ Link exposes a real navigation destination through native anchor semantics.
 
 ## Appearance and responsive behavior
 
+- Enabled Link uses a pointer cursor across its label and padding. Disabled Link uses not-allowed.
 - Link paints neutral text with an accent-bearing underline and no resting control surface; current, hover, focus, and disabled treatments remain distinct in both appearances.
 - Link remains inline with surrounding content and follows normal text wrapping at compact widths.
 

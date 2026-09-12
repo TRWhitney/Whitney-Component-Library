@@ -10,6 +10,7 @@ import {
   Stack,
   Switch,
   TextField,
+  InlineGroup,
   Tree,
 } from '../src/index.js';
 
@@ -89,6 +90,14 @@ export function CompactApplicationExample() {
             onChange={setQuery}
             reserveSupportSpace={reserve}
           />
+          <InlineGroup gap="regular">
+            <Button>Enabled action</Button>
+            <Button isDisabled>Disabled action</Button>
+            <Button isPending pendingLabel="Saving the example">
+              Pending action
+            </Button>
+          </InlineGroup>
+          <TextField label="Disabled field cursor" isDisabled defaultValue="Unavailable" />
           <Tree
             ariaLabel="Buildings"
             expandLabel="Expand campus"

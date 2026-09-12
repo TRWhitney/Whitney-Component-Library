@@ -52,6 +52,7 @@ Toolbar composes frequent related commands under one labeled arrow-key navigatio
 
 ## Appearance and responsive behavior
 
+- Child commands keep their own cursors. Toolbar spacing and passive content retain their normal cursor.
 - Toolbar draws a rounded neutral background and border around its preset gap and orientation.
 - Horizontal toolbars keep one command row with reachable inline overflow. Vertical toolbars stack and stretch their children.
 

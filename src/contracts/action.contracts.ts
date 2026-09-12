@@ -44,6 +44,7 @@ export const buttonContract = {
   ],
   appropriateUses: ['a user runs a command, confirms a choice, or submits or resets a form'],
   appearance: [
+    'Enabled Button uses a pointer cursor across its glyph, label, and padding. Disabled Button uses not-allowed; pending Button uses progress.',
     'Button uses the library control height, rounded shape, type, and secondary, primary, quiet, or danger style.',
   ],
   composition: [
@@ -150,6 +151,7 @@ export const iconButtonContract = {
     'a compact command has a familiar icon whose meaning can be stated by one short accessible label',
   ],
   appearance: [
+    'Enabled IconButton uses a pointer cursor across its glyph and padding. Disabled IconButton uses not-allowed.',
     'IconButton uses a square regular or compact control, rounded shape, and secondary, quiet, or danger treatment in both appearances.',
   ],
   composition: [
@@ -242,6 +244,7 @@ export const linkContract = {
   ],
   appropriateUses: ['activation navigates to a URL, resource, page, or in-page destination'],
   appearance: [
+    'Enabled Link uses a pointer cursor across its label and padding. Disabled Link uses not-allowed.',
     'Link paints neutral text with an accent-bearing underline and no resting control surface; current, hover, focus, and disabled treatments remain distinct in both appearances.',
   ],
   composition: [
@@ -333,6 +336,7 @@ export const toggleButtonContract = {
     'one command-like control represents a persistent binary selection such as pinned, muted, or bold',
   ],
   appearance: [
+    'Enabled ToggleButton uses a pointer cursor across its label and padding. Disabled ToggleButton uses not-allowed.',
     'ToggleButton uses the library control height, rounded shape, type, and secondary or quiet style with a selection rail.',
   ],
   composition: [
@@ -422,6 +426,7 @@ export const buttonGroupContract = {
   ],
   appropriateUses: ['a few related commands need a shared group and optional equal sizing'],
   appearance: [
+    'Child actions keep their own cursors. ButtonGroup spacing and passive content retain their normal cursor.',
     'ButtonGroup sets the gap, orientation, and optional equal-item layout but adds no background, border, text, or state color.',
   ],
   composition: [
@@ -519,6 +524,7 @@ export const toolbarContract = {
     'a compact, frequently used command surface needs one tab entry followed by orientation-aware arrow navigation',
   ],
   appearance: [
+    'Child commands keep their own cursors. Toolbar spacing and passive content retain their normal cursor.',
     'Toolbar draws a rounded neutral background and border around its preset gap and orientation.',
   ],
   composition: [

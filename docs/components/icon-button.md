@@ -52,6 +52,7 @@ IconButton presents a familiar icon-only command with required accessible guidan
 
 ## Appearance and responsive behavior
 
+- Enabled IconButton uses a pointer cursor across its glyph and padding. Disabled IconButton uses not-allowed.
 - IconButton uses a square regular or compact control, rounded shape, and secondary, quiet, or danger treatment in both appearances.
 - IconButton keeps its square regular or compact dimensions while its containing layout determines wrapping or overflow.
 

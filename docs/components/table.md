@@ -38,6 +38,7 @@ Table compares keyed records across typed columns with optional application-owne
 
 ## Control, events, validation, and forms
 
+- Interactive row labels and whitespace use the pointer cursor. Disabled rows use not-allowed while nested enabled controls keep their own cursor. Passive records retain text selection.
 - selectionMode explicitly chooses none, single, or multiple row selection through typed controlled or uncontrolled props.
 - Sortable columns require onSortChange. Table reports a typed descriptor and never mutates or sorts consumer rows.
 - Stable row ids preserve focus through insertion and reordering. Removing the focused row moves focus through the grid behavior.

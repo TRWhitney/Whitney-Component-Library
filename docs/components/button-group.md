@@ -52,6 +52,7 @@ ButtonGroup names and aligns related commands without changing their normal tab 
 
 ## Appearance and responsive behavior
 
+- Child actions keep their own cursors. ButtonGroup spacing and passive content retain their normal cursor.
 - ButtonGroup sets the gap, orientation, and optional equal-item layout but adds no background, border, text, or state color.
 - Horizontal groups keep their declared axis and allow equal child labels to wrap without clipping; choose vertical orientation when the complete horizontal group does not fit the containing region.
 
