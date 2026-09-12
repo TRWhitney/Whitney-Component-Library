@@ -1,3 +1,4 @@
+import {ChartSelectionPresentation} from './chart-selection-presentation.js';
 import {useChartDataMotion} from './use-chart-data-motion.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {curveLinear, line as createLine} from 'd3-shape';
@@ -16,7 +17,6 @@ import {
 } from 'react';
 import {createPortal} from 'react-dom';
 
-import {Button} from '../actions/button.js';
 import {chartActivationPointRadius} from './chart-activation.js';
 import {useChartInteraction, type InteractionPoint} from './chart-interaction.js';
 import {EmptyState} from '../feedback/empty-state.js';
@@ -1193,33 +1193,17 @@ export function Sparkline<Datum extends object, Position extends ChartDomainValu
       </figcaption>
       {content}
       {interaction?.selection ? (
-        <div data-wcl-chart-selection="">
-          <p id={`${descriptionId}-selection`}>{interaction.selection.labels.instructions}</p>
-          <div role="status" aria-atomic="true">
-            <p>
-              {actions.selected.length
-                ? interaction.selection.labels.summary(actions.selected.length)
-                : interaction.selection.labels.empty}
-            </p>
-            {actions.selected.length ? (
-              <ul>
-                {actions.selected.map((item) => (
-                  <li key={item.rowId}>{interaction.selection!.labels.item(item)}</li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-          <Button
-            variant="quiet"
-            isDisabled={!actions.selected.length}
-            onPress={() => {
-              actions.cancel();
-              actions.change([]);
-            }}
-          >
-            {interaction.selection.labels.clear}
-          </Button>
-        </div>
+        <ChartSelectionPresentation
+          selection={interaction.selection}
+          selected={actions.selected}
+          instructionsId={`${descriptionId}-selection`}
+          itemKey={(item) => item.rowId}
+          itemLabel={(item) => interaction.selection!.labels.item(item)}
+          onClear={() => {
+            actions.cancel();
+            actions.change([]);
+          }}
+        />
       ) : null}
     </figure>
   );

@@ -25,6 +25,7 @@ export function itemInteractionSetup<Item>(
     ...(selection
       ? {
           selection: {
+            ...(selection.presentation === undefined ? {} : {presentation: selection.presentation}),
             labels: {
               ...selection.labels,
               item: (item) => selection.labels.item(byId.get(item.rowId)!.item),

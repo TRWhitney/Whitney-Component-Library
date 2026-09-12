@@ -1,3 +1,4 @@
+import {ChartSelectionPresentation} from './chart-selection-presentation.js';
 import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {useAnimatedChartDomain} from './use-animated-chart-domain.js';
 import {useChartDataMotion} from './use-chart-data-motion.js';
@@ -18,7 +19,6 @@ import {
 } from 'react';
 import {createPortal} from 'react-dom';
 
-import {Button} from '../actions/button.js';
 import {itemInteractionSetup} from './item-interaction.js';
 import {useChartInteraction, type InteractionPoint} from './chart-interaction.js';
 import {EmptyState} from '../feedback/empty-state.js';
@@ -1437,42 +1437,27 @@ export function RadarChart<Datum extends object>(props: RadarChartProps<Datum>):
       </figcaption>
       {content}
       {setup?.selection ? (
-        <div data-wcl-chart-selection="">
-          <p id={`${descriptionId}-selection-instructions`}>
-            {setup.selection.labels.instructions}
-          </p>
-          <div role="status" aria-atomic="true">
-            <p>
-              {actions.selected.length
-                ? setup.selection.labels.summary(actions.selected.length)
-                : setup.selection.labels.empty}
-            </p>
-            {actions.selected.length ? (
-              <ul>
-                {actions.selected.map((item) => {
-                  const entry = entries.find((entry) => radarKey(entry.item) === item.rowId);
-                  const label = setup.selection!.labels.item(item);
-                  const hidden =
-                    entry?.item.seriesId === undefined
-                      ? model.series.length === 0
-                      : hiddenIds.includes(entry.item.seriesId);
-                  return (
-                    <li key={item.rowId}>
-                      {hidden ? setup.selection!.labels.hidden(label) : label}
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
-          </div>
-          <Button
-            variant="quiet"
-            isDisabled={!actions.selected.length}
-            onPress={() => actions.change([])}
-          >
-            {setup.selection.labels.clear}
-          </Button>
-        </div>
+        <ChartSelectionPresentation
+          selection={setup.selection}
+          selected={actions.selected}
+          instructionsId={`${descriptionId}-selection-instructions`}
+          itemKey={(item) => item.rowId}
+          itemLabel={(item) =>
+            (() => {
+              const entry = entries.find((entry) => radarKey(entry.item) === item.rowId);
+              const label = setup.selection!.labels.item(item);
+              const hidden =
+                entry?.item.seriesId === undefined
+                  ? model.series.length === 0
+                  : hiddenIds.includes(entry.item.seriesId);
+              return hidden ? setup.selection!.labels.hidden(label) : label;
+            })()
+          }
+          onClear={() => {
+            actions.cancel();
+            actions.change([]);
+          }}
+        />
       ) : null}
       {fullModel.series.length > 0 && status.kind !== 'loading' && status.kind !== 'error' ? (
         <RadarTable model={fullModel} props={props} hiddenIds={hiddenIds} />

@@ -1,3 +1,4 @@
+import {ChartSelectionPresentation} from './chart-selection-presentation.js';
 import {ChartExplorationControls} from './chart-exploration-controls.js';
 import {useChartExploration} from './use-chart-exploration.js';
 import {useChartExplorationGesture} from './use-chart-exploration-gesture.js';
@@ -3545,48 +3546,26 @@ function StatisticalFrame<Datum extends object>({
       </figcaption>
       {content}
       {configuration?.selection ? (
-        <div data-wcl-chart-selection="">
-          <p id={`${descriptionId}-selection-instructions`}>
-            {configuration.selection.labels.instructions}
-          </p>
-          <div aria-live="polite" aria-atomic="true">
-            <span>
-              {actions.selected.length
-                ? configuration.selection.labels.summary(actions.selected.length)
-                : configuration.selection.labels.empty}
-            </span>
-            {actions.selected.length ? (
-              <ul>
-                {actions.selected.map((item) => (
-                  <li key={selectionKey(item)}>
-                    {(() => {
-                      const label = configuration.selection!.labels.item(item);
-                      const seriesId =
-                        item.seriesId ||
-                        allReadings.find((reading) => reading.id === item.rowId)?.seriesId;
-                      return seriesId && hiddenIds.includes(seriesId)
-                        ? configuration.selection!.labels.hidden(label)
-                        : label;
-                    })()}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-          {actions.selected.length ? (
-            <button
-              type="button"
-              data-wcl-chart-clear-selection=""
-              onClick={() => {
-                actions.cancel();
-                actions.change([]);
-                rootElement?.querySelector<HTMLElement>('[data-wcl-chart-canvas]')?.focus();
-              }}
-            >
-              {configuration.selection.labels.clear}
-            </button>
-          ) : null}
-        </div>
+        <ChartSelectionPresentation
+          selection={configuration.selection}
+          selected={actions.selected}
+          instructionsId={`${descriptionId}-selection-instructions`}
+          itemKey={selectionKey}
+          itemLabel={(item) =>
+            (() => {
+              const label = configuration.selection!.labels.item(item);
+              const seriesId =
+                item.seriesId || allReadings.find((reading) => reading.id === item.rowId)?.seriesId;
+              return seriesId && hiddenIds.includes(seriesId)
+                ? configuration.selection!.labels.hidden(label)
+                : label;
+            })()
+          }
+          onClear={() => {
+            actions.cancel();
+            actions.change([]);
+          }}
+        />
       ) : null}
     </figure>
   );

@@ -35,6 +35,7 @@ Show magnitude across an ordered domain with overlap, stacked, or normalized are
 
 ## Control, events, validation, and forms
 
+- selection.presentation chooses one selection view: panel by default or controls for a compact count and clear action. The two views never render together. Both share the same selection and clear behavior; opening the count reveals localized interaction help. The panel keeps item names visible, while compact controls reveal them with the help.
 - AreaChart reads the nearest recorded category on pointer, keyboard, or touch input. Its tooltip reports visible series and each numeric reference line on the value axis, and never interpolates values between records or during scale animation.
 - Legend hover and focus emphasize one series. Click, Enter, or Space pins that emphasis; repeat the action or press Escape to clear it. Repeating the action also clears temporary hover/focus emphasis without moving keyboard focus. Emphasis never hides data, changes a domain, or filters records.
 - Optional visibilityLabels enables unboxed open/closed eye buttons alongside series names. Each eye hides or restores its series without changing name-based emphasis. Hidden entries keep their order, color, and pattern. Hiding clears that series pin; restoring it does not repin it.
@@ -59,7 +60,7 @@ Show magnitude across an ordered domain with overlap, stacked, or normalized are
 
 - The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The required visible title names one figure and the required description explains its point. One title-derived keyboard boundary announces the active category, visible series values, and comparable numeric reference lines. The SVG remains hidden from assistive technology while a generated native data table exposes every valid value, including hidden series whose headers identify them as hidden.
-- Selection instructions, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the target without adding a whole-chart focus outline.
+- On-demand selection help, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the target without adding a whole-chart focus outline.
 
 ## Keyboard, labeling, localization, and direction
 

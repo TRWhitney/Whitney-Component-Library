@@ -1,3 +1,4 @@
+import {ChartSelectionPresentation} from './chart-selection-presentation.js';
 import {ChartExplorationControls} from './chart-exploration-controls.js';
 import {ChartExplorationLayer} from './chart-exploration-layer.js';
 import {useChartExploration} from './use-chart-exploration.js';
@@ -3448,45 +3449,21 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
       ) : null}
       {content}
       {interaction?.selection ? (
-        <div data-wcl-chart-selection="">
-          <p id={`${descriptionId}-selection-instructions`}>
-            {interaction.selection.labels.instructions}
-          </p>
-          <div aria-live="polite" aria-atomic="true">
-            <span>
-              {actions.selected.length
-                ? interaction.selection.labels.summary(actions.selected.length)
-                : interaction.selection.labels.empty}
-            </span>
-            {actions.selected.length ? (
-              <ul>
-                {actions.selected.map((item) => {
-                  const label = interaction.selection!.labels.item(item);
-                  return (
-                    <li key={selectionKey(item)}>
-                      {item.seriesId && hiddenIds.includes(item.seriesId)
-                        ? interaction.selection!.labels.hidden(label)
-                        : label}
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
-          </div>
-          {actions.selected.length ? (
-            <button
-              type="button"
-              data-wcl-chart-clear-selection=""
-              onClick={() => {
-                actions.cancel();
-                actions.change([]);
-                rootElement?.querySelector<HTMLElement>('[data-wcl-chart-canvas]')?.focus();
-              }}
-            >
-              {interaction.selection.labels.clear}
-            </button>
-          ) : null}
-        </div>
+        <ChartSelectionPresentation
+          selection={interaction.selection}
+          selected={actions.selected}
+          instructionsId={`${descriptionId}-selection-instructions`}
+          itemKey={selectionKey}
+          itemLabel={(item) =>
+            item.seriesId && hiddenIds.includes(item.seriesId)
+              ? interaction.selection!.labels.hidden(interaction.selection!.labels.item(item))
+              : interaction.selection!.labels.item(item)
+          }
+          onClear={() => {
+            actions.cancel();
+            actions.change([]);
+          }}
+        />
       ) : null}
       {!isLoading && !isError && hasData ? (
         <>

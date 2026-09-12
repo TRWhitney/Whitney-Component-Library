@@ -1,5 +1,9 @@
+import {
+  SearchableTreeExample,
+  CollectionContextMenuExample,
+} from './collection-interaction-example.js';
 import {ContextMenuExample} from './context-menu-example.js';
-import {SearchableTreeExample, CollectionContextMenuExample} from './collection-interaction-example.js';
+import {ChartSelectionPresentationExample} from './chart-selection-presentation-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
 import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
 import {RadarDataMotionExample} from './radar-data-motion-example.js';
@@ -3662,7 +3666,8 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         their size on compact charts. Outlined pulses travel three screen pixels outward on each
         edge; pie slices keep their outline fade, and radar dimensions draw along the spoke. Reduced
         motion uses static feedback. Source data tables remain accessible without widening narrow
-        chart containers.
+        chart containers. Selection uses either a panel or compact controls; interaction help opens
+        from the selection count rather than occupying a permanent instruction block.
       </p>
       <Specimen
         description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference. Tab into the plot and use the arrow keys for keyboard readings; mouse readings clear when the pointer leaves the plot. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
@@ -3781,6 +3786,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         </Example>
         <Example label="Crowded time labels and a long axis title">
           <CompactAxisExample kind="time" />
+        </Example>
+        <Example label="Selection panel or compact chart controls">
+          <ChartSelectionPresentationExample />
         </Example>
       </Specimen>
 

@@ -1,4 +1,4 @@
-import {act, cleanup, fireEvent, render, screen} from '@testing-library/react';
+import {within, act, cleanup, fireEvent, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 import {
   Heatmap,
@@ -354,4 +354,37 @@ it('keeps the keyboard reading visible after scrolling its cell into view', () =
   fireEvent.scroll(container.querySelector('[data-wcl-heatmap-frame]')!);
   expect(screen.getByRole('tooltip').textContent).toContain('20 °C');
   expect(cell(container, 3).hasAttribute('data-active')).toBe(true);
+});
+
+it('shows selection details on demand in controls mode and returns focus after clearing', () => {
+  const {container} = render(
+    <Heatmap
+      {...common}
+      data={data}
+      interaction={{
+        selection: {
+          labels,
+          presentation: 'controls',
+          defaultSelectedItems: [{rowId: 'north', columnId: 'morning'}],
+        },
+      }}
+    />,
+  );
+  const controls = container.querySelector<HTMLElement>(
+    '[data-wcl-chart-selection][data-presentation="controls"]',
+  )!;
+  const ui = within(controls);
+  expect(controls).toBeTruthy();
+  expect(
+    container.querySelector('[data-wcl-chart-selection][data-presentation="panel"]'),
+  ).toBeNull();
+  expect(ui.queryByRole('list')).toBeNull();
+  const disclosure = container.querySelector('summary')!;
+  fireEvent.click(disclosure);
+  expect(ui.getByRole('list')).toBeTruthy();
+  fireEvent.keyDown(disclosure, {key: 'Escape'});
+  expect(ui.queryByRole('list')).toBeNull();
+  fireEvent.click(ui.getByRole('button', {name: labels.clear}));
+  expect(ui.getByRole('status').textContent).toBe(labels.empty);
+  expect(document.activeElement).toBe(container.querySelector('[data-wcl-chart-canvas]'));
 });

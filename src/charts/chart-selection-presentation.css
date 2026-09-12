@@ -1,0 +1,49 @@
+@layer wcl.components {
+  [data-wcl-chart-selection][data-presentation] {
+    margin-block: 0.5rem;
+  }
+
+  [data-wcl-chart-selection][data-presentation] p,
+  [data-wcl-chart-selection][data-presentation] ul {
+    margin-block: 0.375rem;
+  }
+
+  [data-wcl-chart-selection-controls] {
+    display: flex;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  [data-wcl-chart-selection-controls] summary {
+    cursor: pointer;
+    border: 1px solid var(--wcl-border);
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  [data-wcl-chart-selection-controls] summary > span {
+    display: inline;
+  }
+
+  [data-wcl-chart-selection-controls] summary:focus-visible {
+    outline: 2px solid var(--wcl-accent-focus);
+    outline-offset: 2px;
+  }
+
+  [data-wcl-chart-selection-details] {
+    max-inline-size: 32rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  [data-wcl-chart-selection][data-presentation='controls'] {
+    grid-row: 2;
+    margin-block: 0;
+  }
+
+  [data-wcl-chart-selection][data-presentation='panel'] {
+    padding: 0.5rem;
+    border: 1px solid var(--wcl-border);
+    border-radius: 0.375rem;
+  }
+}

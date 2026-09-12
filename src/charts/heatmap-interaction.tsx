@@ -1,5 +1,5 @@
 import {useLayoutEffect, useState} from 'react';
-import {Button} from '../actions/button.js';
+import {ChartSelectionPresentation} from './chart-selection-presentation.js';
 import {ChartActivationOutline, chartActivationOutset} from './chart-activation.js';
 import {
   useChartInteraction,
@@ -98,6 +98,7 @@ export function useHeatmapInteraction<Datum extends object>(
   };
   const controlledSelection: ChartSelection<HeatmapSelectionItem> | undefined = selection
     ? {
+        ...(selection.presentation === undefined ? {} : {presentation: selection.presentation}),
         labels: {
           ...selection.labels,
           item: (item) => {
@@ -223,27 +224,16 @@ export function HeatmapSelectionSummary({
 }) {
   const {setup, actions} = state;
   if (!setup?.selection) return null;
-  const {labels} = setup.selection;
   return (
-    <div data-wcl-chart-selection="">
-      <p id={id}>{labels.instructions}</p>
-      <div role="status" aria-atomic="true">
-        <p>{actions.selected.length ? labels.summary(actions.selected.length) : labels.empty}</p>
-        {actions.selected.length ? (
-          <ul>
-            {actions.selected.map((item) => (
-              <li key={item.rowId}>{labels.item(item)}</li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-      <Button
-        variant="quiet"
-        isDisabled={!actions.selected.length}
-        onPress={() => actions.change([])}
-      >
-        {labels.clear}
-      </Button>
-    </div>
+    <ChartSelectionPresentation
+      selection={setup.selection}
+      selected={actions.selected}
+      instructionsId={id}
+      itemKey={(item) => item.rowId}
+      onClear={() => {
+        actions.cancel();
+        actions.change([]);
+      }}
+    />
   );
 }

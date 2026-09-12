@@ -1,4 +1,4 @@
-import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import {within, act, cleanup, fireEvent, render} from '@testing-library/react';
 import {afterEach, expect, it, vi} from 'vitest';
 import {
   PieChart,
@@ -417,4 +417,32 @@ it('cancels pending gestures and feedback when activation availability changes',
   fireEvent.pointerUp(svg, {...p, pointerId: 1, pointerType: 'touch'});
   expect(onSelectionChange).not.toHaveBeenCalled();
   expect(container.querySelector('[data-wcl-radial-sweep]')).toBeNull();
+});
+
+it('shows selection details on demand in controls mode and returns focus after clearing', () => {
+  const {container} = render(
+    <PieChart
+      {...common}
+      interaction={{
+        selection: {...selection, presentation: 'controls', defaultSelectedItems: [{id: 'c1'}]},
+      }}
+    />,
+  );
+  const controls = container.querySelector<HTMLElement>(
+    '[data-wcl-chart-selection][data-presentation="controls"]',
+  )!;
+  const ui = within(controls);
+  expect(controls).toBeTruthy();
+  expect(
+    container.querySelector('[data-wcl-chart-selection][data-presentation="panel"]'),
+  ).toBeNull();
+  expect(ui.queryByRole('list')).toBeNull();
+  const disclosure = container.querySelector('summary')!;
+  fireEvent.click(disclosure);
+  expect(ui.getByRole('list')).toBeTruthy();
+  fireEvent.keyDown(disclosure, {key: 'Escape'});
+  expect(ui.queryByRole('list')).toBeNull();
+  fireEvent.click(ui.getByRole('button', {name: labels.clear}));
+  expect(ui.getByRole('status').textContent).toBe(labels.empty);
+  expect(document.activeElement).toBe(container.querySelector('[data-wcl-chart-canvas]'));
 });

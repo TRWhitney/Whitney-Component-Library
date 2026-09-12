@@ -1,4 +1,4 @@
-import {act, cleanup, fireEvent, render, screen} from '@testing-library/react';
+import {within, act, cleanup, fireEvent, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 import {
   Sparkline,
@@ -313,4 +313,33 @@ it('keyboard can distinguish records at duplicate positions and callbacks retain
     expect.objectContaining({item: {rowId: 'two'}, datum: records[2], position: 1, value: 2}),
   );
   expect(onActivate.mock.calls[0]![0].datum).toBe(records[2]);
+});
+
+it('shows selection details on demand in controls mode and returns focus after clearing', () => {
+  const {container} = render(
+    <Sparkline
+      {...common}
+      interaction={{
+        getRowId,
+        selection: {labels, presentation: 'controls', defaultSelectedItems: [{rowId: 'a'}]},
+      }}
+    />,
+  );
+  const controls = container.querySelector<HTMLElement>(
+    '[data-wcl-chart-selection][data-presentation="controls"]',
+  )!;
+  const ui = within(controls);
+  expect(controls).toBeTruthy();
+  expect(
+    container.querySelector('[data-wcl-chart-selection][data-presentation="panel"]'),
+  ).toBeNull();
+  expect(ui.queryByRole('list')).toBeNull();
+  const disclosure = container.querySelector('summary')!;
+  fireEvent.click(disclosure);
+  expect(ui.getByRole('list')).toBeTruthy();
+  fireEvent.keyDown(disclosure, {key: 'Escape'});
+  expect(ui.queryByRole('list')).toBeNull();
+  fireEvent.click(ui.getByRole('button', {name: labels.clear}));
+  expect(ui.getByRole('status').textContent).toBe(labels.empty);
+  expect(document.activeElement).toBe(container.querySelector('[data-wcl-chart-canvas]'));
 });

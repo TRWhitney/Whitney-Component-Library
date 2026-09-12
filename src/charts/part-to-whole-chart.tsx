@@ -1,3 +1,4 @@
+import {ChartSelectionPresentation} from './chart-selection-presentation.js';
 import {ChartVisibilityButton} from './chart-visibility-button.js';
 import {useAnimatedRadialAngles} from './use-animated-radial-angles.js';
 import {arc} from 'd3-shape';
@@ -1498,36 +1499,21 @@ function PartToWholeFrame<Datum extends object>({
       </figcaption>
       {content}
       {setup?.selection ? (
-        <div data-wcl-chart-selection="">
-          <p id={`${descriptionId}-selection-instructions`}>
-            {setup.selection.labels.instructions}
-          </p>
-          <div role="status" aria-atomic="true">
-            <p>
-              {actions.selected.length
-                ? setup.selection.labels.summary(actions.selected.length)
-                : setup.selection.labels.empty}
-            </p>
-            {actions.selected.length ? (
-              <ul>
-                {actions.selected.map((item) => (
-                  <li key={selectionKey(item)}>
-                    {segments.some((segment) => !segment.isAggregate && segment.id === item.rowId)
-                      ? setup.selection!.labels.item(item)
-                      : setup.selection!.labels.hidden(setup.selection!.labels.item(item))}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-          <Button
-            variant="quiet"
-            isDisabled={!actions.selected.length}
-            onPress={() => actions.change([])}
-          >
-            {setup.selection.labels.clear}
-          </Button>
-        </div>
+        <ChartSelectionPresentation
+          selection={setup.selection}
+          selected={actions.selected}
+          instructionsId={`${descriptionId}-selection-instructions`}
+          itemKey={selectionKey}
+          itemLabel={(item) =>
+            segments.some((segment) => !segment.isAggregate && segment.id === item.rowId)
+              ? setup.selection!.labels.item(item)
+              : setup.selection!.labels.hidden(setup.selection!.labels.item(item))
+          }
+          onClear={() => {
+            actions.cancel();
+            actions.change([]);
+          }}
+        />
       ) : null}
       {model.categories.length > 0 && status.kind !== 'loading' && status.kind !== 'error' ? (
         <PartToWholeTable

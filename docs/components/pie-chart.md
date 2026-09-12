@@ -35,6 +35,7 @@ Show category shares of one whole in a proportional pie with bounded paging.
 
 ## Control, events, validation, and forms
 
+- selection.presentation chooses one selection view: panel by default or controls for a compact count and clear action. The two views never render together. Both share the same selection and clear behavior; opening the count reveals localized interaction help. The panel keeps item names visible, while compact controls reveal them with the help.
 - With more than eight positive categories, the first page shows seven ordinary slices and one aggregate. Activating the aggregate opens the next eight ranked categories, with another aggregate when records remain. Back returns through prior pages.
 - Slice hover pops out the slice, mutes the others, and opens a cursor-following tooltip. Legend hover and focus use the same emphasis without a tooltip. A second activation releases the pin and temporary hover/focus emphasis without moving keyboard focus. Clicking a legend item pins that emphasis, another replaces it, and a repeat click or Escape clears it.
 - With selection enabled, click or tap toggles an ordinary category. Control/Command-click activates without changing selection. Touch press-and-hold activates once and release does not also select. Movement and pointer cancellation cancel a pending hold. Without selection, click or tap activates when onActivate is supplied.
@@ -55,7 +56,7 @@ Show category shares of one whole in a proportional pie with bounded paging.
 
 - The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The visible title names one figure and the description explains the part-to-whole question. One title-named keyboard boundary owns slice readings and page announcements. The SVG is hidden from assistive technology, and the generated native table retains every valid category, including zero values and categories outside the current page.
-- Optional selection adds localized instructions, a selected count, category names, off-page labels, and Clear selection outside the SVG. The aggregate announces containsSelection when its remaining categories include a selection and names hidden remaining categories with visibilityLabels.hidden.
+- Optional selection offers localized help, a selected count, category names, off-page labels, and Clear selection outside the SVG. The aggregate announces containsSelection when its remaining categories include a selection and names hidden remaining categories with visibilityLabels.hidden.
 
 ## Keyboard, labeling, localization, and direction
 

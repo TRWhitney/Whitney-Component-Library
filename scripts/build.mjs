@@ -24,20 +24,13 @@ await copyFile(
   resolve(distributionDirectory, 'styles.css'),
 );
 
-await copyFile(
-  resolve(projectRoot, 'src/charts/chart-exploration.css'),
-  resolve(distributionDirectory, 'charts/chart-exploration.css'),
-);
-
-await copyFile(
-  resolve(projectRoot, 'src/charts/chart-rectangular-exploration.css'),
-  resolve(distributionDirectory, 'charts/chart-rectangular-exploration.css'),
-);
-
-await copyFile(
-  resolve(projectRoot, 'src/charts/heatmap-exploration.css'),
-  resolve(distributionDirectory, 'charts/heatmap-exploration.css'),
-);
+for (const entry of await readdir(resolve(projectRoot, 'src/charts'))) {
+  if (!entry.endsWith('.css')) continue;
+  await copyFile(
+    resolve(projectRoot, 'src/charts', entry),
+    resolve(distributionDirectory, 'charts', entry),
+  );
+}
 
 const contractModule = await import(
   pathToFileURL(resolve(distributionDirectory, 'contracts', 'index.js')).href

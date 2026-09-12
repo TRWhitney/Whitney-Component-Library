@@ -34,6 +34,7 @@ Show a numeric distribution through contiguous intervals and an explicit ordinat
 
 ## Control, events, validation, and forms
 
+- selection.presentation chooses one selection view: panel by default or controls for a compact count and clear action. The two views never render together. Both share the same selection and clear behavior; opening the count reveals localized interaction help. The panel keeps item names visible, while compact controls reveal them with the help.
 - Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.
 - Optional HistogramInteraction<Datum> enables independent activation and selection. HistogramSelectionItem identifies a bin with kind: bin, lower, upper, and upperInclusive. Identity follows that complete interval, including its inclusion rule. Count updates preserve identity; changing thresholds does not transfer selection to a different interval.
 - Drag selects bin rectangles that intersect the drag rectangle, including zero-height bins at their rendered baseline.

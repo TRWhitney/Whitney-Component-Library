@@ -529,6 +529,7 @@ export interface ChartSelectionLabels<Item = ChartSelectionItem> {
 }
 
 export type ChartSelection<Item = ChartSelectionItem> = {
+  readonly presentation?: 'panel' | 'controls';
   readonly labels: ChartSelectionLabels<Item>;
 } & (
   | {

@@ -1,4 +1,4 @@
-import {act, cleanup, fireEvent, render, screen} from '@testing-library/react';
+import {within, act, cleanup, fireEvent, render, screen} from '@testing-library/react';
 import {afterEach, expect, it, vi} from 'vitest';
 import {RadarChart, type RadarSelectionItem, type RadarActivation} from '../src/index.js';
 type Profile = {id: string; label: string; speed: number; range: number; comfort: number};
@@ -469,4 +469,37 @@ it('uses the shared screen-space point pulse size for radar activation', () => {
   expect(
     Number(container.querySelector('[data-wcl-chart-activation-dot]')?.getAttribute('r')),
   ).toBe(10);
+});
+
+it('shows selection details on demand in controls mode and returns focus after clearing', () => {
+  const {container} = render(
+    <RadarChart
+      {...common}
+      interaction={{
+        target: 'point',
+        selection: {
+          labels,
+          presentation: 'controls',
+          defaultSelectedItems: [{dimensionId: 'speed', seriesId: 'a'}],
+        },
+      }}
+    />,
+  );
+  const controls = container.querySelector<HTMLElement>(
+    '[data-wcl-chart-selection][data-presentation="controls"]',
+  )!;
+  const ui = within(controls);
+  expect(controls).toBeTruthy();
+  expect(
+    container.querySelector('[data-wcl-chart-selection][data-presentation="panel"]'),
+  ).toBeNull();
+  expect(ui.queryByRole('list')).toBeNull();
+  const disclosure = container.querySelector('summary')!;
+  fireEvent.click(disclosure);
+  expect(ui.getByRole('list')).toBeTruthy();
+  fireEvent.keyDown(disclosure, {key: 'Escape'});
+  expect(ui.queryByRole('list')).toBeNull();
+  fireEvent.click(ui.getByRole('button', {name: labels.clear}));
+  expect(ui.getByRole('status').textContent).toBe(labels.empty);
+  expect(document.activeElement).toBe(container.querySelector('[data-wcl-chart-canvas]'));
 });

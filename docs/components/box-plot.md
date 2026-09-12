@@ -37,6 +37,7 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 
 ## Control, events, validation, and forms
 
+- selection.presentation chooses one selection view: panel by default or controls for a compact count and clear action. The two views never render together. Both share the same selection and clear behavior; opening the count reveals localized interaction help. The panel keeps item names visible, while compact controls reveal them with the help.
 - Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.
 - Legend hover and focus temporarily emphasize one distribution group. Click, Enter, or Space pins it. Repeat the action or press Escape to clear the pin and temporary hover/focus emphasis. Keyboard focus stays on the button.
 - Optional BoxPlotInteraction<Datum> requires getOutlierId for both raw and summary distributions. Return a stable nonempty string unique within its group. Its context contains kind, groupId, value, and the original datum; summary mode also supplies outlierIndex. Preserve the ID only while it identifies the same observation. Equal values and array positions are not stable observation identities.

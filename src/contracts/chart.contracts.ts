@@ -28,6 +28,8 @@ interface ChartContractOptions {
 
 const hiddenDataAlternative =
   'The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.';
+const selectionPresentation =
+  'selection.presentation chooses one selection view: panel by default or controls for a compact count and clear action. The two views never render together. Both share the same selection and clear behavior; opening the count reveals localized interaction help. The panel keeps item names visible, while compact controls reveal them with the help.';
 
 const activationTiming =
   'Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.';
@@ -91,6 +93,7 @@ function chartContract({
       'Use a specific title, one-sentence description, one to six short series labels, explicit axis labels and units, stable series ids, and only annotations that materially aid interpretation. Neutral or accent lines and bands are references; warning or danger lines and bands identify genuine semantic thresholds.',
     ],
     controlBehavior: [
+      selectionPresentation,
       `${name} reads the nearest recorded category on pointer, keyboard, or touch input. Its tooltip reports visible series and each numeric reference line on the value axis, and never interpolates values between records or during scale animation.`,
       'Legend hover and focus emphasize one series. Click, Enter, or Space pins that emphasis; repeat the action or press Escape to clear it. Repeating the action also clears temporary hover/focus emphasis without moving keyboard focus. Emphasis never hides data, changes a domain, or filters records.',
       'Optional visibilityLabels enables unboxed open/closed eye buttons alongside series names. Each eye hides or restores its series without changing name-based emphasis. Hidden entries keep their order, color, and pattern. Hiding clears that series pin; restoring it does not repin it.',
@@ -198,7 +201,7 @@ function partToWholeContract({
     accessibility: [
       hiddenDataAlternative,
       'The visible title names one figure and the description explains the part-to-whole question. One title-named keyboard boundary owns slice readings and page announcements. The SVG is hidden from assistive technology, and the generated native table retains every valid category, including zero values and categories outside the current page.',
-      'Optional selection adds localized instructions, a selected count, category names, off-page labels, and Clear selection outside the SVG. The aggregate announces containsSelection when its remaining categories include a selection and names hidden remaining categories with visibilityLabels.hidden.',
+      'Optional selection offers localized help, a selected count, category names, off-page labels, and Clear selection outside the SVG. The aggregate announces containsSelection when its remaining categories include a selection and names hidden remaining categories with visibilityLabels.hidden.',
     ],
     appearance: [
       'Ordinary slices remain proportional to one another. The aggregate uses a dashed boundary and bold +N count. It is proportional by default, while aggregateSizing="smallest" makes it smaller than every ordinary slice without changing their relative proportions.',
@@ -215,6 +218,7 @@ function partToWholeContract({
       `Use short category labels, one shared unit, a specific title, and a one-sentence description that states the comparison.${name === 'DonutChart' ? ' Center copy names the derived total.' : ''} Describe the aggregate as navigation over hidden records, never as a source category.`,
     ],
     controlBehavior: [
+      selectionPresentation,
       'With more than eight positive categories, the first page shows seven ordinary slices and one aggregate. Activating the aggregate opens the next eight ranked categories, with another aggregate when records remain. Back returns through prior pages.',
       'Slice hover pops out the slice, mutes the others, and opens a cursor-following tooltip. Legend hover and focus use the same emphasis without a tooltip. A second activation releases the pin and temporary hover/focus emphasis without moving keyboard focus. Clicking a legend item pins that emphasis, another replaces it, and a repeat click or Escape clears it.',
       'With selection enabled, click or tap toggles an ordinary category. Control/Command-click activates without changing selection. Touch press-and-hold activates once and release does not also select. Movement and pointer cancellation cancel a pending hold. Without selection, click or tap activates when onActivate is supplied.',
@@ -354,6 +358,7 @@ export const radarChartContract: ComponentContract = {
     'Keep dimension and series labels short. Use one unit and one shared interpretation for every value. Order dimensions deliberately because their adjacency shapes the polygon. Limit spokes and overlapping series to what remains readable.',
   ],
   controlBehavior: [
+    selectionPresentation,
     'Hidden profiles stay in the complete table with a localized hidden label. All-hidden recovery keeps the caption, legend, table and selected summary; Show all restores profiles and focuses the first eye. Hidden profiles cannot be read, selected by a gesture, activated or traversed by keyboard. Removing a profile ID drops its visibility state; value updates retain it.',
     'Pointer and touch readings emphasize one profile on one axis. Point mode reports the chosen profile; dimension mode reports all visible profiles on that axis. Radial guides reach exact values. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them.',
     'Legend hover and focus emphasize one series. Click, Enter, or Space pins it; another legend choice replaces it. A pinned series receives pointer priority where values are close or overlap. Repeat the pinned choice or press Escape to clear it. Repeating the choice also clears temporary hover/focus emphasis without moving keyboard focus. Emphasis never hides source data. Optional visibilityLabels adds a separate eye after each legend name. Hiding clears its pin and keeps its legend position, color and pattern. Hidden names cannot gain emphasis.',
@@ -475,11 +480,12 @@ export const heatmapContract: ComponentContract = {
     'Keep row and column labels concise and order both domains deliberately. Use one value meaning and unit throughout. Choose colors that match the measure, state what they mean in the description, and use a two-sided scale only when its midpoint has a real interpretation.',
   ],
   controlBehavior: [
+    selectionPresentation,
     'Optional exploration uses ChartRectangularExploration<string, string> with column IDs on x and row IDs on y. Windows include complete ordered tracks. Supply localized navigation, corner and range labels, defaultWindow for internal state, or window with required onWindowChange for controlled state. Live callbacks return one domain rectangle; onWindowChangeEnd reports completed gestures and commands.',
     'A quiet Overview icon opens the complete visible grid in Dialog. Move or resize its rectangular window directly. Two fingers pan and pinch the main grid without selecting or activating. Closing retains the range and restores focus. The main frame reserves height for source rows and the label/eye header within its existing size limit. Its height stays fixed during navigation and hiding; narrow layouts stagger column labels. Viewport changes preserve the color domain, missing cells, zeros and the complete source table.',
     'Hidden rows and columns close their gaps in both views. The restore control remains available when a hidden track is outside the window. Selections retain their row and column IDs outside the viewport, while reading and activation target only visible cells.',
 
-    'Selection follows the shared ChartSelection ownership model: selectedItems plus onSelectionChange is controlled; defaultSelectedItems initializes local state. Items retain row/column identity across reordering and value changes; unknown or removed coordinates are pruned. Localized instructions, count, item descriptions and a Clear selection action accompany selection.',
+    'Selection follows the shared ChartSelection ownership model: selectedItems plus onSelectionChange is controlled; defaultSelectedItems initializes local state. Items retain row/column identity across reordering and value changes; unknown or removed coordinates are pruned. Localized help, a count, item descriptions and a Clear selection action use the chosen panel or controls presentation.',
     'Pointer and touch readings begin only on an exact cell and report that row, column, and value. Pointer tooltips follow the cursor. Touch readings stay open until another reading or an outside press replaces them. Missing cells remain readable.',
     'Optional interaction selects cells by stable rowId and columnId. Click/tap toggles selection; Control/Command-click or touch hold activates without changing it. Without selection, ordinary click/tap activates. Rectangle dragging selects boxes it touches, replacing by default, adding with Shift or Control/Command, and removing with Alt. Escape, pointer cancellation, scrolling, data or geometry changes cancel the preview.',
     'Optional visibilityLabels enables individual row and column eyes. Hiding removes the entire track without leaving a blank row or column. Eyes reveal on label hover or keyboard focus and stay visible on touch. When exploration makes row or column eyes too crowded, one corner eye opens the same list with every source row and column. Its open/closed eyes hide and restore whole tracks without restricting zoom. The hidden count remains visible when nonzero, and toggling entries keeps the list and focus in place. Optional visibilityLabels.manage names this control; otherwise it uses the supplied row and column headings. Readable grids retain inline eyes. A permanently visible closed eye with the hidden-dimension count beside the row heading opens an overlaid restore list. Individual closed eyes restore dimensions; Show all restores every dimension.',
@@ -589,6 +595,7 @@ export const sparklineContract: ComponentContract = {
     'Use a specific title and one factual sentence that explains the domain and trend without claiming that change is good or bad. Keep one value meaning and unit throughout. Use a fixed range only when it preserves the same comparison meaning across charts.',
   ],
   controlBehavior: [
+    selectionPresentation,
     'Pointer reads the nearest recorded position and follows the cursor. Touch retains an exact reading until another reading or an outside press replaces it. Missing positions remain readable and report the localized missing label. Tooltips add the localized lowest or highest label when the active value matches an observed extreme and add no range label otherwise.',
     'With interaction.selection, click or tap toggles a recorded value. Horizontal dragging selects recorded values between its starting and ending positions. A drag replaces selection; Shift or Control/Command adds and Alt removes. Escape, pointer cancellation, or changes to data, geometry, status or interaction cancel the preview. Missing readings remain readable gaps and cannot be selected or activated; zero remains a target.',
     'Control/Command-click or touch press-and-hold activates independently when selection is enabled. Without selection, ordinary click or tap activates. Selection supports controlled selectedItems and onSelectionChange or uncontrolled defaultSelectedItems. Removed or missing readings are pruned by stable row ID without transferring selection to replacement records.',
@@ -688,7 +695,7 @@ export const lineChartContract: ComponentContract = {
   ...lineChartBaseContract,
   accessibility: [
     ...lineChartBaseContract.accessibility,
-    'Selection instructions describe the available gestures. A localized count, item names, hidden-item labels, and Clear selection expose the persistent selection outside the SVG. Application activation and selection are separate actions with keyboard equivalents.',
+    'On-demand selection instructions describe the available gestures. A localized count, item names, hidden-item labels, and Clear selection expose the persistent selection outside the SVG. Application activation and selection are separate actions with keyboard equivalents.',
   ],
   appearance: [
     ...lineChartBaseContract.appearance,
@@ -789,7 +796,7 @@ function interactiveBarContract(
     ],
     accessibility: [
       ...base.accessibility,
-      'Selection instructions, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the current bar or category without adding a whole-chart focus outline.',
+      'On-demand selection help, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the current bar or category without adding a whole-chart focus outline.',
     ],
     appearance: [
       ...base.appearance,
@@ -897,7 +904,7 @@ function interactiveAreaMixedContract(
     ...base,
     accessibility: [
       ...base.accessibility,
-      'Selection instructions, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the target without adding a whole-chart focus outline.',
+      'On-demand selection help, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the target without adding a whole-chart focus outline.',
     ],
     appearance: [
       ...base.appearance,
@@ -1278,6 +1285,7 @@ function statisticalChartContract({
     ],
     contentRules: [guidance.content],
     controlBehavior: [
+      selectionPresentation,
       ...(pointInteraction
         ? [
             'Optional exploration uses independent numeric x and y windows through ChartRectangularExploration. Supply labels for navigation, corners and the complete range. Use defaultWindow for internal state, or window with required onWindowChange for application control. onWindowChange emits one rectangle per live change; onWindowChangeEnd reports completed gestures or commands. minimumSpan sets a fractional minimum for each axis.',
