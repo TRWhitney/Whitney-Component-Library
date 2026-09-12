@@ -1,11 +1,11 @@
-import {
-  SearchableTreeExample,
-  CollectionContextMenuExample,
-} from './collection-interaction-example.js';
 import {ChartCommandCompositionExample} from './chart-command-composition-example.js';
 import {ChartApplicationGeometryExample} from './chart-application-geometry-example.js';
 import {ChartSelectionPresentationExample} from './chart-selection-presentation-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
+import {
+  SearchableTreeExample,
+  CollectionContextMenuExample,
+} from './collection-interaction-example.js';
 import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
 import {RadarDataMotionExample} from './radar-data-motion-example.js';
 import {SparklineDataMotionExample} from './sparkline-data-motion-example.js';

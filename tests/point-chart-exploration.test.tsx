@@ -310,15 +310,15 @@ it('preserves visible-group bubble sizing when a group is hidden during explorat
   expect(radius()).toBe(hidden);
 });
 
-it('clips exploring bubble marks to the plot so axes stay clear', () => {
+it('clips bubble marks at cropped window edges so axes stay clear', () => {
   const {container} = render(
     <BubbleChart
       {...common}
       magnitude={{accessor: 'size', label: 'Size'}}
-      exploration={{labels}}
+      exploration={{labels, defaultWindow: {x: [30, 70], y: [30, 70]}}}
     />,
   );
-  const mark = container.querySelector('[data-point-id="e"]')!;
+  const mark = container.querySelector('[data-point-id="c"]')!;
   const clipped = mark.closest('g[clip-path]')!;
   const clipId = clipped.getAttribute('clip-path')!.slice(5, -1);
   const rect = Array.from(container.querySelectorAll('clipPath'))

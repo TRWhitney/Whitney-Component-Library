@@ -1572,19 +1572,53 @@ function spatialTarget(
   return candidates[0]?.index ?? currentIndex;
 }
 
+function pointRadiusAtMagnitude(
+  kind: 'scatter' | 'bubble',
+  magnitudeRatio: number,
+  shape: number,
+  presentation: PresentationMetrics,
+): number {
+  if (kind === 'scatter')
+    return clamp(7.25, presentation.canvasWidth * 0.011, 11.25) / presentation.viewScale;
+  const radius =
+    (Math.sqrt(magnitudeRatio) * clamp(24, presentation.canvasWidth * 0.04, 42)) /
+    presentation.viewScale;
+  return radiusForEquivalentCircleArea(radius, shape);
+}
+
 function pointRadius<Datum extends object>(
   model: PointModel<Datum, 'scatter' | 'bubble'>,
   point: PreparedPoint,
   presentation: PresentationMetrics,
   maximum: number,
 ): number {
-  if (model.kind === 'scatter')
-    return clamp(7.25, presentation.canvasWidth * 0.011, 11.25) / presentation.viewScale;
-  const radius =
-    (Math.sqrt(point.magnitudeRatio ?? (point.magnitude ?? 0) / maximum) *
-      clamp(24, presentation.canvasWidth * 0.04, 42)) /
-    presentation.viewScale;
-  return radiusForEquivalentCircleArea(radius, point.series.shape);
+  return pointRadiusAtMagnitude(
+    model.kind,
+    point.magnitudeRatio ?? (point.magnitude ?? 0) / maximum,
+    point.series.shape,
+    presentation,
+  );
+}
+
+function pointOverviewPadding<Datum extends object>(
+  model: PointModel<Datum, 'scatter' | 'bubble'>,
+  presentation: PresentationMetrics,
+  maximumMagnitude: number,
+): number {
+  return Math.max(
+    0,
+    ...model.points.map(
+      (point) =>
+        (pointRadius(
+          model,
+          point,
+          {...presentation, canvasWidth: viewWidth, viewScale: 1},
+          maximumMagnitude,
+        ) +
+          5 / presentation.viewScale) *
+        (point.series.shape % 6 === 1 ? 0.85 * Math.SQRT2 : 1),
+    ),
+  );
 }
 
 function StatisticalPointOverview<Datum extends object>({
@@ -1604,8 +1638,13 @@ function StatisticalPointOverview<Datum extends object>({
   readonly xPosition: (value: number) => number;
   readonly yPosition: (value: number) => number;
 }): ReactElement {
+  const padding = pointOverviewPadding(model, presentation, maximumMagnitude);
   return (
-    <svg viewBox={`0 0 ${plotWidth(plot)} ${plotHeight(plot)}`} aria-hidden="true">
+    <svg
+      data-wcl-statistical-point-overview=""
+      viewBox={`${-padding} ${-padding} ${plotWidth(plot) + 2 * padding} ${plotHeight(plot) + 2 * padding}`}
+      aria-hidden="true"
+    >
       <g data-wcl-chart-marks="">
         {model.line ? (
           <SuppliedLine
@@ -1654,8 +1693,10 @@ function StatisticalMarks<Datum extends object>({
   projections,
   readings,
   opacityById,
+  pointScale = 1,
 }: {
   readonly opacityById?: ReadonlyMap<string, number>;
+  readonly pointScale?: number;
   readonly maximumMagnitude?: number;
   readonly activeIndex: number | null;
   readonly directIndex: number | null;
@@ -1704,7 +1745,7 @@ function StatisticalMarks<Datum extends object>({
           />
         ) : null}
         {pointRows.map(({index, point, reading}) => {
-          const radius = pointRadius(model, point, presentation, maximum);
+          const radius = pointRadius(model, point, presentation, maximum) * pointScale;
           return (
             <g
               data-active={activeIndex === index ? '' : undefined}
@@ -2243,11 +2284,13 @@ function StatisticalFrame<Datum extends object>({
   );
   const stripNavigation = histogramExploration ? histogramNavigation : boxNavigation;
   const [navigationDragging, setNavigationDragging] = useState(false);
+  const gesturePlot = useRef<PlotBounds | null>(null);
   const changeWindow = (
     range: ChartRectangularWindow<number, number>,
     phase: 'change' | 'end' | 'cancel',
   ) => {
     setNavigationDragging(phase === 'change');
+    if (phase !== 'change') gesturePlot.current = null;
     navigation.change(range, phase);
   };
   const changeStripWindow = (
@@ -2386,10 +2429,23 @@ function StatisticalFrame<Datum extends object>({
         staggerLabels: sidePan && basePresentation.staggerLabels,
       }
     : basePresentation;
-  const basePlot = plotForPresentation(presentation, canvasHeight);
+  const measuredPlot = plotForPresentation(presentation, canvasHeight);
+  // Reserve all declared shapes so visibility changes cannot jump animated axis positions.
+  const sizingPointModel =
+    fullModel.kind === 'scatter' || fullModel.kind === 'bubble' ? fullModel : undefined;
+  const pointExtent = sizingPointModel
+    ? Math.max(
+        0,
+        ...sizingPointModel.series.map(
+          (series) =>
+            pointRadiusAtMagnitude(sizingPointModel.kind, 1, series.shape, presentation) *
+            (series.shape % 6 === 1 ? 0.85 * Math.SQRT2 : 1),
+        ),
+      )
+    : 0;
   const targetInitialPlot = sidePan
-    ? {...basePlot, right: basePlot.right - 38 / presentation.viewScale}
-    : basePlot;
+    ? {...measuredPlot, right: measuredPlot.right - 38 / presentation.viewScale}
+    : measuredPlot;
   const initialPlot = targetInitialPlot;
   const initialProjections = projectionsFor(viewportModel, initialPlot);
   const targetInitialProjections = projectionsFor(viewportModel, targetInitialPlot);
@@ -2450,7 +2506,25 @@ function StatisticalFrame<Datum extends object>({
     }),
   });
   const plot = plotMotion[0]!.value;
-  const projections = projectionsFor(model, plot);
+  // Keep the domain unchanged and move its endpoint ticks and marks inward together.
+  // Cropped edges retain their exact clipping boundary while full extent edges reserve cues.
+  const cuePadding = visiblePointModel ? (5 / presentation.viewScale) * 0.85 * Math.SQRT2 : 0;
+  const availablePointExtent = Math.max(
+    0,
+    Math.min(plotWidth(plot), plotHeight(plot)) / 4 - cuePadding,
+  );
+  // Keep at least half the plot for data positions; one scale preserves bubble area ratios.
+  const pointScale = pointExtent > 0 ? Math.min(1, availablePointExtent / pointExtent) : 1;
+  const pointPadding = pointExtent * pointScale + cuePadding;
+  const horizontalInset = Math.min(pointPadding, Math.max(0, (plotWidth(plot) - 1) / 2));
+  const verticalInset = Math.min(pointPadding, Math.max(0, (plotHeight(plot) - 1) / 2));
+  const dataPlot = {
+    left: plot.left + (!exploration || navigation.normalized.x[0] === 0 ? horizontalInset : 0),
+    right: plot.right - (!exploration || navigation.normalized.x[1] === 1 ? horizontalInset : 0),
+    top: plot.top + (!exploration || navigation.normalized.y[1] === 1 ? verticalInset : 0),
+    bottom: plot.bottom - (!exploration || navigation.normalized.y[0] === 0 ? verticalInset : 0),
+  };
+  const projections = projectionsFor(model, dataPlot);
   const displayedPoint = (point: PreparedPoint): PreparedPoint => {
     const displayed = liveMotion.get(pointKey(point))?.value;
     return displayed
@@ -2660,6 +2734,11 @@ function StatisticalFrame<Datum extends object>({
     sourceData,
   );
   const maximumMagnitude = targetMaximumMagnitude;
+  const overviewPadding = visiblePointModel
+    ? pointOverviewPadding(visiblePointModel, presentation, maximumMagnitude)
+    : 0;
+  const overviewWidth = plotWidth(plot) + 2 * overviewPadding;
+  const overviewHeight = plotHeight(plot) + 2 * overviewPadding;
   const points: DistributionPoint[] = pointModel
     ? pointModel.points.map((point, index) => ({
         kind: 'point' as const,
@@ -2669,26 +2748,27 @@ function StatisticalFrame<Datum extends object>({
         categoryPosition: readings[index]!.x,
         seriesId: point.series.id,
         item: {rowId: point.id, seriesId: point.series.id},
-        radius: pointRadius(
-          pointModel,
-          liveMotion.get(pointKey(point))?.value ?? point,
-          presentation,
-          maximumMagnitude,
-        ),
+        radius:
+          pointRadius(
+            pointModel,
+            liveMotion.get(pointKey(point))?.value ?? point,
+            presentation,
+            maximumMagnitude,
+          ) * pointScale,
         shape: point.series.shape,
       }))
     : distributionGeometry;
-  // Allow complete boundary marks, but contain returning groups while the axes expand.
-  const markPadding =
+  // Distribution marks retain their existing cue margin; point marks fit within the axes.
+  const distributionPadding =
     points.reduce((padding, point) => Math.max(padding, point.radius * Math.SQRT2), 0) +
-    2 / presentation.viewScale;
-  const marksBounds = exploration
+    5 / presentation.viewScale;
+  const marksBounds = pointModel
     ? plot
     : {
-        left: Math.max(0, plot.left - markPadding),
-        right: Math.min(viewWidth, plot.right + markPadding),
-        top: Math.max(0, plot.top - markPadding),
-        bottom: Math.min(canvasHeight, plot.bottom + markPadding),
+        left: Math.max(0, plot.left - distributionPadding),
+        right: Math.min(viewWidth, plot.right + distributionPadding),
+        top: Math.max(0, plot.top - distributionPadding),
+        bottom: Math.min(canvasHeight, plot.bottom + distributionPadding),
       };
   const inPlot = (x: number, y: number) =>
     x >= plot.left && x <= plot.right && y >= plot.top && y <= plot.bottom;
@@ -2754,6 +2834,9 @@ function StatisticalFrame<Datum extends object>({
     setPreviousNavigationVersion(navigationVersion);
     setNavigationDragging(false);
   }
+  useEffect(() => {
+    gesturePlot.current = null;
+  }, [navigationVersion]);
   const navigationGesture = useChartRectangularExplorationGesture<SVGSVGElement>({
     enabled:
       !!exploration && visibleHasData && status.kind !== 'loading' && status.kind !== 'error',
@@ -2761,6 +2844,7 @@ function StatisticalFrame<Datum extends object>({
     minimumSpan: navigation.minimumSpan,
     onChange: changeWindow,
     onStart: () => {
+      gesturePlot.current = dataPlot;
       actions.cancel();
       setPointerReadingId(null);
       setTouchReadingId(null);
@@ -2789,9 +2873,10 @@ function StatisticalFrame<Datum extends object>({
   });
   const gestureCoordinate = (event: PointerEvent<SVGSVGElement>) => {
     const point = viewBoxPointFromPointer(event.currentTarget, event.clientX, event.clientY);
+    const bounds = gesturePlot.current ?? dataPlot;
     return {
-      x: (point.x - plot.left) / plotWidth(plot),
-      y: (plot.bottom - point.y) / plotHeight(plot),
+      x: (point.x - bounds.left) / plotWidth(bounds),
+      y: (bounds.bottom - point.y) / plotHeight(bounds),
     };
   };
   const hasData = allReadings.length > 0;
@@ -3265,7 +3350,11 @@ function StatisticalFrame<Datum extends object>({
                         exploration.labels.range(navigation.fromNormalized(range))
                       }
                       onChange={changeWindow}
-                      aspectRatio={plotWidth(plot) / plotHeight(plot)}
+                      aspectRatio={overviewWidth / overviewHeight}
+                      overviewInset={{
+                        x: overviewPadding / overviewWidth,
+                        y: overviewPadding / overviewHeight,
+                      }}
                       overview={
                         <StatisticalPointOverview
                           model={visiblePointModel}
@@ -3369,7 +3458,7 @@ function StatisticalFrame<Datum extends object>({
                         height={plotHeight(plot)}
                       />
                     </clipPath>
-                    {visibilityLabels || explores ? (
+                    {visibilityLabels || explores || pointModel ? (
                       <clipPath id={marksClipId}>
                         <rect
                           x={marksBounds.left}
@@ -3385,6 +3474,7 @@ function StatisticalFrame<Datum extends object>({
                       {departureModel?.points.length ? (
                         <g pointerEvents="none" aria-hidden="true" data-wcl-chart-departures="">
                           <StatisticalMarks
+                            pointScale={pointScale}
                             activeIndex={null}
                             directIndex={null}
                             legendSeriesId={undefined}
@@ -3399,6 +3489,7 @@ function StatisticalFrame<Datum extends object>({
                         </g>
                       ) : null}
                       <StatisticalMarks
+                        pointScale={pointScale}
                         activeIndex={activeIndex}
                         directIndex={directIndex}
                         legendSeriesId={legendSeriesId}
@@ -3413,7 +3504,7 @@ function StatisticalFrame<Datum extends object>({
                     </g>
                     {interactive ? (
                       <g
-                        clipPath={`url(#${clipId})`}
+                        clipPath={`url(#${pointModel ? marksClipId : clipId})`}
                         data-wcl-chart-interaction-overlay=""
                         pointerEvents="none"
                       >

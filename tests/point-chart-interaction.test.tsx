@@ -271,8 +271,9 @@ it('hits each symbol rather than its surrounding rectangle and keeps the selecte
     value: () => ({left: 0, top: 0, width: 640, height: 360}),
   });
   const plot = container.querySelector('[data-wcl-chart-hit-region]')!;
-  const left = Number(plot.getAttribute('x')),
-    width = Number(plot.getAttribute('width'));
+  const ticks = container.querySelectorAll('[data-axis="x"] [data-wcl-chart-tick-mark]');
+  const left = Number(ticks[0]!.getAttribute('x1'));
+  const width = Number(ticks[ticks.length - 1]!.getAttribute('x1')) - left;
   const y = Number(plot.getAttribute('y')) + Number(plot.getAttribute('height')) / 2;
   for (let i = 0; i < 6; i++) {
     const at = {clientX: left + (width * observations[i]!.x) / 100, clientY: y};

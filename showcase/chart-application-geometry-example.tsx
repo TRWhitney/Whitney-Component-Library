@@ -1,11 +1,36 @@
 import {useState} from 'react';
-import {Button, InlineGroup, LineChart, ScatterChart, Stack} from '../src/index.js';
+import {
+  Button,
+  InlineGroup,
+  LineChart,
+  ScatterChart,
+  Stack,
+  type ChartRectangularExplorationLabels,
+} from '../src/index.js';
 
 const readings = [
   {id: 'elm', name: 'Elm Hall', area: 2400, energy: 188},
   {id: 'birch', name: 'Birch Hall', area: 5800, energy: 175},
   {id: 'cedar', name: 'Cedar Hall', area: 9400, energy: 151},
 ];
+
+const explorationLabels: ChartRectangularExplorationLabels<number, number> = {
+  overview: 'Boundary overview',
+  closeOverview: 'Close boundary overview',
+  done: 'Done',
+  reset: 'Fit buildings',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  panLeft: 'Pan left',
+  panRight: 'Pan right',
+  panUp: 'Pan up',
+  panDown: 'Pan down',
+  window: 'Building range',
+  instructions: 'Drag the window or a corner to change the visible range.',
+  corner: (corner) => `Resize ${corner} corner`,
+  range: ({x, y}) =>
+    `${Math.round(x[0])}–${Math.round(x[1])} m², ${Math.round(y[0])}–${Math.round(y[1])} kWh/m²`,
+};
 
 export function ChartApplicationGeometryExample({kind}: {readonly kind: 'line' | 'scatter'}) {
   const [aspectRatio, setAspectRatio] = useState(3);
@@ -22,7 +47,9 @@ export function ChartApplicationGeometryExample({kind}: {readonly kind: 'line' |
     data: readings,
     aspectRatio,
     description:
-      'Changing proportions reshapes the plot. Activating a reading inspects it immediately.',
+      kind === 'scatter'
+        ? 'Boundary marks stay inside the axes at full extent. Their tick positions retain the supplied values. Activate a reading to inspect it.'
+        : 'Changing proportions reshapes the plot. Activating a reading inspects it immediately.',
     dataTableLabel: 'Building readings',
     emptyState: {title: 'No readings', description: 'Add a building reading.'},
     invalidData: {title: 'Invalid readings', description: 'Check the supplied building readings.'},
@@ -39,6 +66,9 @@ export function ChartApplicationGeometryExample({kind}: {readonly kind: 'line' |
         <ScatterChart
           {...common}
           title="Inspect building energy"
+          xAxis={{...common.xAxis, scale: {type: 'linear', domain: [2400, 9400]}}}
+          yAxis={{...common.yAxis, scale: {type: 'linear', domain: [151, 188]}}}
+          exploration={{labels: explorationLabels}}
           idAccessor="id"
           labelAccessor="name"
           legend={{label: 'Building status'}}

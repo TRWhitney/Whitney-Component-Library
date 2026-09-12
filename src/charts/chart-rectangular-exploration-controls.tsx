@@ -49,6 +49,7 @@ export interface ChartRectangularExplorationControlsProps extends ChartExplorati
   readonly formatWindow: (window: Window) => string;
   readonly onChange: (window: Window, phase: 'change' | 'end' | 'cancel') => void;
   readonly overview: ReactNode;
+  readonly overviewInset?: {readonly x: number; readonly y: number};
   readonly aspectRatio: number;
   readonly yIncreasesDown?: boolean;
   readonly verticalPan?: 'below' | 'beside';
@@ -88,6 +89,7 @@ export function ChartRectangularExplorationControls({
   formatWindow,
   onChange,
   overview,
+  overviewInset = {x: 0, y: 0},
   aspectRatio,
   yIncreasesDown = false,
   verticalPan = 'below',
@@ -180,7 +182,13 @@ export function ChartRectangularExplorationControls({
   function pointerDown(event: PointerEvent<HTMLElement>, kind: Gesture['kind']): void {
     event.stopPropagation();
     if (event.button !== 0 || gesture.current || !navigator.current) return;
-    const bounds = navigator.current.getBoundingClientRect();
+    const outer = navigator.current.getBoundingClientRect();
+    const bounds = new DOMRect(
+      outer.left + outer.width * overviewInset.x,
+      outer.top + outer.height * overviewInset.y,
+      outer.width * (1 - 2 * overviewInset.x),
+      outer.height * (1 - 2 * overviewInset.y),
+    );
     if (bounds.width <= 0 || bounds.height <= 0) return;
     event.preventDefault();
     event.currentTarget.focus();
@@ -368,10 +376,10 @@ export function ChartRectangularExplorationControls({
             aria-describedby={instructionId}
             tabIndex={0}
             style={{
-              left: `${window.x[0] * 100}%`,
-              top: `${top * 100}%`,
-              width: `${span.x * 100}%`,
-              height: `${span.y * 100}%`,
+              left: `${(overviewInset.x + window.x[0] * (1 - 2 * overviewInset.x)) * 100}%`,
+              top: `${(overviewInset.y + top * (1 - 2 * overviewInset.y)) * 100}%`,
+              width: `${span.x * (1 - 2 * overviewInset.x) * 100}%`,
+              height: `${span.y * (1 - 2 * overviewInset.y) * 100}%`,
             }}
             onPointerDown={(event) => pointerDown(event, 'window')}
             onKeyDown={(event) => keyDown(event, 'window')}
@@ -384,8 +392,8 @@ export function ChartRectangularExplorationControls({
               aria-label={labels.corner(corner)}
               aria-describedby={instructionId}
               style={{
-                left: `${window.x[cornerIndex(corner, 'x')] * 100}%`,
-                top: `${(corner.startsWith('top') ? top : top + span.y) * 100}%`,
+                left: `${(overviewInset.x + window.x[cornerIndex(corner, 'x')] * (1 - 2 * overviewInset.x)) * 100}%`,
+                top: `${(overviewInset.y + (corner.startsWith('top') ? top : top + span.y) * (1 - 2 * overviewInset.y)) * 100}%`,
               }}
               onPointerDown={(event) => pointerDown(event, corner)}
               onKeyDown={(event) => keyDown(event, corner)}
