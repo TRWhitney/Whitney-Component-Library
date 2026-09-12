@@ -52,7 +52,7 @@ const reviewNotes = [
 
 export function MarkdownSpecimen() {
   const [value, setValue] = useState(reviewNotes);
-  const [mode, setMode] = useState<MarkdownEditorMode>('source');
+  const [mode, setMode] = useState<MarkdownEditorMode>('live-preview');
   const [size, setSize] = useState<MarkdownEditorSize>('regular');
   const [isRequired, setRequired] = useState(false);
   const [isInvalid, setInvalid] = useState(false);
@@ -68,6 +68,7 @@ export function MarkdownSpecimen() {
           label="Markdown mode"
           onChange={setMode}
           options={[
+            {label: 'Live Preview', value: 'live-preview'},
             {label: 'Source', value: 'source'},
             {label: 'Preview', value: 'preview'},
           ]}
@@ -94,7 +95,7 @@ export function MarkdownSpecimen() {
       </InlineGroup>
       <MarkdownEditor
         label="Markdown review notes"
-        description="Edit the source, then switch to Preview. Tab leaves the editor; returning to Source retains selection and undo history."
+        description="Edit formatted text in Live Preview. Move the cursor into a construct to reveal its Markdown; select across constructs to edit their source. Tab leaves the editor."
         errorMessage="Resolve the boundary review before saving these notes."
         isRequired={isRequired}
         isInvalid={isInvalid}
@@ -118,9 +119,16 @@ export function MarkdownSpecimen() {
         </Button>
       </InlineGroup>
       <p>
-        Preview renders headings, lists, tables, code, links, and footnotes. HTML stays literal;
-        wiki targets stay inert. Live Preview is planned for Ticket 25. Formatting commands, asset
-        callbacks, and wiki-link navigation are planned for Ticket 26.
+        Click the table or move into it with the keyboard to edit its complete pipe-delimited
+        source. Fenced code also reveals its complete source. Move outside the construct to see its
+        rendered form again. Inactive footnotes show the same heading and numbered entries as
+        Preview; click a footnote to edit its Markdown definition. Switching modes retains the
+        Markdown, selection, and undo history.
+      </p>
+      <p>
+        Links reveal their source while editing; use Preview to follow safe links. HTML stays
+        literal and wiki targets stay inert. Formatting commands, asset callbacks, and wiki-link
+        navigation are planned for Ticket 26.
       </p>
     </Stack>
   );

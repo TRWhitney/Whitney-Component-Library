@@ -5,17 +5,9 @@ import {useEffect, useId, useRef, useState, type ReactElement, type SyntheticEve
 import {useFieldGroupDisabled} from '../fields/field-group-context.js';
 import {createSourceSession, type SourceSession} from './source-session.js';
 import {MarkdownPreview} from './markdown-preview.js';
-import type {MarkdownEditorLabels, MarkdownEditorProps} from './markdown-types.js';
+import type {MarkdownEditorProps} from './markdown-types.js';
 
-const englishLabels: MarkdownEditorLabels = {
-  source: 'Markdown source',
-  preview: 'Preview',
-  emptyPreview: 'No content to preview.',
-  required: 'Enter Markdown content.',
-  footnotes: 'Footnotes',
-  footnoteBack: 'Back to reference',
-  position: (line, column) => `Line ${line}, column ${column}`,
-};
+import {englishLabels} from './markdown-labels.js';
 
 export function MarkdownEditor({
   defaultValue = '',
@@ -35,7 +27,7 @@ export function MarkdownEditor({
   reserveSupportSpace = false,
   form,
   name,
-  mode = 'source',
+  mode = 'live-preview',
   size = 'regular',
   labels = englishLabels,
   validate,
@@ -101,13 +93,15 @@ export function MarkdownEditor({
   });
   useEffect(() => {
     const parent = host.current;
-    if (!parent || mode !== 'source' || session.current) return;
+    if (!parent || mode === 'preview' || session.current) return;
     const active = document.activeElement === textarea.current;
     const editor = createSourceSession(
       parent,
       latest.current.currentValue,
       {
         attributes: {},
+        labels,
+        livePreview: mode === 'live-preview',
         isDisabled: latest.current.disabled,
         isReadOnly: latest.current.readonly,
       },
@@ -120,8 +114,8 @@ export function MarkdownEditor({
     );
     session.current = editor;
     setMounted(true);
-    if (active && latest.current.mode === 'source') editor.focus();
-  }, [mode]);
+    if (active && latest.current.mode !== 'preview') editor.focus();
+  }, [mode, labels]);
   useEffect(
     () => () => {
       session.current?.destroy();
@@ -132,6 +126,8 @@ export function MarkdownEditor({
   useEffect(() => {
     session.current?.configure({
       attributes,
+      labels,
+      livePreview: mode === 'live-preview',
       isDisabled: disabled,
       isReadOnly: readonly || mode === 'preview',
     });
@@ -213,9 +209,9 @@ export function MarkdownEditor({
       <label
         data-wcl-field-label=""
         id={labelId}
-        htmlFor={mode === 'source' ? sourceId : undefined}
+        htmlFor={mode !== 'preview' ? sourceId : undefined}
         onClick={() => {
-          if (mode === 'source' && !disabled) session.current?.focus();
+          if (mode !== 'preview' && !disabled) session.current?.focus();
         }}
       >
         {label}
@@ -265,11 +261,11 @@ export function MarkdownEditor({
           onInvalid={(event) => {
             event.preventDefault();
             setAttempted(true);
-            if (mode === 'source') session.current?.focus();
+            if (mode !== 'preview') session.current?.focus();
             else preview.current?.focus();
           }}
         />
-        <div ref={host} data-wcl-markdown-source="" hidden={mode !== 'source'} />
+        <div ref={host} data-wcl-markdown-source="" hidden={mode === 'preview'} />
         {mode === 'preview' ? (
           <div
             ref={preview}
@@ -290,8 +286,14 @@ export function MarkdownEditor({
         ) : null}
       </div>
       <div data-wcl-markdown-context="" id={contextId}>
-        <span>{mode === 'source' ? labels.source : labels.preview}</span>
-        {mode === 'source' ? <span>{labels.position(position.line, position.column)}</span> : null}
+        <span>
+          {mode === 'live-preview'
+            ? labels.livePreview
+            : mode === 'source'
+              ? labels.source
+              : labels.preview}
+        </span>
+        {mode !== 'preview' ? <span>{labels.position(position.line, position.column)}</span> : null}
       </div>
       <div data-wcl-field-support="">
         {description ? (

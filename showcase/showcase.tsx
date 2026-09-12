@@ -1331,7 +1331,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Collect multiline plain text with a deliberate initial height. Use TextField when line breaks carry no meaning, or MarkdownEditor for Markdown source editing and safe preview."
+        description="Collect multiline plain text with a deliberate initial height. Use TextField when line breaks carry no meaning, or MarkdownEditor for in-place Markdown authoring with Live Preview."
         name="TextArea"
       >
         <TextArea
@@ -1348,7 +1348,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Author one Markdown string in source mode and read its safe preview. Compose the mode control with SegmentedControl; the application owns its layout."
+        description="Author one Markdown string in Live Preview, reveal syntax at the cursor, and switch to source or reading preview. Compose the mode control with SegmentedControl; the application owns its layout."
         name="MarkdownEditor"
       >
         <MarkdownSpecimen />

@@ -7,19 +7,7 @@ import type {Root} from 'hast';
 import {remarkWikiLinks} from './wiki-syntax.js';
 import type {MarkdownEditorLabels} from './markdown-types.js';
 
-// react-markdown escapes HTML by default. No raw-HTML plugin or public renderer overrides.
-function safeUrl(url: string, key: string): string | undefined {
-  const clean = url.trim();
-  if (
-    !clean ||
-    [...clean].some((character) => character.charCodeAt(0) <= 32 || character.charCodeAt(0) === 127)
-  )
-    return undefined;
-  const scheme = /^([a-z][a-z\d+.-]*):/i.exec(clean)?.[1]?.toLowerCase();
-  if (scheme && scheme !== 'http' && scheme !== 'https' && !(key === 'href' && scheme === 'mailto'))
-    return undefined;
-  return clean;
-}
+import {safeUrl} from './markdown-url.js';
 
 // mdast's footnote heading uses a fixed ID. Scope every generated ID and local fragment to
 // this mounted field so multiple documents and server hydration agree.

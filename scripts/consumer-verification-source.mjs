@@ -344,6 +344,11 @@ const view = React.createElement(
               defaultValue: '# Packed Markdown',
               label: 'Packed Markdown source',
               name: 'markdown',
+              mode: 'source',
+            }),
+            React.createElement(MarkdownEditor, {
+              defaultValue: '# Live Markdown',
+              label: 'Packed Markdown Live Preview',
             }),
             React.createElement(MarkdownEditor, {
               defaultValue: '# Packed reading\\n\\nA note[^one].\\n\\n[^one]: Packed evidence.',
@@ -881,6 +886,9 @@ await new Promise((resolve) => setTimeout(resolve, 25));
 const packedSource = document.querySelector('[data-wcl-markdown-source] [role="textbox"]');
 if (!packedSource || packedSource.textContent !== '# Packed Markdown') {
   throw new Error('Packed Markdown source did not hydrate into the labeled editor.');
+}
+if (!document.querySelector('[data-mode="live-preview"] [role="heading"]')) {
+  throw new Error('Packed Markdown Live Preview did not hydrate its rendered heading.');
 }
 if (!document.querySelector('[data-wcl-markdown-preview] [data-footnotes]')) {
   throw new Error('Packed Markdown preview did not render footnotes.');

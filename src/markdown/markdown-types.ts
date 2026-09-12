@@ -5,10 +5,11 @@ import type {
   StringValueProps,
 } from '../fields/field-types.js';
 
-export type MarkdownEditorMode = 'source' | 'preview';
+export type MarkdownEditorMode = 'live-preview' | 'source' | 'preview';
 export type MarkdownEditorSize = 'compact' | 'regular' | 'expanded';
 
 export interface MarkdownEditorLabels {
+  readonly livePreview: string;
   readonly source: string;
   readonly preview: string;
   readonly emptyPreview: string;

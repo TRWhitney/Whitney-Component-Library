@@ -23,6 +23,7 @@ describe('Markdown editing', () => {
     const {container, getByRole} = render(
       <form>
         <MarkdownEditor
+          mode="source"
           defaultValue={value}
           description="Review before publishing."
           label="Document"
@@ -120,7 +121,7 @@ describe('Markdown editing', () => {
     const value = '# Heading\r\n\nunfinished **text\rlast\n';
     const onChange = vi.fn();
     const {getByRole} = render(
-      <MarkdownEditor label="Document" defaultValue={value} onChange={onChange} />,
+      <MarkdownEditor mode="source" label="Document" defaultValue={value} onChange={onChange} />,
     );
     fireEvent.keyDown(getByRole('textbox'), {key: 'Enter', code: 'Enter'});
     expect(onChange).toHaveBeenLastCalledWith('\n' + value);
@@ -147,7 +148,7 @@ describe('Markdown editing', () => {
   it('reports exact Markdown edits, keeps the same source control, and undoes after reading', async () => {
     const onChange = vi.fn();
     const {getByRole, rerender} = render(
-      <MarkdownEditor defaultValue="Original" label="Document" onChange={onChange} />,
+      <MarkdownEditor mode="source" defaultValue="Original" label="Document" onChange={onChange} />,
     );
     const editor = getByRole('textbox', {name: 'Document'});
     await replaceVisibleLine(editor, '**Changed');
@@ -161,7 +162,9 @@ describe('Markdown editing', () => {
       />,
     );
     expect(within(getByRole('region')).getByText('**Changed')).toBeTruthy();
-    rerender(<MarkdownEditor defaultValue="Original" label="Document" onChange={onChange} />);
+    rerender(
+      <MarkdownEditor mode="source" defaultValue="Original" label="Document" onChange={onChange} />,
+    );
     expect(getByRole('textbox')).toBe(editor);
     fireEvent.keyDown(editor, {key: 'z', code: 'KeyZ', ctrlKey: true});
     expect(onChange).toHaveBeenLastCalledWith('Original');
@@ -172,7 +175,7 @@ describe('Markdown editing', () => {
   it('accepts controlled updates and restores repeated rejected edits to the owner value', async () => {
     const onChange = vi.fn();
     const {getByRole, rerender} = render(
-      <MarkdownEditor value="Owned" label="Document" onChange={onChange} />,
+      <MarkdownEditor mode="source" value="Owned" label="Document" onChange={onChange} />,
     );
     const editor = getByRole('textbox');
     await replaceVisibleLine(editor, 'Attempt');
@@ -182,7 +185,14 @@ describe('Markdown editing', () => {
     expect(onChange).toHaveBeenCalledTimes(2);
     expect(onChange).toHaveBeenLastCalledWith('Attempt');
     expect(editor.textContent).toBe('Owned');
-    rerender(<MarkdownEditor value="External **update**" label="Document" onChange={onChange} />);
+    rerender(
+      <MarkdownEditor
+        mode="source"
+        value="External **update**"
+        label="Document"
+        onChange={onChange}
+      />,
+    );
     expect(getByRole('textbox')).toBe(editor);
     expect(editor.textContent).toBe('External **update**');
   });
@@ -190,7 +200,7 @@ describe('Markdown editing', () => {
   it('blocks native required submission, links its error, and focuses the visible editor', () => {
     const {container, getByRole} = render(
       <form>
-        <MarkdownEditor label="Document" name="body" isRequired />
+        <MarkdownEditor mode="source" label="Document" name="body" isRequired />
       </form>,
     );
     act(() => {
@@ -206,7 +216,13 @@ describe('Markdown editing', () => {
   it('reports ARIA validation without blocking native form submission', () => {
     const {container, getByRole} = render(
       <form>
-        <MarkdownEditor label="Document" name="body" isRequired validationBehavior="aria" />
+        <MarkdownEditor
+          mode="source"
+          label="Document"
+          name="body"
+          isRequired
+          validationBehavior="aria"
+        />
       </form>,
     );
     expect(container.querySelector('form')!.checkValidity()).toBe(true);
@@ -219,6 +235,7 @@ describe('Markdown editing', () => {
       <>
         <form id="document-form" />
         <MarkdownEditor
+          mode="source"
           form="document-form"
           label="Document"
           name="body"
@@ -243,6 +260,7 @@ describe('Markdown editing', () => {
   it('exposes read-only, locked, pending, and inherited disabled states', () => {
     const {getByRole, rerender, container} = render(
       <MarkdownEditor
+        mode="source"
         label="Document"
         defaultValue="Read me"
         isLocked
@@ -254,6 +272,7 @@ describe('Markdown editing', () => {
     expect(getByRole('textbox').getAttribute('aria-describedby')).toContain(lock.id);
     rerender(
       <MarkdownEditor
+        mode="source"
         label="Document"
         defaultValue="Read me"
         isPending
@@ -264,7 +283,7 @@ describe('Markdown editing', () => {
     expect(getByRole('status').textContent).toBe('Loading document.');
     rerender(
       <FieldGroup legend="Metadata" isDisabled>
-        <MarkdownEditor label="Document" defaultValue="Read me" />
+        <MarkdownEditor mode="source" label="Document" defaultValue="Read me" />
       </FieldGroup>,
     );
     expect(getByRole('textbox').getAttribute('tabindex')).toBe('-1');
@@ -275,12 +294,12 @@ describe('Markdown editing', () => {
     const onChange = vi.fn();
     const {container, getByRole, rerender} = render(
       <form>
-        <MarkdownEditor label="Document" value="Initial" onChange={onChange} />
+        <MarkdownEditor mode="source" label="Document" value="Initial" onChange={onChange} />
       </form>,
     );
     rerender(
       <form>
-        <MarkdownEditor label="Document" value="External" onChange={onChange} />
+        <MarkdownEditor mode="source" label="Document" value="External" onChange={onChange} />
       </form>,
     );
     await act(async () => {
@@ -294,7 +313,7 @@ describe('Markdown editing', () => {
   it('honors cancellation of form reset', async () => {
     const {container, getByRole} = render(
       <form onReset={(event) => event.preventDefault()}>
-        <MarkdownEditor label="Document" defaultValue="Initial" />
+        <MarkdownEditor mode="source" label="Document" defaultValue="Initial" />
       </form>,
     );
     await replaceVisibleLine(getByRole('textbox'), 'Changed');
@@ -307,33 +326,34 @@ describe('Markdown editing', () => {
 
   it('transfers focus between document modes when the document owns focus', () => {
     const {getByRole, rerender} = render(
-      <MarkdownEditor label="Document" defaultValue="# Reading" />,
+      <MarkdownEditor mode="source" label="Document" defaultValue="# Reading" />,
     );
     act(() => {
       getByRole('textbox').focus();
     });
     rerender(<MarkdownEditor label="Document" defaultValue="# Reading" mode="preview" />);
     expect(document.activeElement).toBe(getByRole('region'));
-    rerender(<MarkdownEditor label="Document" defaultValue="# Reading" />);
+    rerender(<MarkdownEditor mode="source" label="Document" defaultValue="# Reading" />);
     expect(document.activeElement).toBe(getByRole('textbox'));
   });
 
   it('allows Tab to leave an editor that becomes disabled while focused', () => {
-    const {getByRole, rerender} = render(<MarkdownEditor label="Document" />);
+    const {getByRole, rerender} = render(<MarkdownEditor mode="source" label="Document" />);
     const editor = getByRole('textbox');
     editor.focus();
-    rerender(<MarkdownEditor label="Document" isDisabled />);
+    rerender(<MarkdownEditor mode="source" label="Document" isDisabled />);
     const tab = new KeyboardEvent('keydown', {key: 'Tab', bubbles: true, cancelable: true});
     editor.dispatchEvent(tab);
     expect(tab.defaultPrevented).toBe(false);
   });
 
-  it('hydrates deterministic source and preview documents without duplicate accessible editors', async () => {
+  it('hydrates all three modes without duplicate accessible editors', async () => {
     function View() {
       const [value, setValue] = useState('# Source\n\nInitial text.');
       return (
         <AppearanceProvider accent="#2878ff" appearance="dark">
-          <MarkdownEditor label="Source" value={value} onChange={setValue} />
+          <MarkdownEditor mode="source" label="Source" value={value} onChange={setValue} />
+          <MarkdownEditor label="Live" defaultValue="# Live document" />
           <MarkdownEditor
             label="Reading"
             mode="preview"
@@ -355,7 +375,12 @@ describe('Markdown editing', () => {
       await Promise.resolve();
     });
     expect(onRecoverableError).not.toHaveBeenCalled();
-    await waitFor(() => expect(within(container).getAllByRole('textbox')).toHaveLength(1));
+    await waitFor(() => expect(within(container).getAllByRole('textbox')).toHaveLength(2));
+    expect(
+      within(within(container).getByRole('textbox', {name: 'Live'})).getByRole('heading', {
+        name: 'Live document',
+      }),
+    ).toBeTruthy();
     await act(async () => {
       root.unmount();
       await Promise.resolve();

@@ -9,9 +9,10 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 24, including the intervening Ticket 03A accent correction, are complete.
+Tickets 01 through 25, including the intervening Ticket 03A accent correction, are complete.
 Ticket 24 delivers Markdown source editing and safe preview with one retained editing session.
-In-place Live Preview remains the defining authoring experience and is next in Ticket 25.
+Ticket 25 adds default in-place Live Preview with context-sensitive source reveal.
+Commands, navigation, assets, and extensions are next in Ticket 26.
 Ticket 23 delivers the accepted [Energy desk prototype](../data-analysis-prototype/status.md)
 and all thirteen library fixes verified in that packed-consumer application.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
@@ -292,10 +293,12 @@ type, and contract conventions while adding only the behavior its data unit requ
 
 ## Frontier
 
-See the [decision map](map.md). [Ticket 24](tickets/24-markdown-source-and-preview.md) delivers
-MarkdownEditor, its canonical guidance and rendered specimen, packed React 18/19 compatibility,
-and editor bundle isolation. Its [verification record](../markdown-source-preview/verification.md)
-contains the behavior and browser evidence. [Ticket 25](tickets/25-markdown-live-preview.md) is next.
+See the [decision map](map.md). [Ticket 25](tickets/25-markdown-live-preview.md) delivers
+in-place Markdown authoring, its canonical guidance and rendered example, and verified keyboard,
+clipboard, composition, SSR/hydration, and large-document behavior. Its
+[verification record](../markdown-live-preview/verification.md) contains the completion evidence.
+[Ticket 26](tickets/26-markdown-commands-links-assets-and-extensions.md) is next.
+Whitney's deferred editor-state styling and showcase cleanup are recorded in Tickets 27 and 30.
 
 ## Accepted sources
 

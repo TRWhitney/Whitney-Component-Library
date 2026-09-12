@@ -266,7 +266,7 @@ export const textAreaContract = {
     'TextArea includes a label, resizable multiline shell, native textarea, and fixed support area.',
   ],
   preferredAlternatives: [
-    'Use TextField for one line, NumberField for numbers, and MarkdownEditor for Markdown source editing and safe preview.',
+    'Use TextField for one line, NumberField for numbers, and MarkdownEditor for Markdown authoring with in-place Live Preview, source editing, and safe reading preview.',
   ],
   preferredCompositions: [
     'Place related prose and metadata fields in FieldGroup or a named FormSection.',

@@ -3,10 +3,9 @@
 **What to build:** Formatting commands, typing shortcuts, wiki-link resolution, asset paste/drop,
 and bounded syntax/command/decoration extension seams for the Markdown surface.
 
-**Blocked by:** [Markdown Live Preview](25-markdown-live-preview.md),
-[File Trigger and Drop Zone](09-file-trigger-and-drop-zone.md), [Action Family](03-action-family.md)
+**Blocked by:** none. Live Preview, file handling, and action prerequisites are complete.
 
-**Status:** blocked
+**Status:** ready-for-agent
 
 - [ ] Keyboard and toolbar commands produce the same canonical Markdown transformations and retain
       predictable selection.
