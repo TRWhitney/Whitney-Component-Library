@@ -3,9 +3,11 @@ import {useLayoutEffect, useState, type CSSProperties, type ReactNode} from 'rea
 /** Place HTML controls against the rendered plot, including SVG letterboxing. */
 export function ChartExplorationLayer({
   svg,
+  panel = false,
   plot,
   children,
 }: {
+  readonly panel?: boolean;
   readonly svg: SVGSVGElement | null;
   readonly plot: {
     readonly left: number;
@@ -34,6 +36,7 @@ export function ChartExplorationLayer({
         '--wcl-exploration-right': `${parent.width - x - right * scale}px`,
         '--wcl-exploration-top': `${y + top * scale}px`,
         '--wcl-exploration-bottom': `${y + bottom * scale + 28}px`,
+        '--wcl-exploration-button-size': `${Math.max(28, Math.min(36, box.width / 18))}px`,
       } as CSSProperties;
       setStyle((current) => (JSON.stringify(current) === JSON.stringify(next) ? current : next));
     };
@@ -44,7 +47,7 @@ export function ChartExplorationLayer({
     return () => observer?.disconnect();
   }, [svg, left, right, top, bottom]);
   return (
-    <div data-wcl-chart-exploration-layer="" style={style}>
+    <div data-wcl-chart-exploration-layer="" data-panel={panel ? '' : undefined} style={style}>
       {children}
     </div>
   );

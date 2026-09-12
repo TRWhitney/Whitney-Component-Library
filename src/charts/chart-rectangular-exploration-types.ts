@@ -1,4 +1,8 @@
-import type {ChartDomainValue, ChartDomainWindow} from './chart-types.js';
+import type {
+  ChartDomainValue,
+  ChartDomainWindow,
+  ChartExplorationPresentation,
+} from './chart-types.js';
 
 export interface ChartRectangularWindow<X extends ChartDomainValue, Y extends ChartDomainValue> {
   readonly x: ChartDomainWindow<X>;
@@ -24,20 +28,23 @@ export interface ChartRectangularExplorationLabels<
   readonly corner: (corner: ChartExplorationCorner) => string;
   readonly range: (window: ChartRectangularWindow<X, Y>) => string;
 }
-export type ChartRectangularExploration<X extends ChartDomainValue, Y extends ChartDomainValue> = {
+export type ChartRectangularExploration<
+  X extends ChartDomainValue,
+  Y extends ChartDomainValue,
+> = ChartExplorationPresentation & {
   readonly labels: ChartRectangularExplorationLabels<X, Y>;
   /** Smallest fraction of each complete axis that a window can show. Defaults to .01. */
   readonly minimumSpan?: {readonly x?: number; readonly y?: number};
   readonly onWindowChangeEnd?: (window: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>) => void;
 } & (
-  | {
-      readonly window: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>;
-      readonly defaultWindow?: never;
-      readonly onWindowChange: (window: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>) => void;
-    }
-  | {
-      readonly window?: never;
-      readonly defaultWindow?: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>;
-      readonly onWindowChange?: (window: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>) => void;
-    }
-);
+    | {
+        readonly window: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>;
+        readonly defaultWindow?: never;
+        readonly onWindowChange: (window: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>) => void;
+      }
+    | {
+        readonly window?: never;
+        readonly defaultWindow?: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>;
+        readonly onWindowChange?: (window: ChartRectangularWindow<NoInfer<X>, NoInfer<Y>>) => void;
+      }
+  );

@@ -24,7 +24,7 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 
 ## Preferred higher-level compositions
 
-- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and zooming remain application-owned.
+- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and cross-chart coordination remain application-owned; optional exploration keeps the chart viewport in controlled or internal state.
 
 ## Content
 
@@ -43,6 +43,7 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 - Optional BoxPlotInteraction<Datum> requires getOutlierId for both raw and summary distributions. Return a stable nonempty string unique within its group. Its context contains kind, groupId, value, and the original datum; summary mode also supplies outlierIndex. Preserve the ID only while it identifies the same observation. Equal values and array positions are not stable observation identities.
 - BoxPlotSelectionItem identifies a group summary with kind: summary and groupId, or a separate outlier with kind: outlier, groupId, and outlierId. Selecting a summary does not select its contributing records or outliers.
 - Drag selects a summary when its central quartile box touches the rectangle, including a zero-spread box at its rendered median segment. Outliers are selected only when their centers are inside the rectangle.
+- Exploration renders one command set. presentation selects chart-edge controls or a panel. renderControls receives named overview, zoomIn, zoomOut, reset and pan nodes plus rangeLabel for composition in a public Toolbar; it replaces the native command regions and removes their empty margins. Both presentations share window callbacks, domain limits, focus, and responsive target sizing. Rectangular lower-edge controls pair left with up and right with down to leave the axis title clear.
 - Optional exploration uses the shared ChartExploration labels and controlled or internal window ownership. Histogram windows report original bin boundaries and show complete bins prepared from the full source. Counts, ordinates and boundary inclusivity do not change with navigation. BoxPlot windows report ordered stable group IDs and retain each summary, whisker and outlier.
 - The Overview icon opens a horizontal distribution strip in Dialog. Zoom, pan, reset and direct window dragging share one range. Two fingers pan and pinch the main chart without selecting or activating. Closing keeps the range and returns focus. Main-chart dimensions remain stable. Full tables and selections outside the window remain available; visible geometry controls automatic value-axis fitting.
 - Each legend eye hides or restores its group independently of name-based emphasis. Hidden entries retain legend order, colors, and shapes. Hidden names cannot emphasize invisible marks. Hiding clears that group pin; restoring does not repin it.

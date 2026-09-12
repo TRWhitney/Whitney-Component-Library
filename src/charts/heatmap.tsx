@@ -1100,9 +1100,18 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
         {allHidden && !explorationConfig ? (
           allHiddenContent
         ) : (
-          <div data-wcl-heatmap-visual="" data-exploration={explorationConfig ? '' : undefined}>
+          <div
+            data-wcl-heatmap-visual=""
+            data-exploration={explorationConfig ? '' : undefined}
+            data-exploration-panel={
+              explorationConfig?.presentation === 'panel' || explorationConfig?.renderControls
+                ? ''
+                : undefined
+            }
+          >
             {explorationConfig ? (
               <ChartRectangularExplorationControls
+                {...explorationConfig}
                 largeStepMultiplier={2}
                 version={JSON.stringify([domainIdentity, visibilityVersion, colorVersion])}
                 window={exploration.normalized}

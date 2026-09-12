@@ -1,6 +1,10 @@
 @layer wcl.components {
+  [data-wcl-chart-command-scope] {
+    display: contents;
+  }
+
   [data-wcl-chart-canvas][data-exploration] {
-    margin-block: 4rem 2.75rem;
+    margin-block: 2.5rem 2.25rem;
   }
 
   [data-wcl-chart-exploration-layer] {
@@ -60,7 +64,9 @@
 
   [data-wcl-chart-exploration-range] {
     min-inline-size: 0;
-    overflow-wrap: anywhere;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   [data-wcl-chart-exploration-buttons],
@@ -176,18 +182,69 @@
     touch-action: none;
   }
 
-  @media (width <= 600px) {
-    [data-wcl-chart-exploration-controls] {
-      flex-wrap: wrap;
-      gap: 0.125rem;
-    }
+  [data-wcl-chart-pan-edge] {
+    display: flex;
+    gap: 0.125rem;
+  }
 
-    [data-wcl-chart-exploration-range] {
-      flex-basis: 100%;
-    }
+  [data-wcl-chart-command-scope] [data-wcl-icon-button] {
+    inline-size: var(--wcl-exploration-button-size, 32px);
+    min-inline-size: var(--wcl-exploration-button-size, 32px);
+    block-size: var(--wcl-exploration-button-size, 32px);
+    min-block-size: var(--wcl-exploration-button-size, 32px);
+    padding: 0.25rem;
+  }
 
-    [data-wcl-chart-exploration-buttons] {
-      margin-inline-start: auto;
+  [data-wcl-chart-command-scope] [data-wcl-icon-button] svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  [data-wcl-chart-canvas][data-exploration-panel] {
+    margin-block: 0;
+    aspect-ratio: auto;
+  }
+
+  [data-wcl-chart-canvas][data-exploration-panel] > [data-wcl-chart-svg] {
+    block-size: auto;
+    aspect-ratio: var(--wcl-chart-aspect-ratio);
+  }
+
+  [data-wcl-chart-exploration-layer][data-panel] {
+    display: contents;
+  }
+
+  [data-wcl-chart-command-scope][data-presentation='panel'] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    padding-block: 0.25rem;
+    pointer-events: auto;
+  }
+
+  [data-wcl-chart-command-scope][data-presentation='panel']
+    :is(
+      [data-wcl-chart-exploration-controls],
+      [data-wcl-chart-exploration-pan],
+      [data-wcl-chart-exploration-vertical-pan]
+    ) {
+    position: static;
+    transform: none;
+    padding: 0;
+    gap: 0.25rem;
+  }
+
+  [data-wcl-chart-command-scope][data-presentation='panel'] [data-wcl-chart-exploration-controls] {
+    flex: 1 1 12rem;
+    min-inline-size: 0;
+  }
+
+  @media (pointer: coarse) {
+    [data-wcl-chart-command-scope] [data-wcl-icon-button] {
+      min-inline-size: 44px;
+      min-block-size: 44px;
     }
   }
 

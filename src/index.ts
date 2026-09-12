@@ -69,6 +69,8 @@ export {
   type ChartSelectionItem,
   type ChartSelectionLabels,
   type ChartSelection,
+  type ChartExplorationPresentation,
+  type ChartExplorationControlSet,
   type LineChartInteraction,
   type ChartMinimumSize,
   type ChartOverflow,

@@ -2108,6 +2108,9 @@ function StatisticalFrame<Datum extends object>({
   readonly rootAttribute: string;
 }): ReactElement {
   validateCommon(common);
+  const explorationPresentation = exploration ?? histogramExploration ?? boxExploration;
+  const commandsInPanel =
+    explorationPresentation?.presentation === 'panel' || !!explorationPresentation?.renderControls;
   const explores = !!(exploration || histogramExploration || boxExploration);
   const aspectRatio = common.aspectRatio ?? viewWidth / viewHeight;
   const canvasHeight = viewWidth / aspectRatio;
@@ -3162,6 +3165,7 @@ function StatisticalFrame<Datum extends object>({
                 aria-labelledby={titleId}
                 data-wcl-chart-canvas=""
                 data-exploration={explores ? '' : undefined}
+                data-exploration-panel={commandsInPanel ? '' : undefined}
                 onBlur={blurChart}
                 onFocus={focusChart}
                 onKeyDown={readKeyboard}
@@ -3169,8 +3173,9 @@ function StatisticalFrame<Datum extends object>({
                 tabIndex={0}
               >
                 {stripLabels ? (
-                  <ChartExplorationLayer svg={svgElement} plot={plot}>
+                  <ChartExplorationLayer svg={svgElement} plot={plot} panel={commandsInPanel}>
                     <ChartExplorationControls
+                      {...(histogramExploration ?? boxExploration)}
                       largeStepMultiplier={2}
                       version={navigationVersion}
                       {...(histogramExploration
@@ -3244,8 +3249,9 @@ function StatisticalFrame<Datum extends object>({
                   </ChartExplorationLayer>
                 ) : null}
                 {exploration && visiblePointModel ? (
-                  <ChartExplorationLayer svg={svgElement} plot={plot}>
+                  <ChartExplorationLayer svg={svgElement} plot={plot} panel={commandsInPanel}>
                     <ChartRectangularExplorationControls
+                      {...exploration}
                       version={navigationVersion}
                       verticalPan={sidePan ? 'beside' : 'below'}
                       window={navigation.normalized}

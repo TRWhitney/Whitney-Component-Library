@@ -22,7 +22,7 @@ Show a numeric distribution through contiguous intervals and an explicit ordinat
 
 ## Preferred higher-level compositions
 
-- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and zooming remain application-owned.
+- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and cross-chart coordination remain application-owned; optional exploration keeps the chart viewport in controlled or internal state.
 
 ## Content
 
@@ -38,6 +38,7 @@ Show a numeric distribution through contiguous intervals and an explicit ordinat
 - Pointer and touch input read only a directly targeted mark. Blank plot space clears pointer reading instead of guessing the nearest value. Direct reading dims every other mark.
 - Optional HistogramInteraction<Datum> enables independent activation and selection. HistogramSelectionItem identifies a bin with kind: bin, lower, upper, and upperInclusive. Identity follows that complete interval, including its inclusion rule. Count updates preserve identity; changing thresholds does not transfer selection to a different interval.
 - Drag selects bin rectangles that intersect the drag rectangle, including zero-height bins at their rendered baseline.
+- Exploration renders one command set. presentation selects chart-edge controls or a panel. renderControls receives named overview, zoomIn, zoomOut, reset and pan nodes plus rangeLabel for composition in a public Toolbar; it replaces the native command regions and removes their empty margins. Both presentations share window callbacks, domain limits, focus, and responsive target sizing. Rectangular lower-edge controls pair left with up and right with down to leave the axis title clear.
 - Optional exploration uses the shared ChartExploration labels and controlled or internal window ownership. Histogram windows report original bin boundaries and show complete bins prepared from the full source. Counts, ordinates and boundary inclusivity do not change with navigation. BoxPlot windows report ordered stable group IDs and retain each summary, whisker and outlier.
 - The Overview icon opens a horizontal distribution strip in Dialog. Zoom, pan, reset and direct window dragging share one range. Two fingers pan and pinch the main chart without selecting or activating. Closing keeps the range and returns focus. Main-chart dimensions remain stable. Full tables and selections outside the window remain available; visible geometry controls automatic value-axis fitting.
 - With selection enabled, click or tap toggles the target. Control/Command-click or touch press-and-hold activates without changing selection. Releasing a hold does not also select. Without selection, click or tap activates when onActivate is supplied.

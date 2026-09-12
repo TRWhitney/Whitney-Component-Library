@@ -1,5 +1,7 @@
 'use client';
 
+import type {ChartExplorationPresentation} from './chart-types.js';
+
 import {
   useEffect,
   useId,
@@ -35,7 +37,7 @@ export interface ChartExplorationControlLabels {
   readonly instructions: string;
 }
 
-export interface ChartExplorationControlsProps {
+export interface ChartExplorationControlsProps extends ChartExplorationPresentation {
   readonly version?: string;
   readonly largeStepMultiplier?: number;
   readonly step?: number;
@@ -75,6 +77,8 @@ function stopPropagation(event: SyntheticEvent): void {
 }
 
 export function ChartExplorationControls({
+  presentation = 'chart',
+  renderControls,
   version,
   largeStepMultiplier = 3,
   isZoomInDisabled = false,
@@ -88,6 +92,7 @@ export function ChartExplorationControls({
   onChange,
   overview,
 }: ChartExplorationControlsProps): ReactElement {
+  const commandScope = useRef<HTMLDivElement>(null);
   const instructionId = useId();
   const navigator = useRef<HTMLDivElement>(null);
   const gesture = useRef<Gesture | null>(null);
@@ -110,6 +115,7 @@ export function ChartExplorationControls({
     onChange(bounded((window[0] + window[1] - nextSpan) / 2, nextSpan), 'end');
   };
 
+  const zoomInDisabled = isZoomInDisabled || span <= minimum + Number.EPSILON;
   function finish(phase: 'end' | 'cancel'): void {
     const current = gesture.current;
     if (!current) return;
@@ -198,8 +204,181 @@ export function ChartExplorationControls({
     else onChange([window[0], clamp(position ?? window[1] + delta, window[0] + minimum, 1)], 'end');
   }
 
-  return (
-    <>
+  const overviewControl = (
+    <Dialog
+      title={labels.overview}
+      description={rangeLabel}
+      closeLabel={labels.closeOverview}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) finish('end');
+      }}
+      trigger={
+        <IconButton variant="quiet" size="compact" label={labels.overview}>
+          <Glyph kind="overview" />
+        </IconButton>
+      }
+      actions={({close}) => (
+        <>
+          <Button variant="quiet" onPress={reset}>
+            {labels.reset}
+          </Button>
+          <Button onPress={close}>{labels.done}</Button>
+        </>
+      )}
+    >
+      <div data-wcl-chart-exploration-overview="">
+        <div
+          data-wcl-chart-exploration-navigator=""
+          data-dragging={dragging ? '' : undefined}
+          ref={navigator}
+          tabIndex={-1}
+          onPointerDown={(event) => pointerDown(event, 'new')}
+          onPointerMove={pointerMove}
+          onPointerUp={pointerUp}
+          onPointerCancel={(event) => {
+            event.stopPropagation();
+            if (event.pointerId === gesture.current?.pointerId) finish('cancel');
+          }}
+          onLostPointerCapture={(event) => {
+            if (event.pointerId === gesture.current?.pointerId) finish('cancel');
+          }}
+          onKeyDownCapture={(event) => {
+            if (event.key === 'Escape' && gesture.current) {
+              event.preventDefault();
+              event.stopPropagation();
+              finish('cancel');
+            }
+          }}
+        >
+          <div data-wcl-chart-exploration-reference="" aria-hidden="true">
+            {overview}
+          </div>
+          <div
+            data-wcl-chart-exploration-shade=""
+            style={{left: 0, width: `${window[0] * 100}%`}}
+          />
+          <div
+            data-wcl-chart-exploration-shade=""
+            style={{left: `${window[1] * 100}%`, right: 0}}
+          />
+          <div
+            data-wcl-chart-exploration-window=""
+            role="slider"
+            aria-label={labels.window}
+            aria-describedby={instructionId}
+            aria-orientation="horizontal"
+            aria-valuemin={0}
+            aria-valuemax={1 - span}
+            aria-valuenow={window[0]}
+            aria-valuetext={formatWindow(window)}
+            tabIndex={0}
+            style={{left: `${window[0] * 100}%`, width: `${span * 100}%`}}
+            onPointerDown={(event) => pointerDown(event, 'window')}
+            onKeyDown={(event) => keyDown(event, 'window')}
+          />
+          {(['start', 'end'] as const).map((part) => (
+            <div
+              key={part}
+              data-wcl-chart-exploration-handle={part}
+              role="slider"
+              aria-label={labels[part]}
+              aria-describedby={instructionId}
+              aria-orientation="horizontal"
+              aria-valuemin={part === 'start' ? 0 : window[0] + minimum}
+              aria-valuemax={part === 'start' ? window[1] - minimum : 1}
+              aria-valuenow={window[part === 'start' ? 0 : 1]}
+              aria-valuetext={formatWindow(window)}
+              tabIndex={0}
+              style={{left: `${window[part === 'start' ? 0 : 1] * 100}%`}}
+              onPointerDown={(event) => pointerDown(event, part)}
+              onKeyDown={(event) => keyDown(event, part)}
+            />
+          ))}
+        </div>
+        <div data-wcl-chart-exploration-extents="">
+          <span>{fullRangeLabels[0]}</span>
+          <span>{fullRangeLabels[1]}</span>
+        </div>
+        <p data-wcl-chart-exploration-instructions="" id={instructionId}>
+          {labels.instructions}
+        </p>
+      </div>
+    </Dialog>
+  );
+  const zoomOutControl = (
+    <IconButton
+      variant="quiet"
+      size="compact"
+      label={labels.zoomOut}
+      isDisabled={span >= 1}
+      onPress={() => zoom(2)}
+    >
+      <Glyph kind="minus" />
+    </IconButton>
+  );
+  const zoomInControl = (
+    <IconButton
+      variant="quiet"
+      size="compact"
+      label={labels.zoomIn}
+      isDisabled={zoomInDisabled}
+      onPress={() => zoom(0.5)}
+    >
+      <Glyph kind="plus" />
+    </IconButton>
+  );
+  const resetControl = (
+    <IconButton
+      variant="quiet"
+      size="compact"
+      label={labels.reset}
+      isDisabled={span >= 1}
+      onPress={reset}
+    >
+      <Glyph kind="reset" />
+    </IconButton>
+  );
+  const panBackwardControl = (
+    <IconButton
+      variant="quiet"
+      size="compact"
+      label={labels.panBackward}
+      isDisabled={window[0] <= 0}
+      onPress={() => pan(-Math.max(step ?? 0, span / 3))}
+    >
+      <Glyph kind="back" />
+    </IconButton>
+  );
+  const panForwardControl = (
+    <IconButton
+      variant="quiet"
+      size="compact"
+      label={labels.panForward}
+      isDisabled={window[1] >= 1}
+      onPress={() => pan(Math.max(step ?? 0, span / 3))}
+    >
+      <Glyph kind="forward" />
+    </IconButton>
+  );
+  const commandContent = {
+    overview: overviewControl,
+    zoomIn: zoomInControl,
+    zoomOut: zoomOutControl,
+    reset: resetControl,
+    rangeLabel,
+    pan: (
+      <>
+        {panBackwardControl}
+        {panForwardControl}
+      </>
+    ),
+  };
+  const controls = (
+    <div
+      ref={commandScope}
+      data-wcl-chart-command-scope=""
+      data-presentation={renderControls ? 'panel' : presentation}
+    >
       <div
         data-wcl-chart-exploration-controls=""
         onClick={stopPropagation}
@@ -208,134 +387,10 @@ export function ChartExplorationControls({
       >
         <span data-wcl-chart-exploration-range="">{rangeLabel}</span>
         <div data-wcl-chart-exploration-buttons="">
-          <span data-wcl-chart-exploration-trigger="">
-            <Dialog
-              title={labels.overview}
-              description={rangeLabel}
-              closeLabel={labels.closeOverview}
-              onOpenChange={(isOpen) => {
-                if (!isOpen) finish('end');
-              }}
-              trigger={
-                <IconButton variant="quiet" size="compact" label={labels.overview}>
-                  <Glyph kind="overview" />
-                </IconButton>
-              }
-              actions={({close}) => (
-                <>
-                  <Button variant="quiet" onPress={reset}>
-                    {labels.reset}
-                  </Button>
-                  <Button onPress={close}>{labels.done}</Button>
-                </>
-              )}
-            >
-              <div data-wcl-chart-exploration-overview="">
-                <div
-                  data-wcl-chart-exploration-navigator=""
-                  data-dragging={dragging ? '' : undefined}
-                  ref={navigator}
-                  tabIndex={-1}
-                  onPointerDown={(event) => pointerDown(event, 'new')}
-                  onPointerMove={pointerMove}
-                  onPointerUp={pointerUp}
-                  onPointerCancel={(event) => {
-                    event.stopPropagation();
-                    if (event.pointerId === gesture.current?.pointerId) finish('cancel');
-                  }}
-                  onLostPointerCapture={(event) => {
-                    if (event.pointerId === gesture.current?.pointerId) finish('cancel');
-                  }}
-                  onKeyDownCapture={(event) => {
-                    if (event.key === 'Escape' && gesture.current) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      finish('cancel');
-                    }
-                  }}
-                >
-                  <div data-wcl-chart-exploration-reference="" aria-hidden="true">
-                    {overview}
-                  </div>
-                  <div
-                    data-wcl-chart-exploration-shade=""
-                    style={{left: 0, width: `${window[0] * 100}%`}}
-                  />
-                  <div
-                    data-wcl-chart-exploration-shade=""
-                    style={{left: `${window[1] * 100}%`, right: 0}}
-                  />
-                  <div
-                    data-wcl-chart-exploration-window=""
-                    role="slider"
-                    aria-label={labels.window}
-                    aria-describedby={instructionId}
-                    aria-orientation="horizontal"
-                    aria-valuemin={0}
-                    aria-valuemax={1 - span}
-                    aria-valuenow={window[0]}
-                    aria-valuetext={formatWindow(window)}
-                    tabIndex={0}
-                    style={{left: `${window[0] * 100}%`, width: `${span * 100}%`}}
-                    onPointerDown={(event) => pointerDown(event, 'window')}
-                    onKeyDown={(event) => keyDown(event, 'window')}
-                  />
-                  {(['start', 'end'] as const).map((part) => (
-                    <div
-                      key={part}
-                      data-wcl-chart-exploration-handle={part}
-                      role="slider"
-                      aria-label={labels[part]}
-                      aria-describedby={instructionId}
-                      aria-orientation="horizontal"
-                      aria-valuemin={part === 'start' ? 0 : window[0] + minimum}
-                      aria-valuemax={part === 'start' ? window[1] - minimum : 1}
-                      aria-valuenow={window[part === 'start' ? 0 : 1]}
-                      aria-valuetext={formatWindow(window)}
-                      tabIndex={0}
-                      style={{left: `${window[part === 'start' ? 0 : 1] * 100}%`}}
-                      onPointerDown={(event) => pointerDown(event, part)}
-                      onKeyDown={(event) => keyDown(event, part)}
-                    />
-                  ))}
-                </div>
-                <div data-wcl-chart-exploration-extents="">
-                  <span>{fullRangeLabels[0]}</span>
-                  <span>{fullRangeLabels[1]}</span>
-                </div>
-                <p data-wcl-chart-exploration-instructions="" id={instructionId}>
-                  {labels.instructions}
-                </p>
-              </div>
-            </Dialog>
-          </span>
-          <IconButton
-            variant="quiet"
-            size="compact"
-            label={labels.zoomOut}
-            isDisabled={span >= 1}
-            onPress={() => zoom(2)}
-          >
-            <Glyph kind="minus" />
-          </IconButton>
-          <IconButton
-            variant="quiet"
-            size="compact"
-            label={labels.zoomIn}
-            isDisabled={isZoomInDisabled || span <= minimum + Number.EPSILON}
-            onPress={() => zoom(0.5)}
-          >
-            <Glyph kind="plus" />
-          </IconButton>
-          <IconButton
-            variant="quiet"
-            size="compact"
-            label={labels.reset}
-            isDisabled={span >= 1}
-            onPress={reset}
-          >
-            <Glyph kind="reset" />
-          </IconButton>
+          <span data-wcl-chart-exploration-trigger="">{overviewControl}</span>
+          {zoomOutControl}
+          {zoomInControl}
+          {resetControl}
         </div>
       </div>
       <div
@@ -344,25 +399,16 @@ export function ChartExplorationControls({
         onPointerDown={stopPropagation}
         onKeyDown={stopPropagation}
       >
-        <IconButton
-          variant="quiet"
-          size="compact"
-          label={labels.panBackward}
-          isDisabled={window[0] <= 0}
-          onPress={() => pan(-Math.max(step ?? 0, span / 3))}
-        >
-          <Glyph kind="back" />
-        </IconButton>
-        <IconButton
-          variant="quiet"
-          size="compact"
-          label={labels.panForward}
-          isDisabled={window[1] >= 1}
-          onPress={() => pan(Math.max(step ?? 0, span / 3))}
-        >
-          <Glyph kind="forward" />
-        </IconButton>
+        {panBackwardControl}
+        {panForwardControl}
       </div>
-    </>
+    </div>
+  );
+  return renderControls ? (
+    <div ref={commandScope} data-wcl-chart-command-scope="" data-presentation="panel">
+      {renderControls(commandContent)}
+    </div>
+  ) : (
+    controls
   );
 }

@@ -26,7 +26,7 @@ Compare two quantitative measurements across distinct recorded observations.
 
 ## Preferred higher-level compositions
 
-- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and zooming remain application-owned.
+- Compose the chart with application-owned details and separate controls. Share ChartSelection through controlled selectedItems and onSelectionChange when charts refer to the same target identities. Filtering and cross-chart coordination remain application-owned; optional exploration keeps the chart viewport in controlled or internal state.
 
 ## Content
 
@@ -40,6 +40,7 @@ Compare two quantitative measurements across distinct recorded observations.
 ## Control, events, validation, and forms
 
 - selection.presentation chooses one selection view: panel by default or controls for a compact count and clear action. The two views never render together. Both share the same selection and clear behavior; opening the count reveals localized interaction help. The panel keeps item names visible, while compact controls reveal them with the help.
+- Exploration renders one command set. presentation selects chart-edge controls or a panel. renderControls receives named overview, zoomIn, zoomOut, reset and pan nodes plus rangeLabel for composition in a public Toolbar; it replaces the native command regions and removes their empty margins. Both presentations share window callbacks, domain limits, focus, and responsive target sizing. Rectangular lower-edge controls pair left with up and right with down to leave the axis title clear.
 - Optional exploration uses independent numeric x and y windows through ChartRectangularExploration. Supply labels for navigation, corners and the complete range. Use defaultWindow for internal state, or window with required onWindowChange for application control. onWindowChange emits one rectangle per live change; onWindowChangeEnd reports completed gestures or commands. minimumSpan sets a fractional minimum for each axis.
 - The Overview icon opens a proportional full-data map in Dialog. Drag the window or its corners directly, or draw a new rectangle. Closing keeps the range and restores focus. Two fingers pan or pinch the main chart and cancel pending selection or hold activation. Pointer navigation follows immediately, keyboard and reset changes animate, and reduced motion removes those transitions.
 - Navigation keeps the complete source table and selections outside the window. Only visible observations can be read or activated. Empty windows retain axes and navigation. Full valid visible observations define reset bounds, explicit axis limits constrain exploration, and logarithmic windows navigate in log space. Bubble magnitude sizing is independent of the viewport. Hidden groups leave the plot and map together.

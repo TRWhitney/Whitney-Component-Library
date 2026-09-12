@@ -1,17 +1,25 @@
 @layer wcl.components {
   [data-wcl-heatmap-visual][data-exploration] {
     position: relative;
-    padding-block: 4rem 2.75rem;
+    padding-block: 2.5rem 2.25rem;
   }
 
-  [data-wcl-heatmap-visual][data-exploration] > [data-wcl-chart-exploration-controls] {
+  [data-wcl-heatmap-visual][data-exploration]
+    > [data-wcl-chart-command-scope]
+    > [data-wcl-chart-exploration-controls] {
     top: 0;
     transform: none;
   }
 
-  [data-wcl-heatmap-visual][data-exploration] > [data-wcl-chart-exploration-pan] {
+  [data-wcl-heatmap-visual][data-exploration]
+    > [data-wcl-chart-command-scope]
+    > [data-wcl-chart-exploration-pan] {
     top: auto;
     bottom: 0;
+  }
+
+  [data-wcl-heatmap-visual][data-exploration-panel] {
+    padding-block: 0;
   }
 
   [data-wcl-heatmap-visual][data-exploration] [data-wcl-heatmap-frame] {

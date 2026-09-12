@@ -2962,6 +2962,9 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             data-stagger={presentation.staggerLabels ? '' : undefined}
             data-wcl-chart-canvas=""
             data-exploration={exploration ? '' : undefined}
+            data-exploration-panel={
+              exploration?.presentation === 'panel' || exploration?.renderControls ? '' : undefined
+            }
             data-item-interaction={isBarInteraction || isShapeInteraction ? '' : undefined}
             onBlur={blurChart}
             onFocus={focusChart}
@@ -2971,8 +2974,13 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             tabIndex={0}
           >
             {exploration ? (
-              <ChartExplorationLayer svg={svgElement} plot={plot}>
+              <ChartExplorationLayer
+                svg={svgElement}
+                plot={plot}
+                panel={exploration.presentation === 'panel' || !!exploration.renderControls}
+              >
                 <ChartExplorationControls
+                  {...exploration}
                   largeStepMultiplier={categoryPlacement === 'y' ? 2 : 3}
                   version={navigationVersion}
                   {...(categoryCount > 0 ? {step: 1 / categoryCount} : {})}

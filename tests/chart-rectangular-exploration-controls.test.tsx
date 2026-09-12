@@ -220,3 +220,17 @@ it('retains changes and restores trigger focus when the dialog closes', async ()
   expect(screen.queryByRole('dialog')).toBeNull();
   await waitFor(() => expect(document.activeElement).toBe(trigger));
 });
+
+it('groups up with left and down with right away from the axis title', () => {
+  renderNavigator();
+  fireEvent.click(screen.getByRole('button', {name: 'Done'}));
+  expect(screen.getByRole('button', {name: 'Left'}).parentElement).toBe(
+    screen.getByRole('button', {name: 'Up'}).parentElement,
+  );
+  expect(screen.getByRole('button', {name: 'Right'}).parentElement).toBe(
+    screen.getByRole('button', {name: 'Down'}).parentElement,
+  );
+  expect(screen.getByRole('button', {name: 'Left'}).parentElement).not.toBe(
+    screen.getByRole('button', {name: 'Right'}).parentElement,
+  );
+});

@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import type {ChartRectangularExploration} from './chart-rectangular-exploration-types.js';
 
 export type ChartDomainValue = string | number | Date;
@@ -573,23 +574,38 @@ export interface ChartExplorationLabels<Value extends ChartDomainValue> {
   readonly instructions: string;
   readonly range: (window: ChartDomainWindow<Value>) => string;
 }
-export type ChartExploration<Value extends ChartDomainValue> = {
+export interface ChartExplorationControlSet {
+  readonly overview: ReactNode;
+  readonly zoomIn: ReactNode;
+  readonly zoomOut: ReactNode;
+  readonly reset: ReactNode;
+  readonly pan: ReactNode;
+  readonly rangeLabel: string;
+}
+export interface ChartExplorationPresentation {
+  /** Show commands at plot edges or together in a panel. Defaults to chart. */
+  readonly presentation?: 'chart' | 'panel';
+  /** Compose the single command set in an application Toolbar. Implies panel placement. */
+  readonly renderControls?: (controls: ChartExplorationControlSet) => ReactNode;
+}
+
+export type ChartExploration<Value extends ChartDomainValue> = ChartExplorationPresentation & {
   readonly labels: ChartExplorationLabels<Value>;
   /** Smallest span as a fraction of the full axis, from greater than zero through one. */
   readonly minimumSpan?: number;
   readonly onWindowChangeEnd?: (window: ChartDomainWindow<NoInfer<Value>>) => void;
 } & (
-  | {
-      readonly window: ChartDomainWindow<NoInfer<Value>>;
-      readonly defaultWindow?: never;
-      readonly onWindowChange: (window: ChartDomainWindow<NoInfer<Value>>) => void;
-    }
-  | {
-      readonly window?: never;
-      readonly defaultWindow?: ChartDomainWindow<NoInfer<Value>>;
-      readonly onWindowChange?: (window: ChartDomainWindow<NoInfer<Value>>) => void;
-    }
-);
+    | {
+        readonly window: ChartDomainWindow<NoInfer<Value>>;
+        readonly defaultWindow?: never;
+        readonly onWindowChange: (window: ChartDomainWindow<NoInfer<Value>>) => void;
+      }
+    | {
+        readonly window?: never;
+        readonly defaultWindow?: ChartDomainWindow<NoInfer<Value>>;
+        readonly onWindowChange?: (window: ChartDomainWindow<NoInfer<Value>>) => void;
+      }
+  );
 
 export interface LineChartProps<
   Datum extends object,

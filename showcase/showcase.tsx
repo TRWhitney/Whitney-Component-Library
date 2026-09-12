@@ -2,6 +2,7 @@ import {
   SearchableTreeExample,
   CollectionContextMenuExample,
 } from './collection-interaction-example.js';
+import {ChartCommandCompositionExample} from './chart-command-composition-example.js';
 import {ChartApplicationGeometryExample} from './chart-application-geometry-example.js';
 import {ChartSelectionPresentationExample} from './chart-selection-presentation-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
@@ -875,6 +876,9 @@ function ActionSpecimens() {
             </IconButton>
           </Toolbar>
         </Example>
+        <p>
+          <a href="#scatter-chart">Compose a chart command set in an application toolbar.</a>
+        </p>
       </Specimen>
     </>
   );
@@ -3952,6 +3956,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         </Example>
         <Example label="Resize the plot and inspect a different building">
           <ChartApplicationGeometryExample kind="scatter" />
+        </Example>
+        <Example label="Chart controls, panel, or application toolbar">
+          <ChartCommandCompositionExample />
         </Example>
       </Specimen>
 
