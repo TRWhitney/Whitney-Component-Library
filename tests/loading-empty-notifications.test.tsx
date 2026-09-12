@@ -404,7 +404,7 @@ describe('loading, empty, and notification feedback', () => {
     }).toThrow(/timeout must be between 4000 and 30000/i);
   });
 
-  it('server-renders and hydrates without mounting a notification portal early', () => {
+  it('server-renders and hydrates without mounting a notification portal early', async () => {
     const specimen = (
       <AppearanceProvider accent="#2878ff" appearance="light">
         <Skeleton lines={2} shape="text" width="three-quarters" />
@@ -423,6 +423,12 @@ describe('loading, empty, and notification feedback', () => {
     const rootElement = document.querySelector('#root')!;
 
     expect(markup).not.toContain('data-wcl-notification-region');
-    expect(() => hydrateRoot(rootElement, specimen)).not.toThrow();
+    let root: ReturnType<typeof hydrateRoot>;
+    await act(async () => {
+      root = hydrateRoot(rootElement, specimen);
+      await Promise.resolve();
+    });
+    expect(rootElement.textContent).toContain('Application content');
+    act(() => root.unmount());
   });
 });
