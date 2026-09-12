@@ -20,3 +20,12 @@ it('curves both lower corner feedback borders on the final table row', async () 
     ),
   ).toBe(true);
 });
+
+it('bounds hidden chart data tables without retaining intrinsic table width', async () => {
+  const css = await readFile('src/styles.css', 'utf8');
+  expect(
+    /\[data-wcl-chart-table\]\s*\{[^}]*display:\s*block[^}]*max-inline-size:\s*1px[^}]*contain:\s*strict/s.test(
+      css,
+    ),
+  ).toBe(true);
+});

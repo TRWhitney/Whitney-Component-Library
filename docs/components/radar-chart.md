@@ -48,6 +48,7 @@ Compare a few subjects across ordered qualities on one shared radial scale.
 
 ## Accessibility
 
+- The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The visible title names one figure and the description explains the comparison. One title-named keyboard boundary announces the active dimension and every visible series value. The SVG is hidden from assistive technology, and a generated native table lists dimensions as rows and series as columns.
 
 ## Keyboard, labeling, localization, and direction

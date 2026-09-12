@@ -26,6 +26,9 @@ interface ChartContractOptions {
   readonly use: string;
 }
 
+const hiddenDataAlternative =
+  'The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.';
+
 const activationTiming =
   'Activation uses shared 620ms timing and easing, with feedback removed at 650ms. Repeated activation restarts feedback; reduced motion displays a static cue for the same lifetime.';
 const outlineMotion =
@@ -74,6 +77,7 @@ function chartContract({
       'Application accent identifies the first ordinary series and accent annotations. Later ordinary series orbit that accent with an achromatic fallback, and automatic colors avoid explicit ordinary choices. Success, warning, and danger remain semantic colors.',
     ],
     accessibility: [
+      hiddenDataAlternative,
       'The required visible title names one figure and the required description explains its point. One title-derived keyboard boundary announces the active category, visible series values, and comparable numeric reference lines. The SVG remains hidden from assistive technology while a generated native data table exposes every valid value, including hidden series whose headers identify them as hidden.',
     ],
     appearance: [
@@ -192,6 +196,7 @@ function partToWholeContract({
       'Application accent identifies the first ranked category on each original page. Later categories use the role-aware chart palette. Colors and patterns stay attached to categories when hiding or restoration moves them between pages. A repeated color also receives a stable dash treatment so color is never its only identity.',
     ],
     accessibility: [
+      hiddenDataAlternative,
       'The visible title names one figure and the description explains the part-to-whole question. One title-named keyboard boundary owns slice readings and page announcements. The SVG is hidden from assistive technology, and the generated native table retains every valid category, including zero values and categories outside the current page.',
       'Optional selection adds localized instructions, a selected count, category names, off-page labels, and Clear selection outside the SVG. The aggregate announces containsSelection when its remaining categories include a selection and names hidden remaining categories with visibilityLabels.hidden.',
     ],
@@ -333,6 +338,7 @@ export const radarChartContract: ComponentContract = {
     'Application accent identifies the first series. Later series use the role-aware chart palette. Line patterns supplement color when polygons overlap.',
   ],
   accessibility: [
+    hiddenDataAlternative,
     'The visible title names one figure and the description explains the comparison. One title-named keyboard boundary announces the active dimension and every visible series value. The SVG is hidden from assistive technology, and a generated native table lists dimensions as rows and series as columns.',
   ],
   appearance: [
@@ -453,6 +459,7 @@ export const heatmapContract: ComponentContract = {
     'The Heatmap cell encoding does not read the application accent; optional navigation controls use it. A sequential scale accepts one color. A two-sided scale accepts ordered low and high colors. Callers may pass their application accent when it fits the measure. Missing cells stay neutral and outside both numeric scales.',
   ],
   accessibility: [
+    hiddenDataAlternative,
     'The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. Visual cells are hidden from assistive technology, while enabled visibility controls remain accessible. A generated native table preserves every declared row and column intersection, marking hidden dimensions.',
   ],
   appearance: [
@@ -566,6 +573,7 @@ export const sparklineContract: ComponentContract = {
     'The application accent identifies the single line, directional observed-range cues, and hollow current cue. Filling the upper half for highs and lower half for lows separates the extrema without implying semantic good or bad.',
   ],
   accessibility: [
+    hiddenDataAlternative,
     'The standard visible title names one figure and the description explains the domain and trend meaning. One title-named keyboard boundary announces exact position and value readings. A localized derived summary exposes first, last, lowest, and highest valid values, and a generated native table preserves every valid position including missing values.',
   ],
   appearance: [
@@ -1243,6 +1251,7 @@ function statisticalChartContract({
   return {
     accentBehavior: [guidance.accent],
     accessibility: [
+      hiddenDataAlternative,
       'The visible title names one figure and the description explains the chart question. One keyboard boundary owns readings and announcements. The SVG is hidden from assistive technology; a generated native table exposes the valid chart data without interaction.',
     ],
     appearance: [

@@ -42,6 +42,7 @@ Show one compact ordered trend with exact current and observed-range context.
 
 ## Accessibility
 
+- The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The standard visible title names one figure and the description explains the domain and trend meaning. One title-named keyboard boundary announces exact position and value readings. A localized derived summary exposes first, last, lowest, and highest valid values, and a generated native table preserves every valid position including missing values.
 
 ## Keyboard, labeling, localization, and direction

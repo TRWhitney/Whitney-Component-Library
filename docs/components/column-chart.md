@@ -56,6 +56,7 @@ Compare discrete categories with grouped, stacked, or normalized vertical column
 
 ## Accessibility
 
+- The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The required visible title names one figure and the required description explains its point. One title-derived keyboard boundary announces the active category, visible series values, and comparable numeric reference lines. The SVG remains hidden from assistive technology while a generated native data table exposes every valid value, including hidden series whose headers identify them as hidden.
 - Selection instructions, a localized count, item names, hidden-item labels, and Clear selection expose selection outside the SVG. Keyboard reading cues identify the current bar or category without adding a whole-chart focus outline.
 

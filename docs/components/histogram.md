@@ -49,6 +49,7 @@ Show a numeric distribution through contiguous intervals and an explicit ordinat
 
 ## Accessibility
 
+- The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The visible title names one figure and the description explains the chart question. One keyboard boundary owns readings and announcements. The SVG is hidden from assistive technology; a generated native table exposes the valid chart data without interaction.
 
 ## Keyboard, labeling, localization, and direction

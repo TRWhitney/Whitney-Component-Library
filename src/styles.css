@@ -7720,6 +7720,13 @@
     white-space: nowrap !important;
   }
 
+  [data-wcl-chart-table] {
+    /* Native table minimums must not widen the one-pixel accessible data alternative. */
+    display: block;
+    max-inline-size: 1px;
+    contain: strict;
+  }
+
   [data-wcl-sparkline-summary] {
     position: absolute !important;
     inline-size: 1px !important;

@@ -49,6 +49,7 @@ Show one numeric measure across the complete intersections of two ordered domain
 
 ## Accessibility
 
+- The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The visible title names one figure and the description explains the grid. One title-named keyboard boundary announces the active row, column, and value, including localized missing values. Visual cells are hidden from assistive technology, while enabled visibility controls remain accessible. A generated native table preserves every declared row and column intersection, marking hidden dimensions.
 
 ## Keyboard, labeling, localization, and direction

@@ -53,6 +53,7 @@ Show category shares of one whole in a proportional pie with bounded paging.
 
 ## Accessibility
 
+- The complete named source table remains available to assistive technology. Its one-pixel contained layout prevents long headers or many columns from widening the chart or document.
 - The visible title names one figure and the description explains the part-to-whole question. One title-named keyboard boundary owns slice readings and page announcements. The SVG is hidden from assistive technology, and the generated native table retains every valid category, including zero values and categories outside the current page.
 - Optional selection adds localized instructions, a selected count, category names, off-page labels, and Clear selection outside the SVG. The aggregate announces containsSelection when its remaining categories include a selection and names hidden remaining categories with visibilityLabels.hidden.
 
