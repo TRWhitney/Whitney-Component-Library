@@ -131,11 +131,13 @@ describe('component showcase', () => {
   });
 
   it('keeps the controlled ToggleButton caption aligned with its live state', () => {
-    const {getByRole, getByText} = render(<Showcase />);
+    const {container} = render(<Showcase />);
+    const toggle = within(
+      container.querySelector<HTMLElement>('[data-showcase-component="ToggleButton"]')!,
+    );
+    fireEvent.click(toggle.getByRole('button', {name: 'Pin result'}));
 
-    fireEvent.click(getByRole('button', {name: 'Pin result'}));
-
-    expect(getByText('Unselected ToggleButton')).toBeTruthy();
+    expect(toggle.getByText('Unselected ToggleButton')).toBeTruthy();
   });
 
   it('demonstrates selection, overflow, expansion, and collapse in the navigation family', () => {
@@ -212,9 +214,10 @@ describe('component showcase', () => {
     expect(getByText('Export ready')).toBeTruthy();
     expect(getByText('Storage nearly full')).toBeTruthy();
     expect(getByText('Export failed')).toBeTruthy();
-    expect(getByRole('button', {name: 'Retry export'})).toBeTruthy();
+    const notificationRegion = getByRole('region', {name: 'Showcase notifications'});
+    expect(within(notificationRegion).getByRole('button', {name: 'Retry export'})).toBeTruthy();
     expect(document.activeElement).toBe(errorTrigger);
-    expect(getByRole('region', {name: 'Showcase notifications'})).toBeTruthy();
+    expect(notificationRegion).toBeTruthy();
   });
 
   it('sorts the table showcase by each semantic data column', () => {
