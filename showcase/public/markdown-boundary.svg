@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="220" viewBox="0 0 480 220">
+  <title>North boundary review</title>
+  <desc>A rectangular mesh with its top north boundary highlighted in blue.</desc>
+  <rect width="480" height="220" rx="8" fill="#f8fafc" />
+  <rect x="64" y="76" width="352" height="112" fill="#e2e8f0" stroke="#475569" stroke-width="2" />
+  <path
+    d="M108 76v112m44-112v112m44-112v112m44-112v112m44-112v112m44-112v112m44-112v112M64 104h352M64 132h352M64 160h352"
+    fill="none"
+    stroke="#94a3b8"
+  />
+  <path d="M64 76h352" stroke="#1d4ed8" stroke-width="6" />
+  <path d="M240 46v18m-5-5 5 5 5-5" fill="none" stroke="#1d4ed8" stroke-width="2" />
+  <text x="240" y="32" text-anchor="middle" fill="#1e293b" font-family="sans-serif" font-size="18">
+    North boundary
+  </text>
+</svg>

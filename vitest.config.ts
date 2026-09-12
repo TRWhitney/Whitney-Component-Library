@@ -2,6 +2,7 @@ import {defineConfig} from 'vitest/config';
 
 export default defineConfig({
   test: {
+    setupFiles: ['./tests/dom-text-geometry.ts'],
     environment: 'jsdom',
     exclude: ['.work/**', 'dist/**', 'node_modules/**'],
     maxWorkers: 4,

@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "build": "node ./scripts/build.mjs",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run check:generated && npm run typecheck:matrix && npm run verify:chart-isolation",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run check:generated && npm run typecheck:matrix && npm run verify:chart-isolation && npm run verify:editor-isolation",
     "check:generated": "node ./scripts/build.mjs --check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -46,20 +46,33 @@
     "typecheck:matrix": "npm run build && node ./scripts/typecheck-matrix.mjs",
     "verify:chart-performance": "node ./scripts/verify-chart-performance.mjs",
     "verify:chart-isolation": "npm run build && node ./scripts/verify-chart-isolation.mjs",
-    "verify:package": "node ./scripts/verify-package.mjs"
+    "verify:package": "node ./scripts/verify-package.mjs",
+    "verify:editor-isolation": "npm run build && node ./scripts/verify-editor-isolation.mjs"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",
     "react-dom": "^18.3.1 || ^19.0.0"
   },
   "dependencies": {
+    "@codemirror/commands": "6.11.0",
+    "@codemirror/lang-markdown": "6.5.2",
+    "@codemirror/language": "6.12.4",
+    "@codemirror/state": "6.7.4",
+    "@codemirror/view": "6.43.11",
     "@internationalized/date": "3.12.3",
+    "@lezer/highlight": "1.2.3",
     "d3-array": "3.2.4",
     "d3-scale": "4.0.2",
     "d3-shape": "3.2.0",
+    "mdast-util-from-markdown": "2.0.3",
+    "micromark-util-types": "2.0.2",
     "react-aria": "3.51.0",
     "react-aria-components": "1.20.0",
-    "react-stately": "3.49.0"
+    "react-markdown": "10.1.0",
+    "react-stately": "3.49.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
@@ -67,6 +80,8 @@
     "@types/d3-array": "3.2.2",
     "@types/d3-scale": "4.0.9",
     "@types/d3-shape": "3.2.0",
+    "@types/hast": "3.0.5",
+    "@types/mdast": "4.0.4",
     "@types/node": "26.2.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",

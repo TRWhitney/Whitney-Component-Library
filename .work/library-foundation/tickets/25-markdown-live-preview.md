@@ -3,9 +3,9 @@
 **What to build:** In-place Markdown Live Preview for the accepted syntax, revealing relevant
 markup around the active cursor or selection while preserving a stable Markdown value.
 
-**Blocked by:** [Markdown Source and Preview](24-markdown-source-and-preview.md)
+**Blocked by:** none. [Markdown Source and Preview](24-markdown-source-and-preview.md) is complete.
 
-**Status:** blocked
+**Status:** ready-for-agent
 
 - [ ] Headings, emphasis, links, images, lists, task lists, blockquotes, fenced code, tables,
       horizontal rules, footnotes, and wiki links render in place outside the active edit context.
@@ -26,6 +26,7 @@ markup around the active cursor or selection while preserving a stable Markdown 
 
 - [Specification](../spec.md)
 - [Markdown Editor Scope](../decisions/12-markdown-editor-scope.md)
+- [Source editor and parser considerations](../../markdown-source-preview/research/editor-engine.md)
 
 ## Completion evidence
 

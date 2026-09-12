@@ -81,6 +81,7 @@ describe('canonical component contracts', () => {
       'LineChart',
       'List',
       'ListBox',
+      'MarkdownEditor',
       'Meter',
       'Menu',
       'NotificationProvider',

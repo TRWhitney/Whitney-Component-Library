@@ -12,7 +12,7 @@ TextArea collects multiline plain text with a preset initial height.
 
 ## Prefer instead
 
-- Use TextField for one line, NumberField for numbers, and the later Markdown editor for structured Markdown authoring.
+- Use TextField for one line, NumberField for numbers, and MarkdownEditor for Markdown source editing and safe preview.
 
 ## Composition and parts
 

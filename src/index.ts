@@ -1,5 +1,14 @@
 'use client';
 
+export {MarkdownEditor} from './markdown/markdown-editor.js';
+export type {
+  MarkdownEditorProps,
+  MarkdownEditorMode,
+  MarkdownEditorSize,
+  MarkdownEditorLabels,
+  MarkdownEditorLockProps,
+} from './markdown/markdown-types.js';
+
 export {
   AppearanceProvider,
   type Appearance,

@@ -9,7 +9,9 @@ propagated application accent.
 
 ## Current state
 
-Tickets 01 through 23, including the intervening Ticket 03A accent correction, are complete.
+Tickets 01 through 24, including the intervening Ticket 03A accent correction, are complete.
+Ticket 24 delivers Markdown source editing and safe preview with one retained editing session.
+In-place Live Preview remains the defining authoring experience and is next in Ticket 25.
 Ticket 23 delivers the accepted [Energy desk prototype](../data-analysis-prototype/status.md)
 and all thirteen library fixes verified in that packed-consumer application.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
@@ -290,10 +292,10 @@ type, and contract conventions while adding only the behavior its data unit requ
 
 ## Frontier
 
-See the [decision map](map.md). [Ticket 22](tickets/22-chart-interaction-and-composition.md) is
-complete and signed off. [Ticket 23](tickets/23-data-analysis-prerelease.md) now exercises the
-completed library in a packed-package client. Its [prototype effort](../data-analysis-prototype/status.md)
-owns the app, direct inspection evidence, and resulting library deficiency tickets.
+See the [decision map](map.md). [Ticket 24](tickets/24-markdown-source-and-preview.md) delivers
+MarkdownEditor, its canonical guidance and rendered specimen, packed React 18/19 compatibility,
+and editor bundle isolation. Its [verification record](../markdown-source-preview/verification.md)
+contains the behavior and browser evidence. [Ticket 25](tickets/25-markdown-live-preview.md) is next.
 
 ## Accepted sources
 

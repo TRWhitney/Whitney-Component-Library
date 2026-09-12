@@ -1,4 +1,5 @@
 export {appearanceProviderContract} from './appearance-provider.contract.js';
+export {markdownEditorContract} from './markdown.contract.js';
 export {pageHeaderContract, splitViewContract} from './application.contracts.js';
 export {
   areaChartContract,
@@ -109,6 +110,7 @@ export {
 } from './component-contract.js';
 
 import {appearanceProviderContract} from './appearance-provider.contract.js';
+import {markdownEditorContract} from './markdown.contract.js';
 import {pageHeaderContract, splitViewContract} from './application.contracts.js';
 import {
   areaChartContract,
@@ -253,6 +255,7 @@ export const componentContracts = [
   lineChartContract,
   listBoxContract,
   listContract,
+  markdownEditorContract,
   meterContract,
   menuContract,
   notificationProviderContract,

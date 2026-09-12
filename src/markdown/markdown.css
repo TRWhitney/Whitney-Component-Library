@@ -1,0 +1,274 @@
+@layer wcl.components {
+  [data-wcl-markdown-editor] {
+    --wcl-markdown-height: 24rem;
+
+    grid-template-rows: auto auto auto auto;
+  }
+
+  [data-wcl-markdown-editor][data-size='compact'] {
+    --wcl-markdown-height: 14rem;
+  }
+
+  [data-wcl-markdown-editor][data-size='expanded'] {
+    --wcl-markdown-height: 36rem;
+  }
+
+  [data-wcl-markdown-editor] > [data-wcl-field-control] {
+    display: block;
+    block-size: var(--wcl-markdown-height);
+    background: var(--wcl-surface);
+  }
+
+  [data-wcl-markdown-bridge] {
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 1rem;
+    border: 0;
+    resize: none;
+    background: transparent;
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  [data-wcl-markdown-bridge][data-enhanced] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  [data-wcl-markdown-source] {
+    block-size: 100%;
+  }
+
+  [data-wcl-markdown-preview] {
+    box-sizing: border-box;
+    block-size: 100%;
+    padding: 1rem 1.25rem;
+    overflow: auto;
+    outline: none;
+    color: var(--wcl-text);
+    font-family: var(--wcl-font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    scrollbar-color: var(--wcl-border-strong) transparent;
+    scrollbar-width: thin;
+  }
+
+  [data-wcl-markdown-preview] > :first-child {
+    margin-block-start: 0;
+  }
+
+  [data-wcl-markdown-preview] > :last-child {
+    margin-block-end: 0;
+  }
+
+  [data-wcl-markdown-preview] :is(h1, h2, h3, h4, h5, h6) {
+    margin-block: 1.5em 0.5em;
+    line-height: 1.25;
+  }
+
+  [data-wcl-markdown-preview] h1 {
+    font-size: 1.75rem;
+  }
+
+  [data-wcl-markdown-preview] h2 {
+    font-size: 1.4rem;
+  }
+
+  [data-wcl-markdown-preview] h3 {
+    font-size: 1.15rem;
+  }
+
+  [data-wcl-markdown-preview] :is(h4, h5, h6) {
+    font-size: 1rem;
+  }
+
+  [data-wcl-markdown-preview] blockquote {
+    margin-inline: 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 3px solid var(--wcl-border-strong);
+    color: var(--wcl-text-muted);
+  }
+
+  [data-wcl-markdown-preview] :is(code, pre) {
+    border-radius: 4px;
+    background: var(--wcl-surface-subtle);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.875em;
+  }
+
+  [data-wcl-markdown-preview] code {
+    padding: 0.1em 0.25em;
+  }
+
+  [data-wcl-markdown-preview] pre {
+    padding: 0.75rem;
+    white-space: pre-wrap;
+  }
+
+  [data-wcl-markdown-preview] pre code {
+    padding: 0;
+    font-size: 1em;
+  }
+
+  [data-wcl-markdown-preview] a[href] {
+    border-radius: 2px;
+    color: var(--wcl-accent-hover-contrast);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    cursor: pointer;
+  }
+
+  [data-wcl-markdown-preview] a[href]:focus-visible {
+    outline: 2px solid var(--wcl-accent-focus);
+    outline-offset: 2px;
+  }
+
+  [data-wcl-markdown-preview] img {
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  [data-wcl-markdown-preview] table {
+    inline-size: 100%;
+    border-collapse: collapse;
+  }
+
+  [data-wcl-markdown-preview] :is(th, td) {
+    padding: 0.5rem;
+    border: 1px solid var(--wcl-border);
+    text-align: start;
+  }
+
+  [data-wcl-markdown-preview] th {
+    background: var(--wcl-surface-subtle);
+    font-weight: 600;
+  }
+
+  [data-wcl-markdown-preview] hr {
+    border: 0;
+    border-block-start: 1px solid var(--wcl-border);
+  }
+
+  [data-wcl-markdown-preview] [data-footnotes] {
+    border-block-start: 1px solid var(--wcl-border);
+    font-size: 0.875rem;
+  }
+
+  [data-wcl-wiki-link] {
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+  }
+
+  [data-wcl-markdown-empty] {
+    color: var(--wcl-text-muted);
+  }
+
+  [data-wcl-markdown-context] {
+    grid-area: 3 / 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    color: var(--wcl-text-muted);
+    font-family: var(--wcl-font-utility);
+    font-size: 0.75rem;
+  }
+
+  [data-wcl-markdown-editor] > [data-wcl-field-support] {
+    grid-area: 4 / 1;
+  }
+
+  [data-wcl-markdown-editor] [data-wcl-markdown-lock] {
+    grid-area: 2 / 1;
+    margin-block-start: 0.25rem;
+    color: var(--wcl-text-muted);
+  }
+
+  [data-wcl-markdown-editor][data-disabled] [data-wcl-markdown-preview] {
+    pointer-events: none;
+  }
+}
+
+/* CodeMirror installs unlayered base styles. Scope the static overrides at the same layer
+   priority so its defaults cannot replace the library's typography or focus treatment. */
+[data-wcl-markdown-source] .cm-editor {
+  block-size: 100%;
+  background: transparent;
+  color: var(--wcl-text);
+}
+
+[data-wcl-markdown-source] .cm-editor.cm-focused {
+  outline: none;
+}
+
+[data-wcl-markdown-source] .cm-scroller {
+  overflow: auto;
+  font-family: var(--wcl-font-utility);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  scrollbar-color: var(--wcl-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+[data-wcl-markdown-source] .cm-content {
+  min-block-size: 100%;
+  padding: 1rem 0;
+  caret-color: var(--wcl-text);
+}
+
+[data-wcl-markdown-source] .cm-line {
+  padding: 0 1rem;
+}
+
+[data-wcl-markdown-source] .tok-meta {
+  color: var(--wcl-text-muted);
+}
+
+[data-wcl-markdown-source] .tok-heading {
+  font-weight: 600;
+}
+
+[data-wcl-markdown-source] .tok-strong {
+  font-weight: 600;
+}
+
+[data-wcl-markdown-source] .tok-emphasis {
+  font-style: italic;
+}
+
+[data-wcl-markdown-source] .tok-strikethrough {
+  text-decoration: line-through;
+}
+
+[data-wcl-markdown-editor][data-disabled] .cm-content {
+  cursor: not-allowed;
+}
+
+@media (forced-colors: active) {
+  [data-wcl-markdown-source] .cm-editor,
+  [data-wcl-markdown-preview] {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  [data-wcl-markdown-source] .cm-content {
+    caret-color: CanvasText;
+  }
+
+  [data-wcl-markdown-source] .tok-meta {
+    color: CanvasText;
+  }
+
+  [data-wcl-markdown-preview] a[href] {
+    color: LinkText;
+  }
+}

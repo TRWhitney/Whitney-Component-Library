@@ -1,4 +1,5 @@
 import {ChartCommandCompositionExample} from './chart-command-composition-example.js';
+import {MarkdownSpecimen} from './markdown-specimen.js';
 import {ChartApplicationGeometryExample} from './chart-application-geometry-example.js';
 import {ChartSelectionPresentationExample} from './chart-selection-presentation-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
@@ -1330,7 +1331,7 @@ function FieldSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Collect multiline plain text with a deliberate initial height. Use TextField when line breaks carry no meaning."
+        description="Collect multiline plain text with a deliberate initial height. Use TextField when line breaks carry no meaning, or MarkdownEditor for Markdown source editing and safe preview."
         name="TextArea"
       >
         <TextArea
@@ -1344,6 +1345,13 @@ function FieldSpecimens() {
             Try compact density and optional field support reservation.
           </a>
         </p>
+      </Specimen>
+
+      <Specimen
+        description="Author one Markdown string in source mode and read its safe preview. Compose the mode control with SegmentedControl; the application owns its layout."
+        name="MarkdownEditor"
+      >
+        <MarkdownSpecimen />
       </Specimen>
 
       <Specimen

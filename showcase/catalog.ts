@@ -42,6 +42,7 @@ export const showcaseGroups = [
       'Field',
       'TextField',
       'TextArea',
+      'MarkdownEditor',
       'NumberField',
       'SearchField',
       'FieldGroup',

@@ -24,6 +24,11 @@ await copyFile(
   resolve(distributionDirectory, 'styles.css'),
 );
 
+await copyFile(
+  resolve(projectRoot, 'src/markdown/markdown.css'),
+  resolve(distributionDirectory, 'markdown/markdown.css'),
+);
+
 for (const entry of await readdir(resolve(projectRoot, 'src/charts'))) {
   if (!entry.endsWith('.css')) continue;
   await copyFile(

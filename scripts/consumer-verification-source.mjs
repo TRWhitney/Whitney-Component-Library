@@ -37,6 +37,7 @@ import {
   LineChart,
   List,
   ListBox,
+  MarkdownEditor,
   Meter,
   NotificationProvider,
   NumberField,
@@ -338,6 +339,16 @@ const view = React.createElement(
               label: 'Search runs',
               clearLabel: 'Clear query',
               defaultValue: 'thermal',
+            }),
+            React.createElement(MarkdownEditor, {
+              defaultValue: '# Packed Markdown',
+              label: 'Packed Markdown source',
+              name: 'markdown',
+            }),
+            React.createElement(MarkdownEditor, {
+              defaultValue: '# Packed reading\\n\\nA note[^one].\\n\\n[^one]: Packed evidence.',
+              label: 'Packed Markdown preview',
+              mode: 'preview',
             }),
             React.createElement(TextArea, {
               label: 'Notes',
@@ -807,8 +818,12 @@ const view = React.createElement(
   ),
 );
 const serverMarkup = renderToString(view);
-const dom = new JSDOM('<div id="root">' + serverMarkup + '</div>');
+const dom = new JSDOM('<div id="root">' + serverMarkup + '</div>', {pretendToBeVisual: true});
+// JSDOM has no text layout; browser checks own real caret and document geometry.
+dom.window.Range.prototype.getClientRects = () => Object.assign([], {item: () => null});
+dom.window.Range.prototype.getBoundingClientRect = () => new dom.window.DOMRect();
 globalThis.window = dom.window;
+globalThis.Window = dom.window.Window;
 globalThis.document = dom.window.document;
 globalThis.CustomEvent = dom.window.CustomEvent;
 globalThis.CSS = {escape: (value) => value.replace(/[^a-zA-Z0-9_-]/g, '\\$&')};
@@ -863,6 +878,13 @@ hydrateRoot(document.getElementById('root'), view, {
   onRecoverableError(error) { recoverableErrors.push(error); },
 });
 await new Promise((resolve) => setTimeout(resolve, 25));
+const packedSource = document.querySelector('[data-wcl-markdown-source] [role="textbox"]');
+if (!packedSource || packedSource.textContent !== '# Packed Markdown') {
+  throw new Error('Packed Markdown source did not hydrate into the labeled editor.');
+}
+if (!document.querySelector('[data-wcl-markdown-preview] [data-footnotes]')) {
+  throw new Error('Packed Markdown preview did not render footnotes.');
+}
 const findPackedButton = (label) =>
   [...document.querySelectorAll('[data-wcl-button]')].find(
     (button) => button.textContent === label,

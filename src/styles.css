@@ -1,5 +1,6 @@
 @layer wcl.reset, wcl.theme, wcl.components, wcl.utilities;
 
+@import url('./markdown/markdown.css');
 @import url('./charts/chart-exploration.css');
 @import url('./charts/chart-rectangular-exploration.css');
 @import url('./charts/heatmap-exploration.css');
