@@ -6,7 +6,7 @@ Complete [Ticket 26](../library-foundation/tickets/26-markdown-commands-links-as
 
 ## Current state
 
-Commands are delivered in f25e80a. Wiki navigation is complete and ready to commit; assets and extensions remain.
+Commands are delivered in f25e80a and wiki navigation in 367ab77. Asset acquisition is complete, validated, and reviewed; extensions remain.
 [Specification](spec.md) records the implementation boundary. The optional question about expected
 custom syntax is pending; the documented inline/fence boundary applies in its absence.
 
@@ -17,11 +17,11 @@ custom syntax is pending; the documented inline/fence boundary applies in its ab
 
 ## Verification
 
-[Current command evidence](verification.md). Package and zoom checks pass.
+[Current verification](verification.md) covers commands, navigation, and asset acquisition.
 
 ## Continuation
 
-Branch main, current baseline f25e80a, clean after command delivery. This effort owns Ticket 26 authoring behavior,
+Branch main, current baseline 367ab77. The current outcome delivers asset acquisition. This effort owns Ticket 26 authoring behavior,
 showcase, tests, contracts, and effort records. Deferred cleanup remains separate.
-Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work delivery`.
-Next action: commit wiki navigation, then implement asset acquisition.
+Resume with `python3 /home/whitney-white/.codex/skills/work-system/scripts/navigate.py resume novel-work implementation`.
+Next action: implement declared extensions after this asset delivery.

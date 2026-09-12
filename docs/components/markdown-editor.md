@@ -9,7 +9,7 @@ MarkdownEditor edits a Markdown string with in-place Live Preview, source editin
 ## Do not use for
 
 - plain multiline text with no Markdown meaning
-- uploads or custom syntax and commands, which are not delivered in this milestone
+- file storage or an unrestricted parser and plugin runtime
 
 ## Prefer instead
 
@@ -53,6 +53,10 @@ MarkdownEditor edits a Markdown string with in-place Live Preview, source editin
 - Inline commands wrap the source selection or remove matching surrounding delimiters. An empty selection leaves the caret inside the inserted delimiters. Code delimiters accommodate backticks in selected text. The link command inserts Markdown link syntax and selects its destination for editing.
 - Block commands transform complete selected lines and preserve unaffected text. Commands keep literal code literal. Toolbar and keyboard commands share the retained source selection, return focus to the document, and create individually undoable edits.
 - execute returns false without changing the document for an unsupported or unavailable command. Preview, disabled, read-only, pending, and locked states reject editing commands.
+- assets.insert receives {files, source, signal} and returns {markdown} or {error}, synchronously or as a Promise. source is paste or drop. The application owns storage and URLs; the editor inserts only returned Markdown and never uploads files.
+- assets accepts acceptedFileTypes, allowsMultiple, and maxFileSize using the shared file acceptance rules. One file is allowed by default. Rejected files produce associated feedback without entering the callback. File paste and drop are consumed even when no asset callback is supplied; ordinary text paste remains available.
+- One asset insertion can run at a time. Typing remains available while it is pending. The captured range follows unrelated edits, and completion preserves a caret moved elsewhere. Edits inside the captured selection, external value replacement, reset, noneditable state, or unmount cancel insertion. Late results are ignored even if the callback ignores its AbortSignal.
+- A successful asset insertion is one undoable edit. Failure offers Retry asset insertion and Dismiss asset feedback. Retry retains the accepted files and mapped insertion range; dismissal clears them. Controlled values retain final authority over insertion.
 - wikiLinks.resolve synchronously receives a target string and returns {href, label?} or null. wikiLinks.onNavigate receives the resolved {target, href, label}. The application owns routes and navigation; the editor prevents default wiki-link navigation and never rewrites the Markdown target.
 - onChange receives the complete Markdown string after an accepted edit. No engine state or syntax tree crosses the public API.
 - validationBehavior defaults to native. validate receives the string and may return localized errors; isInvalid with errorMessage supplies application validation.
@@ -74,6 +78,7 @@ MarkdownEditor edits a Markdown string with in-place Live Preview, source editin
 - Ctrl/Cmd-click on a resolved wiki link navigates without editing. Middle-click on a rendered wiki link also delegates to the application callback. With the cursor inside a resolved target, Mod+Enter or the composed Open link action calls the application navigation callback. Ordinary clicks reveal its Markdown source. Preview exposes resolved wiki links as native links for keyboard, pointer, and touch activation.
 - Preview supports ordinary document reading and safe-link keyboard navigation. Task checkboxes and unresolved wiki targets are inert.
 - label is required and visible. The field creates its own description, error, mode, and position relationships.
+- To localize asset feedback, supply complete assets.labels with pending(fileCount), rejected(files), failed, retry, and dismiss. Application-returned error strings are already localized by the application.
 - Localize label, description, errorMessage, pendingMessage, lockMessage, and any supplied toolbar labels in the application. English mode, position, empty-preview, required-validation, and footnote copy is built in.
 - To localize built-in copy, supply a complete labels object with livePreview, source, preview, emptyPreview, required, footnotes, footnoteBack, and position(line, column).
 - The field inherits writing direction; source selection and reading order follow the document text.

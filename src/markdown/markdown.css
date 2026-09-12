@@ -214,6 +214,18 @@
     grid-area: 5 / 1;
   }
 
+  [data-wcl-markdown-assets] {
+    grid-area: 2 / 1;
+    display: grid;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+
+  [data-wcl-markdown-assets] > [aria-atomic] {
+    display: grid;
+    gap: 0.25rem;
+  }
+
   [data-wcl-markdown-editor] [data-wcl-markdown-lock] {
     grid-area: 2 / 1;
     margin-block-start: 0.25rem;

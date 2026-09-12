@@ -64,6 +64,7 @@ export function MarkdownSpecimen() {
   const [isPending, setPending] = useState(false);
   const [isLocked, setLocked] = useState(false);
   const [openedWiki, setOpenedWiki] = useState('');
+  const [assetUnavailable, setAssetUnavailable] = useState(false);
 
   return (
     <Stack gap="regular">
@@ -96,6 +97,11 @@ export function MarkdownSpecimen() {
         <Switch label="Disabled" isSelected={isDisabled} onChange={setDisabled} />
         <Switch label="Pending" isSelected={isPending} onChange={setPending} />
         <Switch label="Locked" isSelected={isLocked} onChange={setLocked} />
+        <Switch
+          label="Asset service unavailable"
+          isSelected={assetUnavailable}
+          onChange={setAssetUnavailable}
+        />
       </InlineGroup>
       <MarkdownEditor
         label="Markdown review notes"
@@ -221,6 +227,26 @@ export function MarkdownSpecimen() {
         size={size}
         value={value}
         onChange={setValue}
+        assets={{
+          acceptedFileTypes: ['image/png', 'image/jpeg', 'image/svg+xml'],
+          maxFileSize: 5 * 1024 * 1024,
+          insert: async ({signal}) => {
+            await new Promise<void>((resolve) => {
+              const timer = setTimeout(resolve, 700);
+              signal.addEventListener(
+                'abort',
+                () => {
+                  clearTimeout(timer);
+                  resolve();
+                },
+                {once: true},
+              );
+            });
+            return assetUnavailable
+              ? {error: 'The example asset service is unavailable. Turn it back on and retry.'}
+              : {markdown: '![Boundary mesh](/markdown-boundary.svg)'};
+          },
+        }}
         wikiLinks={{
           resolve: (target) =>
             target === 'Boundary review'
@@ -256,6 +282,12 @@ export function MarkdownSpecimen() {
         activation. This example reports the selected note below the editor. Unresolved wiki targets
         stay inert, and HTML stays literal. The application supplies wiki destinations and handles
         navigation.
+      </p>
+      <p>
+        Paste or drop one PNG, JPEG, or SVG up to 5 MB. This example waits briefly, then inserts the
+        bundled boundary mesh. Turn on Asset service unavailable to try failure and retry. Typing
+        remains available while insertion is pending. Applications handle file storage and return
+        the Markdown to insert; this example does not upload your file.
       </p>
     </Stack>
   );

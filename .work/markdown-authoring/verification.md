@@ -108,3 +108,55 @@ prevention. Direct browser inspection confirms one native anchor with the origin
 callbacks with no extra tab and a single reading-preview anchor for the nested example.
 `npm run check` passes all 1,103 tests and all configured checks. The revised native browser
 checks pass in Chromium and Firefox. Both independent correction reviews pass without blocking findings.
+
+## Asset acquisition
+
+Public integration tests cover accepted files, callback-only Markdown insertion, pending typing,
+range mapping, isolated undo, retry, rejection, noneditable states, controlled replacement and
+rejection, reset, and ignored late results. Initial acquisition tests observed 7 expected failures;
+additional boundary tests observed caret theft and replacement of newly inserted text inside a
+captured selection. Both corrections now pass. The two asset suites pass all 21 tests.
+
+`npm run check` passes all 1124 tests in 79 files, formatting, both linters, generated contracts,
+TypeScript 5.9/6/7 declarations, and ordinary component bundle isolation. `npm run verify:package`
+passes packed React 18.3.1 and 19.2.8 SSR, hydration, types, and browser builds. The production
+showcase build passes.
+
+Chromium and Firefox operated the actual showcase with file paste, coordinate-targeted drop,
+pending typing elsewhere, preserved caret, isolated undo, failure/retry, and rejected file
+feedback. Browser-created File/DataTransfer objects entered native events; Firefox ignores the
+ClipboardEvent clipboardData initializer, so its synthetic paste event explicitly supplied that
+browser boundary property. Neither browser reported page errors. Ordinary text clipboard behavior
+was also retained in the existing Live Preview interaction run.
+
+Direct preview operation reproduced failure and dismissal in Live Preview and inspected the
+associated alert/description relationship. Inspected screenshots cover pending and error in dark
+appearance, narrow light appearance, and forced colors with reduced motion in both browsers.
+Feedback has a separate row below the field description; recovery buttons wrap without clipping.
+Screenshots are removed after inspection. The 115392-character interaction run retains the
+200 ms input/selection and 2-second mode-switch budgets; current measurements are recorded below.
+
+The canonical component contract, generated documentation, public declaration fixtures, packed
+consumer example, and human-facing Markdown specimen describe the callback and recovery boundary.
+
+Chromium measured input 61–103 ms, selection 18–35 ms, and Live Preview switching 113 ms.
+Firefox measured input 26–51 ms, selection 29–51 ms, and Live Preview switching 208 ms.
+
+Independent asset intent review passed without findings. Engineering review found that Live Preview
+widgets suppressed file drops before the acquisition handler. Public image/table/code tests now
+cover consumed dragover and drop. The table/code drop checks and all three dragover checks first
+failed, then passed after allowing acquisition events through widgets and admitting file drags.
+The affected asset, Live Preview, and wiki suites pass 62 tests. A Chromium native file drag through
+CDP now enters, hovers, and drops onto each rendered image/table/code target and inserts the
+callback Markdown. Firefox tests send all three events to those exact rendered descendants and
+also pass. Direct preview operation confirmed consumed acquisition events and rendered insertion.
+
+A concurrent full-suite run exceeded the existing five-second timeout in a Drawer showcase test.
+That unchanged suite passed all 15 tests on repeat. Final full-suite evidence follows the bounded
+widget correction. Package and performance evidence remains valid because the correction changes
+only file drag admission and widget event filtering.
+
+Final `npm run check` passes all 1127 tests in 79 files after the drag correction, plus formatting,
+linters, generated contracts, declaration matrix, and bundle isolation.
+
+Bounded independent intent and engineering correction reviews both pass with no findings.

@@ -252,8 +252,9 @@ export class LiveWidget extends WidgetType {
     return element;
   }
 
-  override ignoreEvent(): boolean {
-    return true;
+  override ignoreEvent(event: Event): boolean {
+    // File acquisition belongs to the editor even when the target is rendered content.
+    return !['dragenter', 'dragover', 'drop'].includes(event.type);
   }
 }
 

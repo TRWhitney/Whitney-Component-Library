@@ -357,6 +357,7 @@ const view = React.createElement(
               label: 'Packed Markdown preview',
               mode: 'preview',
               wikiLinks: {resolve: (target) => ({href: '/notes/' + encodeURIComponent(target)}), onNavigate: () => {}},
+              assets: {acceptedFileTypes: ['image/png'], insert: ({source, signal}) => ({markdown: signal.aborted ? '' : '![Packed ' + source + '](/asset.png)'})},
             }),
             React.createElement(TextArea, {
               label: 'Notes',

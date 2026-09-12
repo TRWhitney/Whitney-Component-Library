@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react';
+import type {FileAcceptanceProps, RejectedFile} from '../files/file-types.js';
 
 import type {
   FieldPendingProps,
@@ -54,6 +55,31 @@ export interface MarkdownWikiLinks {
   readonly onNavigate: (link: MarkdownWikiLink) => void;
 }
 
+export interface MarkdownAssetRequest {
+  readonly files: readonly File[];
+  readonly source: 'paste' | 'drop';
+  readonly signal: AbortSignal;
+}
+
+export type MarkdownAssetResult =
+  | {readonly markdown: string; readonly error?: never}
+  | {readonly error: string; readonly markdown?: never};
+
+export interface MarkdownAssetLabels {
+  readonly pending: (fileCount: number) => string;
+  readonly rejected: (files: readonly RejectedFile[]) => string;
+  readonly failed: string;
+  readonly retry: string;
+  readonly dismiss: string;
+}
+
+export interface MarkdownAssetOptions extends FileAcceptanceProps {
+  readonly insert: (
+    request: MarkdownAssetRequest,
+  ) => MarkdownAssetResult | Promise<MarkdownAssetResult>;
+  readonly labels?: MarkdownAssetLabels;
+}
+
 export type MarkdownEditorSize = 'compact' | 'regular' | 'expanded';
 
 export interface MarkdownEditorLabels {
@@ -78,6 +104,7 @@ export type MarkdownEditorProps = FieldStateProps &
   MarkdownEditorLockProps & {
     readonly renderToolbar?: (controls: MarkdownEditorControls) => ReactNode;
     readonly wikiLinks?: MarkdownWikiLinks;
+    readonly assets?: MarkdownAssetOptions;
     readonly form?: string;
     readonly name?: string;
     readonly mode?: MarkdownEditorMode;

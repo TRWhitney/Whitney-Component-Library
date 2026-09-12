@@ -11,6 +11,10 @@ import {
 } from 'react';
 
 import {useFieldGroupDisabled} from '../fields/field-group-context.js';
+import {Button} from '../actions/button.js';
+import {InlineGroup} from '../layout/inline-group.js';
+import {assertFileAcceptanceProps} from '../files/file-validation.js';
+import {defaultAssetLabels, type AssetState} from './asset-session.js';
 import {createSourceSession, type SourceSession} from './source-session.js';
 import {MarkdownPreview} from './markdown-preview.js';
 import type {MarkdownEditorProps, MarkdownEditorControls} from './markdown-types.js';
@@ -28,6 +32,7 @@ const unavailableControls: MarkdownEditorControls = {
 export function MarkdownEditor({
   renderToolbar,
   wikiLinks,
+  assets,
   defaultValue = '',
   value,
   onChange,
@@ -51,6 +56,7 @@ export function MarkdownEditor({
   validate,
   validationBehavior = 'native',
 }: MarkdownEditorProps): ReactElement {
+  if (assets) assertFileAcceptanceProps(assets);
   const inheritedDisabled = useFieldGroupDisabled();
   const disabled = isDisabled || inheritedDisabled;
   const readonly = isReadOnly || isPending || isLocked;
@@ -59,6 +65,9 @@ export function MarkdownEditor({
   const [initialValue] = useState(currentValue);
   const [mounted, setMounted] = useState(false);
   const [commandControls, setCommandControls] = useState(unavailableControls);
+  const [assetState, setAssetState] = useState<AssetState>({kind: 'idle'});
+  const assetLabels = assets?.labels ?? defaultAssetLabels;
+  const acquiring = assetState.kind === 'pending';
   const [attempted, setAttempted] = useState(false);
   const [reconcileVersion, setReconcileVersion] = useState(0);
   const [position, setPosition] = useState({line: 1, column: 1});
@@ -77,6 +86,7 @@ export function MarkdownEditor({
   const descriptionId = `${baseId}-description`;
   const lockId = `${baseId}-lock`;
   const pendingId = `${baseId}-pending`;
+  const assetId = `${baseId}-assets`;
   const result = validate?.(currentValue);
   const customError =
     typeof result === 'string' ? result : Array.isArray(result) ? result.join(' ') : '';
@@ -92,6 +102,7 @@ export function MarkdownEditor({
     visibleError ? errorId : '',
     isLocked ? lockId : '',
     isPending ? pendingId : '',
+    assetState.kind !== 'idle' ? assetId : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -104,10 +115,10 @@ export function MarkdownEditor({
       'aria-invalid': String(invalid),
       'aria-readonly': String(readonly || disabled),
       'aria-disabled': String(disabled),
-      'aria-busy': String(isPending),
+      'aria-busy': String(isPending || acquiring),
       tabindex: disabled ? '-1' : '0',
     }),
-    [sourceId, labelId, describedBy, isRequired, invalid, readonly, disabled, isPending],
+    [sourceId, labelId, describedBy, isRequired, invalid, readonly, disabled, isPending, acquiring],
   );
 
   useEffect(() => {
@@ -125,6 +136,8 @@ export function MarkdownEditor({
         ...(renderToolbar ? {onControls: setCommandControls} : {}),
         labels,
         ...(wikiLinks ? {wikiLinks} : {}),
+        ...(assets ? {assets} : {}),
+        onAssetState: setAssetState,
         livePreview: mode === 'live-preview',
         isDisabled: latest.current.disabled,
         isReadOnly: latest.current.readonly,
@@ -139,7 +152,7 @@ export function MarkdownEditor({
     session.current = editor;
     setMounted(true);
     if (active && latest.current.mode !== 'preview') editor.focus();
-  }, [mode, labels, renderToolbar, wikiLinks]);
+  }, [mode, labels, renderToolbar, wikiLinks, assets]);
   useEffect(
     () => () => {
       session.current?.destroy();
@@ -153,11 +166,13 @@ export function MarkdownEditor({
       ...(renderToolbar ? {onControls: setCommandControls} : {}),
       labels,
       ...(wikiLinks ? {wikiLinks} : {}),
+      ...(assets ? {assets} : {}),
+      onAssetState: setAssetState,
       livePreview: mode === 'live-preview',
       isDisabled: disabled,
       isReadOnly: readonly || mode === 'preview',
     });
-  }, [attributes, renderToolbar, labels, mode, disabled, readonly, wikiLinks]);
+  }, [attributes, renderToolbar, labels, mode, disabled, readonly, wikiLinks, assets]);
   useEffect(() => {
     session.current?.replace(currentValue);
   }, [currentValue, reconcileVersion]);
@@ -240,7 +255,7 @@ export function MarkdownEditor({
       data-reserve-support={reserveSupportSpace || undefined}
       data-locked={isLocked || undefined}
       {...(isPending ? {'data-wcl-pending': ''} : {})}
-      aria-busy={isPending || undefined}
+      aria-busy={isPending || acquiring || undefined}
     >
       <label
         data-wcl-field-label=""
@@ -334,6 +349,37 @@ export function MarkdownEditor({
         {mode !== 'preview' ? <span>{labels.position(position.line, position.column)}</span> : null}
       </div>
       <div data-wcl-field-support="">
+        {assetState.kind !== 'idle' ? (
+          <div data-wcl-markdown-assets="">
+            <div id={assetId} role={acquiring ? 'status' : 'alert'} aria-atomic="true">
+              {assetState.kind === 'pending' ? (
+                <span data-wcl-field-pending="">{assetLabels.pending(assetState.count)}</span>
+              ) : null}
+              {assetState.kind === 'error' ? (
+                <span data-wcl-field-error="">{assetState.message}</span>
+              ) : null}
+              {assetState.rejections.length ? (
+                <span data-wcl-field-error="">{assetLabels.rejected(assetState.rejections)}</span>
+              ) : null}
+            </div>
+            {!acquiring ? (
+              <InlineGroup gap="tight" wrap>
+                {assetState.kind === 'error' ? (
+                  <Button
+                    size="compact"
+                    isDisabled={disabled || readonly || mode === 'preview'}
+                    onPress={() => session.current?.retryAssets()}
+                  >
+                    {assetLabels.retry}
+                  </Button>
+                ) : null}
+                <Button size="compact" onPress={() => session.current?.dismissAssets()}>
+                  {assetLabels.dismiss}
+                </Button>
+              </InlineGroup>
+            ) : null}
+          </div>
+        ) : null}
         {description ? (
           <span data-wcl-field-description="" id={descriptionId}>
             {description}

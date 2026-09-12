@@ -7,6 +7,8 @@ import {
   type MarkdownEditorControls,
   type MarkdownEditorLabels,
   type MarkdownEditorProps,
+  type MarkdownAssetResult,
+  type MarkdownAssetLabels,
 } from '../src/index.js';
 
 export const defaultLivePreview = (
@@ -14,6 +16,26 @@ export const defaultLivePreview = (
 );
 export const livePreview = <MarkdownEditor label="Document" mode="live-preview" />;
 export const source = <MarkdownEditor label="Document" mode="source" />;
+export const assets = (
+  <MarkdownEditor
+    label="Document"
+    assets={{
+      acceptedFileTypes: ['image/png'],
+      allowsMultiple: true,
+      maxFileSize: 1000000,
+      insert: ({files, source, signal}) =>
+        Promise.resolve(
+          signal.aborted
+            ? {error: 'Cancelled'}
+            : {markdown: `![${files.length} ${source}](/asset.png)`},
+        ),
+    }}
+  />
+);
+// @ts-expect-error An asset result supplies Markdown or an error, never both.
+export const ambiguousAsset: MarkdownAssetResult = {markdown: 'text', error: 'Failed'};
+// @ts-expect-error Asset labels require complete recovery and rejection copy.
+export const incompleteAssetLabels: MarkdownAssetLabels = {failed: 'Failed'};
 export const reading = (
   <MarkdownEditor
     label="Document"

@@ -16,7 +16,9 @@ import type {
   MarkdownEditorLabels,
   MarkdownEditorControls,
   MarkdownWikiLinks,
+  MarkdownAssetOptions,
 } from './markdown-types.js';
+import {createAssetSession, type AssetState} from './asset-session.js';
 import {
   wikiLinks,
   wikiDisabled,
@@ -28,6 +30,8 @@ import {
 interface SourceConfiguration {
   readonly onControls?: (controls: MarkdownEditorControls) => void;
   readonly wikiLinks?: MarkdownWikiLinks;
+  readonly assets?: MarkdownAssetOptions;
+  readonly onAssetState?: (state: AssetState) => void;
   readonly labels: MarkdownEditorLabels;
   readonly livePreview: boolean;
   readonly attributes: Record<string, string>;
@@ -42,6 +46,8 @@ export interface SourceSession {
   hasFocus: () => boolean;
   refresh: () => void;
   destroy: () => void;
+  retryAssets: () => void;
+  dismissAssets: () => void;
 }
 
 export function createSourceSession(
@@ -56,6 +62,10 @@ export function createSourceSession(
   const presentation = new Compartment();
   let showingLive = configuration.livePreview;
   let currentConfiguration = configuration;
+  const assets = createAssetSession(
+    () => currentConfiguration.assets,
+    (state) => currentConfiguration.onAssetState?.(state),
+  );
   let commandSignature = '';
   const reportCommands = (view: EditorView) => {
     if (!currentConfiguration.onControls) return;
@@ -90,6 +100,7 @@ export function createSourceSession(
         EditorView.lineWrapping,
         EditorView.perLineTextDirection.of(true),
         wikiNavigation,
+        assets.extension,
         presentation.of(showingLive ? livePreview : []),
         settings.of(configure(configuration)),
         undoHistory.of(history()),
@@ -102,6 +113,7 @@ export function createSourceSession(
         markdown({base: markdownLanguage, addKeymap: false, completeHTMLTags: false}),
         syntaxHighlighting(classHighlighter),
         EditorView.updateListener.of((update) => {
+          assets.update(update);
           reportCommands(update.view);
           if (
             update.docChanged &&
@@ -135,6 +147,7 @@ export function createSourceSession(
     },
     replace(next, resetHistory = false) {
       const previous = view.state.doc.toString();
+      if (resetHistory || previous !== next) assets.cancel();
       if (resetHistory) {
         view.dispatch({effects: undoHistory.reconfigure([])});
       }
@@ -167,7 +180,14 @@ export function createSourceSession(
       view.requestMeasure();
     },
     destroy() {
+      assets.destroy();
       view.destroy();
+    },
+    retryAssets() {
+      assets.retry(view);
+    },
+    dismissAssets() {
+      assets.dismiss();
     },
   };
 }
