@@ -349,6 +349,8 @@ const view = React.createElement(
             React.createElement(MarkdownEditor, {
               defaultValue: '# Live Markdown',
               label: 'Packed Markdown Live Preview',
+              renderToolbar: (controls) => React.createElement(Toolbar, {label: 'Markdown formatting'},
+                React.createElement(Button, {isDisabled: !controls.canExecute('bold'), onPress: () => controls.execute('bold')}, 'Bold')),
             }),
             React.createElement(MarkdownEditor, {
               defaultValue: '# Packed reading\\n\\nA note[^one].\\n\\n[^one]: Packed evidence.',

@@ -1,4 +1,13 @@
-import {MarkdownEditor, type MarkdownEditorLabels, type MarkdownEditorProps} from '../src/index.js';
+import {
+  Button,
+  MarkdownEditor,
+  ToggleButton,
+  Toolbar,
+  type MarkdownCommand,
+  type MarkdownEditorControls,
+  type MarkdownEditorLabels,
+  type MarkdownEditorProps,
+} from '../src/index.js';
 
 export const defaultLivePreview = (
   <MarkdownEditor label="Document" defaultValue="# Review" name="body" />
@@ -28,6 +37,81 @@ const labels = {
   position: (line, column) => `Line ${line}, column ${column}`,
 } satisfies MarkdownEditorLabels;
 export const localized = <MarkdownEditor label="Document" labels={labels} />;
+export const composedCommands = (
+  <MarkdownEditor
+    label="Document"
+    renderToolbar={({execute, canExecute, isActive}) => (
+      <Toolbar label="Formatting">
+        <ToggleButton
+          isSelected={isActive('bold')}
+          isDisabled={!canExecute('bold')}
+          onChange={() => {
+            execute('bold');
+          }}
+        >
+          Bold
+        </ToggleButton>
+        <Button
+          isDisabled={!canExecute('undo')}
+          onPress={() => {
+            execute('undo');
+          }}
+        >
+          Undo
+        </Button>
+      </Toolbar>
+    )}
+  />
+);
+
+export const builtInCommands = [
+  'bold',
+  'italic',
+  'strikethrough',
+  'inline-code',
+  'link',
+  'heading-1',
+  'heading-2',
+  'heading-3',
+  'heading-4',
+  'heading-5',
+  'heading-6',
+  'paragraph',
+  'blockquote',
+  'bullet-list',
+  'ordered-list',
+  'task-list',
+  'code-block',
+  'horizontal-rule',
+  'undo',
+  'redo',
+] satisfies readonly MarkdownCommand[];
+
+export function commandResults(controls: MarkdownEditorControls, command: MarkdownCommand) {
+  const executed: boolean = controls.execute(command);
+  const available: boolean = controls.canExecute(command);
+  const active: boolean = controls.isActive(command);
+  return {executed, available, active};
+}
+
+export function rejectUnsupportedCommands(controls: MarkdownEditorControls) {
+  // @ts-expect-error Custom command identifiers are not built-in commands.
+  controls.execute('custom-format');
+  // @ts-expect-error Heading commands support levels one through six.
+  controls.canExecute('heading-7');
+  // @ts-expect-error Active state uses the same finite command identifiers.
+  controls.isActive('unknown');
+  // @ts-expect-error Commands accept identifiers, not engine command objects.
+  controls.execute({id: 'bold', run: () => true});
+}
+
+// @ts-expect-error Engine command callbacks are not Markdown command identifiers.
+export const engineCommand: MarkdownCommand = () => true;
+export const invalidToolbar = (
+  // @ts-expect-error Toolbar composition requires a render callback.
+  <MarkdownEditor label="Document" renderToolbar={<Toolbar label="Formatting" />} />
+);
+
 // @ts-expect-error Complete label overrides must include Live Preview copy.
 export const incompleteLabels: MarkdownEditorLabels = {
   source: labels.source,
@@ -56,10 +140,30 @@ export const unsafeRenderer = <MarkdownEditor label="Document" remarkPlugins={[]
 // @ts-expect-error General styling does not enter the public component contract.
 export const styling = <MarkdownEditor label="Document" className="custom" />;
 
-type PrivateKeys = 'editorState' | 'editorView' | 'extensions' | 'plugins' | 'renderHTML';
+type PrivateKeys =
+  | 'editorState'
+  | 'editorView'
+  | 'state'
+  | 'view'
+  | 'dispatch'
+  | 'extensions'
+  | 'plugins'
+  | 'renderHTML';
 export const publicTypesKeepEnginePrivate: Extract<
   keyof MarkdownEditorProps,
   PrivateKeys
 > extends never
   ? true
   : false = true;
+export const commandControlsKeepEnginePrivate: Extract<
+  keyof MarkdownEditorControls,
+  PrivateKeys
+> extends never
+  ? true
+  : false = true;
+
+type ControlPrivateKeys = Extract<
+  keyof MarkdownEditorControls,
+  'editorView' | 'editorState' | 'dispatch' | 'plugins'
+>;
+export const privateCommandStateIsAbsent: ControlPrivateKeys extends never ? true : false = true;

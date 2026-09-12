@@ -12,7 +12,8 @@ propagated application accent.
 Tickets 01 through 25, including the intervening Ticket 03A accent correction, are complete.
 Ticket 24 delivers Markdown source editing and safe preview with one retained editing session.
 Ticket 25 adds default in-place Live Preview with context-sensitive source reveal.
-Commands, navigation, assets, and extensions are next in Ticket 26.
+Ticket 26 is active in the [Markdown authoring effort](../markdown-authoring/status.md).
+Commands are complete; navigation, assets, and extensions remain.
 Ticket 23 delivers the accepted [Energy desk prototype](../data-analysis-prototype/status.md)
 and all thirteen library fixes verified in that packed-consumer application.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
@@ -544,4 +545,4 @@ Whitney's deferred editor-state styling and showcase cleanup are recorded in Tic
 - Ticket 22 is complete through `19a050f`. Its accepted performance results and delivery evidence
   remain in the [chart effort](../chart-interaction-composition/status.md).
 - Ticket 23 and all thirteen library fixes are complete. See the [delivery and verification record](../data-analysis-prototype/status.md).
-- Next planned foundation work is Ticket 24. It has not begun.
+- Current foundation work is Ticket 26, tracked in the [authoring effort](../markdown-authoring/status.md).

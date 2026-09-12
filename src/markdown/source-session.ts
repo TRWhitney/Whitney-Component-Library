@@ -1,15 +1,21 @@
 import {Compartment, EditorState, Transaction} from '@codemirror/state';
 import {EditorView, keymap} from '@codemirror/view';
 import {defaultKeymap, history, historyKeymap, insertNewline} from '@codemirror/commands';
-import {markdown} from '@codemirror/lang-markdown';
+import {markdown, markdownLanguage} from '@codemirror/lang-markdown';
 import {syntaxHighlighting} from '@codemirror/language';
 import {classHighlighter} from '@lezer/highlight';
 
+import {
+  runMarkdownCommand,
+  markdownCommandStatus,
+  markdownCommandKeymap,
+} from './markdown-commands.js';
 import {liveFocus, liveLabels} from './live-effects.js';
 import {livePreview} from './live-preview.js';
-import type {MarkdownEditorLabels} from './markdown-types.js';
+import type {MarkdownEditorLabels, MarkdownEditorControls} from './markdown-types.js';
 
 interface SourceConfiguration {
+  readonly onControls?: (controls: MarkdownEditorControls) => void;
   readonly labels: MarkdownEditorLabels;
   readonly livePreview: boolean;
   readonly attributes: Record<string, string>;
@@ -37,6 +43,20 @@ export function createSourceSession(
   const undoHistory = new Compartment();
   const presentation = new Compartment();
   let showingLive = configuration.livePreview;
+  let currentConfiguration = configuration;
+  let commandSignature = '';
+  const reportCommands = (view: EditorView) => {
+    if (!currentConfiguration.onControls) return;
+    const {available, active} = markdownCommandStatus(view);
+    const signature = JSON.stringify([available, active]);
+    if (signature === commandSignature) return;
+    commandSignature = signature;
+    currentConfiguration.onControls({
+      execute: (command) => runMarkdownCommand(view, command),
+      canExecute: (command) => available.includes(command),
+      isActive: (command) => active.includes(command),
+    });
+  };
   const configure = (next: SourceConfiguration) => [
     liveLabels.of(next.labels),
     EditorState.readOnly.of(next.isReadOnly || next.isDisabled),
@@ -55,10 +75,16 @@ export function createSourceSession(
         presentation.of(showingLive ? livePreview : []),
         settings.of(configure(configuration)),
         undoHistory.of(history()),
-        keymap.of([{key: 'Enter', run: insertNewline}, ...defaultKeymap, ...historyKeymap]),
-        markdown({addKeymap: false, completeHTMLTags: false}),
+        keymap.of([
+          ...markdownCommandKeymap,
+          {key: 'Enter', run: insertNewline},
+          ...defaultKeymap,
+          ...historyKeymap,
+        ]),
+        markdown({base: markdownLanguage, addKeymap: false, completeHTMLTags: false}),
         syntaxHighlighting(classHighlighter),
         EditorView.updateListener.of((update) => {
+          reportCommands(update.view);
           if (
             update.docChanged &&
             update.transactions.some((transaction) => !transaction.annotation(externalChange))
@@ -75,8 +101,11 @@ export function createSourceSession(
     }),
   });
 
+  reportCommands(view);
   return {
     configure(next) {
+      if (currentConfiguration.onControls !== next.onControls) commandSignature = '';
+      currentConfiguration = next;
       const effects = [settings.reconfigure(configure(next))];
       if (next.livePreview !== showingLive) {
         showingLive = next.livePreview;

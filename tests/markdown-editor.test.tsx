@@ -4,7 +4,7 @@ import {renderToString} from 'react-dom/server';
 import {hydrateRoot} from 'react-dom/client';
 import {useState} from 'react';
 
-import {AppearanceProvider, FieldGroup, MarkdownEditor} from '../src/index.js';
+import {AppearanceProvider, FieldGroup, MarkdownEditor, Toolbar, Button} from '../src/index.js';
 
 afterEach(cleanup);
 
@@ -353,7 +353,20 @@ describe('Markdown editing', () => {
       return (
         <AppearanceProvider accent="#2878ff" appearance="dark">
           <MarkdownEditor mode="source" label="Source" value={value} onChange={setValue} />
-          <MarkdownEditor label="Live" defaultValue="# Live document" />
+          <MarkdownEditor
+            label="Live"
+            defaultValue="# Live document"
+            renderToolbar={(controls) => (
+              <Toolbar label="Formatting">
+                <Button
+                  isDisabled={!controls.canExecute('bold')}
+                  onPress={() => controls.execute('bold')}
+                >
+                  Bold
+                </Button>
+              </Toolbar>
+            )}
+          />
           <MarkdownEditor
             label="Reading"
             mode="preview"
@@ -365,6 +378,7 @@ describe('Markdown editing', () => {
     const server = renderToString(<View />);
     expect(server).toContain('# Source');
     expect(server).toContain('<h1>Reading</h1>');
+    expect(server).toContain('Formatting');
     const container = document.createElement('div');
     document.body.append(container);
     container.innerHTML = server;
@@ -375,6 +389,9 @@ describe('Markdown editing', () => {
       await Promise.resolve();
     });
     expect(onRecoverableError).not.toHaveBeenCalled();
+    expect(within(container).getByRole('button', {name: 'Bold'}).hasAttribute('disabled')).toBe(
+      false,
+    );
     await waitFor(() => expect(within(container).getAllByRole('textbox')).toHaveLength(2));
     expect(
       within(within(container).getByRole('textbox', {name: 'Live'})).getByRole('heading', {

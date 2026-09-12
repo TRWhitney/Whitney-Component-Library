@@ -1,3 +1,5 @@
+import type {ReactNode} from 'react';
+
 import type {
   FieldPendingProps,
   FieldStateProps,
@@ -6,6 +8,34 @@ import type {
 } from '../fields/field-types.js';
 
 export type MarkdownEditorMode = 'live-preview' | 'source' | 'preview';
+export type MarkdownCommand =
+  | 'bold'
+  | 'italic'
+  | 'strikethrough'
+  | 'inline-code'
+  | 'link'
+  | 'heading-1'
+  | 'heading-2'
+  | 'heading-3'
+  | 'heading-4'
+  | 'heading-5'
+  | 'heading-6'
+  | 'paragraph'
+  | 'blockquote'
+  | 'bullet-list'
+  | 'ordered-list'
+  | 'task-list'
+  | 'code-block'
+  | 'horizontal-rule'
+  | 'undo'
+  | 'redo';
+
+export interface MarkdownEditorControls {
+  readonly execute: (command: MarkdownCommand) => boolean;
+  readonly canExecute: (command: MarkdownCommand) => boolean;
+  readonly isActive: (command: MarkdownCommand) => boolean;
+}
+
 export type MarkdownEditorSize = 'compact' | 'regular' | 'expanded';
 
 export interface MarkdownEditorLabels {
@@ -28,6 +58,7 @@ export type MarkdownEditorProps = FieldStateProps &
   FieldValidationProps<string> &
   StringValueProps &
   MarkdownEditorLockProps & {
+    readonly renderToolbar?: (controls: MarkdownEditorControls) => ReactNode;
     readonly form?: string;
     readonly name?: string;
     readonly mode?: MarkdownEditorMode;

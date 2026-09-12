@@ -5,6 +5,19 @@
     grid-template-rows: auto auto auto auto;
   }
 
+  [data-wcl-markdown-editor][data-toolbar] {
+    grid-template-rows: auto auto auto auto auto;
+  }
+
+  [data-wcl-markdown-toolbar] [data-wcl-toolbar] {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  [data-wcl-markdown-toolbar] :is([data-wcl-button], [data-wcl-toggle-button]) {
+    max-inline-size: 100%;
+  }
+
   [data-wcl-markdown-editor][data-size='compact'] {
     --wcl-markdown-height: 14rem;
   }
@@ -185,6 +198,14 @@
 
   [data-wcl-markdown-editor] > [data-wcl-field-support] {
     grid-area: 4 / 1;
+  }
+
+  [data-wcl-markdown-editor][data-toolbar] > [data-wcl-markdown-context] {
+    grid-area: 4 / 1;
+  }
+
+  [data-wcl-markdown-editor][data-toolbar] > [data-wcl-field-support] {
+    grid-area: 5 / 1;
   }
 
   [data-wcl-markdown-editor] [data-wcl-markdown-lock] {

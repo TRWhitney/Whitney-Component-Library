@@ -1,15 +1,30 @@
 'use client';
 
-import {useEffect, useId, useRef, useState, type ReactElement, type SyntheticEvent} from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useMemo,
+  type ReactElement,
+  type SyntheticEvent,
+} from 'react';
 
 import {useFieldGroupDisabled} from '../fields/field-group-context.js';
 import {createSourceSession, type SourceSession} from './source-session.js';
 import {MarkdownPreview} from './markdown-preview.js';
-import type {MarkdownEditorProps} from './markdown-types.js';
+import type {MarkdownEditorProps, MarkdownEditorControls} from './markdown-types.js';
 
 import {englishLabels} from './markdown-labels.js';
 
+const unavailableControls: MarkdownEditorControls = {
+  execute: () => false,
+  canExecute: () => false,
+  isActive: () => false,
+};
+
 export function MarkdownEditor({
+  renderToolbar,
   defaultValue = '',
   value,
   onChange,
@@ -40,6 +55,7 @@ export function MarkdownEditor({
   const currentValue = value ?? localValue;
   const [initialValue] = useState(currentValue);
   const [mounted, setMounted] = useState(false);
+  const [commandControls, setCommandControls] = useState(unavailableControls);
   const [attempted, setAttempted] = useState(false);
   const [reconcileVersion, setReconcileVersion] = useState(0);
   const [position, setPosition] = useState({line: 1, column: 1});
@@ -76,17 +92,20 @@ export function MarkdownEditor({
   ]
     .filter(Boolean)
     .join(' ');
-  const attributes = {
-    id: sourceId,
-    'aria-labelledby': labelId,
-    'aria-describedby': describedBy,
-    'aria-required': String(isRequired),
-    'aria-invalid': String(invalid),
-    'aria-readonly': String(readonly || disabled),
-    'aria-disabled': String(disabled),
-    'aria-busy': String(isPending),
-    tabindex: disabled ? '-1' : '0',
-  };
+  const attributes = useMemo(
+    () => ({
+      id: sourceId,
+      'aria-labelledby': labelId,
+      'aria-describedby': describedBy,
+      'aria-required': String(isRequired),
+      'aria-invalid': String(invalid),
+      'aria-readonly': String(readonly || disabled),
+      'aria-disabled': String(disabled),
+      'aria-busy': String(isPending),
+      tabindex: disabled ? '-1' : '0',
+    }),
+    [sourceId, labelId, describedBy, isRequired, invalid, readonly, disabled, isPending],
+  );
 
   useEffect(() => {
     latest.current = {onChange, currentValue, disabled, readonly, mode};
@@ -100,6 +119,7 @@ export function MarkdownEditor({
       latest.current.currentValue,
       {
         attributes: {},
+        ...(renderToolbar ? {onControls: setCommandControls} : {}),
         labels,
         livePreview: mode === 'live-preview',
         isDisabled: latest.current.disabled,
@@ -115,7 +135,7 @@ export function MarkdownEditor({
     session.current = editor;
     setMounted(true);
     if (active && latest.current.mode !== 'preview') editor.focus();
-  }, [mode, labels]);
+  }, [mode, labels, renderToolbar]);
   useEffect(
     () => () => {
       session.current?.destroy();
@@ -126,12 +146,13 @@ export function MarkdownEditor({
   useEffect(() => {
     session.current?.configure({
       attributes,
+      ...(renderToolbar ? {onControls: setCommandControls} : {}),
       labels,
       livePreview: mode === 'live-preview',
       isDisabled: disabled,
       isReadOnly: readonly || mode === 'preview',
     });
-  });
+  }, [attributes, renderToolbar, labels, mode, disabled, readonly]);
   useEffect(() => {
     session.current?.replace(currentValue);
   }, [currentValue, reconcileVersion]);
@@ -185,6 +206,13 @@ export function MarkdownEditor({
     };
   }, [form, initialValue]);
 
+  const editable = mounted && mode !== 'preview' && !readonly && !disabled;
+  const controls: MarkdownEditorControls = {
+    execute: (command) => editable && commandControls.execute(command),
+    canExecute: (command) => editable && commandControls.canExecute(command),
+    isActive: (command) => mounted && commandControls.isActive(command),
+  };
+
   const preventDisabled = (event: SyntheticEvent) => {
     if (!disabled) return;
     event.preventDefault();
@@ -197,6 +225,7 @@ export function MarkdownEditor({
       data-wcl-markdown-editor=""
       data-size={size}
       data-mode={mode}
+      data-toolbar={!!renderToolbar || undefined}
       data-disabled={disabled || undefined}
       data-readonly={readonly || undefined}
       data-invalid={invalid || undefined}
@@ -221,6 +250,7 @@ export function MarkdownEditor({
           </span>
         ) : null}
       </label>
+      {renderToolbar ? <div data-wcl-markdown-toolbar="">{renderToolbar(controls)}</div> : null}
       <div
         data-wcl-field-control=""
         onFocusCapture={() => {

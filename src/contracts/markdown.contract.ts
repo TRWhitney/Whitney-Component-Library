@@ -13,12 +13,14 @@ export const markdownEditorContract = {
   appropriateUses: ['a user authors Markdown and needs formatted content with editable syntax'],
   inappropriateUses: [
     'plain multiline text with no Markdown meaning',
-    'formatting commands, uploads, or wiki-link navigation, which are not delivered in this milestone',
+    'uploads, wiki-link navigation, or custom syntax and commands, which are not delivered in this milestone',
   ],
   preferredAlternatives: ['Use TextArea for plain multiline text and TextField for a single line.'],
   composition: [
     'Render inside AppearanceProvider. The parent owns width, layout, and mode controls; compose SegmentedControl to switch between live-preview, source, and preview.',
-    'mode defaults to live-preview. Source exposes the complete Markdown text; preview provides a read-only document. Formatting commands, asset callbacks, and wiki-link callbacks belong to Ticket 26.',
+    'mode defaults to live-preview. Source exposes the complete Markdown text; preview provides a read-only document.',
+    'Supply renderToolbar to compose Toolbar, Button, and ToggleButton between the field label and document. No toolbar appears by default. The callback receives MarkdownEditorControls with execute, canExecute, and isActive; all accept a MarkdownCommand identifier and return a boolean.',
+    'Bind action availability to canExecute and toggle selection to isActive. Execute commands through these controls so toolbar actions use the retained source selection. The application owns toolbar labels and action choices.',
     'Import the shared stylesheet once. Bundlers can omit the editor engine when only ordinary components are used; editor engine types remain private.',
   ],
   parts: [
@@ -26,6 +28,7 @@ export const markdownEditorContract = {
   ],
   preferredCompositions: [
     'Use FieldGroup for related fields and FormSection for a named form section.',
+    'Use ToggleButton for formatting toggles and Button for insertion, undo, and redo inside a labeled Toolbar.',
   ],
   contentRules: [
     'The canonical value is Markdown text. Supported syntax is CommonMark plus tables, task lists, strikethrough, autolinks, footnotes, and simple double-bracket wiki links.',
@@ -43,6 +46,10 @@ export const markdownEditorContract = {
     'Click rendered content or move the cursor into it with the keyboard to edit its source. A selection across constructs exposes every crossed source range. Editing-mode links enter source editing; safe-link navigation is available in preview.',
     'Mode, theme, and field-state changes retain source selection and undo history. Switching modes does not rewrite the Markdown string.',
     'Ordinary controlled-value echoes preserve the session. An external value replacement maps the selection into the changed text without adding a local undo entry.',
+    'Built-in MarkdownCommand identifiers are bold, italic, strikethrough, inline-code, link, heading-1 through heading-6, paragraph, blockquote, bullet-list, ordered-list, task-list, code-block, horizontal-rule, undo, and redo.',
+    'Inline commands wrap the source selection or remove matching surrounding delimiters. An empty selection leaves the caret inside the inserted delimiters. Code delimiters accommodate backticks in selected text. The link command inserts Markdown link syntax and selects its destination for editing.',
+    'Block commands transform complete selected lines and preserve unaffected text. Commands keep literal code literal. Toolbar and keyboard commands share the retained source selection, return focus to the document, and create individually undoable edits.',
+    'execute returns false without changing the document for an unsupported or unavailable command. Preview, disabled, read-only, pending, and locked states reject editing commands.',
   ],
   events: [
     'onChange receives the complete Markdown string after an accepted edit. No engine state or syntax tree crosses the public API.',
@@ -62,13 +69,15 @@ export const markdownEditorContract = {
   ],
   keyboardBehavior: [
     'Live Preview and source support text entry, selection, composition input, newline entry, plain-text clipboard operations, and undo/redo. Copying preserves the selected Markdown source. Tab and Shift+Tab leave the editor.',
+    'In Live Preview and source, Mod+B applies bold, Mod+I italic, Mod+Shift+X strikethrough, Mod+Shift+C inline code, and Mod+K a link. Mod+Alt+1 through Mod+Alt+6 choose heading levels; Mod+Alt+0 restores paragraphs. Mod is Command on macOS and Control elsewhere.',
+    'Enter continues a nonempty Markdown list or quotation and exits an empty item. New task-list items start unchecked. Literal code, composition input, and paste do not trigger Markdown continuation.',
     'Preview supports ordinary document reading and safe-link keyboard navigation. Task checkboxes and wiki targets are inert.',
   ],
   labeling: [
     'label is required and visible. The field creates its own description, error, mode, and position relationships.',
   ],
   localization: [
-    'Localize label, description, errorMessage, pendingMessage, and lockMessage in the application. English mode, position, empty-preview, required-validation, and footnote copy is built in.',
+    'Localize label, description, errorMessage, pendingMessage, lockMessage, and any supplied toolbar labels in the application. English mode, position, empty-preview, required-validation, and footnote copy is built in.',
     'To localize built-in copy, supply a complete labels object with livePreview, source, preview, emptyPreview, required, footnotes, footnoteBack, and position(line, column).',
   ],
   directionality: [
@@ -92,12 +101,15 @@ export const markdownEditorContract = {
   ],
   relatedExports: [
     'AppearanceProvider',
+    'Button',
     'FieldGroup',
     'FormSection',
     'SegmentedControl',
     'Stack',
     'TextArea',
     'TextField',
+    'ToggleButton',
+    'Toolbar',
   ],
   examples: [
     {
@@ -124,6 +136,53 @@ export function MarkdownLivePreviewExample() {
         />
         <MarkdownEditor label="Review notes" name="notes" mode={mode} value={value} onChange={setValue} />
       </Stack>
+    </AppearanceProvider>
+  );
+}`,
+    },
+    {
+      title: 'Compose formatting and history controls',
+      description:
+        'The toolbar reflects command availability and active formatting. Actions use the retained source selection and return focus to the document.',
+      code: `export function MarkdownCommandsExample() {
+  return (
+    <AppearanceProvider appearance="dark" accent="#2878ff">
+      <MarkdownEditor
+        label="Review notes"
+        defaultValue="Check the north boundary."
+        renderToolbar={({execute, canExecute, isActive}) => (
+          <Toolbar label="Review note formatting">
+            <ToggleButton
+              variant="quiet"
+              isSelected={isActive('bold')}
+              isDisabled={!canExecute('bold')}
+              onChange={() => {
+                execute('bold');
+              }}
+            >
+              Bold
+            </ToggleButton>
+            <Button
+              variant="quiet"
+              isDisabled={!canExecute('link')}
+              onPress={() => {
+                execute('link');
+              }}
+            >
+              Insert link
+            </Button>
+            <Button
+              variant="quiet"
+              isDisabled={!canExecute('undo')}
+              onPress={() => {
+                execute('undo');
+              }}
+            >
+              Undo
+            </Button>
+          </Toolbar>
+        )}
+      />
     </AppearanceProvider>
   );
 }`,

@@ -5,7 +5,7 @@ and bounded syntax/command/decoration extension seams for the Markdown surface.
 
 **Blocked by:** none. Live Preview, file handling, and action prerequisites are complete.
 
-**Status:** ready-for-agent
+**Status:** active
 
 - [ ] Keyboard and toolbar commands produce the same canonical Markdown transformations and retain
       predictable selection.
@@ -32,4 +32,4 @@ and bounded syntax/command/decoration extension seams for the Markdown surface.
 
 ## Completion evidence
 
-Pending implementation.
+Implementation and current evidence are tracked in the [authoring effort](../../markdown-authoring/status.md). Commands are complete; links/assets and extensions remain.

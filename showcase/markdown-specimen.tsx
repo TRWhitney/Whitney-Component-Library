@@ -7,6 +7,9 @@ import {
   SegmentedControl,
   Stack,
   Switch,
+  Toolbar,
+  Menu,
+  ToggleButton,
   type MarkdownEditorMode,
   type MarkdownEditorSize,
 } from '../src/index.js';
@@ -95,6 +98,107 @@ export function MarkdownSpecimen() {
       </InlineGroup>
       <MarkdownEditor
         label="Markdown review notes"
+        renderToolbar={(controls) => (
+          <Toolbar label="Markdown formatting">
+            {(
+              [
+                ['bold', 'Bold'],
+                ['italic', 'Italic'],
+                ['strikethrough', 'Strike'],
+                ['inline-code', 'Code'],
+                ['heading-2', 'Heading'],
+                ['bullet-list', 'List'],
+                ['task-list', 'Task'],
+                ['blockquote', 'Quote'],
+              ] as const
+            ).map(([command, text]) => (
+              <ToggleButton
+                key={command}
+                size="compact"
+                isDisabled={!controls.canExecute(command)}
+                isSelected={controls.isActive(command)}
+                onChange={() => controls.execute(command)}
+              >
+                {text}
+              </ToggleButton>
+            ))}
+            <Button
+              size="compact"
+              isDisabled={!controls.canExecute('link')}
+              onPress={() => controls.execute('link')}
+            >
+              Link
+            </Button>
+            <Menu
+              trigger={
+                <Button
+                  size="compact"
+                  isDisabled={
+                    !controls.canExecute('paragraph') && !controls.canExecute('code-block')
+                  }
+                >
+                  More formatting
+                </Button>
+              }
+              items={[
+                {
+                  type: 'group',
+                  id: 'headings',
+                  label: 'Headings',
+                  items: (
+                    [
+                      ['heading-1', 'Heading 1'],
+                      ['heading-2', 'Heading 2'],
+                      ['heading-3', 'Heading 3'],
+                      ['heading-4', 'Heading 4'],
+                      ['heading-5', 'Heading 5'],
+                      ['heading-6', 'Heading 6'],
+                    ] as const
+                  ).map(([command, text]) => ({
+                    type: 'action' as const,
+                    id: command,
+                    label: text,
+                    isDisabled: !controls.canExecute(command),
+                    onAction: () => requestAnimationFrame(() => controls.execute(command)),
+                  })),
+                },
+                {
+                  type: 'group',
+                  id: 'blocks',
+                  label: 'Blocks',
+                  items: (
+                    [
+                      ['paragraph', 'Paragraph'],
+                      ['ordered-list', 'Numbered list'],
+                      ['code-block', 'Code block'],
+                      ['horizontal-rule', 'Horizontal rule'],
+                    ] as const
+                  ).map(([command, text]) => ({
+                    type: 'action' as const,
+                    id: command,
+                    label: text,
+                    isDisabled: !controls.canExecute(command),
+                    onAction: () => requestAnimationFrame(() => controls.execute(command)),
+                  })),
+                },
+              ]}
+            />
+            <Button
+              size="compact"
+              isDisabled={!controls.canExecute('undo')}
+              onPress={() => controls.execute('undo')}
+            >
+              Undo
+            </Button>
+            <Button
+              size="compact"
+              isDisabled={!controls.canExecute('redo')}
+              onPress={() => controls.execute('redo')}
+            >
+              Redo
+            </Button>
+          </Toolbar>
+        )}
         description="Edit formatted text in Live Preview. Move the cursor into a construct to reveal its Markdown; select across constructs to edit their source. Tab leaves the editor."
         errorMessage="Resolve the boundary review before saving these notes."
         isRequired={isRequired}
@@ -126,9 +230,14 @@ export function MarkdownSpecimen() {
         Markdown, selection, and undo history.
       </p>
       <p>
+        Select text and use the formatting toolbar, or press Ctrl/Cmd+B for bold, Ctrl/Cmd+I for
+        italic, and Ctrl/Cmd+K for a link. Enter continues lists and quotations; Enter on an empty
+        item exits it. Each formatting action can be undone. Literal code keeps ordinary newlines.
+      </p>
+      <p>
         Links reveal their source while editing; use Preview to follow safe links. HTML stays
-        literal and wiki targets stay inert. Formatting commands, asset callbacks, and wiki-link
-        navigation are planned for Ticket 26.
+        literal and wiki targets stay inert. Asset callbacks and wiki-link navigation are the next
+        part of Ticket 26.
       </p>
     </Stack>
   );

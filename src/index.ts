@@ -3,6 +3,8 @@
 export {MarkdownEditor} from './markdown/markdown-editor.js';
 export type {
   MarkdownEditorProps,
+  MarkdownCommand,
+  MarkdownEditorControls,
   MarkdownEditorMode,
   MarkdownEditorSize,
   MarkdownEditorLabels,
