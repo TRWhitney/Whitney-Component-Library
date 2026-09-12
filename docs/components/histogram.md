@@ -65,6 +65,7 @@ Show a numeric distribution through contiguous intervals and an explicit ordinat
 ## Appearance and responsive behavior
 
 - Contiguous translucent bins share the numeric baseline and use stronger boundaries to keep adjacent intervals distinct. Direct reading dims every other bin and uses an inset outline. Selection frames meet at exact shared edges without covering the neighboring reading outline.
+- aspectRatio changes the plot geometry used by axes, marks, clipping, hit testing, and navigation. Wide or square plots use the available canvas instead of letterboxing a fixed 640-by-360 SVG. minimumSize and overflow still control the legibility limit.
 - The production chart frame scales type, strokes, and plot geometry from measured space while bin boundaries remain aligned to their numeric intervals. minimumSize and overflow retain the established local-scroll behavior.
 
 ## Accent, forced colors, and reduced motion

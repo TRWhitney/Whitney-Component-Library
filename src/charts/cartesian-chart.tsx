@@ -534,13 +534,22 @@ function tickLabelOffset(staggered: boolean, index: number): number {
   return staggered && index % 2 === 1 ? 2.625 : 1.125;
 }
 
-export function plotForPresentation(presentation: PresentationMetrics): PlotBounds {
+export function plotForPresentation(
+  presentation: PresentationMetrics,
+  viewportHeight = viewHeight,
+): PlotBounds {
   const axisFontSize = presentation.fontSize / presentation.viewScale;
   const tickOffset = axisFontSize * tickLabelOffset(presentation.staggerLabels, 1);
   const labelGap = axisFontSize * 1.45;
   return {
     ...compactPlot,
-    bottom: Math.min(compactPlot.bottom, viewHeight - 7 - tickOffset - labelGap),
+    bottom: Math.max(
+      compactPlot.top + 1,
+      Math.min(
+        viewportHeight - (viewHeight - compactPlot.bottom),
+        viewportHeight - 7 - tickOffset - labelGap,
+      ),
+    ),
   };
 }
 
@@ -1829,7 +1838,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   annotations,
   interaction,
   exploration,
-  aspectRatio = 1.75,
+  aspectRatio = viewWidth / viewHeight,
   categoryAxis,
   categoryPlacement,
   data,
@@ -2278,7 +2287,8 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
   );
   const hasLocalOverflow =
     overflow === 'scroll' && presentation.canvasWidth > (availableWidth ?? minimumSize.width);
-  const basePlot = plotForPresentation(presentation);
+  const requestedHeight = viewWidth / aspectRatio;
+  const basePlot = plotForPresentation(presentation, requestedHeight);
   const categoryCount =
     categoryAxis.scale.type === 'categorical'
       ? (categoryAxis.scale.domain ?? stableDomain(allPrepared.rows.map((row) => row.category)))
@@ -2293,7 +2303,7 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
             plotHeight(basePlot),
         )
       : 0;
-  const canvasHeight = viewHeight + extraHeight;
+  const canvasHeight = requestedHeight + extraHeight;
   const presentationPlot = {...basePlot, bottom: basePlot.bottom + extraHeight};
   const frameStyle: ChartFrameStyles = {
     '--wcl-chart-aspect-ratio':

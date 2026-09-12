@@ -82,6 +82,7 @@ Compare two quantitative measurements across distinct recorded observations.
 - Each point has a translucent group-color fill and a stronger edge. Shape distinguishes groups when color is unavailable or points overlap. Direct reading dims every other point.
 - Interactive reading uses a small filled center. Selection outlines follow the full symbol; activation gives finite feedback. All six symbol shapes and bubble magnitude remain unchanged, and interaction cues stay inside the plot.
 - The supplied line has a line swatch and circular sample markers. Its eye removes the line and its samples from both plot and rectangular modal Overview. With a supplied line and exploration, Up sits above Down in a reserved gutter beside the plot; Left and Right stay below.
+- aspectRatio changes the plot geometry used by axes, marks, clipping, hit testing, and navigation. Wide or square plots use the available canvas instead of letterboxing a fixed 640-by-360 SVG. minimumSize and overflow still control the legibility limit.
 - Horizontal axes consider formatted labels on categorical, time and numeric scales, using staggered rows before local scrolling. Complete vertical titles reserve space and wrap when needed. The production chart frame scales type, strokes, and plot geometry from measured space. Scatter points keep a bounded readable rendered size as the plot narrows. minimumSize and overflow retain the established local-scroll behavior.
 
 ## Accent, forced colors, and reduced motion

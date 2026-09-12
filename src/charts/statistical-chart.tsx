@@ -2109,7 +2109,8 @@ function StatisticalFrame<Datum extends object>({
 }): ReactElement {
   validateCommon(common);
   const explores = !!(exploration || histogramExploration || boxExploration);
-  const aspectRatio = common.aspectRatio ?? 1.75;
+  const aspectRatio = common.aspectRatio ?? viewWidth / viewHeight;
+  const canvasHeight = viewWidth / aspectRatio;
   const minimumSize = common.minimumSize ?? {height: 180, width: explores ? 240 : 320};
   const overflow = common.overflow ?? 'scroll';
   const status = common.status ?? {kind: 'ready'};
@@ -2382,7 +2383,7 @@ function StatisticalFrame<Datum extends object>({
         staggerLabels: sidePan && basePresentation.staggerLabels,
       }
     : basePresentation;
-  const basePlot = plotForPresentation(presentation);
+  const basePlot = plotForPresentation(presentation, canvasHeight);
   const targetInitialPlot = sidePan
     ? {...basePlot, right: basePlot.right - 38 / presentation.viewScale}
     : basePlot;
@@ -2432,6 +2433,7 @@ function StatisticalFrame<Datum extends object>({
     presentation.fontSize / presentation.viewScale / 16,
     initialPlot,
     `${yAxis.label}${yAxis.unit === undefined ? '' : ` (${yAxis.unit})`}`,
+    canvasHeight,
   );
   const plotMotion = useChartDataMotion([{id: 'plot', value: targetPlot}], {
     version: JSON.stringify(targetPlot),
@@ -2681,7 +2683,7 @@ function StatisticalFrame<Datum extends object>({
         left: Math.max(0, plot.left - markPadding),
         right: Math.min(viewWidth, plot.right + markPadding),
         top: Math.max(0, plot.top - markPadding),
-        bottom: Math.min(viewHeight, plot.bottom + markPadding),
+        bottom: Math.min(canvasHeight, plot.bottom + markPadding),
       };
   const inPlot = (x: number, y: number) =>
     x >= plot.left && x <= plot.right && y >= plot.top && y <= plot.bottom;
@@ -3302,10 +3304,11 @@ function StatisticalFrame<Datum extends object>({
                   onPointerLeave={clearPointer}
                   onPointerMove={interactive ? moveItem : pointModel?.line ? readItem : readPointer}
                   ref={setSvgElement}
-                  viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+                  viewBox={`0 0 ${viewWidth} ${canvasHeight}`}
                 >
                   {model.kind === 'box' ? (
                     <Axis
+                      viewportHeight={canvasHeight}
                       axis={{
                         formatTick: (value) =>
                           model.series.find((item) => item.id === value)?.label ?? value,
@@ -3323,6 +3326,7 @@ function StatisticalFrame<Datum extends object>({
                     />
                   ) : (
                     <Axis
+                      viewportHeight={canvasHeight}
                       axis={model.xAxis}
                       placement="x"
                       plot={plot}
@@ -3332,6 +3336,7 @@ function StatisticalFrame<Datum extends object>({
                     />
                   )}
                   <Axis
+                    viewportHeight={canvasHeight}
                     axis={model.yAxis}
                     placement="y"
                     plot={plot}

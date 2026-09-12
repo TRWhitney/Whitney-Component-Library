@@ -2,7 +2,7 @@ import {
   SearchableTreeExample,
   CollectionContextMenuExample,
 } from './collection-interaction-example.js';
-import {ContextMenuExample} from './context-menu-example.js';
+import {ChartApplicationGeometryExample} from './chart-application-geometry-example.js';
 import {ChartSelectionPresentationExample} from './chart-selection-presentation-example.js';
 import {CompactApplicationExample} from './compact-application-example.js';
 import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
@@ -150,6 +150,7 @@ import {
 } from '../src/index.js';
 import {useScrollbarActivity} from '../src/scrollbar-activity.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
+import {ContextMenuExample} from './context-menu-example.js';
 
 const defaultAccent: AccentColor = '#2878ff';
 const chartData = [
@@ -3790,6 +3791,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         <Example label="Selection panel or compact chart controls">
           <ChartSelectionPresentationExample />
         </Example>
+        <Example label="Wide and square plot proportions">
+          <ChartApplicationGeometryExample kind="line" />
+        </Example>
       </Specimen>
 
       <Specimen
@@ -3945,6 +3949,9 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         </Example>
         <Example label="Crowded numeric labels">
           <CompactAxisExample kind="numeric" />
+        </Example>
+        <Example label="Resize the building energy plot">
+          <ChartApplicationGeometryExample kind="scatter" />
         </Example>
       </Specimen>
 

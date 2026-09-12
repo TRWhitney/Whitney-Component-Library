@@ -78,6 +78,7 @@ Compare distribution center, spread, whiskers, and outliers across declared grou
 ## Appearance and responsive behavior
 
 - Each quartile box has a translucent group-color fill and stronger boundary. Whisker tails stop at Q1 and Q3, and their caps paint above the box so short whiskers remain visible. Only the median crosses the box. Outliers remain separate marks and direct reading dims every other mark. An interactive summary reading uses an inset outline and whisker cues, with no dot on the median. Selection frames the box; an outlier reading has a filled center and outlier selection uses a ring.
+- aspectRatio changes the plot geometry used by axes, marks, clipping, hit testing, and navigation. Wide or square plots use the available canvas instead of letterboxing a fixed 640-by-360 SVG. minimumSize and overflow still control the legibility limit.
 - The production chart frame scales type, strokes, boxes, whiskers, and outliers from measured space while preserving their statistical relationships. minimumSize and overflow retain the established local-scroll behavior.
 
 ## Accent, forced colors, and reduced motion
