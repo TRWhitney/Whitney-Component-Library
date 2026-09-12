@@ -32,6 +32,7 @@ export function ComboBox<Value extends string>({
   isReadOnly = false,
   isRequired = false,
   label,
+  reserveSupportSpace = false,
   loadingMessage,
   name,
   onChange,
@@ -55,6 +56,7 @@ export function ComboBox<Value extends string>({
       aria-busy={isLoading || undefined}
       allowsEmptyCollection
       data-wcl-combo-box=""
+      data-reserve-support={reserveSupportSpace || undefined}
       data-wcl-field=""
       data-wcl-selection-field=""
       defaultFilter={defaultFilter}

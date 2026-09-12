@@ -87,7 +87,7 @@ export function renderSelectionSupport({
   loadingMessage,
 }: SelectionSupportOptions): ReactElement {
   return (
-    <>
+    <div data-wcl-field-support="">
       {description ? (
         <Text data-wcl-field-description="" slot="description">
           {description}
@@ -101,6 +101,6 @@ export function renderSelectionSupport({
           {loadingMessage}
         </span>
       ) : null}
-    </>
+    </div>
   );
 }

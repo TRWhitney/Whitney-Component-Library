@@ -27,6 +27,7 @@ export function NumberField({
   isRequired = false,
   isWheelDisabled = true,
   label,
+  reserveSupportSpace = false,
   locale,
   maxValue,
   minValue,
@@ -49,6 +50,7 @@ export function NumberField({
       <AriaNumberField
         aria-busy={isPending || undefined}
         commitBehavior={commitBehavior}
+        data-reserve-support={reserveSupportSpace || undefined}
         data-wcl-field=""
         data-wcl-number-field=""
         isDisabled={disabled}

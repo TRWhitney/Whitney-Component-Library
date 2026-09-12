@@ -52,7 +52,7 @@ Popover holds short interactive content beside the control that opened it.
 
 ## Appearance and responsive behavior
 
-- Popover is a compact raised surface with an accent threshold and a joined arrow that identifies its current anchor.
+- Popover is a compact raised surface with an accent threshold and a joined arrow that identifies its current anchor. Its dialog is constrained by the positioned surface’s available height; the body scrolls inside that boundary when space is short.
 - The surface flips when its requested side lacks room, stays inside the visual viewport, and scrolls its own content when available height is limited.
 
 ## Accent, forced colors, and reduced motion

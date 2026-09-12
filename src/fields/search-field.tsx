@@ -24,6 +24,7 @@ export function SearchField({
   isReadOnly = false,
   isRequired = false,
   label,
+  reserveSupportSpace = false,
   maxLength,
   minLength,
   name,
@@ -43,6 +44,7 @@ export function SearchField({
   return (
     <AriaSearchField
       aria-busy={isPending || undefined}
+      data-reserve-support={reserveSupportSpace || undefined}
       data-wcl-field=""
       data-wcl-search-field=""
       isDisabled={disabled}

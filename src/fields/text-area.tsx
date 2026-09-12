@@ -20,6 +20,7 @@ export function TextArea({
   isReadOnly = false,
   isRequired = false,
   label,
+  reserveSupportSpace = false,
   maxLength,
   minLength,
   name,
@@ -37,6 +38,7 @@ export function TextArea({
   return (
     <AriaTextField
       aria-busy={isPending || undefined}
+      data-reserve-support={reserveSupportSpace || undefined}
       data-wcl-field=""
       data-wcl-text-area=""
       isDisabled={disabled}

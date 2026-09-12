@@ -26,6 +26,7 @@ export function Select<Value extends string>({
   isLoading = false,
   isRequired = false,
   label,
+  reserveSupportSpace = false,
   loadingMessage,
   name,
   onChange,
@@ -44,6 +45,7 @@ export function Select<Value extends string>({
     <AriaSelect<CollectionOption<Value>>
       aria-busy={isLoading || undefined}
       allowsEmptyCollection
+      data-reserve-support={reserveSupportSpace || undefined}
       data-wcl-field=""
       data-wcl-selection-field=""
       disabledKeys={disabledKeys}

@@ -348,7 +348,7 @@ export const popoverContract = {
     'Opening moves focus to the visible close control, keeps interactive content inside one labeled dialog, and restores focus to the trigger after dismissal.',
   ],
   appearance: [
-    'Popover is a compact raised surface with an accent threshold and a joined arrow that identifies its current anchor.',
+    'Popover is a compact raised surface with an accent threshold and a joined arrow that identifies its current anchor. Its dialog is constrained by the positioned surface’s available height; the body scrolls inside that boundary when space is short.',
   ],
   appropriateUses: [
     'supplemental interactive content needs an anchored surface near the control or object that opened it',

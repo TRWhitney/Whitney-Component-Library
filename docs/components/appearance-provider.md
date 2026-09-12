@@ -19,7 +19,7 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 ## Composition and parts
 
 - Place one provider around the interface that uses library components.
-- Nest a provider only when a contained region intentionally uses a different appearance or accent.
+- Nest a provider when a contained region intentionally uses a different appearance, accent, or density.
 - The provider exposes one children region and no named parts or slots.
 
 ## Preferred higher-level compositions
@@ -63,7 +63,8 @@ AppearanceProvider scopes the library visual system to light or dark appearance 
 
 - Light and dark are the only supported appearances.
 - Appearance selects the library canvas, background, text, and border colors within the provider.
-- The provider does not introduce viewport-specific behavior or mutate the document root.
+- density defaults to comfortable. compact reduces field heights, menu option padding, and Tree row spacing through inherited tokens, including portaled menus.
+- Density does not change with viewport size. Coarse pointers retain usable field, menu, and Tree targets. The provider does not mutate the document root.
 
 ## Accent, forced colors, and reduced motion
 

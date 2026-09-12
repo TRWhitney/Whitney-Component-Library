@@ -51,8 +51,8 @@ TextField collects one line of text with native form and validation behavior.
 
 ## Appearance and responsive behavior
 
-- The field family uses compact rounded controls, one consistent single-line control height, neutral surfaces, and a reserved support track beneath each control.
-- Fields fill their parent width. Support text grows below without moving or resizing the control. Responsive groups collapse when their content no longer fits.
+- The field family uses rounded controls, a consistent single-line height, and neutral surfaces. Empty support tracks are omitted by default; reserveSupportSpace keeps room for two lines when stable form height matters.
+- Fields fill their parent width and inherit comfortable or compact density from AppearanceProvider. Description, error, and pending text remain visible and grow below the control. Responsive groups align their support tracks and collapse when their content no longer fits.
 
 ## Accent, forced colors, and reduced motion
 

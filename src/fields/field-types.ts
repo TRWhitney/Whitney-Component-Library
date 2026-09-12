@@ -23,6 +23,8 @@ export interface FieldControlProps {
 }
 
 export interface FieldStateProps {
+  /** Reserve a support row even when no description, error, or pending message is visible. */
+  readonly reserveSupportSpace?: boolean;
   readonly description?: string;
   readonly errorMessage?: string;
   readonly isDisabled?: boolean;

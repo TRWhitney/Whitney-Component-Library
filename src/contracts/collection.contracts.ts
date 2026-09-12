@@ -697,6 +697,7 @@ export const treeContract = {
   ],
   responsiveBehavior: [
     'Long labels wrap within their hierarchy level. Compact layouts preserve indentation without causing document overflow.',
+    'Inherited compact density uses border-box row sizing and a smaller empty chevron slot. Coarse pointers retain larger targets.',
   ],
   states: [
     ...sharedCollectionStates,

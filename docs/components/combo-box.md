@@ -52,7 +52,7 @@ ComboBox filters local, dynamic, or asynchronous options and chooses one value.
 ## Appearance and responsive behavior
 
 - ComboBox extends the neutral field shell with an editable input and compact suggestion trigger; its raised collection uses the same neutral labels and slim selected rail as Select.
-- The control fills its parent. The anchored list matches the trigger width when possible, stays inside the viewport, scrolls within the available height, and wraps option text on narrow screens.
+- The control fills its parent and inherits comfortable or compact density from AppearanceProvider. Compact option rows reduce padding while preserving wrapped descriptions; coarse pointers retain 44px minimum targets. The anchored list matches the trigger width, stays inside the viewport, and scrolls within the available height. Empty field support space is omitted unless reserveSupportSpace is true.
 
 ## Accent, forced colors, and reduced motion
 

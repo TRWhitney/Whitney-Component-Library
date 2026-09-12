@@ -32,6 +32,8 @@ export type CollectionLoadingProps =
     };
 
 export interface CollectionFieldProps<Value extends string = string> {
+  /** Reserve a support row even when no description, error, or pending message is visible. */
+  readonly reserveSupportSpace?: boolean;
   readonly description?: string;
   readonly emptyMessage: string;
   readonly errorMessage?: string;

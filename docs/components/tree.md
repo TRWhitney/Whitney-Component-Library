@@ -60,6 +60,7 @@ Tree navigates keyed hierarchical information with explicit expansion and option
 - Collection text, dividers, feedback, focus, and selection use the active AppearanceProvider values.
 - Compact layouts keep readable rows and move card and description layouts to one column.
 - Long labels wrap within their hierarchy level. Compact layouts preserve indentation without causing document overflow.
+- Inherited compact density uses border-box row sizing and a smaller empty chevron slot. Coarse pointers retain larger targets.
 
 ## Accent, forced colors, and reduced motion
 

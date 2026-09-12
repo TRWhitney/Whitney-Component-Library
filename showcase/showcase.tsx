@@ -1,3 +1,4 @@
+import {CompactApplicationExample} from './compact-application-example.js';
 import {DistributionDataMotionExample} from './distribution-data-motion-example.js';
 import {RadarDataMotionExample} from './radar-data-motion-example.js';
 import {SparklineDataMotionExample} from './sparkline-data-motion-example.js';
@@ -1275,6 +1276,11 @@ function FieldSpecimens() {
         >
           {(controlProps) => <PhaseAngleDial {...controlProps} />}
         </Field>
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen
@@ -1295,6 +1301,11 @@ function FieldSpecimens() {
             onChange={() => undefined}
           />
         </ResponsiveGrid>
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen
@@ -1307,6 +1318,11 @@ function FieldSpecimens() {
           label="Review notes"
           rows={3}
         />
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen
@@ -1323,6 +1339,11 @@ function FieldSpecimens() {
           minValue={0}
           step={0.0005}
         />
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen
@@ -1335,6 +1356,11 @@ function FieldSpecimens() {
           description="Search run name, owner, or identifier."
           label="Search runs"
         />
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen
@@ -1352,6 +1378,11 @@ function FieldSpecimens() {
           />
           <NumberField defaultValue={0.0025} label="Tolerance" locale="en-US" step={0.0005} />
         </FieldGroup>
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen
@@ -1478,6 +1509,11 @@ function SelectionSpecimens() {
           name="mode"
           options={runModeOptions}
         />
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
 
       <Specimen
@@ -1507,6 +1543,11 @@ function SelectionSpecimens() {
             />
           </Example>
         </ResponsiveGrid>
+        <p>
+          <a href="#appearance-provider">
+            Try compact density and optional field support reservation.
+          </a>
+        </p>
       </Specimen>
     </>
   );
@@ -3997,7 +4038,7 @@ function OverlaySpecimens() {
       </Specimen>
 
       <Specimen
-        description="Keep short interactive content beside the control that opened it. Focus enters the anchored surface and returns after outside press, Escape, or its close control."
+        description="Keep short interactive content beside the control that opened it. Focus enters the anchored surface and returns after outside press, Escape, or its close control. In a short window, the body scrolls within the available space."
         name="Popover"
       >
         <Popover
@@ -4243,7 +4284,7 @@ export function Showcase() {
                   <h2 id="foundation-heading">Theme every component together</h2>
                 </header>
                 <Specimen
-                  description="Choose light or dark appearance and one accent at the application boundary. Every library component below the provider uses those values."
+                  description="Choose light or dark appearance, an accent, and comfortable or compact application density. Descendant controls and portaled menus inherit these values."
                   name="AppearanceProvider"
                 >
                   <div className="showcase-provider-sample">
@@ -4255,6 +4296,9 @@ export function Showcase() {
                       </p>
                     </div>
                   </div>
+                  <Example label="Compact application density and control states">
+                    <CompactApplicationExample />
+                  </Example>
                 </Specimen>
               </section>
 

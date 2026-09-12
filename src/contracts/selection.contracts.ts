@@ -17,7 +17,7 @@ const commonSelectionGuidance = {
     'Reduced motion removes overlay, chevron, selection-rail, and loading transitions. Their final states remain visible.',
   ],
   responsiveBehavior: [
-    'The control fills its parent. The anchored list matches the trigger width when possible, stays inside the viewport, scrolls within the available height, and wraps option text on narrow screens.',
+    'The control fills its parent and inherits comfortable or compact density from AppearanceProvider. Compact option rows reduce padding while preserving wrapped descriptions; coarse pointers retain 44px minimum targets. The anchored list matches the trigger width, stays inside the viewport, and scrolls within the available height. Empty field support space is omitted unless reserveSupportSpace is true.',
   ],
   stylesheet: './styles.css',
 } satisfies Pick<

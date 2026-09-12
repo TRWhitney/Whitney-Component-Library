@@ -17,6 +17,7 @@ export function Field({
   isReadOnly = false,
   isRequired = false,
   label,
+  reserveSupportSpace = false,
   pendingMessage,
 }: FieldProps): ReactElement {
   const inheritedDisabled = useFieldGroupDisabled();
@@ -52,6 +53,7 @@ export function Field({
       data-invalid={isInvalid || undefined}
       data-readonly={isReadOnly || isPending || undefined}
       data-required={isRequired || undefined}
+      data-reserve-support={reserveSupportSpace || undefined}
       data-wcl-field=""
       {...(isPending ? {'data-wcl-pending': ''} : {})}
     >

@@ -16,10 +16,16 @@ export interface AppearanceProviderProps {
   readonly accent: AccentColor;
   readonly appearance: Appearance;
   readonly children: ReactNode;
+  readonly density?: 'comfortable' | 'compact';
 }
 type ProviderStyles = CSSProperties & Record<`--wcl-${string}`, string>;
 
-export function AppearanceProvider({accent, appearance, children}: AppearanceProviderProps) {
+export function AppearanceProvider({
+  accent,
+  appearance,
+  children,
+  density = 'comfortable',
+}: AppearanceProviderProps) {
   const providerRef = useRef<HTMLDivElement>(null);
   const roles = deriveAccentRoles(accent, appearance);
   const styles: ProviderStyles = {
@@ -35,7 +41,13 @@ export function AppearanceProvider({accent, appearance, children}: AppearancePro
 
   return (
     <UNSAFE_PortalProvider getContainer={() => providerRef.current}>
-      <div data-wcl-appearance={appearance} data-wcl-provider="" ref={providerRef} style={styles}>
+      <div
+        data-wcl-appearance={appearance}
+        data-wcl-density={density}
+        data-wcl-provider=""
+        ref={providerRef}
+        style={styles}
+      >
         {children}
       </div>
     </UNSAFE_PortalProvider>

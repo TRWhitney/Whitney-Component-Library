@@ -43,6 +43,13 @@
     --wcl-radius: 12px;
     --wcl-control-radius: 8px;
     --wcl-space: 8px;
+    --wcl-field-control-size: 2.75rem;
+    --wcl-option-min-size: 2.75rem;
+    --wcl-option-padding: 6px;
+    --wcl-tree-min-size: 2.75rem;
+    --wcl-tree-padding: 5px;
+    --wcl-tree-chevron-size: 1.75rem;
+    --wcl-tree-leaf-size: 1.75rem;
     --wcl-shadow: 0 18px 48px rgb(23 32 39 / 11%);
     --wcl-font-body: 'IBM Plex Sans', inter, ui-sans-serif, system-ui, sans-serif;
     --wcl-font-utility: 'IBM Plex Mono', 'SFMono-Regular', consolas, monospace;
@@ -52,6 +59,26 @@
     --wcl-motion-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
 
     color-scheme: light;
+  }
+
+  [data-wcl-provider][data-wcl-density='compact'] {
+    --wcl-field-control-size: 2.25rem;
+    --wcl-option-min-size: 2rem;
+    --wcl-option-padding: 3px;
+    --wcl-tree-min-size: 2rem;
+    --wcl-tree-padding: 3px;
+    --wcl-tree-chevron-size: 1.5rem;
+    --wcl-tree-leaf-size: 0.75rem;
+  }
+
+  @media (pointer: coarse) {
+    [data-wcl-provider][data-wcl-density] {
+      --wcl-field-control-size: 2.75rem;
+      --wcl-option-min-size: 2.75rem;
+      --wcl-tree-min-size: 2.75rem;
+      --wcl-tree-chevron-size: 2.75rem;
+      --wcl-tree-leaf-size: 1.75rem;
+    }
   }
 
   [data-wcl-provider][data-wcl-appearance='dark'] {
@@ -698,12 +725,16 @@
 
   [data-wcl-field] {
     display: grid;
-    grid-template-rows: var(--wcl-field-grid-rows, auto auto minmax(2.25rem, auto));
+    grid-template-rows: var(--wcl-field-grid-rows, auto auto);
     gap: calc(var(--wcl-space) * 0.625);
     align-content: start;
     min-inline-size: 0;
     color: var(--wcl-text);
     font-family: var(--wcl-font-body);
+  }
+
+  [data-wcl-field][data-reserve-support] {
+    grid-template-rows: auto auto minmax(2.25rem, auto);
   }
 
   :is(
@@ -736,8 +767,8 @@
     position: relative;
     display: flex;
     align-items: stretch;
-    block-size: 2.75rem;
-    min-block-size: 2.75rem;
+    block-size: var(--wcl-field-control-size, 2.75rem);
+    min-block-size: var(--wcl-field-control-size, 2.75rem);
     min-inline-size: 0;
     overflow: hidden;
     border: 1px solid var(--wcl-border-strong);
@@ -822,23 +853,21 @@
   }
 
   [data-wcl-field-support] {
+    grid-area: 3 / 1;
     display: var(--wcl-field-support-display, grid);
-    min-block-size: 2.25rem;
+    min-block-size: 0;
     min-inline-size: 0;
     align-content: start;
     font-size: 0.75rem;
     line-height: 1.45;
   }
 
-  [data-wcl-selection-field]
-    > :is([data-wcl-field-description], [data-wcl-field-error], [data-wcl-field-pending]) {
-    grid-area: 3 / 1;
+  [data-wcl-field][data-reserve-support] > [data-wcl-field-support] {
     min-block-size: 2.25rem;
-    min-inline-size: 0;
-    margin: 0;
-    font-size: 0.75rem;
-    line-height: 1.45;
-    overflow-wrap: anywhere;
+  }
+
+  [data-wcl-field]:not([data-reserve-support]) > [data-wcl-field-support]:empty {
+    display: none;
   }
 
   :where([data-wcl-field-support] > *) {
@@ -1063,13 +1092,14 @@
   }
 
   [data-wcl-selection-option] {
+    box-sizing: border-box;
     position: relative;
     display: grid;
     grid-template-columns: 3px minmax(0, 1fr);
     gap: var(--wcl-space);
     align-items: center;
-    min-block-size: 2.75rem;
-    padding-block: calc(var(--wcl-space) * 0.75);
+    min-block-size: var(--wcl-option-min-size, 2.75rem);
+    padding-block: var(--wcl-option-padding, 6px);
     padding-inline: calc(var(--wcl-space) * 0.75) calc(var(--wcl-space) * 1.25);
     border-radius: calc(var(--wcl-control-radius) * 0.5);
     outline: 0;
@@ -3804,13 +3834,15 @@
   }
 
   [data-wcl-popover] {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
     inline-size: min(24rem, calc(100vw - calc(var(--wcl-space) * 2)));
   }
 
   [data-wcl-popover-dialog] {
     display: grid;
+    min-block-size: 0;
     grid-template-rows: auto minmax(0, 1fr) auto;
-    max-block-size: var(--available-height);
     overflow: hidden;
     border-radius: inherit;
     outline: 0;
@@ -4201,11 +4233,18 @@
   }
 
   [data-wcl-popover] [data-wcl-overlay-header] {
-    max-block-size: min(14rem, calc(var(--available-height) / 2));
+    max-block-size: min(14rem, 40dvh);
   }
 
-  [data-wcl-popover] [data-wcl-overlay-body] {
-    max-block-size: calc(var(--available-height) - 8rem);
+  @media (height <= 400px) {
+    [data-wcl-popover] [data-wcl-overlay-header] {
+      max-block-size: 3rem;
+      padding-block: var(--wcl-space);
+    }
+
+    [data-wcl-popover] [data-wcl-overlay-body] {
+      padding-block: var(--wcl-space);
+    }
   }
 
   [data-wcl-overlay-actions] {
@@ -5748,16 +5787,21 @@
   }
 
   [data-wcl-tree-content] {
+    box-sizing: border-box;
     display: grid;
-    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+    grid-template-columns: var(--wcl-tree-chevron-size, 1.75rem) minmax(0, 1fr) auto;
     gap: calc(var(--wcl-space) * 0.75);
     align-items: center;
-    min-block-size: 2.75rem;
-    padding-block: calc(var(--wcl-space) * 0.625);
+    min-block-size: var(--wcl-tree-min-size, 2.75rem);
+    padding-block: var(--wcl-tree-padding, 5px);
     padding-inline: calc(var(--wcl-space) * 0.75);
     padding-inline-start: calc(
       calc(var(--tree-item-level, 1) - 1) * 1.25rem + calc(var(--wcl-space) * 0.75)
     );
+  }
+
+  [data-wcl-tree-content]:has(> [data-wcl-tree-chevron-space]) {
+    grid-template-columns: var(--wcl-tree-leaf-size, 1.75rem) minmax(0, 1fr) auto;
   }
 
   [data-wcl-tree-item]:is([data-hovered], [data-pressed]) {
@@ -5787,8 +5831,12 @@
   [data-wcl-tree-chevron-space] {
     display: inline-grid;
     place-items: center;
-    inline-size: 1.75rem;
-    block-size: 1.75rem;
+    inline-size: var(--wcl-tree-chevron-size, 1.75rem);
+    block-size: var(--wcl-tree-chevron-size, 1.75rem);
+  }
+
+  [data-wcl-tree-chevron-space] {
+    inline-size: var(--wcl-tree-leaf-size, 1.75rem);
   }
 
   [data-wcl-tree-chevron] {
@@ -7648,10 +7696,14 @@
     }
 
     [data-wcl-tree-content] {
-      grid-template-columns: 1.75rem minmax(0, 1fr);
+      grid-template-columns: var(--wcl-tree-chevron-size, 1.75rem) minmax(0, 1fr);
       padding-inline-start: calc(
         calc(var(--tree-item-level, 1) - 1) * 0.875rem + calc(var(--wcl-space) * 0.5)
       );
+    }
+
+    [data-wcl-tree-content]:has(> [data-wcl-tree-chevron-space]) {
+      grid-template-columns: var(--wcl-tree-leaf-size, 1.75rem) minmax(0, 1fr);
     }
 
     [data-wcl-tree-actions] {

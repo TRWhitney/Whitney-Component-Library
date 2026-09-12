@@ -17,11 +17,12 @@ export const appearanceProviderContract = {
   appearance: [
     'Light and dark are the only supported appearances.',
     'Appearance selects the library canvas, background, text, and border colors within the provider.',
+    'density defaults to comfortable. compact reduces field heights, menu option padding, and Tree row spacing through inherited tokens, including portaled menus.',
   ],
   appropriateUses: ['an application or isolated region needs the library appearance and accent'],
   composition: [
     'Place one provider around the interface that uses library components.',
-    'Nest a provider only when a contained region intentionally uses a different appearance or accent.',
+    'Nest a provider when a contained region intentionally uses a different appearance, accent, or density.',
   ],
   contentRules: [
     'Pass rendered application content as children.',
@@ -104,7 +105,7 @@ export const appearanceProviderContract = {
   ],
   relatedExports: [],
   responsiveBehavior: [
-    'The provider does not introduce viewport-specific behavior or mutate the document root.',
+    'Density does not change with viewport size. Coarse pointers retain usable field, menu, and Tree targets. The provider does not mutate the document root.',
   ],
   states: [
     'Changing appearance or accent updates the scoped custom properties without remounting children.',

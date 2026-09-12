@@ -1235,21 +1235,25 @@ describe('static appearance styles', () => {
     );
   });
 
-  it('keeps field controls and their support tracks dimensionally stable across states', async () => {
+  it('omits empty support tracks and allows forms to reserve stable support space', async () => {
     const styles = await readFile('src/styles.css', 'utf8');
     const field = styles.match(/\[data-wcl-field\]\s*\{([^}]*)\}/)?.[1];
     const control = styles.match(/\[data-wcl-field-control\]\s*\{([^}]*)\}/)?.[1];
-    const support = styles.match(/\[data-wcl-field-support\]\s*\{([^}]*)\}/)?.[1];
+    const support = styles.match(/\n {2}\[data-wcl-field-support\]\s*\{([^}]*)\}/)?.[1];
     const textArea = styles.match(
       /\[data-wcl-text-area\]\s+\[data-wcl-field-control\]\s*\{([^}]*)\}/,
     )?.[1];
 
-    expect(field).toContain(
-      'grid-template-rows: var(--wcl-field-grid-rows, auto auto minmax(2.25rem, auto))',
+    expect(field).toContain('grid-template-rows: var(--wcl-field-grid-rows, auto auto)');
+    expect(control).toContain('min-block-size: var(--wcl-field-control-size, 2.75rem)');
+    expect(control).toContain('block-size: var(--wcl-field-control-size, 2.75rem)');
+    expect(support).toContain('min-block-size: 0');
+    expect(styles).toMatch(
+      /\[data-wcl-field\]\[data-reserve-support\] > \[data-wcl-field-support\]\s*\{[^}]*min-block-size: 2.25rem/,
     );
-    expect(control).toContain('min-block-size: 2.75rem');
-    expect(control).toContain('block-size: 2.75rem');
-    expect(support).toContain('min-block-size: 2.25rem');
+    expect(styles).toMatch(
+      /\[data-wcl-field\]:not\(\[data-reserve-support\]\) > \[data-wcl-field-support\]:empty\s*\{[^}]*display: none/,
+    );
     expect(support).toContain('display: var(--wcl-field-support-display, grid)');
     expect(textArea).toContain('block-size: auto');
     expect(textArea).not.toContain('min-block-size: 7.5rem');
@@ -1399,7 +1403,9 @@ describe('static appearance styles', () => {
     expect(popover).toContain('max-block-size: min(20rem, var(--available-height))');
     expect(popover).toContain('background: var(--wcl-surface-raised)');
     expect(list).toContain('padding: calc(var(--wcl-space) * 0.5)');
-    expect(option).toContain('padding-block: calc(var(--wcl-space) * 0.75)');
+    expect(option).toContain('padding-block: var(--wcl-option-padding, 6px)');
+    expect(option).toContain('box-sizing: border-box');
+    expect(option).toContain('min-block-size: var(--wcl-option-min-size, 2.75rem)');
     expect(option).toContain(
       'padding-inline: calc(var(--wcl-space) * 0.75) calc(var(--wcl-space) * 1.25)',
     );
