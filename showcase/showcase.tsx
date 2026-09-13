@@ -3,7 +3,8 @@ import {ChartCommandCompositionExample} from './chart-command-composition-exampl
 import {MarkdownSpecimen} from './markdown-specimen.js';
 import {ChartApplicationGeometryExample} from './chart-application-geometry-example.js';
 import {ChartSelectionPresentationExample} from './chart-selection-presentation-example.js';
-import {CompactApplicationExample} from './compact-application-example.js';
+import {AppearanceProviderExample} from './appearance-provider-example.js';
+import {ContextMenuExample} from './context-menu-example.js';
 import {
   SearchableTreeExample,
   CollectionContextMenuExample,
@@ -153,7 +154,6 @@ import {
 } from '../src/index.js';
 import {useScrollbarActivity} from '../src/scrollbar-activity.js';
 import {componentAnchor, showcaseGroups, showcasedComponentNames} from './catalog.js';
-import {ContextMenuExample} from './context-menu-example.js';
 
 const defaultAccent: AccentColor = '#2878ff';
 const chartData = [
@@ -4320,11 +4320,17 @@ const StaticOverlaySpecimens = memo(OverlaySpecimens);
 export function Showcase() {
   const [appearance, setAppearance] = useState<Appearance>('dark');
   const [accent, setAccent] = useState<AccentColor>(defaultAccent);
+  const [compact, setCompact] = useState(false);
+  const [reserve, setReserve] = useState(false);
   const indexScrollbarProps = useScrollbarActivity<HTMLElement>();
   const mainScrollbarProps = useScrollbarActivity<HTMLElement>();
 
   return (
-    <AppearanceProvider accent={accent} appearance={appearance}>
+    <AppearanceProvider
+      accent={accent}
+      appearance={appearance}
+      density={compact ? 'compact' : 'comfortable'}
+    >
       <div className="showcase-shell">
         <div className="showcase-frame">
           <aside
@@ -4360,6 +4366,18 @@ export function Showcase() {
                   <code id="showcase-accent-value">{accent}</code>
                 </div>
               </div>
+              <Switch
+                label="Compact application density"
+                isSelected={compact}
+                onChange={setCompact}
+                reserveSupportSpace={false}
+              />
+              <Switch
+                label="Reserve field support space"
+                isSelected={reserve}
+                onChange={setReserve}
+                reserveSupportSpace={false}
+              />
             </div>
             <nav aria-label="Component catalog">
               {showcaseGroups.map((group) => (
@@ -4406,21 +4424,10 @@ export function Showcase() {
                   <h2 id="foundation-heading">Theme every component together</h2>
                 </header>
                 <Specimen
-                  description="Choose light or dark appearance, an accent, and comfortable or compact application density. Descendant controls and portaled menus inherit these values."
+                  description="Change appearance, accent, density, and support spacing in the sidebar. These controls inherit those settings, including the Priority menu when it opens."
                   name="AppearanceProvider"
                 >
-                  <div className="showcase-provider-sample">
-                    <span className="showcase-accent-swatch" />
-                    <div>
-                      <strong>{appearance === 'dark' ? 'Dark' : 'Light'} appearance</strong>
-                      <p className="showcase-muted">
-                        Accent {accent} shapes focus, rails, and emphasis.
-                      </p>
-                    </div>
-                  </div>
-                  <Example label="Compact application density and control states">
-                    <CompactApplicationExample />
-                  </Example>
+                  <AppearanceProviderExample reserve={reserve} />
                 </Specimen>
               </section>
 

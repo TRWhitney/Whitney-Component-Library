@@ -8,6 +8,31 @@ import {Showcase} from '../showcase/showcase.js';
 afterEach(cleanup);
 
 describe('component showcase', () => {
+  it('keeps application appearance options together in the sidebar', () => {
+    const {container} = render(<Showcase />);
+    const sidebar = container.querySelector('aside')!;
+    expect(within(sidebar).getByRole('switch', {name: 'Compact application density'})).toBeTruthy();
+    expect(within(sidebar).getByRole('switch', {name: 'Reserve field support space'})).toBeTruthy();
+  });
+
+  it('applies sidebar appearance and density to the application example', () => {
+    const {container} = render(<Showcase />);
+    const sidebar = within(container.querySelector('aside')!);
+    fireEvent.click(sidebar.getByRole('switch', {name: 'Compact application density'}));
+    fireEvent.click(sidebar.getByRole('button', {name: 'Dark'}));
+    fireEvent.change(sidebar.getByLabelText('Accent'), {target: {value: '#ff0000'}});
+
+    const owner = screen.getByRole('textbox', {name: 'Owner'});
+    const provider = owner.closest('[data-wcl-provider]');
+    expect(provider?.getAttribute('data-wcl-density')).toBe('compact');
+    expect(provider?.getAttribute('data-wcl-appearance')).toBe('light');
+    expect(provider?.getAttribute('style')).toContain('--wcl-accent: #ff0000');
+    expect(owner.closest('[data-wcl-field]')?.hasAttribute('data-reserve-support')).toBe(false);
+
+    fireEvent.click(sidebar.getByRole('switch', {name: 'Reserve field support space'}));
+    expect(owner.closest('[data-wcl-field]')?.hasAttribute('data-reserve-support')).toBe(true);
+  });
+
   it('runs context commands on the named object', async () => {
     render(<Showcase />);
     const target = screen.getByRole('group', {name: 'Boundary condition BC-12'});
