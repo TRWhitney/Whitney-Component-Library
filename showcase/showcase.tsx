@@ -1279,11 +1279,6 @@ function CollectionSpecimens() {
         <Example label="Independent row context actions">
           <CollectionContextMenuExample />
         </Example>
-        <p>
-          <a href="#appearance-provider">
-            Compare rounded final-row feedback and compact application controls.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1371,11 +1366,6 @@ function FieldSpecimens() {
         >
           {(controlProps) => <PhaseAngleDial {...controlProps} />}
         </Field>
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1396,11 +1386,6 @@ function FieldSpecimens() {
             onChange={() => undefined}
           />
         </ResponsiveGrid>
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1413,11 +1398,6 @@ function FieldSpecimens() {
           label="Review notes"
           rows={3}
         />
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1441,11 +1421,6 @@ function FieldSpecimens() {
           minValue={0}
           step={0.0005}
         />
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1458,11 +1433,6 @@ function FieldSpecimens() {
           description="Search run name, owner, or identifier."
           label="Search runs"
         />
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1480,11 +1450,6 @@ function FieldSpecimens() {
           />
           <NumberField defaultValue={0.0025} label="Tolerance" locale="en-US" step={0.0005} />
         </FieldGroup>
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1617,11 +1582,6 @@ function SelectionSpecimens() {
           name="mode"
           options={runModeOptions}
         />
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
 
       <Specimen
@@ -1651,11 +1611,6 @@ function SelectionSpecimens() {
             />
           </Example>
         </ResponsiveGrid>
-        <p>
-          <a href="#appearance-provider">
-            Try compact density and optional field support reservation.
-          </a>
-        </p>
       </Specimen>
     </>
   );
