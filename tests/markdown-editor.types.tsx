@@ -15,6 +15,9 @@ export const defaultLivePreview = (
   <MarkdownEditor label="Document" defaultValue="# Review" name="body" />
 );
 export const livePreview = <MarkdownEditor label="Document" mode="live-preview" />;
+export const boundedEditor = <MarkdownEditor label="Document" fillHeight />;
+// @ts-expect-error fillHeight is a boolean layout choice; the parent owns its dimensions.
+export const invalidFillHeight = <MarkdownEditor label="Document" fillHeight="40rem" />;
 export const source = <MarkdownEditor label="Document" mode="source" />;
 export const assets = (
   <MarkdownEditor

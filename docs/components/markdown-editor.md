@@ -48,6 +48,7 @@ MarkdownEditor edits a Markdown string with in-place Live Preview, source editin
 - isRequired and isInvalid follow field conventions. isReadOnly keeps the document readable and copyable; isDisabled prevents interaction and omits the value from form submission. FieldGroup disabled state is inherited.
 - isPending requires pendingMessage and prevents edits while preserving reading and copying. isLocked requires lockMessage with the application explanation and also prevents edits. The application owns lock transport.
 - Read-only and locked documents use a distinct document background, dashed boundary, and a small lock indicator inside the document area. The indicator remains visible during document scrolling. Its localized access description is available to assistive technology and on hover; lockMessage remains in support text.
+- fillHeight fills an explicitly sized parent, including label, toolbar, mode context, and support text. The remaining height belongs to the scrolling document in every mode. It takes precedence over size; the parent must leave enough height for the field chrome and a usable document.
 - reserveSupportSpace keeps room for support text. size accepts compact, regular, or expanded and defaults to regular.
 
 ## Control, events, validation, and forms
@@ -99,7 +100,7 @@ MarkdownEditor edits a Markdown string with in-place Live Preview, source editin
 
 - Source uses the utility monospace role at 0.9375rem and 1.6 line height. Live Preview and preview use body text at 1rem and 1.6 line height with document heading hierarchy. Revealed table and fenced-code source uses the utility monospace role.
 - Neutral document content fills the rounded field boundary. Inline and fenced code use the utility role; blockquote borders identify quoted content.
-- The field fills its parent width. Text wraps and bounded vertical scrolling keep the document usable in compact containers; size controls document height.
+- The field fills its parent width. Text wraps and bounded vertical scrolling keep the document usable in compact containers; size controls document height unless fillHeight fills the bounded parent. Parent resizing and wrapped toolbar or support content resize the scrolling document without rebuilding the editing session.
 
 ## Accent, forced colors, and reduced motion
 

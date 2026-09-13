@@ -56,6 +56,7 @@ export function MarkdownEditor({
   name,
   mode = 'live-preview',
   size = 'regular',
+  fillHeight = false,
   labels = englishLabels,
   validate,
   validationBehavior = 'native',
@@ -276,6 +277,7 @@ export function MarkdownEditor({
       data-wcl-field=""
       data-wcl-markdown-editor=""
       data-size={size}
+      data-fill-height={fillHeight || undefined}
       data-mode={mode}
       data-toolbar={!!renderToolbar || undefined}
       data-disabled={disabled || undefined}

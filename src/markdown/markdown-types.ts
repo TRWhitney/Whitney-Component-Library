@@ -116,6 +116,8 @@ export type MarkdownEditorProps = FieldStateProps &
     readonly name?: string;
     readonly mode?: MarkdownEditorMode;
     readonly size?: MarkdownEditorSize;
+    /** Fill an explicitly bounded parent height, including label, toolbar, and support text. */
+    readonly fillHeight?: boolean;
     /** Override English mode, position, validation, and reading copy, with optional access labels. */
     readonly labels?: MarkdownEditorLabels;
   };

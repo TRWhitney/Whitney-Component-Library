@@ -67,6 +67,8 @@ export function MarkdownSpecimen() {
   const [value, setValue] = useState(reviewNotes);
   const [mode, setMode] = useState<MarkdownEditorMode>('live-preview');
   const [size, setSize] = useState<MarkdownEditorSize>('regular');
+  const [fillHeight, setFillHeight] = useState(false);
+  const [parentHeight, setParentHeight] = useState<'28rem' | '40rem'>('40rem');
   const [isRequired, setRequired] = useState(false);
   const [isInvalid, setInvalid] = useState(false);
   const [isReadOnly, setReadOnly] = useState(false);
@@ -123,6 +125,7 @@ export function MarkdownSpecimen() {
     <Stack gap="regular">
       <InlineGroup align="start" gap="regular" wrap>
         <SegmentedControl
+          reserveSupportSpace={false}
           label="Markdown mode"
           onChange={setMode}
           options={[
@@ -133,6 +136,7 @@ export function MarkdownSpecimen() {
           value={mode}
         />
         <SegmentedControl
+          reserveSupportSpace={false}
           label="Document height"
           onChange={setSize}
           options={[
@@ -144,13 +148,64 @@ export function MarkdownSpecimen() {
         />
       </InlineGroup>
       <InlineGroup align="start" gap="regular" wrap>
-        <Switch label="Required" isSelected={isRequired} onChange={setRequired} />
-        <Switch label="Invalid" isSelected={isInvalid} onChange={setInvalid} />
-        <Switch label="Read-only" isSelected={isReadOnly} onChange={setReadOnly} />
-        <Switch label="Disabled" isSelected={isDisabled} onChange={setDisabled} />
-        <Switch label="Pending" isSelected={isPending} onChange={setPending} />
-        <Switch label="Locked" isSelected={isLocked} onChange={setLocked} />
         <Switch
+          reserveSupportSpace={false}
+          label="Fill parent height"
+          isSelected={fillHeight}
+          onChange={setFillHeight}
+        />
+        {fillHeight ? (
+          <SegmentedControl
+            reserveSupportSpace={false}
+            label="Parent height"
+            value={parentHeight}
+            onChange={setParentHeight}
+            options={[
+              {label: '28 rem', value: '28rem'},
+              {label: '40 rem', value: '40rem'},
+            ]}
+          />
+        ) : null}
+      </InlineGroup>
+      <InlineGroup align="start" gap="regular" wrap>
+        <Switch
+          reserveSupportSpace={false}
+          label="Required"
+          isSelected={isRequired}
+          onChange={setRequired}
+        />
+        <Switch
+          reserveSupportSpace={false}
+          label="Invalid"
+          isSelected={isInvalid}
+          onChange={setInvalid}
+        />
+        <Switch
+          reserveSupportSpace={false}
+          label="Read-only"
+          isSelected={isReadOnly}
+          onChange={setReadOnly}
+        />
+        <Switch
+          reserveSupportSpace={false}
+          label="Disabled"
+          isSelected={isDisabled}
+          onChange={setDisabled}
+        />
+        <Switch
+          reserveSupportSpace={false}
+          label="Pending"
+          isSelected={isPending}
+          onChange={setPending}
+        />
+        <Switch
+          reserveSupportSpace={false}
+          label="Locked"
+          isSelected={isLocked}
+          onChange={setLocked}
+        />
+        <Switch
+          reserveSupportSpace={false}
           label="Asset service unavailable"
           isSelected={assetUnavailable}
           onChange={setAssetUnavailable}
@@ -160,173 +215,183 @@ export function MarkdownSpecimen() {
         Read-only and locked documents have a distinct document background, dashed border, and lock
         indicator.
       </p>
-      <MarkdownEditor
-        label="Markdown review notes"
-        extensions={extensions}
-        renderToolbar={(controls) => (
-          <Toolbar label="Markdown formatting">
-            {(
-              [
-                ['bold', 'Bold'],
-                ['italic', 'Italic'],
-                ['strikethrough', 'Strike'],
-                ['inline-code', 'Code'],
-                ['heading-2', 'Heading 2'],
-                ['bullet-list', 'List'],
-                ['task-list', 'Task'],
-                ['blockquote', 'Quote'],
-              ] as const
-            ).map(([command, text]) => (
-              <ToggleButton
-                key={command}
-                label={text}
-                size="compact"
-                isDisabled={!controls.canExecute(command)}
-                isSelected={controls.isActive(command)}
-                onChange={() => controls.execute(command)}
-              >
-                <MarkdownIcon name={command} />
-              </ToggleButton>
-            ))}
-            <IconButton
-              label="Link"
-              size="compact"
-              isDisabled={!controls.canExecute('link')}
-              onPress={() => controls.execute('link')}
-            >
-              <MarkdownIcon name="link" />
-            </IconButton>
-            <IconButton
-              label="Text color"
-              size="compact"
-              isDisabled={!controls.canExecuteExtension('color-selection')}
-              onPress={() => controls.executeExtension('color-selection')}
-            >
-              <MarkdownIcon name="color" />
-            </IconButton>
-            <Menu
-              trigger={
-                <IconButton
-                  label="More formatting"
+      <div style={{blockSize: fillHeight ? parentHeight : undefined}}>
+        <MarkdownEditor
+          fillHeight={fillHeight}
+          label="Markdown review notes"
+          extensions={extensions}
+          renderToolbar={(controls) => (
+            <Toolbar label="Markdown formatting">
+              {(
+                [
+                  ['bold', 'Bold'],
+                  ['italic', 'Italic'],
+                  ['strikethrough', 'Strike'],
+                  ['inline-code', 'Code'],
+                  ['heading-2', 'Heading 2'],
+                  ['bullet-list', 'List'],
+                  ['task-list', 'Task'],
+                  ['blockquote', 'Quote'],
+                ] as const
+              ).map(([command, text]) => (
+                <ToggleButton
+                  key={command}
+                  label={text}
                   size="compact"
-                  isDisabled={
-                    !controls.canExecute('paragraph') && !controls.canExecute('code-block')
-                  }
+                  isDisabled={!controls.canExecute(command)}
+                  isSelected={controls.isActive(command)}
+                  onChange={() => controls.execute(command)}
                 >
-                  <MarkdownIcon name="more" />
-                </IconButton>
-              }
-              items={[
-                {
-                  type: 'group',
-                  id: 'headings',
-                  label: 'Headings',
-                  items: (
-                    [
-                      ['heading-1', 'Heading 1'],
-                      ['heading-2', 'Heading 2'],
-                      ['heading-3', 'Heading 3'],
-                      ['heading-4', 'Heading 4'],
-                      ['heading-5', 'Heading 5'],
-                      ['heading-6', 'Heading 6'],
-                    ] as const
-                  ).map(([command, text]) => ({
-                    type: 'action' as const,
-                    id: command,
-                    label: text,
-                    isDisabled: !controls.canExecute(command),
-                    onAction: () => requestAnimationFrame(() => controls.execute(command)),
-                  })),
-                },
-                {
-                  type: 'group',
-                  id: 'blocks',
-                  label: 'Blocks',
-                  items: (
-                    [
-                      ['paragraph', 'Paragraph'],
-                      ['ordered-list', 'Numbered list'],
-                      ['code-block', 'Code block'],
-                      ['horizontal-rule', 'Horizontal rule'],
-                    ] as const
-                  ).map(([command, text]) => ({
-                    type: 'action' as const,
-                    id: command,
-                    label: text,
-                    isDisabled: !controls.canExecute(command),
-                    onAction: () => requestAnimationFrame(() => controls.execute(command)),
-                  })),
-                },
-              ]}
-            />
-            <IconButton
-              label="Undo"
-              size="compact"
-              isDisabled={!controls.canExecute('undo')}
-              onPress={() => controls.execute('undo')}
-            >
-              <MarkdownIcon name="undo" />
-            </IconButton>
-            <IconButton
-              label="Redo"
-              size="compact"
-              isDisabled={!controls.canExecute('redo')}
-              onPress={() => controls.execute('redo')}
-            >
-              <MarkdownIcon name="redo" />
-            </IconButton>
-            <IconButton
-              label="Open link"
-              size="compact"
-              isDisabled={!controls.canOpenLink}
-              onPress={() => controls.openLink()}
-            >
-              <MarkdownIcon name="open" />
-            </IconButton>
-          </Toolbar>
-        )}
-        description="Edit formatted text in Live Preview. Move the cursor into a construct to reveal its Markdown; select across constructs to edit their source. Tab leaves the editor."
-        errorMessage="Resolve the boundary review before saving these notes."
-        isRequired={isRequired}
-        isInvalid={isInvalid}
-        isReadOnly={isReadOnly}
-        isDisabled={isDisabled}
-        isPending={isPending}
-        pendingMessage="Checking the review notes."
-        isLocked={isLocked}
-        lockMessage="Morgan is editing these notes. You can still read and copy the document."
-        mode={mode}
-        size={size}
-        value={value}
-        onChange={setValue}
-        assets={{
-          acceptedFileTypes: ['image/png', 'image/jpeg', 'image/svg+xml'],
-          maxFileSize: 5 * 1024 * 1024,
-          insert: async ({signal}) => {
-            await new Promise<void>((resolve) => {
-              const timer = setTimeout(resolve, 700);
-              signal.addEventListener(
-                'abort',
-                () => {
-                  clearTimeout(timer);
-                  resolve();
-                },
-                {once: true},
-              );
-            });
-            return assetUnavailable
-              ? {error: 'The example asset service is unavailable. Turn it back on and retry.'}
-              : {markdown: '![Boundary mesh](/markdown-boundary.svg)'};
-          },
-        }}
-        wikiLinks={{
-          resolve: (target) =>
-            target === 'Boundary review'
-              ? {href: '#markdown-editor', label: 'Boundary review'}
-              : null,
-          onNavigate: ({label}) => setOpenedWiki(label),
-        }}
-      />
+                  <MarkdownIcon name={command} />
+                </ToggleButton>
+              ))}
+              <IconButton
+                label="Link"
+                size="compact"
+                isDisabled={!controls.canExecute('link')}
+                onPress={() => controls.execute('link')}
+              >
+                <MarkdownIcon name="link" />
+              </IconButton>
+              <IconButton
+                label="Text color"
+                size="compact"
+                isDisabled={!controls.canExecuteExtension('color-selection')}
+                onPress={() => controls.executeExtension('color-selection')}
+              >
+                <MarkdownIcon name="color" />
+              </IconButton>
+              <Menu
+                trigger={
+                  <IconButton
+                    label="More formatting"
+                    size="compact"
+                    isDisabled={
+                      !controls.canExecute('paragraph') && !controls.canExecute('code-block')
+                    }
+                  >
+                    <MarkdownIcon name="more" />
+                  </IconButton>
+                }
+                items={[
+                  {
+                    type: 'group',
+                    id: 'headings',
+                    label: 'Headings',
+                    items: (
+                      [
+                        ['heading-1', 'Heading 1'],
+                        ['heading-2', 'Heading 2'],
+                        ['heading-3', 'Heading 3'],
+                        ['heading-4', 'Heading 4'],
+                        ['heading-5', 'Heading 5'],
+                        ['heading-6', 'Heading 6'],
+                      ] as const
+                    ).map(([command, text]) => ({
+                      type: 'action' as const,
+                      id: command,
+                      label: text,
+                      isDisabled: !controls.canExecute(command),
+                      onAction: () => requestAnimationFrame(() => controls.execute(command)),
+                    })),
+                  },
+                  {
+                    type: 'group',
+                    id: 'blocks',
+                    label: 'Blocks',
+                    items: (
+                      [
+                        ['paragraph', 'Paragraph'],
+                        ['ordered-list', 'Numbered list'],
+                        ['code-block', 'Code block'],
+                        ['horizontal-rule', 'Horizontal rule'],
+                      ] as const
+                    ).map(([command, text]) => ({
+                      type: 'action' as const,
+                      id: command,
+                      label: text,
+                      isDisabled: !controls.canExecute(command),
+                      onAction: () => requestAnimationFrame(() => controls.execute(command)),
+                    })),
+                  },
+                ]}
+              />
+              <IconButton
+                label="Undo"
+                size="compact"
+                isDisabled={!controls.canExecute('undo')}
+                onPress={() => controls.execute('undo')}
+              >
+                <MarkdownIcon name="undo" />
+              </IconButton>
+              <IconButton
+                label="Redo"
+                size="compact"
+                isDisabled={!controls.canExecute('redo')}
+                onPress={() => controls.execute('redo')}
+              >
+                <MarkdownIcon name="redo" />
+              </IconButton>
+              <IconButton
+                label="Open link"
+                size="compact"
+                isDisabled={!controls.canOpenLink}
+                onPress={() => controls.openLink()}
+              >
+                <MarkdownIcon name="open" />
+              </IconButton>
+            </Toolbar>
+          )}
+          description="Edit formatted text in Live Preview. Move the cursor into a construct to reveal its Markdown; select across constructs to edit their source. Tab leaves the editor."
+          errorMessage="Resolve the boundary review before saving these notes."
+          isRequired={isRequired}
+          isInvalid={isInvalid}
+          isReadOnly={isReadOnly}
+          isDisabled={isDisabled}
+          isPending={isPending}
+          pendingMessage="Checking the review notes."
+          isLocked={isLocked}
+          lockMessage="Morgan is editing these notes. You can still read and copy the document."
+          mode={mode}
+          size={size}
+          value={value}
+          onChange={setValue}
+          assets={{
+            acceptedFileTypes: ['image/png', 'image/jpeg', 'image/svg+xml'],
+            maxFileSize: 5 * 1024 * 1024,
+            insert: async ({signal}) => {
+              await new Promise<void>((resolve) => {
+                const timer = setTimeout(resolve, 700);
+                signal.addEventListener(
+                  'abort',
+                  () => {
+                    clearTimeout(timer);
+                    resolve();
+                  },
+                  {once: true},
+                );
+              });
+              return assetUnavailable
+                ? {error: 'The example asset service is unavailable. Turn it back on and retry.'}
+                : {markdown: '![Boundary mesh](/markdown-boundary.svg)'};
+            },
+          }}
+          wikiLinks={{
+            resolve: (target) =>
+              target === 'Boundary review'
+                ? {href: '#markdown-editor', label: 'Boundary review'}
+                : null,
+            onNavigate: ({label}) => setOpenedWiki(label),
+          }}
+        />
+      </div>
+      <p>
+        Read-only and Locked show an access label beside the document name. Both preserve text
+        selection and copying. Fill parent height fits the entire field into an explicitly sized
+        parent, with the document scrolling beneath the toolbar. Change the parent height or mode to
+        try the same bounds with Live Preview, Source, and Preview. Without fillHeight, Document
+        height sets the document size.
+      </p>
       <InlineGroup gap="regular" wrap>
         <Button variant="secondary" onPress={() => setValue('')}>
           Clear document
