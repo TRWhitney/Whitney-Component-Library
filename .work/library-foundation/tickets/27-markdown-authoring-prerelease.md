@@ -6,21 +6,27 @@ consumer-owned layout and persistence state.
 
 **Blocked by:** none. Markdown authoring, application structure, overlays, and feedback prerequisites are complete.
 
-**Status:** ready
+**Status:** complete
 
-- [ ] The fixture coordinates editor, metadata fields, toolbar/commands, link navigation, asset
+## Delivery boundary
+
+Whitney clarified that the outputs are a substantial [authoring demo](../../markdown-authoring-demo/spec.md) and actionable additions to [Ticket 30](30-cross-browser-accessibility-and-visual-hardening.md). Iterate on the application through public APIs. Record anything requiring library changes rather than implementing it here. After Whitney accepts the application-author experience, work through the cleanup ticket. This is a proof of concept without production hardening; release-wide evidence remains with Ticket 30.
+
+- [x] The fixture coordinates editor, metadata fields, toolbar/commands, link navigation, asset
       state, and preview through public component APIs.
-- [ ] It demonstrates unsaved, saving, saved, invalid, read-only, locked, asset-pending, and error
+- [x] It demonstrates unsaved, saving, saved, invalid, read-only, locked, asset-pending, and error
       states without owning persistence or collaborative transport.
-- [ ] Source, Live Preview, and read-only flows remain keyboard operable and expose coherent
+- [x] Source, Live Preview, and read-only flows remain keyboard operable and expose coherent
       controls, content, relationships, and state in the browser accessibility tree.
-- [ ] Compact and wide layouts preserve authoring focus, supporting metadata, and commands.
-- [ ] A clean packed-package fixture implements the complete slice with no private import or
+- [x] Compact and wide layouts preserve authoring focus, supporting metadata, and commands.
+- [x] A clean packed-package fixture implements the complete slice with no private import or
       external substitute component.
-- [ ] No Markdown-workspace export, contract, required layout, persistence model, or notes-vault
+- [x] No Markdown-workspace export, contract, required layout, persistence model, or notes-vault
       abstraction is introduced.
-- [ ] Representative document workloads, browsers, theme, SSR, hydration, types, accessibility,
-      and generated guidance pass.
+- [x] Representative document workflows, Chromium and Firefox, desktop and phone layouts,
+      appearance, public consumer types, and browser builds pass under the accepted prototype scope.
+      Release-wide SSR, hydration, assistive-technology, and compatibility certification remains
+      in Ticket 30.
 
 ## Accepted sources
 
@@ -30,10 +36,8 @@ consumer-owned layout and persistence state.
 
 ## Completion evidence
 
-Pending implementation.
+Whitney accepted the [Fieldnotes publication studio](../../markdown-authoring-demo/prototype.md) and authorized delivery followed by the recorded cleanup. Packed-consumer and Chromium/Firefox workflow checks pass. The retained demo and Ticket 30 findings satisfy the clarified delivery boundary.
 
 ## Markdown cleanup
 
-- [ ] Give read-only and collaboratively locked editors a visible treatment on the editor itself
-      that makes their non-editable state clear without relying on the support text below.
-      Whitney requested this cleanup after the Markdown tickets; retain the explanatory text.
+Read-only and locked editor styling is tracked in Ticket 30, alongside new library deficiencies found through this demo.

@@ -47,7 +47,9 @@
     "verify:chart-performance": "node ./scripts/verify-chart-performance.mjs",
     "verify:chart-isolation": "npm run build && node ./scripts/verify-chart-isolation.mjs",
     "verify:package": "node ./scripts/verify-package.mjs",
-    "verify:editor-isolation": "npm run build && node ./scripts/verify-editor-isolation.mjs"
+    "verify:editor-isolation": "npm run build && node ./scripts/verify-editor-isolation.mjs",
+    "prototype:markdown": "node ./scripts/markdown-authoring-prototype.mjs",
+    "prototype:markdown:build": "node ./scripts/markdown-authoring-prototype.mjs --build"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",

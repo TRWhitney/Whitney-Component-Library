@@ -13,7 +13,7 @@ Tickets 01 through 26, including the intervening Ticket 03A accent correction, a
 Ticket 24 delivers Markdown source editing and safe preview with one retained editing session.
 Ticket 25 adds default in-place Live Preview with context-sensitive source reveal.
 Ticket 26 delivers commands, navigation, asset callbacks, and declared extensions, including stored RGBA text colors. See the [Markdown authoring effort](../markdown-authoring/status.md).
-Ticket 27 is ready.
+Ticket 27 delivers the accepted [Markdown authoring demo](../markdown-authoring-demo/status.md). Whitney authorized implementation of the recorded cleanup findings.
 Ticket 23 delivers the accepted [Energy desk prototype](../data-analysis-prototype/status.md)
 and all thirteen library fixes verified in that packed-consumer application.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
@@ -545,4 +545,4 @@ Whitney's deferred editor-state styling and showcase cleanup are recorded in Tic
 - Ticket 22 is complete through `19a050f`. Its accepted performance results and delivery evidence
   remain in the [chart effort](../chart-interaction-composition/status.md).
 - Ticket 23 and all thirteen library fixes are complete. See the [delivery and verification record](../data-analysis-prototype/status.md).
-- Ticket 26 is complete. [Ticket 27](tickets/27-markdown-authoring-prerelease.md) is ready to begin.
+- Ticket 26 is complete. [Ticket 27](tickets/27-markdown-authoring-prerelease.md) is complete; the recorded cleanup is next.
