@@ -16,6 +16,7 @@ Table compares keyed records across typed columns with optional application-owne
 
 ## Composition and parts
 
+- Set minimumWidth="content" for a short table that should fit its container, or supply a nonnegative finite CSS-pixel minimum for deliberate scrolling. The default remains 38rem.
 - Render Table inside AppearanceProvider.
 - Define columns once and provide every row cell through a record keyed by the same column ids.
 - Place Button, IconButton, Link, or another explicit control in a column whose kind is actions.

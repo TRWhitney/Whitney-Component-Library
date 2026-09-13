@@ -59,6 +59,7 @@ const query: CollectionQuery<'status', 'running'> = {
 export const advancedCollections = (
   <>
     <Table
+      minimumWidth="content"
       ariaLabel="Runs"
       columns={columns}
       emptyState={emptyState}

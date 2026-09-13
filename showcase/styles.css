@@ -711,3 +711,7 @@
 .showcase-navigation-command {
   padding: 0.75rem;
 }
+
+.showcase-small-table {
+  max-inline-size: 24rem;
+}

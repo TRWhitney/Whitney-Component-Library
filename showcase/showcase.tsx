@@ -1245,6 +1245,33 @@ function CollectionSpecimens() {
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
         />
+        <Example label="Compact table for narrow spaces">
+          <div className="showcase-small-table">
+            <Table
+              ariaLabel="Compact review table"
+              minimumWidth="content"
+              selectionMode="none"
+              columns={[
+                {id: 'document', label: 'Document', isRowHeader: true},
+                {id: 'status', label: 'Status'},
+              ]}
+              rows={[
+                {
+                  id: 'brief',
+                  textValue: 'Arrival brief',
+                  cells: {document: 'Arrival brief', status: 'Reviewed'},
+                },
+                {
+                  id: 'notes',
+                  textValue: 'Site observations',
+                  cells: {document: 'Site observations', status: 'Needs review'},
+                },
+              ]}
+              emptyState={emptyState}
+            />
+          </div>
+          <p>Content-based minimum width fits short tables into narrow spaces.</p>
+        </Example>
         <Example label="Independent row context actions">
           <CollectionContextMenuExample />
         </Example>

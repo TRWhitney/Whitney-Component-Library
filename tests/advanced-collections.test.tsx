@@ -70,6 +70,21 @@ function rows(onInspect: () => void) {
 }
 
 describe('table, tree, and filter family', () => {
+  it('rejects a table minimum width that cannot describe a visible table', () => {
+    expect(() =>
+      render(
+        <Table
+          ariaLabel="Readings"
+          columns={[{id: 'name', label: 'Name', isRowHeader: true}]}
+          rows={[]}
+          emptyState={emptyState}
+          selectionMode="none"
+          minimumWidth={-1}
+        />,
+      ),
+    ).toThrow(/minimumWidth/);
+  });
+
   it('keeps table sorting, row selection, and embedded actions separate', () => {
     const onInspect = vi.fn();
     const onSelectionChange = vi.fn();

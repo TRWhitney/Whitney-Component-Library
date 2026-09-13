@@ -9,7 +9,7 @@ import {
   TableHeader as AriaTableHeader,
 } from 'react-aria-components/Table';
 import type {Key} from 'react-aria-components/Table';
-import {useRef, type ReactElement} from 'react';
+import {useRef, type CSSProperties, type ReactElement} from 'react';
 
 import {useCollectionContextMenu} from './collection-context-menu.js';
 
@@ -31,6 +31,13 @@ function validateTable<RowId extends string, ColumnId extends string>(
   props: TableProps<RowId, ColumnId>,
 ): void {
   const {columns, rows} = props;
+  if (
+    typeof props.minimumWidth === 'number' &&
+    (!Number.isFinite(props.minimumWidth) || props.minimumWidth < 0)
+  )
+    throw new Error(
+      'Table minimumWidth must be a nonnegative finite number of CSS pixels or content.',
+    );
   assertStableCollectionIds(columns);
   assertStableCollectionIds(rows);
 
@@ -106,7 +113,18 @@ export function Table<const RowId extends string, const ColumnId extends string>
   const disabledKeys = selectionRows.filter((row) => row.isDisabled).map((row) => row.id);
 
   return (
-    <div data-status={status} data-wcl-collection="" data-wcl-table="">
+    <div
+      data-status={status}
+      data-wcl-collection=""
+      data-wcl-table=""
+      data-minimum-width={props.minimumWidth === 'content' ? 'content' : undefined}
+      style={
+        {
+          '--wcl-table-minimum-width':
+            typeof props.minimumWidth === 'number' ? `${props.minimumWidth}px` : '38rem',
+        } as CSSProperties
+      }
+    >
       <div data-wcl-table-scroll="">
         <AriaTable
           ref={collectionRef}

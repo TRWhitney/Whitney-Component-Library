@@ -5691,12 +5691,22 @@
   }
 
   [data-wcl-table-grid] {
-    inline-size: max(100%, 38rem);
+    inline-size: max(100%, var(--wcl-table-minimum-width));
     border-spacing: 0;
     border-collapse: separate;
     outline: none;
     color: var(--wcl-text);
     font-family: var(--wcl-font-body);
+  }
+
+  [data-wcl-table][data-minimum-width='content'] [data-wcl-table-grid] {
+    inline-size: 100%;
+  }
+
+  [data-wcl-table][data-minimum-width='content']
+    :is([data-wcl-table-column], [data-wcl-table-cell]) {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
   }
 
   [data-wcl-table-column] {

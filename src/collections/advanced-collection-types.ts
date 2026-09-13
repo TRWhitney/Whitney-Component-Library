@@ -83,6 +83,7 @@ type TableBaseProps<RowId extends string, ColumnId extends string> = CollectionS
   TableSortingProps<ColumnId> & {
     readonly ariaLabel: string;
     readonly columns: TableColumns<ColumnId>;
+    readonly minimumWidth?: number | 'content';
     readonly contextMenu?: CollectionContextMenuProps<NoInfer<RowId>>;
     readonly emptyState: EmptyStateProps;
   };
