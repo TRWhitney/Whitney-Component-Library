@@ -138,6 +138,7 @@ export type CollapsibleNavigationPaneGroups<Id extends string = string> = readon
 
 export type CollapsibleNavigationPaneProps<Id extends string = string> = {
   readonly defaultCollapsed?: boolean;
+  readonly placement?: 'standalone' | 'sidebar-top';
   readonly ariaLabel: string;
   readonly collapseLabel: string;
   readonly currentId: NoInfer<Id>;

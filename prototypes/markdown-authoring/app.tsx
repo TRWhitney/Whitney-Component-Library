@@ -863,6 +863,7 @@ export function App() {
             <aside className="workspace-sidebar" data-region="Project sidebar">
               <div className="sidebar-navigation">
                 <CollapsibleNavigationPane
+                  placement="sidebar-top"
                   ariaLabel="Riverside workspace"
                   collapseLabel="Collapse navigator"
                   expandLabel="Open navigator"

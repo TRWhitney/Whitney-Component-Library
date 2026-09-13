@@ -989,6 +989,7 @@ function NavigationSpecimens() {
       >
         <div className="showcase-navigation-sidebar">
           <CollapsibleNavigationPane
+            placement="sidebar-top"
             ariaLabel="Workspace navigation"
             collapseLabel="Collapse workspace navigation"
             currentId="active-runs"
@@ -1018,8 +1019,9 @@ function NavigationSpecimens() {
         </div>
         <p>
           Collapse shrinks the bordered navigator to its header. Its width, header control, and the
-          separate New document action remain stable. Link rows follow application density and include
-          padding within their control height.
+          separate New document action remain stable. The navigator meets the top sidebar edge and
+          retains its border. Link rows follow application density and include padding within their
+          control height.
         </p>
       </Specimen>
     </>

@@ -23,7 +23,7 @@ CollapsibleNavigationPane exposes grouped application destinations without ownin
 
 ## Preferred higher-level compositions
 
-- Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. Do not use a collapsible navigator as the only substantive sidebar content; use Drawer when the whole navigation region should disappear. Keep sibling commands outside navigation.
+- Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. Use placement="sidebar-top" when this is the top item of a sidebar: the top corners meet the sidebar edge while retaining the border. Do not use a collapsible navigator as the only substantive sidebar content; use Drawer when the whole navigation region should disappear. Keep sibling commands outside navigation.
 
 ## Content
 

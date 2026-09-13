@@ -5436,6 +5436,12 @@
     gap: 0;
   }
 
+  [data-wcl-collapsible-navigation-pane][data-placement='sidebar-top'] {
+    inline-size: 100%;
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+
   [data-wcl-collection] {
     min-inline-size: 0;
     color: var(--wcl-text);

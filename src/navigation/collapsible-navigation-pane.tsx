@@ -70,6 +70,7 @@ export function CollapsibleNavigationPane<const Id extends string>({
   defaultCollapsed = false,
   expandLabel,
   groups,
+  placement = 'standalone',
   onNavigate,
 }: CollapsibleNavigationPaneProps<Id>): ReactElement {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
@@ -78,6 +79,7 @@ export function CollapsibleNavigationPane<const Id extends string>({
     <nav
       aria-label={ariaLabel}
       data-collapsed={collapsed || undefined}
+      data-placement={placement}
       data-wcl-collapsible-navigation-pane=""
     >
       <AriaButton
