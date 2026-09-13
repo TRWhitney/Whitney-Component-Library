@@ -68,6 +68,7 @@ export const selectContract = {
   ],
   controlBehavior: [
     'Use value with onChange for controlled selection or defaultValue for uncontrolled selection. null means no selection. Option keys must not depend on array identity or order.',
+    'An opening pointer release does not select an option that moves beneath a stationary pointer. Clicking an option or deliberately dragging from the trigger selects it. Select works inside Popover without dismissing the containing settings panel.',
   ],
   counterExamples: [
     {

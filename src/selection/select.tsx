@@ -4,7 +4,7 @@ import {Button} from 'react-aria-components/Button';
 import {Label} from 'react-aria-components/Label';
 import {Popover} from 'react-aria-components/Popover';
 import {Select as AriaSelect, SelectValue} from 'react-aria-components/Select';
-import type {ReactElement} from 'react';
+import {useRef, type ReactElement} from 'react';
 
 import {useFieldGroupDisabled} from '../fields/field-group-context.js';
 import {
@@ -40,6 +40,7 @@ export function Select<Value extends string>({
   const disabled = inheritedDisabled || isDisabled;
   const disabledKeys = options.filter((option) => option.isDisabled).map((option) => option.value);
   const emptyContent = collectionEmptyContent(emptyMessage, isLoading, loadingMessage);
+  const openingPointer = useRef<{id: number; x: number; y: number} | null>(null);
 
   return (
     <AriaSelect<CollectionOption<Value>>
@@ -74,6 +75,12 @@ export function Select<Value extends string>({
         ) : null}
       </Label>
       <Button
+        onPointerDownCapture={(event) => {
+          openingPointer.current =
+            event.pointerType === 'mouse'
+              ? {id: event.pointerId, x: event.clientX, y: event.clientY}
+              : null;
+        }}
         aria-busy={isLoading || undefined}
         data-wcl-field-control=""
         data-wcl-select-trigger=""
@@ -86,7 +93,28 @@ export function Select<Value extends string>({
         <SelectionChevron />
       </Button>
       {renderSelectionSupport({description, errorMessage, isLoading, loadingMessage})}
-      <Popover data-wcl-selection-popover="" offset={6} placement="bottom start">
+      <Popover
+        data-wcl-selection-popover=""
+        offset={6}
+        placement="bottom start"
+        onPointerDownCapture={() => {
+          openingPointer.current = null;
+        }}
+        onPointerUpCapture={(event) => {
+          const origin = openingPointer.current;
+          openingPointer.current = null;
+          // Positioning can move an option beneath the opening click. Keep deliberate
+          // trigger-to-option drags, but do not select on a stationary opening release.
+          if (
+            origin &&
+            origin.id === event.pointerId &&
+            Math.hypot(event.clientX - origin.x, event.clientY - origin.y) <= 4
+          ) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
+      >
         <CollectionList emptyContent={emptyContent} options={options} />
       </Popover>
     </AriaSelect>

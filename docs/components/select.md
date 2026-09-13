@@ -34,6 +34,7 @@ Select chooses one value from a finite collapsible list.
 ## Control, events, validation, and forms
 
 - Use value with onChange for controlled selection or defaultValue for uncontrolled selection. null means no selection. Option keys must not depend on array identity or order.
+- An opening pointer release does not select an option that moves beneath a stationary pointer. Clicking an option or deliberately dragging from the trigger selects it. Select works inside Popover without dismissing the containing settings panel.
 - onChange reports the selected string key, or null after an external clear.
 - Use isRequired and validationBehavior for native requirements, validate for value rules, and isInvalid with errorMessage for errors supplied by the application. Loading does not imply an error.
 - name and form serialize the selected key through the hidden native control; native reset restores defaultValue, and required native validation prevents empty submission.

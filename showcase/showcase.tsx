@@ -4179,6 +4179,21 @@ function OverlaySpecimens() {
           <Stack gap="tight">
             <StatusIndicator label="Stable" tone="success" />
             <p>RUN 0284 converged after 18 boundary passes.</p>
+            <Select
+              label="Review state"
+              defaultValue="ready"
+              emptyMessage="No review states"
+              options={[
+                {value: 'ready', label: 'Ready'},
+                {value: 'loading', label: 'Loading'},
+                {value: 'empty', label: 'Empty workspace'},
+                {value: 'error', label: 'Load error'},
+              ]}
+            />
+            <p>
+              Open the choice list, select a state, and reopen it. Opening the list keeps the
+              current selection until you choose an option.
+            </p>
           </Stack>
         </Popover>
       </Specimen>

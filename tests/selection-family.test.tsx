@@ -3,7 +3,7 @@ import {hydrateRoot} from 'react-dom/client';
 import {renderToString} from 'react-dom/server';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {ComboBox, Select} from '../src/index.js';
+import {AppearanceProvider, Button, ComboBox, Popover, Select} from '../src/index.js';
 
 if (globalThis.CSS === undefined) {
   Object.defineProperty(globalThis, 'CSS', {
@@ -21,6 +21,68 @@ const options = [
 ] as const;
 
 describe('selection family', () => {
+  it('keeps a nested Select open when an option moves beneath its opening pointer release', async () => {
+    const onChange = vi.fn();
+    render(
+      <AppearanceProvider appearance="dark" accent="#2878ff">
+        <Popover
+          title="Settings"
+          description="Configure the document."
+          closeLabel="Close settings"
+          trigger={<Button>Settings</Button>}
+        >
+          <Select label="Run mode" emptyMessage="No modes" options={options} onChange={onChange} />
+        </Popover>
+      </AppearanceProvider>,
+    );
+    fireEvent.click(screen.getByRole('button', {name: 'Settings'}));
+    const trigger = await screen.findByRole('button', {name: /Run mode/});
+    fireEvent.pointerDown(trigger, {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 20,
+      clientY: 20,
+    });
+    const option = await screen.findByRole('option', {name: 'Conservative'});
+    fireEvent.pointerUp(option, {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 20,
+      clientY: 20,
+    });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('listbox')).toBeTruthy();
+    fireEvent.click(option);
+    expect(onChange).toHaveBeenCalledWith('conservative');
+    expect(screen.getByRole('dialog', {name: 'Settings'})).toBeTruthy();
+  });
+
+  it('preserves deliberate dragging from the Select trigger onto an option', async () => {
+    const onChange = vi.fn();
+    render(
+      <Select label="Run mode" emptyMessage="No modes" options={options} onChange={onChange} />,
+    );
+    fireEvent.pointerDown(screen.getByRole('button', {name: /Run mode/}), {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 20,
+      clientY: 20,
+    });
+    const option = await screen.findByRole('option', {name: 'Conservative'});
+    fireEvent.pointerMove(option, {pointerId: 1, pointerType: 'mouse', clientX: 60, clientY: 60});
+    fireEvent.pointerUp(option, {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 60,
+      clientY: 60,
+    });
+    expect(onChange).toHaveBeenCalledWith('conservative');
+  });
+
   it('connects Select labels, support text, requirement, and controlled selection', () => {
     const onChange = vi.fn();
     render(
