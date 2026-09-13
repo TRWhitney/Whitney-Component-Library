@@ -16,6 +16,8 @@ Stack arranges related elements vertically with consistent spacing.
 
 ## Composition and parts
 
+- Size application regions and controls independently: use intrinsic widths for short commands and choices, bound text-entry widths by expected input, and deliberately position bounded content within the remaining workspace. A full-width parent does not require stretched children.
+- Keep related controls together with bounded gaps. Do not distribute spare container height between form rows. Inspect parent gaps together with child padding and reserved support rows before adding more space.
 - Render Stack inside AppearanceProvider to load its spacing tokens.
 - Place related siblings directly inside Stack and nest another layout primitive only when the relationship changes.
 - Stack exposes one ordered children region and no named parts.

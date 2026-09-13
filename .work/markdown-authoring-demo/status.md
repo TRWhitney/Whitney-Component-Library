@@ -10,7 +10,7 @@ Complete. Whitney accepted the application-author experience and authorized deli
 
 ## Frontier
 
-The recorded [Ticket 30 findings](../library-foundation/tickets/30-cross-browser-accessibility-and-visual-hardening.md) are authorized for implementation. Release-wide certification remains separate from those findings.
+The recorded [Ticket 30 findings](../library-foundation/tickets/30-cross-browser-accessibility-and-visual-hardening.md) are completed in the [cleanup record](../authoring-cleanup/status.md). Release-wide certification remains separate from those findings.
 
 ## Verification
 
@@ -18,4 +18,4 @@ Packed-consumer types and browser build, targeted ESLint, Stylelint, and Prettie
 
 ## Continuation
 
-Ticket 27 delivery on branch `main`, baseline `370d42a`. No library implementation changes belong to this delivery. Next work is the authorized cleanup.
+Ticket 27 was delivered as `d11a053` on branch `main`, from baseline `370d42a`. Library implementation changes belong to the subsequent cleanup. The subsequent [cleanup](../authoring-cleanup/status.md) also updates the prototype to use its new public APIs.

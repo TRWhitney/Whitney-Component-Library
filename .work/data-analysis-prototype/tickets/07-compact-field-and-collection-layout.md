@@ -45,13 +45,13 @@ The reported spacing is primarily inside the filter popover and the open Select 
 
 `reserveSupportSpace` is available on Field, TextField, TextArea, NumberField, SearchField, Select, and ComboBox. The default omits an empty support track. Real description, validation, and pending messages retain their accessible associations; explicit reservation leaves a two-line track and FieldGroup keeps shared row alignment.
 
-The rendered `CompactApplicationExample` compares both densities, optional support reservation, validation, filter popovers, dropdown descriptions, and a searchable tree. The example is registered and final browser checks pass.
+The original combined application example verified density, support reservation, validation, and collection controls. The authoring cleanup subsequently replaced it with the minimal `AppearanceProviderExample`: Owner, Priority, and Notifications inherit sidebar settings. Component-specific validation and collection examples remain in their own showcase sections.
 
 Focused verification: both supplied density tests failed before implementation. All 134 tests pass across `application-density`, `field-family`, `selection-family`, `styles`, and `appearance-provider`.
 
 ## Rework
 
-The filter form uses the public relaxed Stack gap, providing 16px between controls without restoring empty support tracks. The compact application example demonstrates the same separation.
+The filter form uses the public relaxed Stack gap, providing 16px between controls without restoring empty support tracks. The filter example remains part of the data-analysis prototype.
 
 Popover now constrains its dialog and scrollable body to the positioned container's actual available height. It no longer relies on an absent CSS height variable. Short windows reduce header and body padding, while the body scrolls to keep Clear filters reachable. Chromium and Firefox checks cover 800px-wide windows at 220px, 300px, and 500px high.
 

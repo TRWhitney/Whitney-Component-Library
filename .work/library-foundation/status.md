@@ -13,7 +13,7 @@ Tickets 01 through 26, including the intervening Ticket 03A accent correction, a
 Ticket 24 delivers Markdown source editing and safe preview with one retained editing session.
 Ticket 25 adds default in-place Live Preview with context-sensitive source reveal.
 Ticket 26 delivers commands, navigation, asset callbacks, and declared extensions, including stored RGBA text colors. See the [Markdown authoring effort](../markdown-authoring/status.md).
-Ticket 27 delivers the accepted [Markdown authoring demo](../markdown-authoring-demo/status.md). Whitney authorized implementation of the recorded cleanup findings.
+Ticket 27 delivers the accepted [Markdown authoring demo](../markdown-authoring-demo/status.md). The recorded cleanup findings are complete; see the [cleanup evidence](../authoring-cleanup/status.md).
 Ticket 23 delivers the accepted [Energy desk prototype](../data-analysis-prototype/status.md)
 and all thirteen library fixes verified in that packed-consumer application.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
@@ -298,8 +298,8 @@ See the [decision map](map.md). [Ticket 25](tickets/25-markdown-live-preview.md)
 in-place Markdown authoring, its canonical guidance and rendered example, and verified keyboard,
 clipboard, composition, SSR/hydration, and large-document behavior. Its
 [verification record](../markdown-live-preview/verification.md) contains the completion evidence.
-[Ticket 27](tickets/27-markdown-authoring-prerelease.md) is next.
-Whitney's deferred editor-state styling and showcase cleanup are recorded in Tickets 27 and 30.
+[Ticket 27](tickets/27-markdown-authoring-prerelease.md) and its [recorded cleanup](../authoring-cleanup/status.md) are complete.
+Ticket 30 retains the remaining release-wide certification requirements.
 
 ## Accepted sources
 
@@ -545,4 +545,4 @@ Whitney's deferred editor-state styling and showcase cleanup are recorded in Tic
 - Ticket 22 is complete through `19a050f`. Its accepted performance results and delivery evidence
   remain in the [chart effort](../chart-interaction-composition/status.md).
 - Ticket 23 and all thirteen library fixes are complete. See the [delivery and verification record](../data-analysis-prototype/status.md).
-- Ticket 26 is complete. [Ticket 27](tickets/27-markdown-authoring-prerelease.md) is complete; the recorded cleanup is next.
+- Ticket 26 is complete. [Ticket 27](tickets/27-markdown-authoring-prerelease.md) is complete; the [recorded cleanup](../authoring-cleanup/status.md) is also complete.
