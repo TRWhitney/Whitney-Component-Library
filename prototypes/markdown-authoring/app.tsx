@@ -28,6 +28,7 @@ import {initialDocuments, snapshot, type Attachment, type DocumentRecord} from '
 import {Formatting} from './formatting.js';
 import {Icon} from './icons.js';
 import {CollectionDesk, ReviewDesk} from './publication.js';
+import {DocumentHome} from './home.js';
 
 function useNarrow(width: number) {
   const [narrow, setNarrow] = useState(false);
@@ -84,7 +85,7 @@ export function App() {
   const [documents, setDocuments] = useState(initialDocuments);
   const [activeId, setActiveId] = useState('arrival');
   const [mode, setMode] = useState<MarkdownEditorMode>('live-preview');
-  const [view, setView] = useState<'collection' | 'document' | 'review'>('document');
+  const [view, setView] = useState<'home' | 'collection' | 'document' | 'review'>('home');
   const [included, setIncluded] = useState(['arrival', 'site', 'review']);
   const [reviewed, setReviewed] = useState<Record<string, string>>({});
   const [exported, setExported] = useState(false);
@@ -380,7 +381,8 @@ export function App() {
 
   useEffect(() => {
     const navigate = () => {
-      if (location.hash === '#collection') setView('collection');
+      if (location.hash === '#home' || !location.hash) setView('home');
+      else if (location.hash === '#collection') setView('collection');
       else if (location.hash === '#review') setView('review');
       else if (location.hash.startsWith('#document-')) {
         const id = location.hash.slice(10);
@@ -390,6 +392,7 @@ export function App() {
         }
       }
     };
+    navigate();
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
   }, [documents]);
@@ -668,6 +671,9 @@ export function App() {
       }}
     >
       <div className="navigation-group">
+        <Link href="#home" {...(view === 'home' ? {current: 'page' as const} : {})}>
+          Home
+        </Link>
         <Link href="#collection" {...(view === 'collection' ? {current: 'page' as const} : {})}>
           Collection
         </Link>
@@ -862,7 +868,8 @@ export function App() {
                   expandLabel="Open navigator"
                   currentId={view === 'document' ? `document:${activeId}` : `page:${view}`}
                   onNavigate={(id) => {
-                    if (id === 'page:collection') setView('collection');
+                    if (id === 'page:home') setView('home');
+                    else if (id === 'page:collection') setView('collection');
                     else if (id === 'page:review') setView('review');
                     else if (id.startsWith('document:')) choose(id.slice('document:'.length));
                   }}
@@ -871,6 +878,7 @@ export function App() {
                       id: 'project',
                       label: 'Riverside field guide',
                       items: [
+                        {id: 'page:home', label: 'Home', href: '#home'},
                         {id: 'page:collection', label: 'Collection', href: '#collection'},
                         {id: 'page:review', label: 'Review & export', href: '#review'},
                       ],
@@ -905,6 +913,14 @@ export function App() {
             </aside>
           )}
           <main className="workspace-main">
+            <div hidden={scenario !== 'ready' || view !== 'home'}>
+              <DocumentHome
+                documents={documents}
+                included={included}
+                onInclude={publicationProps.onInclude}
+                onOpen={choose}
+              />
+            </div>
             <div hidden={scenario !== 'ready' || view !== 'collection'}>
               <CollectionDesk {...publicationProps} />
             </div>

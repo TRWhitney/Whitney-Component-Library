@@ -143,6 +143,8 @@ export type SelectableCardCollectionItems<Id extends string = string> =
 type CardCollectionBaseProps = CollectionBaseProps &
   CollectionStatusProps & {
     readonly headingLevel: CardHeadingLevel;
+    readonly cardWidth?: number;
+    readonly cardHeight?: number;
   };
 
 type StaticCardCollectionProps<Id extends string> = CardCollectionBaseProps &

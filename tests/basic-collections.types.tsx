@@ -52,6 +52,8 @@ export const basicCollections = (
       selectionMode="multiple"
     />
     <CardCollection
+      cardWidth={280}
+      cardHeight={180}
       ariaLabel="Cards"
       emptyState={emptyState}
       headingLevel={3}

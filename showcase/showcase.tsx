@@ -1117,6 +1117,30 @@ function CollectionSpecimens() {
         name="CardCollection"
       >
         <Stack gap="regular">
+          <Example label="Explicit dimensions with different content">
+            <CardCollection
+              ariaLabel="Sized document cards"
+              headingLevel={3}
+              selectionMode="multiple"
+              defaultSelectedIds={['brief', 'notes']}
+              cardWidth={280}
+              cardHeight={180}
+              emptyState={emptyState}
+              items={[
+                {id: 'brief', title: 'Arrival brief', description: 'A short introduction.'},
+                {
+                  id: 'notes',
+                  title: 'Site observations',
+                  description: 'Measurements and findings from the site.',
+                  content: 'Preserve the accessible entrance during construction. '.repeat(14),
+                },
+              ]}
+            />
+            <p>
+              Both cards use an explicit 280 × 180 pixel size. Longer content scrolls inside its
+              card. Natural cards below size to their contents.
+            </p>
+          </Example>
           <Example label="Static cards with a nested action">
             <CardCollection
               ariaLabel="Recent runs"

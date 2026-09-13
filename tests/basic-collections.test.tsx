@@ -28,6 +28,35 @@ const emptyState = {
 };
 
 describe('basic data and collection family', () => {
+  it('makes explicitly bounded card content keyboard reachable', () => {
+    const {getByRole} = render(
+      <CardCollection
+        ariaLabel="Cards"
+        headingLevel={2}
+        selectionMode="none"
+        items={[{id: 'a', title: 'Long note', content: 'Text '.repeat(100)}]}
+        emptyState={emptyState}
+        cardHeight={180}
+      />,
+    );
+    expect(getByRole('article', {name: 'Long note'}).tabIndex).toBe(0);
+  });
+
+  it('rejects explicit card dimensions that cannot define a visible card', () => {
+    expect(() =>
+      render(
+        <CardCollection
+          ariaLabel="Cards"
+          headingLevel={2}
+          selectionMode="none"
+          items={[]}
+          emptyState={emptyState}
+          cardHeight={-10}
+        />,
+      ),
+    ).toThrow(/cardHeight/);
+  });
+
   it('keeps lists and description lists semantically distinct', () => {
     const {container} = render(
       <AppearanceProvider accent="#2878ff" appearance="light">

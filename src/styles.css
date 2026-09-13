@@ -5573,6 +5573,10 @@
     margin: 0;
   }
 
+  [data-wcl-card-collection][data-card-width] > :is([data-wcl-card-list], [data-wcl-card-grid]) {
+    grid-template-columns: repeat(auto-fill, minmax(0, min(100%, var(--wcl-card-width))));
+  }
+
   [data-wcl-card-list] > li {
     display: flex;
     min-inline-size: 0;
@@ -5611,6 +5615,12 @@
     border-radius: var(--wcl-radius);
     background: var(--wcl-surface);
     box-shadow: 0 8px 22px rgb(23 32 39 / 7%);
+  }
+
+  [data-wcl-card-collection][data-card-height] [data-wcl-card] {
+    box-sizing: border-box;
+    block-size: var(--wcl-card-height);
+    overflow: auto;
   }
 
   [data-wcl-card-option]:is([data-hovered], [data-pressed]) [data-wcl-card] {

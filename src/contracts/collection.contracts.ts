@@ -331,6 +331,7 @@ export const cardCollectionContract = {
     'related records need separate summary surfaces with optional visible actions or explicit selection',
   ],
   composition: [
+    'Set cardWidth and cardHeight to positive finite CSS-pixel dimensions when cards with different content must share explicit bounds. Width contracts to fit a narrower container; excess content scrolls inside a fixed-height card. Omit dimensions for natural sizing. Selection rails remain inside each card.',
     'Render CardCollection inside AppearanceProvider.',
     'Pass title, optional description, content, actions, and stable id through items. Selectable items may also declare disabled state.',
   ],
