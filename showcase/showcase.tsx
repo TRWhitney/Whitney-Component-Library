@@ -1113,7 +1113,7 @@ function CollectionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Group summary cards without making each card a hidden button. Selection is explicit, and commands remain visible nested actions."
+        description="Group summary cards without making each card a hidden button. Selection is explicit, and commands remain visible nested actions. Selection rails stay within each card when content heights differ."
         name="CardCollection"
       >
         <Stack gap="regular">

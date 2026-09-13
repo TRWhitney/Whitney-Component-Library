@@ -5580,6 +5580,7 @@
 
   [data-wcl-card-option] {
     position: relative;
+    align-self: start;
     min-inline-size: 0;
     border-radius: var(--wcl-radius);
     outline: 2px solid transparent;
