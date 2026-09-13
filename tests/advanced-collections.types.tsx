@@ -60,6 +60,7 @@ export const advancedCollections = (
   <>
     <Table
       minimumWidth="content"
+      columnSizing="fixed"
       ariaLabel="Runs"
       columns={columns}
       emptyState={emptyState}

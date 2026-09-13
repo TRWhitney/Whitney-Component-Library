@@ -13,6 +13,7 @@ export type TableColumnAlignment = 'start' | 'end';
 export type TableSortDirection = 'ascending' | 'descending';
 
 interface TableColumnBase<ColumnId extends string = string> {
+  readonly width?: number;
   readonly align?: TableColumnAlignment;
   readonly id: ColumnId;
   readonly label: string;
@@ -84,6 +85,7 @@ type TableBaseProps<RowId extends string, ColumnId extends string> = CollectionS
     readonly ariaLabel: string;
     readonly columns: TableColumns<ColumnId>;
     readonly minimumWidth?: number | 'content';
+    readonly columnSizing?: 'auto' | 'fixed';
     readonly contextMenu?: CollectionContextMenuProps<NoInfer<RowId>>;
     readonly emptyState: EmptyStateProps;
   };

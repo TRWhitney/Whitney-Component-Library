@@ -38,6 +38,10 @@ function validateTable<RowId extends string, ColumnId extends string>(
     throw new Error(
       'Table minimumWidth must be a nonnegative finite number of CSS pixels or content.',
     );
+  for (const column of columns) {
+    if (column.width !== undefined && (!Number.isFinite(column.width) || column.width <= 0))
+      throw new Error('Table column width must be a positive finite number of CSS pixels.');
+  }
   assertStableCollectionIds(columns);
   assertStableCollectionIds(rows);
 
@@ -118,6 +122,7 @@ export function Table<const RowId extends string, const ColumnId extends string>
       data-wcl-collection=""
       data-wcl-table=""
       data-minimum-width={props.minimumWidth === 'content' ? 'content' : undefined}
+      data-column-sizing={props.columnSizing ?? 'auto'}
       style={
         {
           '--wcl-table-minimum-width':
@@ -140,6 +145,7 @@ export function Table<const RowId extends string, const ColumnId extends string>
           <AriaTableHeader<TableColumn<ColumnId>> columns={columns}>
             {(column) => (
               <AriaColumn
+                {...(column.width === undefined ? {} : {style: {width: column.width}})}
                 data-align={column.align ?? 'start'}
                 data-kind={column.kind ?? 'data'}
                 data-wcl-table-column=""
@@ -178,6 +184,7 @@ export function Table<const RowId extends string, const ColumnId extends string>
               >
                 {(column) => (
                   <AriaCell
+                    {...(column.width === undefined ? {} : {style: {width: column.width}})}
                     data-align={column.align ?? 'start'}
                     data-kind={column.kind ?? 'data'}
                     data-wcl-table-cell=""

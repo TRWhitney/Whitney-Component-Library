@@ -1245,11 +1245,12 @@ function CollectionSpecimens() {
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
         />
-        <Example label="Compact table for narrow spaces">
+        <Example label="Compact table with stable columns">
           <div className="showcase-small-table">
             <Table
               ariaLabel="Compact review table"
               minimumWidth="content"
+              columnSizing="fixed"
               selectionMode="none"
               columns={[
                 {id: 'document', label: 'Document', isRowHeader: true},
@@ -1270,7 +1271,10 @@ function CollectionSpecimens() {
               emptyState={emptyState}
             />
           </div>
-          <p>Content-based minimum width fits short tables into narrow spaces.</p>
+          <p>
+            Content-based minimum width fits short tables into narrow spaces. Fixed column sizing
+            keeps columns still as cell text changes; long content can wrap.
+          </p>
         </Example>
         <Example label="Independent row context actions">
           <CollectionContextMenuExample />

@@ -5709,6 +5709,10 @@
     overflow-wrap: anywhere;
   }
 
+  [data-wcl-table][data-column-sizing='fixed'] [data-wcl-table-grid] {
+    table-layout: fixed;
+  }
+
   [data-wcl-table-column] {
     min-inline-size: 8rem;
     padding: calc(var(--wcl-space) * 0.875) var(--wcl-space);
@@ -5790,6 +5794,10 @@
     line-height: 1.45;
     text-align: start;
     vertical-align: middle;
+  }
+
+  [data-wcl-table][data-column-sizing='fixed'] [data-wcl-table-cell] {
+    overflow-wrap: anywhere;
   }
 
   [data-wcl-table-cell]::after {
