@@ -156,6 +156,10 @@ export function MarkdownSpecimen() {
           onChange={setAssetUnavailable}
         />
       </InlineGroup>
+      <p>
+        Read-only and locked documents have a distinct document background, dashed border, and lock
+        indicator.
+      </p>
       <MarkdownEditor
         label="Markdown review notes"
         extensions={extensions}

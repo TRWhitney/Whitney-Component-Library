@@ -46,6 +46,7 @@ export const markdownEditorContract = {
     'Use value with onChange for controlled strings, or defaultValue for uncontrolled strings.',
     'isRequired and isInvalid follow field conventions. isReadOnly keeps the document readable and copyable; isDisabled prevents interaction and omits the value from form submission. FieldGroup disabled state is inherited.',
     'isPending requires pendingMessage and prevents edits while preserving reading and copying. isLocked requires lockMessage with the application explanation and also prevents edits. The application owns lock transport.',
+    'Read-only and locked documents use a distinct document background, dashed boundary, and a small lock indicator inside the document area. The indicator remains visible during document scrolling. Its localized access description is available to assistive technology and on hover; lockMessage remains in support text.',
     'reserveSupportSpace keeps room for support text. size accepts compact, regular, or expanded and defaults to regular.',
   ],
   controlBehavior: [
@@ -97,7 +98,7 @@ export const markdownEditorContract = {
   localization: [
     'To localize asset feedback, supply complete assets.labels with pending(fileCount), rejected(files), failed, retry, and dismiss. Application-returned error strings are already localized by the application.',
     'Localize label, description, errorMessage, pendingMessage, lockMessage, and any supplied toolbar labels in the application. English mode, position, empty-preview, required-validation, and footnote copy is built in.',
-    'To localize built-in copy, supply a complete labels object with livePreview, source, preview, emptyPreview, required, footnotes, footnoteBack, and position(line, column).',
+    'To localize built-in copy, supply a complete labels object with livePreview, source, preview, emptyPreview, required, footnotes, footnoteBack, and position(line, column). Optional readOnly and locked override the access labels and default to English when omitted.',
   ],
   directionality: [
     'The field inherits writing direction; source selection and reading order follow the document text.',

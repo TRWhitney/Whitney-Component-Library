@@ -49,6 +49,8 @@ export const locked = (
   <MarkdownEditor label="Document" isLocked lockMessage="Whitney is editing." />
 );
 const labels = {
+  readOnly: 'Read-only',
+  locked: 'Locked',
   livePreview: 'Live Preview',
   source: 'Source',
   preview: 'Preview',

@@ -86,6 +86,9 @@ export interface MarkdownAssetOptions extends FileAcceptanceProps {
 export type MarkdownEditorSize = 'compact' | 'regular' | 'expanded';
 
 export interface MarkdownEditorLabels {
+  /** Defaults to English when omitted for compatibility with existing label sets. */
+  readonly readOnly?: string;
+  readonly locked?: string;
   readonly livePreview: string;
   readonly source: string;
   readonly preview: string;
@@ -113,6 +116,6 @@ export type MarkdownEditorProps = FieldStateProps &
     readonly name?: string;
     readonly mode?: MarkdownEditorMode;
     readonly size?: MarkdownEditorSize;
-    /** Override the complete English mode, position, validation, and reading copy. */
+    /** Override English mode, position, validation, and reading copy, with optional access labels. */
     readonly labels?: MarkdownEditorLabels;
   };

@@ -18,6 +18,63 @@ async function replaceVisibleLine(editor: HTMLElement, text: string) {
 }
 
 describe('Markdown editing', () => {
+  it('identifies non-editable access within the document area', () => {
+    const {container, rerender} = render(
+      <MarkdownEditor label="Document" isReadOnly defaultValue="Text" />,
+    );
+    const label = () => container.querySelector('[data-wcl-field-control]')!;
+    expect(label().textContent).toContain('Read-only');
+    rerender(
+      <MarkdownEditor
+        label="Document"
+        isLocked
+        lockMessage="Another author is editing"
+        defaultValue="Text"
+      />,
+    );
+    expect(label().textContent).toContain('Locked');
+  });
+
+  it('localizes access descriptions while keeping the document name and lock explanation', () => {
+    const labels = {
+      livePreview: 'Live Preview',
+      source: 'Source',
+      preview: 'Preview',
+      emptyPreview: 'No content.',
+      required: 'Enter content.',
+      footnotes: 'Footnotes',
+      footnoteBack: 'Back',
+      position: (line: number, column: number) => `${line}:${column}`,
+      readOnly: 'Lecture seule',
+      locked: 'Verrouillé',
+    };
+    const {getByRole, getByText, rerender} = render(
+      <MarkdownEditor label="Document" labels={labels} isReadOnly defaultValue="Text" />,
+    );
+    const editor = getByRole('textbox', {name: 'Document'});
+    expect(editor.getAttribute('aria-describedby')?.split(' ')).toContain(
+      getByText('Lecture seule').id,
+    );
+    expect(editor.getAttribute('aria-readonly')).toBe('true');
+    expect(editor.getAttribute('tabindex')).toBe('0');
+    rerender(
+      <MarkdownEditor
+        label="Document"
+        labels={labels}
+        isReadOnly
+        isLocked
+        lockMessage="Another author is editing."
+        mode="preview"
+        defaultValue="Text"
+      />,
+    );
+    const region = getByRole('region', {name: 'Document'});
+    const describedBy = region.getAttribute('aria-describedby')?.split(' ');
+    expect(describedBy).toContain(getByText('Verrouillé').id);
+    expect(describedBy).toContain(getByText('Another author is editing.').id);
+    expect(region.textContent).toBe('Text');
+  });
+
   it('exposes one labeled source editor and submits the unchanged Markdown string', () => {
     const value = '# Review\r\n\n  unfinished **text\rfinal\n';
     const {container, getByRole} = render(

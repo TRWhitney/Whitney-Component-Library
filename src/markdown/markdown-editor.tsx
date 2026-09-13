@@ -90,6 +90,12 @@ export function MarkdownEditor({
   const baseId = useId();
   const sourceId = `${baseId}-source`;
   const labelId = `${baseId}-label`;
+  const accessId = `${baseId}-access`;
+  const accessLabel = isLocked
+    ? (labels.locked ?? englishLabels.locked)
+    : isReadOnly
+      ? (labels.readOnly ?? englishLabels.readOnly)
+      : undefined;
   const contextId = `${baseId}-context`;
   const errorId = `${baseId}-error`;
   const descriptionId = `${baseId}-description`;
@@ -107,6 +113,7 @@ export function MarkdownEditor({
   const visibleError = invalid ? errorMessage || validationError : '';
   const describedBy = [
     contextId,
+    accessLabel ? accessId : '',
     description ? descriptionId : '',
     visibleError ? errorId : '',
     isLocked ? lockId : '',
@@ -282,13 +289,12 @@ export function MarkdownEditor({
     >
       <label
         data-wcl-field-label=""
-        id={labelId}
         htmlFor={mode !== 'preview' ? sourceId : undefined}
         onClick={() => {
           if (mode !== 'preview' && !disabled) session.current?.focus();
         }}
       >
-        {label}
+        <span id={labelId}>{label}</span>
         {isRequired ? (
           <span aria-hidden="true" data-wcl-field-required="">
             *
@@ -311,6 +317,17 @@ export function MarkdownEditor({
           if (event.key !== 'Tab') preventDisabled(event);
         }}
       >
+        {accessLabel ? (
+          <span data-wcl-markdown-access="" title={accessLabel}>
+            <svg aria-hidden="true" viewBox="0 0 20 20">
+              <rect x="4" y="9" width="12" height="9" rx="2" />
+              <path d="M6 9V6a4 4 0 0 1 8 0v3M10 12v3" />
+            </svg>
+            <span data-wcl-markdown-access-label="" id={accessId}>
+              {accessLabel}
+            </span>
+          </span>
+        ) : null}
         <textarea
           ref={textarea}
           id={mounted || mode === 'preview' ? undefined : sourceId}
