@@ -160,7 +160,7 @@
     outline-offset: -2px;
     scrollbar-color: transparent transparent;
     scrollbar-gutter: stable;
-    scrollbar-width: thin;
+    scrollbar-width: auto;
     transition: scrollbar-color var(--wcl-motion-duration) var(--wcl-motion-easing);
   }
 
@@ -264,7 +264,7 @@
     overscroll-behavior-block: contain;
     scrollbar-color: transparent transparent;
     scrollbar-gutter: stable;
-    scrollbar-width: thin;
+    scrollbar-width: auto;
     transition: scrollbar-color var(--wcl-motion-duration) var(--wcl-motion-easing);
   }
 

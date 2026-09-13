@@ -84,7 +84,7 @@ describe('static appearance styles', () => {
     );
     expect(styles).toMatch(/\[data-wcl-radial-aggregate-label\]\s*\{[^}]*font-weight:\s*800/);
     expect(radialLegend).toContain('scrollbar-color: transparent transparent');
-    expect(radialLegend).toContain('scrollbar-width: thin');
+    expect(radialLegend).toContain('scrollbar-width: auto');
     expect(styles).toMatch(
       /@supports\s+not\s*\(scrollbar-color:\s*auto\)\s*\{[\s\S]*\[data-wcl-radial-legend\]::-webkit-scrollbar-thumb/,
     );
@@ -189,7 +189,7 @@ describe('static appearance styles', () => {
     );
   });
 
-  it('contains document overflow and gives both showcase panes a transient thin scrollbar', async () => {
+  it('contains document overflow and gives both showcase panes a transient scrollbar', async () => {
     const styles = await readFile('showcase/styles.css', 'utf8');
     const body = styles.match(/body\s*\{([^}]*)\}/)?.[1];
     const provider = styles.match(/#root > \[data-wcl-provider\]\s*\{([^}]*)\}/)?.[1];
@@ -209,10 +209,10 @@ describe('static appearance styles', () => {
     expect(contentBody).toContain('contain: paint');
     expect(content).toContain('scrollbar-color: transparent transparent');
     expect(content).toContain('scrollbar-gutter: stable');
-    expect(content).toContain('scrollbar-width: thin');
+    expect(content).toContain('scrollbar-width: auto');
     expect(index).toContain('scrollbar-color: transparent transparent');
     expect(index).toContain('scrollbar-gutter: stable');
-    expect(index).toContain('scrollbar-width: thin');
+    expect(index).toContain('scrollbar-width: auto');
     expect(styles).toMatch(
       /:is\(\.showcase-index, \.showcase-main-pane\)\[data-scrollbar-active\][^{]*\{[^}]*scrollbar-color:\s*var\(--wcl-border-strong\) transparent/,
     );
@@ -752,7 +752,7 @@ describe('static appearance styles', () => {
     )?.[1];
 
     expect(chartFrame).toContain('scrollbar-color: transparent transparent');
-    expect(chartFrame).toContain('scrollbar-width: thin');
+    expect(chartFrame).toContain('scrollbar-width: auto');
     expect(chartFrame).toContain('transition: scrollbar-color');
     expect(styles).toMatch(
       /\[data-wcl-chart-frame\]\[data-overflow='scroll'\]\[data-scrollbar-active\][\s\S]*scrollbar-color:\s*var\(--wcl-border-strong\) transparent/,

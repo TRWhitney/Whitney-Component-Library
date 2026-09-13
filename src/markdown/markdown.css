@@ -143,7 +143,7 @@
     line-height: 1.6;
     overflow-wrap: anywhere;
     scrollbar-color: var(--wcl-border-strong) transparent;
-    scrollbar-width: thin;
+    scrollbar-width: auto;
   }
 
   [data-wcl-field][data-wcl-markdown-editor][data-readonly] > [data-wcl-field-control] {
@@ -335,7 +335,7 @@
   font-size: 0.9375rem;
   line-height: 1.6;
   scrollbar-color: var(--wcl-border-strong) transparent;
-  scrollbar-width: thin;
+  scrollbar-width: auto;
 }
 
 [data-wcl-markdown-source] .cm-content {
