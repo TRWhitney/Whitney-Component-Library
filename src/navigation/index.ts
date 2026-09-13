@@ -18,7 +18,6 @@ export type {
   DisclosureProps,
   NavigationOrientation,
   PaginationProps,
-  CollapsibleNavigationPaneCollapseProps,
   CollapsibleNavigationPaneGroup,
   CollapsibleNavigationPaneGroups,
   CollapsibleNavigationPaneItem,

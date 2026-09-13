@@ -257,7 +257,6 @@ describe('navigation and disclosure family', () => {
   });
 
   it('keeps hierarchical navigation-pane links reachable through compact collapse', () => {
-    const onCollapsedChange = vi.fn();
     const onNavigate = vi.fn();
     render(
       <NavigationFixture>
@@ -285,7 +284,6 @@ describe('navigation and disclosure family', () => {
             },
           ]}
           currentId="active-runs"
-          onCollapsedChange={onCollapsedChange}
           onNavigate={onNavigate}
         />
       </NavigationFixture>,
@@ -293,7 +291,6 @@ describe('navigation and disclosure family', () => {
 
     expect(screen.queryByRole('link', {name: 'Active runs'})).toBeNull();
     fireEvent.click(screen.getByRole('button', {name: 'Expand workspace navigation'}));
-    expect(onCollapsedChange).toHaveBeenCalledWith(false);
     const current = screen.getByRole('link', {name: 'Active runs'});
     current.closest('nav')?.addEventListener('click', (event) => event.preventDefault());
     expect(current.getAttribute('aria-current')).toBe('page');

@@ -70,17 +70,9 @@ export function CollapsibleNavigationPane<const Id extends string>({
   defaultCollapsed = false,
   expandLabel,
   groups,
-  isCollapsed,
-  onCollapsedChange,
   onNavigate,
 }: CollapsibleNavigationPaneProps<Id>): ReactElement {
-  const [uncontrolledCollapsed, setUncontrolledCollapsed] = useState(defaultCollapsed);
-  const collapsed = isCollapsed ?? uncontrolledCollapsed;
-  const toggleCollapsed = () => {
-    const nextCollapsed = !collapsed;
-    if (isCollapsed === undefined) setUncontrolledCollapsed(nextCollapsed);
-    onCollapsedChange?.(nextCollapsed);
-  };
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
   return (
     <nav
@@ -92,28 +84,26 @@ export function CollapsibleNavigationPane<const Id extends string>({
         aria-expanded={!collapsed}
         aria-label={collapsed ? expandLabel : collapseLabel}
         data-wcl-collapsible-navigation-pane-collapse=""
-        onPress={toggleCollapsed}
+        onPress={() => setCollapsed((value) => !value)}
       >
         <CollapseIcon isCollapsed={collapsed} />
         <span>{collapsed ? expandLabel : collapseLabel}</span>
       </AriaButton>
-      {collapsed ? null : (
-        <div data-wcl-collapsible-navigation-pane-groups="">
-          {groups.map((group) => (
-            <section data-wcl-collapsible-navigation-pane-group="" key={group.id}>
-              {group.label ? (
-                <h2 data-wcl-collapsible-navigation-pane-group-label="">{group.label}</h2>
-              ) : null}
-              <NavigationItems
-                currentId={currentId}
-                items={group.items}
-                level={1}
-                {...(onNavigate === undefined ? {} : {onNavigate})}
-              />
-            </section>
-          ))}
-        </div>
-      )}
+      <div aria-hidden={collapsed || undefined} data-wcl-collapsible-navigation-pane-groups="">
+        {groups.map((group) => (
+          <section data-wcl-collapsible-navigation-pane-group="" key={group.id}>
+            {group.label ? (
+              <h2 data-wcl-collapsible-navigation-pane-group-label="">{group.label}</h2>
+            ) : null}
+            <NavigationItems
+              currentId={currentId}
+              items={group.items}
+              level={1}
+              {...(onNavigate === undefined ? {} : {onNavigate})}
+            />
+          </section>
+        ))}
+      </div>
     </nav>
   );
 }

@@ -987,30 +987,40 @@ function NavigationSpecimens() {
         description="Navigate grouped application destinations without coupling the library to a router. The current link, hierarchy, URL, and compact collapse state remain explicit."
         name="CollapsibleNavigationPane"
       >
-        <CollapsibleNavigationPane
-          ariaLabel="Workspace navigation"
-          collapseLabel="Collapse workspace navigation"
-          currentId="active-runs"
-          expandLabel="Expand workspace navigation"
-          groups={[
-            {
-              id: 'workspace',
-              items: [
-                {href: '#overview', id: 'overview', label: 'Overview'},
-                {
-                  children: [
-                    {href: '#active-runs', id: 'active-runs', label: 'Active runs'},
-                    {href: '#run-history', id: 'run-history', label: 'Run history'},
-                  ],
-                  href: '#runs',
-                  id: 'runs',
-                  label: 'Runs',
-                },
-              ],
-              label: 'Workspace',
-            },
-          ]}
-        />
+        <div className="showcase-navigation-sidebar">
+          <CollapsibleNavigationPane
+            ariaLabel="Workspace navigation"
+            collapseLabel="Collapse workspace navigation"
+            currentId="active-runs"
+            expandLabel="Expand workspace navigation"
+            groups={[
+              {
+                id: 'workspace',
+                items: [
+                  {href: '#overview', id: 'overview', label: 'Overview'},
+                  {
+                    children: [
+                      {href: '#active-runs', id: 'active-runs', label: 'Active runs'},
+                      {href: '#run-history', id: 'run-history', label: 'Run history'},
+                    ],
+                    href: '#runs',
+                    id: 'runs',
+                    label: 'Runs',
+                  },
+                ],
+                label: 'Workspace',
+              },
+            ]}
+          />
+          <div className="showcase-navigation-command">
+            <Button size="compact">New document</Button>
+          </div>
+        </div>
+        <p>
+          Collapse shrinks the bordered navigator to its header. Its width, header control, and the
+          separate New document action remain stable. Link rows follow application density and include
+          padding within their control height.
+        </p>
       </Specimen>
     </>
   );

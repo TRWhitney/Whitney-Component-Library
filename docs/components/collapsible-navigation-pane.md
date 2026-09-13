@@ -18,12 +18,12 @@ CollapsibleNavigationPane exposes grouped application destinations without ownin
 
 - Render inside AppearanceProvider so the surface, route, focus, and text roles use the active theme and accent.
 - Pass labeled groups containing stable destination ids, labels, href values, and optional nested destinations.
-- Set currentId from the active route. Control isCollapsed from an application breakpoint when compact layout should begin collapsed.
+- Set currentId from the active route. Use defaultCollapsed for the initial state. Collapse removes navigation contents from layout and shrinks the outlined pane to its header while preserving width; no external collapse callback is exposed.
 - CollapsibleNavigationPane owns its landmark, collapse control, labeled groups, nested lists, links, and current marker.
 
 ## Preferred higher-level compositions
 
-- Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. It does not require sidebar placement.
+- Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. Do not use a collapsible navigator as the only substantive sidebar content; use Drawer when the whole navigation region should disappear. Keep sibling commands outside navigation.
 
 ## Content
 
@@ -31,12 +31,12 @@ CollapsibleNavigationPane exposes grouped application destinations without ownin
 
 ## States
 
-- Current destination is consumer-owned; collapse may be controlled or uncontrolled; links may be disabled.
+- Current destination is consumer-owned; collapse is internally owned; links may be disabled.
 
 ## Control, events, validation, and forms
 
-- CollapsibleNavigationPane supports controlled or uncontrolled collapse, preserves native link navigation, and reports destination ids through onNavigate.
-- onNavigate reports the activated destination id without replacing href routing. onCollapsedChange reports compact-state requests.
+- CollapsibleNavigationPane owns collapse internally, preserves native link navigation, and reports destination ids through onNavigate.
+- onNavigate reports the activated destination id without replacing href routing. Collapse does not emit application callbacks.
 - TypeScript constrains controlled and uncontrolled state, finite modes, and library-owned item models. Consumers keep identifiers unique and destination URLs valid.
 - This component does not submit a form value. Keep navigation and disclosure state separate from form data.
 
@@ -55,7 +55,7 @@ CollapsibleNavigationPane exposes grouped application destinations without ownin
 ## Appearance and responsive behavior
 
 - CollapsibleNavigationPane uses one restrained surface, quiet nested guide rails, and an accent route marker for the current destination.
-- The controlled or uncontrolled collapsed state reduces the compact layout to one reachable expansion control.
+- The internally owned collapsed state reduces the outlined pane to its expansion control. Pane width and control dimensions remain stable; applications independently size their sidebar and place sibling commands.
 
 ## Accent, forced colors, and reduced motion
 

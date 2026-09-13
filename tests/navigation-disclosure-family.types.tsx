@@ -101,13 +101,13 @@ export const controlledAccordionWithoutCallback = (
 );
 
 export const controlledCollapsibleNavigationPaneWithoutCallback = (
-  // @ts-expect-error Controlled collapsed state requires onCollapsedChange.
   <CollapsibleNavigationPane
     ariaLabel="Workspace"
     collapseLabel="Collapse"
     currentId="runs"
     expandLabel="Expand"
     groups={groups}
+    // @ts-expect-error Collapse is internal to the navigator.
     isCollapsed
   />
 );

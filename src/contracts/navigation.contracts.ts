@@ -401,13 +401,13 @@ export const collapsibleNavigationPaneContract = {
   composition: [
     'Render inside AppearanceProvider so the surface, route, focus, and text roles use the active theme and accent.',
     'Pass labeled groups containing stable destination ids, labels, href values, and optional nested destinations.',
-    'Set currentId from the active route. Control isCollapsed from an application breakpoint when compact layout should begin collapsed.',
+    'Set currentId from the active route. Use defaultCollapsed for the initial state. Collapse removes navigation contents from layout and shrinks the outlined pane to its header while preserving width; no external collapse callback is exposed.',
   ],
   contentRules: [
     'Use short destination nouns, group labels only when they clarify hierarchy, and no command actions.',
   ],
   controlBehavior: [
-    'CollapsibleNavigationPane supports controlled or uncontrolled collapse, preserves native link navigation, and reports destination ids through onNavigate.',
+    'CollapsibleNavigationPane owns collapse internally, preserves native link navigation, and reports destination ids through onNavigate.',
   ],
   counterExamples: [
     {
@@ -421,7 +421,7 @@ export const collapsibleNavigationPaneContract = {
     },
   ],
   events: [
-    'onNavigate reports the activated destination id without replacing href routing. onCollapsedChange reports compact-state requests.',
+    'onNavigate reports the activated destination id without replacing href routing. Collapse does not emit application callbacks.',
   ],
   examples: [
     {
@@ -453,16 +453,16 @@ export const collapsibleNavigationPaneContract = {
     'Use Menu for commands, Tabs for peer panels, Breadcrumbs for ancestry, or Link for isolated destinations.',
   ],
   preferredCompositions: [
-    'Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. It does not require sidebar placement.',
+    'Place CollapsibleNavigationPane wherever the application needs a bounded persistent navigation region. Do not use a collapsible navigator as the only substantive sidebar content; use Drawer when the whole navigation region should disappear. Keep sibling commands outside navigation.',
   ],
   purpose:
     'CollapsibleNavigationPane exposes grouped application destinations without owning a router.',
   relatedExports: ['AppearanceProvider', 'Breadcrumbs', 'Link', 'Menu', 'Tabs'],
   responsiveBehavior: [
-    'The controlled or uncontrolled collapsed state reduces the compact layout to one reachable expansion control.',
+    'The internally owned collapsed state reduces the outlined pane to its expansion control. Pane width and control dimensions remain stable; applications independently size their sidebar and place sibling commands.',
   ],
   states: [
-    'Current destination is consumer-owned; collapse may be controlled or uncontrolled; links may be disabled.',
+    'Current destination is consumer-owned; collapse is internally owned; links may be disabled.',
   ],
   summary:
     'Navigate grouped application destinations with hierarchy, current location, and compact collapse.',

@@ -49,7 +49,9 @@ body {
 
 .workspace-sidebar {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-content: start;
+  overflow: auto;
   min-height: 0;
   border-right: 1px solid var(--wcl-border);
   background: var(--wcl-surface);
@@ -69,7 +71,6 @@ body {
 
 .sidebar-create {
   padding: 12px;
-  border-top: 1px solid var(--wcl-border);
 }
 
 .workspace-navigation-actions {

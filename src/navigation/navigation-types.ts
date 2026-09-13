@@ -136,24 +136,12 @@ export type CollapsibleNavigationPaneGroups<Id extends string = string> = readon
   ...CollapsibleNavigationPaneGroup<Id>[],
 ];
 
-export type CollapsibleNavigationPaneCollapseProps =
-  | {
-      readonly defaultCollapsed?: boolean;
-      readonly isCollapsed?: never;
-      readonly onCollapsedChange?: (isCollapsed: boolean) => void;
-    }
-  | {
-      readonly defaultCollapsed?: never;
-      readonly isCollapsed: boolean;
-      readonly onCollapsedChange: (isCollapsed: boolean) => void;
-    };
-
-export type CollapsibleNavigationPaneProps<Id extends string = string> =
-  CollapsibleNavigationPaneCollapseProps & {
-    readonly ariaLabel: string;
-    readonly collapseLabel: string;
-    readonly currentId: NoInfer<Id>;
-    readonly expandLabel: string;
-    readonly groups: CollapsibleNavigationPaneGroups<Id>;
-    readonly onNavigate?: (id: Id) => void;
-  };
+export type CollapsibleNavigationPaneProps<Id extends string = string> = {
+  readonly defaultCollapsed?: boolean;
+  readonly ariaLabel: string;
+  readonly collapseLabel: string;
+  readonly currentId: NoInfer<Id>;
+  readonly expandLabel: string;
+  readonly groups: CollapsibleNavigationPaneGroups<Id>;
+  readonly onNavigate?: (id: Id) => void;
+};
