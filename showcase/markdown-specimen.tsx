@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react';
 
 import {
   Button,
+  IconButton,
   InlineGroup,
   MarkdownEditor,
   SegmentedControl,
@@ -14,6 +15,8 @@ import {
   type MarkdownEditorSize,
   type MarkdownExtension,
 } from '../src/index.js';
+
+import {MarkdownIcon} from './markdown-icons.js';
 
 const reviewNotes = [
   '# Boundary review',
@@ -164,7 +167,7 @@ export function MarkdownSpecimen() {
                 ['italic', 'Italic'],
                 ['strikethrough', 'Strike'],
                 ['inline-code', 'Code'],
-                ['heading-2', 'Heading'],
+                ['heading-2', 'Heading 2'],
                 ['bullet-list', 'List'],
                 ['task-list', 'Task'],
                 ['blockquote', 'Quote'],
@@ -172,38 +175,42 @@ export function MarkdownSpecimen() {
             ).map(([command, text]) => (
               <ToggleButton
                 key={command}
+                label={text}
                 size="compact"
                 isDisabled={!controls.canExecute(command)}
                 isSelected={controls.isActive(command)}
                 onChange={() => controls.execute(command)}
               >
-                {text}
+                <MarkdownIcon name={command} />
               </ToggleButton>
             ))}
-            <Button
+            <IconButton
+              label="Link"
               size="compact"
               isDisabled={!controls.canExecute('link')}
               onPress={() => controls.execute('link')}
             >
-              Link
-            </Button>
-            <Button
+              <MarkdownIcon name="link" />
+            </IconButton>
+            <IconButton
+              label="Text color"
               size="compact"
               isDisabled={!controls.canExecuteExtension('color-selection')}
               onPress={() => controls.executeExtension('color-selection')}
             >
-              Text color
-            </Button>
+              <MarkdownIcon name="color" />
+            </IconButton>
             <Menu
               trigger={
-                <Button
+                <IconButton
+                  label="More formatting"
                   size="compact"
                   isDisabled={
                     !controls.canExecute('paragraph') && !controls.canExecute('code-block')
                   }
                 >
-                  More formatting
-                </Button>
+                  <MarkdownIcon name="more" />
+                </IconButton>
               }
               items={[
                 {
@@ -248,27 +255,30 @@ export function MarkdownSpecimen() {
                 },
               ]}
             />
-            <Button
+            <IconButton
+              label="Undo"
               size="compact"
               isDisabled={!controls.canExecute('undo')}
               onPress={() => controls.execute('undo')}
             >
-              Undo
-            </Button>
-            <Button
+              <MarkdownIcon name="undo" />
+            </IconButton>
+            <IconButton
+              label="Redo"
               size="compact"
               isDisabled={!controls.canExecute('redo')}
               onPress={() => controls.execute('redo')}
             >
-              Redo
-            </Button>
-            <Button
+              <MarkdownIcon name="redo" />
+            </IconButton>
+            <IconButton
+              label="Open link"
               size="compact"
               isDisabled={!controls.canOpenLink}
               onPress={() => controls.openLink()}
             >
-              Open link
-            </Button>
+              <MarkdownIcon name="open" />
+            </IconButton>
           </Toolbar>
         )}
         description="Edit formatted text in Live Preview. Move the cursor into a construct to reveal its Markdown; select across constructs to edit their source. Tab leaves the editor."
