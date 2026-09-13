@@ -927,7 +927,6 @@ export function clientPointFromViewBox(
 
 function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>({
   pointTarget = false,
-  hideNeedle = false,
   filledPresentation,
   categoryPlacement,
   categoryProjection,
@@ -940,7 +939,6 @@ function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>
   valueProjection,
 }: {
   readonly pointTarget?: boolean;
-  readonly hideNeedle?: boolean;
   readonly filledPresentation?: PresentationMetrics;
   readonly categoryPlacement: 'x' | 'y';
   readonly categoryProjection: Projection<Category>;
@@ -958,15 +956,13 @@ function ReadingOverlay<Datum extends object, Category extends ChartDomainValue>
   if (category === undefined) return null;
   return (
     <g data-wcl-chart-reading="">
-      {hideNeedle ? null : (
-        <line
-          data-wcl-chart-reading-needle=""
-          x1={categoryPlacement === 'x' ? category : plot.left}
-          x2={categoryPlacement === 'x' ? category : plot.right}
-          y1={categoryPlacement === 'x' ? plot.top : category}
-          y2={categoryPlacement === 'x' ? plot.bottom : category}
-        />
-      )}
+      <line
+        data-wcl-chart-reading-needle=""
+        x1={categoryPlacement === 'x' ? category : plot.left}
+        x2={categoryPlacement === 'x' ? category : plot.right}
+        y1={categoryPlacement === 'x' ? plot.top : category}
+        y2={categoryPlacement === 'x' ? plot.bottom : category}
+      />
       {series.flatMap((item, seriesIndex) => {
         if (pointTarget && reading.seriesId !== item.id) return null;
         if (filledPresentation && (item.kind === 'bar' || item.kind === 'column')) return null;
@@ -3237,7 +3233,6 @@ function ChartFrame<Datum extends object, Category extends ChartDomainValue>({
                 {activeReading === null || isBarInteraction ? null : (
                   <ReadingOverlay
                     pointTarget={interaction?.target === 'point'}
-                    hideNeedle={isShapeInteraction}
                     {...(interaction || rootAttribute === 'data-wcl-line-chart'
                       ? {filledPresentation: presentation}
                       : {})}

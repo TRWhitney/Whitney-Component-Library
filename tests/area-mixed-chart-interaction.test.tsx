@@ -275,3 +275,21 @@ it('targets the visible area fill when its value marker is outside an explicit d
     container.querySelector('[data-wcl-chart-activation-dot]')?.closest('[clip-path]'),
   ).not.toBeNull();
 });
+
+it('shows a vertical reading guide while hovering an area and clears it on leave', () => {
+  const {container} = render(
+    <AreaChart {...common} data={data} xAxis={xAxis} yAxis={yAxis} interaction={config()} />,
+  );
+  const svg = geometry(container);
+  const points = areaVertices(container);
+  fireEvent.pointerMove(svg, {
+    pointerType: 'mouse',
+    clientX: points[0]!.x,
+    clientY: (points[0]!.y + points[points.length - 1]!.y) / 2,
+  });
+  const needle = container.querySelector('[data-wcl-chart-reading-needle]');
+  expect(needle).not.toBeNull();
+  expect(needle?.getAttribute('x1')).toBe(needle?.getAttribute('x2'));
+  fireEvent.pointerLeave(svg, {pointerType: 'mouse'});
+  expect(container.querySelector('[data-wcl-chart-reading-needle]')).toBeNull();
+});

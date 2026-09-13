@@ -77,6 +77,7 @@ Show magnitude across an ordered domain with overlap, stacked, or normalized are
 ## Appearance and responsive behavior
 
 - A direct instrument plot uses restrained grid and axis rails with readable utility typography. Filled marks use softened series color beneath stronger lines and boundaries. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.
+- An active area reading includes a vertical dashed guide at its category position. The guide clears with the pointer reading and preserves keyboard and touch readings.
 - A value marker sits at each targeted area's plotted upper boundary, including stacked and normalized areas. Filled centers preview the target; outer rings persist for selected values. Rings meet the marker outline without a background gap. Category mode previews every visible value and underlines selected category labels.
 - A brief pulse acknowledges every activation, including repeated activation of the same item. Reading, selection, and whole-series legend emphasis remain distinct in both appearances.
 - aspectRatio changes the plot geometry used by axes, marks, clipping, hit testing, and navigation. Wide or square plots use the available canvas instead of letterboxing a fixed 640-by-360 SVG. minimumSize and overflow still control the legibility limit.

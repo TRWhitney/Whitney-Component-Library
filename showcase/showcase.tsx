@@ -2613,7 +2613,7 @@ function AreaMixedInteractionExample({
         Left and Right move between months; Up and Down move between visible series in Value mode.
         Home and End reach the first and last months.{' '}
         {kind === 'area'
-          ? "Filled markers preview values at each area's upper boundary. Outer rings mark selected values, including in stacked and normalized areas. Drag selection follows these markers."
+          ? "A vertical dashed guide connects the current reading to its month. Filled markers preview values at each area's upper boundary. Outer rings mark selected values, including in stacked and normalized areas. Drag selection follows these markers."
           : "Columns use inset reading outlines and selected outer frames. Lines and areas use filled reading markers and selected outer rings. Try January's cooling marker inside the heating column, then the column body."}{' '}
         Month mode previews every visible series, underlines selected months, and opens one set of
         details. Pin a legend name to prioritize that series where shapes overlap; a shape alone

@@ -925,6 +925,7 @@ function interactiveAreaMixedContract(
     ],
     appearance: [
       ...base.appearance,
+      'An active area reading includes a vertical dashed guide at its category position. The guide clears with the pointer reading and preserves keyboard and touch readings.',
       area
         ? "A value marker sits at each targeted area's plotted upper boundary, including stacked and normalized areas. Filled centers preview the target; outer rings persist for selected values. Rings meet the marker outline without a background gap. Category mode previews every visible value and underlines selected category labels."
         : 'Each mark keeps its own interaction cues. Columns use inset reading outlines and outer selection frames; line and area values use filled reading markers and outer selection rings. Area markers follow the plotted upper boundary. Category mode previews all visible values, combining column outlines without internal seams, and underlines selected category labels.',

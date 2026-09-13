@@ -81,6 +81,7 @@ Combine compatible line, range, area, and column series in one shared Cartesian 
 ## Appearance and responsive behavior
 
 - A direct instrument plot uses restrained grid and axis rails with readable utility typography. Filled marks use softened series color beneath stronger lines and boundaries. Dash and outline patterns supplement color when series overlap. The component does not add a card, dashboard chrome, or workflow layout.
+- An active area reading includes a vertical dashed guide at its category position. The guide clears with the pointer reading and preserves keyboard and touch readings.
 - Each mark keeps its own interaction cues. Columns use inset reading outlines and outer selection frames; line and area values use filled reading markers and outer selection rings. Area markers follow the plotted upper boundary. Category mode previews all visible values, combining column outlines without internal seams, and underlines selected category labels.
 - A brief pulse acknowledges every activation, including repeated activation of the same item. Reading, selection, and whole-series legend emphasis remain distinct in both appearances.
 - A range fills the space between its changing lower and upper boundaries. Point-target reading fills both endpoint markers. One selected interval has two outer rings joined by a stem; equal bounds coincide. Whole-category selection keeps the shared label underline. Shared activation pulses acknowledge both limits with the existing duration, size and reduced-motion behavior.
