@@ -126,6 +126,27 @@ describe('component showcase', () => {
     expect(mainPane?.getAttribute('tabindex')).toBe('0');
   });
 
+  it('groups each chart example under a heading and keeps size controls local', () => {
+    render(<Showcase />);
+    const update = within(screen.getByRole('figure', {name: 'Update chart data'}));
+    const exploration = within(screen.getByRole('figure', {name: 'Pan, zoom and overview'}));
+
+    expect(update.getByRole('heading', {name: 'Update chart data'})).toBeTruthy();
+    expect(update.getByRole('button', {name: 'Update values'})).toBeTruthy();
+    expect(update.getByRole('figure', {name: 'Building energy'})).toBeTruthy();
+    expect(update.queryByRole('figure', {name: 'Revenue and operating costs'})).toBeNull();
+    expect(exploration.getByRole('heading', {name: 'Pan, zoom and overview'})).toBeTruthy();
+    expect(exploration.getByRole('figure', {name: 'Revenue and operating costs'})).toBeTruthy();
+
+    fireEvent.click(update.getByRole('switch', {name: 'Compact chart'}));
+    expect(update.getByRole<HTMLInputElement>('switch', {name: 'Compact chart'}).checked).toBe(
+      true,
+    );
+    expect(exploration.getByRole<HTMLInputElement>('switch', {name: 'Compact chart'}).checked).toBe(
+      false,
+    );
+  });
+
   it('shows distinct automatic colors for the mixed Cartesian bars and line', () => {
     render(<Showcase />);
     const chart = screen.getByRole('figure', {name: 'Heating and cooling comparison'});

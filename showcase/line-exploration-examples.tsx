@@ -1,8 +1,8 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   LineChart,
   Stack,
-  Switch,
   type ChartDomainWindow,
   type ChartExplorationLabels,
 } from '../src/index.js';
@@ -60,13 +60,13 @@ export function LineExplorationExample({coordinated = false}: {readonly coordina
   const [details, setDetails] = useState('');
   return (
     <Stack gap="regular">
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <p>
         {coordinated
           ? 'Both charts share an application-controlled date range. Changing either one updates both.'
           : 'Use the chart buttons or two fingers to pan and zoom. Overview opens the full timeline. Tap to select; hold or Control/Command-click to open details. Drag to select a range.'}
       </p>
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame compact={compact}>
         <LineChart
           {...common}
           title={coordinated ? 'Coordinated monthly figures' : 'Revenue and operating costs'}
@@ -105,7 +105,7 @@ export function LineExplorationExample({coordinated = false}: {readonly coordina
             exploration={{labels, window, onWindowChange: setWindow}}
           />
         ) : null}
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

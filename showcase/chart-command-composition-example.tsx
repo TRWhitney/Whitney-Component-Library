@@ -1,3 +1,4 @@
+import {ChartFrame} from './chart-presentation.js';
 import {useState} from 'react';
 import {ScatterChart, Select, Stack, Toolbar, type ChartRectangularWindow} from '../src/index.js';
 const points = [
@@ -42,40 +43,42 @@ export function ChartCommandCompositionExample() {
           {value: 'toolbar', label: 'Application toolbar'},
         ]}
       />
-      <ScatterChart
-        title="Building review"
-        description="Choose one command presentation. Focus the chart or a command, then use arrows to pan, plus/minus to zoom, or the wheel over the chart to zoom. Hold the middle mouse button over the plot and drag to pan."
-        dataTableLabel="Building readings"
-        data={points}
-        idAccessor="id"
-        labelAccessor="id"
-        series={[{id: 'buildings', label: 'Buildings'}]}
-        aspectRatio={2.8}
-        minimumSize={{width: 260, height: 180}}
-        xAxis={{accessor: 'x', label: 'Area', scale: {type: 'linear', domain: [0, 10]}}}
-        yAxis={{accessor: 'y', label: 'Energy', scale: {type: 'linear', domain: [0, 10]}}}
-        exploration={{
-          window,
-          onWindowChange: setWindow,
-          labels,
-          presentation: presentation === 'chart' ? 'chart' : 'panel',
-          ...(presentation === 'toolbar'
-            ? {
-                renderControls: (controls) => (
-                  <Toolbar label="Building exploration">
-                    {controls.overview}
-                    {controls.zoomOut}
-                    {controls.zoomIn}
-                    {controls.reset}
-                    {controls.pan}
-                  </Toolbar>
-                ),
-              }
-            : {}),
-        }}
-        emptyState={{title: 'No buildings', description: 'No readings'}}
-        invalidData={{title: 'Invalid buildings', description: 'Check readings'}}
-      />
+      <ChartFrame compact={false}>
+        <ScatterChart
+          title="Building review"
+          description="Choose one command presentation. Focus the chart or a command, then use arrows to pan, plus/minus to zoom, or the wheel over the chart to zoom. Hold the middle mouse button over the plot and drag to pan."
+          dataTableLabel="Building readings"
+          data={points}
+          idAccessor="id"
+          labelAccessor="id"
+          series={[{id: 'buildings', label: 'Buildings'}]}
+          aspectRatio={2.8}
+          minimumSize={{width: 260, height: 180}}
+          xAxis={{accessor: 'x', label: 'Area', scale: {type: 'linear', domain: [0, 10]}}}
+          yAxis={{accessor: 'y', label: 'Energy', scale: {type: 'linear', domain: [0, 10]}}}
+          exploration={{
+            window,
+            onWindowChange: setWindow,
+            labels,
+            presentation: presentation === 'chart' ? 'chart' : 'panel',
+            ...(presentation === 'toolbar'
+              ? {
+                  renderControls: (controls) => (
+                    <Toolbar label="Building exploration">
+                      {controls.overview}
+                      {controls.zoomOut}
+                      {controls.zoomIn}
+                      {controls.reset}
+                      {controls.pan}
+                    </Toolbar>
+                  ),
+                }
+              : {}),
+          }}
+          emptyState={{title: 'No buildings', description: 'No readings'}}
+          invalidData={{title: 'Invalid buildings', description: 'Check readings'}}
+        />
+      </ChartFrame>
     </Stack>
   );
 }

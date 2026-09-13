@@ -1,9 +1,9 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   CartesianChart,
   SegmentedControl,
   Stack,
-  Switch,
   type ChartExplorationLabels,
   type ChartInteraction,
 } from '../src/index.js';
@@ -60,6 +60,7 @@ export function RangeChartExample() {
   return (
     <Stack gap="regular">
       <SegmentedControl
+        reserveSupportSpace={false}
         label="Range chart selection target"
         value={target}
         onChange={setTarget}
@@ -68,12 +69,12 @@ export function RangeChartExample() {
           {label: 'Month', value: 'category'},
         ]}
       />
-      <Switch label="Compact range chart" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <p>
         The measured temperature and expected range are supplied independently. Select the range to
         mark both limits as one item. The eyes hide a series in the chart and Overview.
       </p>
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame compact={compact}>
         <CartesianChart
           key={target}
           data={rows}
@@ -116,7 +117,7 @@ export function RangeChartExample() {
           exploration={{labels: navigation}}
           interaction={interaction}
         />
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

@@ -1,3 +1,4 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   BarChart,
@@ -6,7 +7,6 @@ import {
   CartesianChart,
   SegmentedControl,
   Stack,
-  Switch,
   type ChartInteraction,
 } from '../src/index.js';
 
@@ -75,6 +75,7 @@ export function CartesianDataMotionExample() {
   return (
     <Stack gap="regular">
       <SegmentedControl
+        reserveSupportSpace={false}
         label="Chart type"
         value={kind}
         onChange={setKind}
@@ -153,8 +154,8 @@ export function CartesianDataMotionExample() {
           Reset data
         </Button>
       </InlineGroup>
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartSizeControl compact={compact} onChange={setCompact} />
+      <ChartFrame compact={compact}>
         {kind === 'bars' ? (
           <BarChart
             {...common}
@@ -200,7 +201,7 @@ export function CartesianDataMotionExample() {
             }
           />
         )}
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

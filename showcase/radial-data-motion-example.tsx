@@ -1,3 +1,4 @@
+import {ChartPresentation} from './chart-presentation.js';
 import {useState} from 'react';
 import {Button, DonutChart, PieChart, Stack, type PartToWholeSelectionItem} from '../src/index.js';
 
@@ -85,56 +86,58 @@ export function RadialDataMotionExample({kind}: {readonly kind: 'pie' | 'donut'}
           Reset data
         </Button>
       </div>
-      <Chart
-        data={data}
-        idAccessor="id"
-        labelAccessor="label"
-        value={{accessor: 'value', label: 'Energy use', unit: 'MWh'}}
-        title={`${kind === 'pie' ? 'Pie' : 'Donut'} energy updates`}
-        description="Current energy use by building."
-        dataTableLabel={`${kind === 'pie' ? 'Pie' : 'Donut'} current building readings`}
-        totalLabel="Total MWh"
-        legend={{label: 'Buildings'}}
-        emptyState={{title: 'No buildings', description: 'Add building readings.'}}
-        invalidData={{
-          title: 'Invalid energy use',
-          description: 'Supply nonnegative energy readings.',
-        }}
-        labels={{
-          back: 'Previous buildings',
-          category: 'Building',
-          categoryRange: ({start, end, total}) => `${start} to ${end} of ${total} buildings`,
-          moreCategories: (count) => `${count} more buildings`,
-          shareOfTotal: 'Share of total',
-          shareOnPage: 'Share on page',
-        }}
-        visibilityLabels={{
-          hideSeries: (label) => `Hide ${label}`,
-          showSeries: (label) => `Show ${label}`,
-          hidden: 'Hidden',
-          showAll: 'Show all buildings',
-          allHidden: {
-            title: 'All buildings hidden',
-            description: 'Show a building to restore its slice.',
-          },
-        }}
-        interaction={{
-          onActivate: (event) => setDetails(`${event.label}: ${event.value} MWh`),
-          selection: {
-            containsSelection: 'Contains selected buildings',
-            labels: {
-              instructions:
-                'Tap to select. Drag across slices to select several buildings. Control/Command-click or press and hold to open details.',
-              clear: 'Clear selection',
-              empty: 'Nothing selected',
-              summary: (count) => `${count} selected`,
-              item: (item: PartToWholeSelectionItem) =>
-                [...buildings, ...additions].find((row) => row.id === item.id)?.label ?? item.id,
-              hidden: (label) => `${label} (hidden)`,
+      <ChartPresentation>
+        <Chart
+          data={data}
+          idAccessor="id"
+          labelAccessor="label"
+          value={{accessor: 'value', label: 'Energy use', unit: 'MWh'}}
+          title={`${kind === 'pie' ? 'Pie' : 'Donut'} energy updates`}
+          description="Current energy use by building."
+          dataTableLabel={`${kind === 'pie' ? 'Pie' : 'Donut'} current building readings`}
+          totalLabel="Total MWh"
+          legend={{label: 'Buildings'}}
+          emptyState={{title: 'No buildings', description: 'Add building readings.'}}
+          invalidData={{
+            title: 'Invalid energy use',
+            description: 'Supply nonnegative energy readings.',
+          }}
+          labels={{
+            back: 'Previous buildings',
+            category: 'Building',
+            categoryRange: ({start, end, total}) => `${start} to ${end} of ${total} buildings`,
+            moreCategories: (count) => `${count} more buildings`,
+            shareOfTotal: 'Share of total',
+            shareOnPage: 'Share on page',
+          }}
+          visibilityLabels={{
+            hideSeries: (label) => `Hide ${label}`,
+            showSeries: (label) => `Show ${label}`,
+            hidden: 'Hidden',
+            showAll: 'Show all buildings',
+            allHidden: {
+              title: 'All buildings hidden',
+              description: 'Show a building to restore its slice.',
             },
-          },
-        }}
-      />
+          }}
+          interaction={{
+            onActivate: (event) => setDetails(`${event.label}: ${event.value} MWh`),
+            selection: {
+              containsSelection: 'Contains selected buildings',
+              labels: {
+                instructions:
+                  'Tap to select. Drag across slices to select several buildings. Control/Command-click or press and hold to open details.',
+                clear: 'Clear selection',
+                empty: 'Nothing selected',
+                summary: (count) => `${count} selected`,
+                item: (item: PartToWholeSelectionItem) =>
+                  [...buildings, ...additions].find((row) => row.id === item.id)?.label ?? item.id,
+                hidden: (label) => `${label} (hidden)`,
+              },
+            },
+          }}
+        />
+      </ChartPresentation>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

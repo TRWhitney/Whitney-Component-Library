@@ -1,5 +1,6 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
-import {BarChart, BoxPlot, LineChart, ScatterChart, Stack, Switch} from '../src/index.js';
+import {BarChart, BoxPlot, LineChart, ScatterChart, Stack} from '../src/index.js';
 
 const months = Array.from({length: 12}, (_, index) => ({
   date: new Date(Date.UTC(2026, index, 1)),
@@ -39,8 +40,8 @@ export function CompactAxisExample({kind}: {readonly kind: 'time' | 'numeric' | 
   const [details, setDetails] = useState('');
   return (
     <Stack gap="regular">
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
-      <div style={{width: '100%', maxWidth: compact ? '20rem' : '48rem'}}>
+      <ChartSizeControl compact={compact} onChange={setCompact} />
+      <ChartFrame compact={compact}>
         {kind === 'bar' ? (
           <BarChart
             {...common}
@@ -117,7 +118,7 @@ export function CompactAxisExample({kind}: {readonly kind: 'time' | 'numeric' | 
             yAxis={{label: 'Recovery duration', unit: 'minutes', scale: {type: 'linear'}}}
           />
         )}
-      </div>
+      </ChartFrame>
       {kind === 'bar' && details ? <p role="status">Opened {details}</p> : null}
     </Stack>
   );

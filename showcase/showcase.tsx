@@ -1,3 +1,4 @@
+import {ChartPresentation} from './chart-presentation.js';
 import {MarkdownIcon} from './markdown-icons.js';
 import {ChartCommandCompositionExample} from './chart-command-composition-example.js';
 import {MarkdownSpecimen} from './markdown-specimen.js';
@@ -2330,6 +2331,7 @@ function BarInteractionExample({
   return (
     <Stack gap="regular">
       <SegmentedControl
+        reserveSupportSpace={false}
         label={`${name} layout`}
         onChange={setLayout}
         options={[
@@ -2340,6 +2342,7 @@ function BarInteractionExample({
         value={layout}
       />
       <SegmentedControl
+        reserveSupportSpace={false}
         label={`${name} click target`}
         onChange={(nextTarget) => {
           setTarget(nextTarget);
@@ -2354,11 +2357,13 @@ function BarInteractionExample({
       />
       <InlineGroup align="start" gap="regular" wrap>
         <Switch
+          reserveSupportSpace={false}
           isSelected={selectionEnabled}
           label="Enable selection"
           onChange={setSelectionEnabled}
         />
         <Switch
+          reserveSupportSpace={false}
           isSelected={detailsEnabled}
           label="Open details on activation"
           onChange={(enabled) => {
@@ -2370,24 +2375,36 @@ function BarInteractionExample({
       <p>{instructions}</p>
       {horizontal ? (
         layout === 'normalized' ? (
-          <BarChart
-            {...common}
-            layout={layout}
-            xAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
-            yAxis={categoryAxis}
-          />
+          <ChartPresentation>
+            <BarChart
+              {...common}
+              layout={layout}
+              xAxis={{
+                label: 'Share of visible energy',
+                scale: {type: 'normalized'},
+                showGrid: true,
+              }}
+              yAxis={categoryAxis}
+            />
+          </ChartPresentation>
         ) : (
-          <BarChart {...common} layout={layout} xAxis={valueAxis} yAxis={categoryAxis} />
+          <ChartPresentation>
+            <BarChart {...common} layout={layout} xAxis={valueAxis} yAxis={categoryAxis} />
+          </ChartPresentation>
         )
       ) : layout === 'normalized' ? (
-        <ColumnChart
-          {...common}
-          layout={layout}
-          xAxis={categoryAxis}
-          yAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
-        />
+        <ChartPresentation>
+          <ColumnChart
+            {...common}
+            layout={layout}
+            xAxis={categoryAxis}
+            yAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
+          />
+        </ChartPresentation>
       ) : (
-        <ColumnChart {...common} layout={layout} xAxis={categoryAxis} yAxis={valueAxis} />
+        <ChartPresentation>
+          <ColumnChart {...common} layout={layout} xAxis={categoryAxis} yAxis={valueAxis} />
+        </ChartPresentation>
       )}
       <p className="showcase-muted">
         {horizontal ? 'Up and Down' : 'Left and Right'} move between months;{' '}
@@ -2506,6 +2523,7 @@ function AreaMixedInteractionExample({
     <Stack gap="regular">
       {kind === 'area' ? (
         <SegmentedControl
+          reserveSupportSpace={false}
           label="AreaChart stacking"
           onChange={setStacking}
           options={[
@@ -2517,6 +2535,7 @@ function AreaMixedInteractionExample({
         />
       ) : (
         <SegmentedControl
+          reserveSupportSpace={false}
           label="CartesianChart marks"
           onChange={setMixedKind}
           options={[
@@ -2527,6 +2546,7 @@ function AreaMixedInteractionExample({
         />
       )}
       <SegmentedControl
+        reserveSupportSpace={false}
         label={`${name} click target`}
         onChange={(nextTarget) => {
           setTarget(nextTarget);
@@ -2541,11 +2561,13 @@ function AreaMixedInteractionExample({
       />
       <InlineGroup align="start" gap="regular" wrap>
         <Switch
+          reserveSupportSpace={false}
           isSelected={selectionEnabled}
           label="Enable selection"
           onChange={setSelectionEnabled}
         />
         <Switch
+          reserveSupportSpace={false}
           isSelected={detailsEnabled}
           label="Open details on activation"
           onChange={(enabled) => {
@@ -2556,26 +2578,32 @@ function AreaMixedInteractionExample({
       </InlineGroup>
       <p>{instructions}</p>
       {kind === 'mixed' ? (
-        <CartesianChart
-          {...common}
-          series={[
-            {...areaSeries[0], kind: 'column'},
-            {
-              ...areaSeries[1],
-              ...(mixedKind === 'line' ? {kind: 'line', showPoints: true} : {kind: 'area'}),
-            },
-          ]}
-          yAxis={valueAxis}
-        />
+        <ChartPresentation>
+          <CartesianChart
+            {...common}
+            series={[
+              {...areaSeries[0], kind: 'column'},
+              {
+                ...areaSeries[1],
+                ...(mixedKind === 'line' ? {kind: 'line', showPoints: true} : {kind: 'area'}),
+              },
+            ]}
+            yAxis={valueAxis}
+          />
+        </ChartPresentation>
       ) : stacking === 'normalized' ? (
-        <AreaChart
-          {...common}
-          series={areaSeries}
-          stacking="normalized"
-          yAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
-        />
+        <ChartPresentation>
+          <AreaChart
+            {...common}
+            series={areaSeries}
+            stacking="normalized"
+            yAxis={{label: 'Share of visible energy', scale: {type: 'normalized'}, showGrid: true}}
+          />
+        </ChartPresentation>
       ) : (
-        <AreaChart {...common} series={areaSeries} stacking={stacking} yAxis={valueAxis} />
+        <ChartPresentation>
+          <AreaChart {...common} series={areaSeries} stacking={stacking} yAxis={valueAxis} />
+        </ChartPresentation>
       )}
       <p className="showcase-muted">
         Left and Right move between months; Up and Down move between visible series in Value mode.
@@ -2695,11 +2723,13 @@ function PointInteractionExample({
     <Stack gap="regular">
       <Stack gap="regular">
         <Switch
+          reserveSupportSpace={false}
           isSelected={selectionEnabled}
           label="Enable selection"
           onChange={setSelectionEnabled}
         />
         <Switch
+          reserveSupportSpace={false}
           isSelected={detailsEnabled}
           label="Open details on activation"
           onChange={(enabled) => {
@@ -2710,18 +2740,22 @@ function PointInteractionExample({
       </Stack>
       <p>{instructions}</p>
       {kind === 'scatter' ? (
-        <ScatterChart
-          {...common}
-          description="Compare temperature and thermal demand for recorded operating periods."
-          title="Temperature and demand"
-        />
+        <ChartPresentation>
+          <ScatterChart
+            {...common}
+            description="Compare temperature and thermal demand for recorded operating periods."
+            title="Temperature and demand"
+          />
+        </ChartPresentation>
       ) : (
-        <BubbleChart
-          {...common}
-          description="Compare temperature, demand, and stored energy for recorded operating periods."
-          magnitude={{accessor: 'stored', label: 'Stored energy', unit: 'MWh'}}
-          title="Thermal demand and stored energy"
-        />
+        <ChartPresentation>
+          <BubbleChart
+            {...common}
+            description="Compare temperature, demand, and stored energy for recorded operating periods."
+            magnitude={{accessor: 'stored', label: 'Stored energy', unit: 'MWh'}}
+            title="Thermal demand and stored energy"
+          />
+        </ChartPresentation>
       )}
       <p className="showcase-muted">
         Left and Right visit visible observations in data order, including North Tuesday and South
@@ -2800,11 +2834,13 @@ function DistributionInteractionControls({
   return (
     <InlineGroup align="start" gap="regular" wrap>
       <Switch
+        reserveSupportSpace={false}
         isSelected={selectionEnabled}
         label="Enable selection"
         onChange={setSelectionEnabled}
       />
       <Switch
+        reserveSupportSpace={false}
         isSelected={detailsEnabled}
         label="Open details on activation"
         onChange={setDetailsEnabled}
@@ -2860,20 +2896,22 @@ function HistogramInteractionExample() {
         }}
       />
       <p>{instructions}</p>
-      <Histogram
-        {...distributionChartStateCopy}
-        data={restartLatencies}
-        description="See which restart-latency ranges occurred most often."
-        distribution={{
-          accessor: 'latency',
-          kind: 'raw',
-          thresholds: [0, 40, 80, 120, 160, 200, 240],
-        }}
-        interaction={interaction}
-        title="Pump restart latency"
-        xAxis={{label: 'Restart latency', scale: {domain: [0, 240], type: 'linear'}, unit: 'ms'}}
-        yAxis={{label: 'Restarts', scale: {domain: [0, 8], type: 'linear'}, showGrid: true}}
-      />
+      <ChartPresentation>
+        <Histogram
+          {...distributionChartStateCopy}
+          data={restartLatencies}
+          description="See which restart-latency ranges occurred most often."
+          distribution={{
+            accessor: 'latency',
+            kind: 'raw',
+            thresholds: [0, 40, 80, 120, 160, 200, 240],
+          }}
+          interaction={interaction}
+          title="Pump restart latency"
+          xAxis={{label: 'Restart latency', scale: {domain: [0, 240], type: 'linear'}, unit: 'ms'}}
+          yAxis={{label: 'Restarts', scale: {domain: [0, 8], type: 'linear'}, showGrid: true}}
+        />
+      </ChartPresentation>
       <p className="showcase-muted">
         Arrow keys visit every bin in interval order. Home and End reach the first and last bins.
         Selection frames share their adjoining edges; the inset outline marks the current reading.
@@ -2968,11 +3006,13 @@ function BoxPlotInteractionExample({
   return (
     <Stack gap="regular">
       <Switch
+        reserveSupportSpace={false}
         isSelected={selectionEnabled}
         label="Enable selection"
         onChange={setSelectionEnabled}
       />
       <Switch
+        reserveSupportSpace={false}
         isSelected={detailsEnabled}
         label="Open details on activation"
         onChange={(enabled) => {
@@ -2981,25 +3021,27 @@ function BoxPlotInteractionExample({
         }}
       />
       <p>{instructions}</p>
-      <BoxPlot
-        {...distributionChartStateCopy}
-        data={recoveryTimes}
-        description="Compare the center, spread, and outliers of recovery time for three turbine loops."
-        distribution={{kind: 'raw', valueAccessor: 'recovery', whisker: 'tukey'}}
-        groupAccessor="loop"
-        groups={statisticalSeries}
-        interaction={interaction}
-        legend={{label: 'Turbine loops'}}
-        title="Recovery-time distribution"
-        visibilityLabels={visibilityLabels}
-        xAxis={{label: 'Turbine loop'}}
-        yAxis={{
-          label: 'Recovery time',
-          scale: {type: 'linear'},
-          showGrid: true,
-          unit: 'minutes',
-        }}
-      />
+      <ChartPresentation>
+        <BoxPlot
+          {...distributionChartStateCopy}
+          data={recoveryTimes}
+          description="Compare the center, spread, and outliers of recovery time for three turbine loops."
+          distribution={{kind: 'raw', valueAccessor: 'recovery', whisker: 'tukey'}}
+          groupAccessor="loop"
+          groups={statisticalSeries}
+          interaction={interaction}
+          legend={{label: 'Turbine loops'}}
+          title="Recovery-time distribution"
+          visibilityLabels={visibilityLabels}
+          xAxis={{label: 'Turbine loop'}}
+          yAxis={{
+            label: 'Recovery time',
+            scale: {type: 'linear'},
+            showGrid: true,
+            unit: 'minutes',
+          }}
+        />
+      </ChartPresentation>
       <p className="showcase-muted">
         Arrow keys visit each visible group summary followed by its individual outliers. Home and
         End reach the first and last targets. A summary reading uses an inset outline and whisker
@@ -3151,6 +3193,7 @@ function RadarInteractionExample({
   return (
     <Stack gap="regular">
       <SegmentedControl
+        reserveSupportSpace={false}
         label={sparse ? 'Sparse radar click target' : 'Radar click target'}
         onChange={(nextTarget) => {
           setTarget(nextTarget);
@@ -3165,11 +3208,13 @@ function RadarInteractionExample({
       />
       <InlineGroup align="start" gap="regular" wrap>
         <Switch
+          reserveSupportSpace={false}
           isSelected={selectionEnabled}
           label="Enable selection"
           onChange={setSelectionEnabled}
         />
         <Switch
+          reserveSupportSpace={false}
           isSelected={detailsEnabled}
           label="Open details on activation"
           onChange={(enabled) => {
@@ -3179,18 +3224,20 @@ function RadarInteractionExample({
         />
       </InlineGroup>
       <p>{instructions}</p>
-      <RadarChart
-        {...radarCommon}
-        visibilityLabels={visibilityLabels}
-        data={data}
-        description={
-          sparse
-            ? 'Missing qualities remain zero while isolated scores retain a readable fill.'
-            : 'Courier and Scout scores across five shared vehicle qualities.'
-        }
-        interaction={interaction}
-        title={sparse ? 'Sparse vehicle profiles' : 'Vehicle profiles'}
-      />
+      <ChartPresentation>
+        <RadarChart
+          {...radarCommon}
+          visibilityLabels={visibilityLabels}
+          data={data}
+          description={
+            sparse
+              ? 'Missing qualities remain zero while isolated scores retain a readable fill.'
+              : 'Courier and Scout scores across five shared vehicle qualities.'
+          }
+          interaction={interaction}
+          title={sparse ? 'Sparse vehicle profiles' : 'Vehicle profiles'}
+        />
+      </ChartPresentation>
       <p className="showcase-muted">
         Left and Right move between dimensions. Up and Down switch profiles. Home and End reach the
         first and last dimension. Zero and missing values share the center. Reach them with the
@@ -3310,11 +3357,13 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
     <Stack gap="regular">
       <InlineGroup align="start" gap="regular" wrap>
         <Switch
+          reserveSupportSpace={false}
           isSelected={selectionEnabled}
           label="Enable selection"
           onChange={setSelectionEnabled}
         />
         <Switch
+          reserveSupportSpace={false}
           isSelected={detailsEnabled}
           label="Open details on activation"
           onChange={(enabled) => {
@@ -3325,14 +3374,18 @@ function PartToWholeInteractionExample({kind}: {readonly kind: 'pie' | 'donut'})
       </InlineGroup>
       <p>{instructions}</p>
       {kind === 'pie' ? (
-        <PieChart {...partToWholeCommon} interaction={interaction} title="Community energy use" />
+        <ChartPresentation>
+          <PieChart {...partToWholeCommon} interaction={interaction} title="Community energy use" />
+        </ChartPresentation>
       ) : (
-        <DonutChart
-          {...partToWholeCommon}
-          interaction={interaction}
-          title="Community energy use by category"
-          totalLabel="Visible MWh"
-        />
+        <ChartPresentation>
+          <DonutChart
+            {...partToWholeCommon}
+            interaction={interaction}
+            title="Community energy use by category"
+            totalLabel="Visible MWh"
+          />
+        </ChartPresentation>
       )}
       <p className="showcase-muted">
         Use an eye to hide or restore a category. Remaining slices animate to fill the circle;
@@ -3432,11 +3485,13 @@ function SparklineInteractionExample() {
   return (
     <Stack gap="regular">
       <Switch
+        reserveSupportSpace={false}
         isSelected={selectionEnabled}
         label="Enable selection"
         onChange={setSelectionEnabled}
       />
       <Switch
+        reserveSupportSpace={false}
         isSelected={detailsEnabled}
         label="Open details on activation"
         onChange={(enabled) => {
@@ -3445,28 +3500,30 @@ function SparklineInteractionExample() {
         }}
       />
       <p>{instructions}</p>
-      <Sparkline
-        interaction={interaction}
-        data={compactDemandData}
-        dataTableLabel="Daily thermal demand history"
-        description="Daily demand; Tuesday has no reading, current demand is 65 MWh, and the observed range is 38 to 65 MWh."
-        emptyState={{description: 'Record daily demand to begin.', title: 'No demand history'}}
-        invalidData={{
-          description: 'Correct non-finite demand readings.',
-          title: 'Invalid demand history',
-        }}
-        labels={{
-          first: 'First',
-          highest: 'Highest',
-          last: 'Last',
-          lowest: 'Lowest',
-          missing: 'No reading',
-        }}
-        position={{accessor: 'day', label: 'Day', scale: {type: 'categorical'}}}
-        title="Thermal demand this week"
-        value={{accessor: 'demand', label: 'Demand', unit: 'MWh'}}
-        valueRange={[0, 80]}
-      />
+      <ChartPresentation>
+        <Sparkline
+          interaction={interaction}
+          data={compactDemandData}
+          dataTableLabel="Daily thermal demand history"
+          description="Daily demand; Tuesday has no reading, current demand is 65 MWh, and the observed range is 38 to 65 MWh."
+          emptyState={{description: 'Record daily demand to begin.', title: 'No demand history'}}
+          invalidData={{
+            description: 'Correct non-finite demand readings.',
+            title: 'Invalid demand history',
+          }}
+          labels={{
+            first: 'First',
+            highest: 'Highest',
+            last: 'Last',
+            lowest: 'Lowest',
+            missing: 'No reading',
+          }}
+          position={{accessor: 'day', label: 'Day', scale: {type: 'categorical'}}}
+          title="Thermal demand this week"
+          value={{accessor: 'demand', label: 'Demand', unit: 'MWh'}}
+          valueRange={[0, 80]}
+        />
+      </ChartPresentation>
       <p className="showcase-muted">
         Left and Right read each day; Home and End reach the first and last day. Tuesday remains
         readable as a gap, and cannot be selected or opened. Zero would be a recorded value.
@@ -3608,44 +3665,46 @@ function HeatmapInteractionExample({
           ? 'This chart keeps a fixed color range of −6 to 6 °C when tracks are hidden.'
           : 'The color range automatically fits the remaining visible readings.'}
       </p>
-      <Heatmap
-        {...heatmapCommon}
-        data={deviation ? roomDeviationData : roomTemperatureData}
-        description={
-          deviation
-            ? 'Degrees below or above the target; zero means the room met its target.'
-            : 'Temperature by room and time; patterned cells have no recorded reading.'
-        }
-        scale={
-          deviation
-            ? {colors: [accent, '#d14f00'], domain: [-6, 6], midpoint: 0, type: 'two-sided'}
-            : {color: accent, type: 'sequential'}
-        }
-        title={deviation ? 'Temperature deviation' : 'Room temperature'}
-        value={{accessor: 'value', label: deviation ? 'Deviation' : 'Temperature', unit: '°C'}}
-        interaction={interaction}
-        visibilityLabels={visibilityLabels}
-        exploration={{
-          labels: {
-            overview: 'Overview',
-            closeOverview: 'Close overview',
-            done: 'Done',
-            reset: 'Reset view',
-            zoomIn: 'Zoom in',
-            zoomOut: 'Zoom out',
-            panLeft: 'Earlier times',
-            panRight: 'Later times',
-            panUp: 'Previous rooms',
-            panDown: 'Next rooms',
-            window: 'Visible rooms and times',
-            corner: (corner) => `Resize ${corner.replace('-', ' ')} corner`,
-            instructions:
-              'Drag the window to move it or drag a corner to resize it. Arrow keys adjust the focused window or corner.',
-            range: ({x, y}) =>
-              `${heatmapColumns.find((column) => column.id === x[0])?.label} to ${heatmapColumns.find((column) => column.id === x[1])?.label}, ${heatmapRows.find((row) => row.id === y[0])?.label} to ${heatmapRows.find((row) => row.id === y[1])?.label}`,
-          },
-        }}
-      />
+      <ChartPresentation>
+        <Heatmap
+          {...heatmapCommon}
+          data={deviation ? roomDeviationData : roomTemperatureData}
+          description={
+            deviation
+              ? 'Degrees below or above the target; zero means the room met its target.'
+              : 'Temperature by room and time; patterned cells have no recorded reading.'
+          }
+          scale={
+            deviation
+              ? {colors: [accent, '#d14f00'], domain: [-6, 6], midpoint: 0, type: 'two-sided'}
+              : {color: accent, type: 'sequential'}
+          }
+          title={deviation ? 'Temperature deviation' : 'Room temperature'}
+          value={{accessor: 'value', label: deviation ? 'Deviation' : 'Temperature', unit: '°C'}}
+          interaction={interaction}
+          visibilityLabels={visibilityLabels}
+          exploration={{
+            labels: {
+              overview: 'Overview',
+              closeOverview: 'Close overview',
+              done: 'Done',
+              reset: 'Reset view',
+              zoomIn: 'Zoom in',
+              zoomOut: 'Zoom out',
+              panLeft: 'Earlier times',
+              panRight: 'Later times',
+              panUp: 'Previous rooms',
+              panDown: 'Next rooms',
+              window: 'Visible rooms and times',
+              corner: (corner) => `Resize ${corner.replace('-', ' ')} corner`,
+              instructions:
+                'Drag the window to move it or drag a corner to resize it. Arrow keys adjust the focused window or corner.',
+              range: ({x, y}) =>
+                `${heatmapColumns.find((column) => column.id === x[0])?.label} to ${heatmapColumns.find((column) => column.id === x[1])?.label}, ${heatmapRows.find((row) => row.id === y[0])?.label} to ${heatmapRows.find((row) => row.id === y[1])?.label}`,
+            },
+          }}
+        />
+      </ChartPresentation>
       {details ? (
         <Stack gap="tight">
           <DescriptionList
@@ -3754,6 +3813,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         <ChartExample label="Two-series LineChart with selection and details">
           <Stack gap="regular">
             <SegmentedControl
+              reserveSupportSpace={false}
               label="Click target"
               onChange={(target) => {
                 setLineTarget(target);
@@ -3768,11 +3828,13 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
             />
             <InlineGroup align="start" gap="regular" wrap>
               <Switch
+                reserveSupportSpace={false}
                 isSelected={lineSelectionEnabled}
                 label="Enable selection"
                 onChange={setLineSelectionEnabled}
               />
               <Switch
+                reserveSupportSpace={false}
                 isSelected={lineDetailsEnabled}
                 label="Open details on activation"
                 onChange={(enabled) => {
@@ -3782,42 +3844,44 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
               />
             </InlineGroup>
             <p>{lineInstructions}</p>
-            <LineChart
-              {...common}
-              {...verticalAxes}
-              annotations={[{axis: 'y', kind: 'line', label: 'Target', value: 60}]}
-              interaction={{
-                getRowId: chartRowId,
-                ...(lineDetailsEnabled ? {onActivate: setLineDetails} : {}),
-                ...(lineSelectionEnabled
-                  ? {
-                      selection: {
-                        labels: {
-                          clear: 'Clear selection',
-                          empty: 'Nothing selected',
-                          hidden: (label) => `${label} (hidden)`,
-                          instructions: lineInstructions,
-                          item: ({rowId, seriesId}) =>
-                            seriesId
-                              ? `${rowId}, ${seriesId === 'demand' ? 'Demand' : 'Capacity'}`
-                              : rowId,
-                          summary: (count) =>
-                            `${count} ${lineTarget === 'category' ? (count === 1 ? 'month' : 'months') : count === 1 ? 'point' : 'points'} selected`,
+            <ChartPresentation>
+              <LineChart
+                {...common}
+                {...verticalAxes}
+                annotations={[{axis: 'y', kind: 'line', label: 'Target', value: 60}]}
+                interaction={{
+                  getRowId: chartRowId,
+                  ...(lineDetailsEnabled ? {onActivate: setLineDetails} : {}),
+                  ...(lineSelectionEnabled
+                    ? {
+                        selection: {
+                          labels: {
+                            clear: 'Clear selection',
+                            empty: 'Nothing selected',
+                            hidden: (label) => `${label} (hidden)`,
+                            instructions: lineInstructions,
+                            item: ({rowId, seriesId}) =>
+                              seriesId
+                                ? `${rowId}, ${seriesId === 'demand' ? 'Demand' : 'Capacity'}`
+                                : rowId,
+                            summary: (count) =>
+                              `${count} ${lineTarget === 'category' ? (count === 1 ? 'month' : 'months') : count === 1 ? 'point' : 'points'} selected`,
+                          },
+                          onSelectionChange: setLineSelection,
+                          selectedItems: lineSelection,
                         },
-                        onSelectionChange: setLineSelection,
-                        selectedItems: lineSelection,
-                      },
-                    }
-                  : {}),
-                target: lineTarget,
-              }}
-              legend={{label: 'Energy series'}}
-              series={[
-                {accessor: 'demand', id: 'demand', label: 'Demand', showPoints: true},
-                {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
-              ]}
-              title="Thermal demand"
-            />
+                      }
+                    : {}),
+                  target: lineTarget,
+                }}
+                legend={{label: 'Energy series'}}
+                series={[
+                  {accessor: 'demand', id: 'demand', label: 'Demand', showPoints: true},
+                  {accessor: 'capacity', color: 'series-2', id: 'capacity', label: 'Capacity'},
+                ]}
+                title="Thermal demand"
+              />
+            </ChartPresentation>
             <p className="showcase-muted">
               Hover highlights a line in either mode. Filled centers show what clicking will select:
               both series in Month mode, one in Point mode. Underlines mark selected months and

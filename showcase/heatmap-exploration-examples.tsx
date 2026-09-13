@@ -1,5 +1,6 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
-import {Heatmap, Stack, Switch, type ChartRectangularExplorationLabels} from '../src/index.js';
+import {Heatmap, Stack, type ChartRectangularExplorationLabels} from '../src/index.js';
 
 const rows = ['North', 'South', 'East', 'West', 'Studio', 'Office'].map((label) => ({
   id: label.toLowerCase(),
@@ -51,13 +52,13 @@ export function HeatmapExplorationExample() {
   const [details, setDetails] = useState('');
   return (
     <Stack gap="regular">
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <p>
         Pan and zoom through complete cells with the controls or two fingers. Overview shows every
         visible room and hour. Hide tracks with their eyes and restore them beside Room. The color
         key uses all unhidden readings.
       </p>
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame compact={compact}>
         <Heatmap
           rows={rows}
           columns={columns}
@@ -113,7 +114,7 @@ export function HeatmapExplorationExample() {
             },
           }}
         />
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

@@ -1,5 +1,6 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
-import {ScatterChart, Stack, Switch, type ChartRectangularExplorationLabels} from '../src/index.js';
+import {ScatterChart, Stack, type ChartRectangularExplorationLabels} from '../src/index.js';
 
 const targets = [
   [2, 102],
@@ -81,13 +82,13 @@ export function ScatterLineExample() {
   const [details, setDetails] = useState('');
   return (
     <Stack gap="regular">
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <p>
         Daily observations and a supplied energy target use separate datasets. The line connects
         target samples in their supplied order. Select a dot or click near the line to select a
         target sample. Each series has its own eye and details callback.
       </p>
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame compact={compact}>
         <ScatterChart
           data={observed}
           idAccessor="id"
@@ -141,7 +142,7 @@ export function ScatterLineExample() {
             },
           }}
         />
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

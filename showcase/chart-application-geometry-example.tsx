@@ -1,3 +1,4 @@
+import {ChartFrame} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   Button,
@@ -62,35 +63,37 @@ export function ChartApplicationGeometryExample({kind}: {readonly kind: 'line' |
         <Button onPress={() => setAspectRatio(3)}>Wide plot</Button>
         <Button onPress={() => setAspectRatio(1)}>Square plot</Button>
       </InlineGroup>
-      {kind === 'scatter' ? (
-        <ScatterChart
-          {...common}
-          title="Inspect building energy"
-          xAxis={{...common.xAxis, scale: {type: 'linear', domain: [2400, 9400]}}}
-          yAxis={{...common.yAxis, scale: {type: 'linear', domain: [151, 188]}}}
-          exploration={{labels: explorationLabels}}
-          idAccessor="id"
-          labelAccessor="name"
-          legend={{label: 'Building status'}}
-          seriesAccessor={(row) => (row.id === current ? 'current' : 'buildings')}
-          series={[
-            {id: 'buildings', label: 'Buildings'},
-            {id: 'current', label: 'Current'},
-          ]}
-          interaction={{onActivate: (event) => inspect(event.item.rowId)}}
-        />
-      ) : (
-        <LineChart
-          {...common}
-          title="Inspect energy readings"
-          series={[{id: 'energy', label: 'Energy', accessor: 'energy', showPoints: true}]}
-          interaction={{
-            target: 'point',
-            getRowId: (row) => row.id,
-            onActivate: (event) => inspect(event.item.rowId),
-          }}
-        />
-      )}
+      <ChartFrame compact={false}>
+        {kind === 'scatter' ? (
+          <ScatterChart
+            {...common}
+            title="Inspect building energy"
+            xAxis={{...common.xAxis, scale: {type: 'linear', domain: [2400, 9400]}}}
+            yAxis={{...common.yAxis, scale: {type: 'linear', domain: [151, 188]}}}
+            exploration={{labels: explorationLabels}}
+            idAccessor="id"
+            labelAccessor="name"
+            legend={{label: 'Building status'}}
+            seriesAccessor={(row) => (row.id === current ? 'current' : 'buildings')}
+            series={[
+              {id: 'buildings', label: 'Buildings'},
+              {id: 'current', label: 'Current'},
+            ]}
+            interaction={{onActivate: (event) => inspect(event.item.rowId)}}
+          />
+        ) : (
+          <LineChart
+            {...common}
+            title="Inspect energy readings"
+            series={[{id: 'energy', label: 'Energy', accessor: 'energy', showPoints: true}]}
+            interaction={{
+              target: 'point',
+              getRowId: (row) => row.id,
+              onActivate: (event) => inspect(event.item.rowId),
+            }}
+          />
+        )}
+      </ChartFrame>
       <p role="status">{inspection}</p>
     </Stack>
   );

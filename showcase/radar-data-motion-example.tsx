@@ -1,5 +1,6 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
-import {Button, RadarChart, Stack, Switch} from '../src/index.js';
+import {Button, RadarChart, Stack} from '../src/index.js';
 
 const dimensions = [
   {id: 'speed', label: 'Speed', accessor: 'speed'},
@@ -39,8 +40,8 @@ export function RadarDataMotionExample() {
           Reset
         </Button>
       </div>
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartSizeControl compact={compact} onChange={setCompact} />
+      <ChartFrame compact={compact}>
         <RadarChart<Profile>
           data={profiles[revision % profiles.length]!}
           title="Updated vehicle profiles"
@@ -85,7 +86,7 @@ export function RadarDataMotionExample() {
             },
           }}
         />
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

@@ -1,3 +1,4 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   AreaChart,
@@ -6,7 +7,6 @@ import {
   ColumnChart,
   SegmentedControl,
   Stack,
-  Switch,
   type ChartExplorationLabels,
   type ChartInteraction,
 } from '../src/index.js';
@@ -92,6 +92,7 @@ export function CartesianExplorationExample() {
   return (
     <Stack gap="regular">
       <SegmentedControl
+        reserveSupportSpace={false}
         label="Exploration chart type"
         value={mode}
         onChange={(next) => {
@@ -107,13 +108,13 @@ export function CartesianExplorationExample() {
           {label: 'Bars', value: 'bar'},
         ]}
       />
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <p>
         Use the chart buttons or two fingers to pan and zoom. Overview shows every month. The eyes
         hide or restore a series in both views. Horizontal bars keep the same month order from top
         to bottom, with earlier months on the left in Overview.
       </p>
-      <div key={mode} style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame key={mode} compact={compact}>
         {mode === 'area' ? (
           <AreaChart {...common} stacking="stacked" xAxis={categoryAxis} yAxis={valueAxis} />
         ) : mode === 'bar' ? (
@@ -140,7 +141,7 @@ export function CartesianExplorationExample() {
         ) : (
           <ColumnChart {...common} layout={mode} xAxis={categoryAxis} yAxis={valueAxis} />
         )}
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

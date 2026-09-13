@@ -1,10 +1,10 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   BoxPlot,
   Histogram,
   SegmentedControl,
   Stack,
-  Switch,
   type BoxPlotInteraction,
   type ChartDomainValue,
   type ChartExplorationLabels,
@@ -90,6 +90,7 @@ export function DistributionExplorationExample() {
   return (
     <Stack gap="regular">
       <SegmentedControl
+        reserveSupportSpace={false}
         label="Distribution chart type"
         value={mode}
         onChange={(next) => {
@@ -101,13 +102,13 @@ export function DistributionExplorationExample() {
           {label: 'Box plot', value: 'box'},
         ]}
       />
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <p>
         Pan and zoom with the buttons or two fingers. Overview shows the complete distribution.
         Histograms keep the original bins and counts. Box plots show whole groups, including every
         whisker and outlier. Use the eyes to hide or restore a group.
       </p>
-      <div key={mode} style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame key={mode} compact={compact}>
         {mode === 'histogram' ? (
           <Histogram
             {...copy}
@@ -148,7 +149,7 @@ export function DistributionExplorationExample() {
             }}
           />
         )}
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

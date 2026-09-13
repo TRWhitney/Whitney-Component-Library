@@ -1,3 +1,4 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   BubbleChart,
@@ -5,7 +6,6 @@ import {
   InlineGroup,
   ScatterChart,
   Stack,
-  Switch,
   type ChartRectangularExplorationLabels,
   type ScatterChartProps,
 } from '../src/index.js';
@@ -115,7 +115,7 @@ export function StatisticalDataMotionExample({kind}: {readonly kind: 'scatter' |
         building. The data table and details report the current supplied values while marks move.
         Load 500 buildings to try the same controls with a larger dataset.
       </p>
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <InlineGroup gap="tight" wrap>
         <Button
           variant="secondary"
@@ -183,7 +183,7 @@ export function StatisticalDataMotionExample({kind}: {readonly kind: 'scatter' |
           Reset data
         </Button>
       </InlineGroup>
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame compact={compact}>
         {kind === 'bubble' ? (
           <BubbleChart {...common} magnitude={{accessor: 'size', label: 'Occupants'}} />
         ) : (
@@ -201,7 +201,7 @@ export function StatisticalDataMotionExample({kind}: {readonly kind: 'scatter' |
             }}
           />
         )}
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

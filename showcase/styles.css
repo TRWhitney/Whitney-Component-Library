@@ -438,6 +438,35 @@
     margin: 0;
   }
 
+  .showcase-chart-size-control {
+    inline-size: fit-content;
+    max-inline-size: 100%;
+  }
+
+  .showcase-chart-presentation {
+    display: grid;
+    gap: 1rem;
+    min-inline-size: 0;
+  }
+
+  .showcase-chart-plot {
+    min-inline-size: 0;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--wcl-border);
+  }
+
+  .showcase-chart-frame {
+    display: grid;
+    gap: 1.5rem;
+    inline-size: 100%;
+    max-inline-size: 52rem;
+    min-inline-size: 0;
+  }
+
+  .showcase-chart-frame[data-chart-size='compact'] {
+    max-inline-size: 22rem;
+  }
+
   .showcase-charts {
     gap: 2.5rem;
   }

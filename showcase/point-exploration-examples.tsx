@@ -1,10 +1,10 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   BubbleChart,
   ScatterChart,
   SegmentedControl,
   Stack,
-  Switch,
   type ChartRectangularExplorationLabels,
   type PointChartInteraction,
 } from '../src/index.js';
@@ -88,6 +88,7 @@ export function PointExplorationExample() {
   return (
     <Stack gap="regular">
       <SegmentedControl
+        reserveSupportSpace={false}
         label="Point chart type"
         value={mode}
         onChange={(next) => {
@@ -99,14 +100,14 @@ export function PointExplorationExample() {
           {label: 'Bubble', value: 'bubble'},
         ]}
       />
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <p>
         Pan and zoom both axes with the chart buttons or two fingers. Overview shows the full
         observation map and keeps selected observations marked outside the current view. The eyes
         hide or restore a loop in both views. Bubble area shows capacity and keeps the same scale as
         you zoom.
       </p>
-      <div key={mode} style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartFrame key={mode} compact={compact}>
         {mode === 'scatter' ? (
           <ScatterChart {...common} />
         ) : (
@@ -115,7 +116,7 @@ export function PointExplorationExample() {
             magnitude={{accessor: 'capacity', label: 'Capacity', unit: 'MWh'}}
           />
         )}
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

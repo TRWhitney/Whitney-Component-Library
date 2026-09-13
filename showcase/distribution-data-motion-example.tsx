@@ -1,3 +1,4 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {
   BoxPlot,
@@ -5,7 +6,6 @@ import {
   Histogram,
   InlineGroup,
   Stack,
-  Switch,
   type BoxPlotSelectionItem,
   type ChartSelectionLabels,
   type HistogramSelectionItem,
@@ -90,7 +90,7 @@ export function DistributionDataMotionExample({kind}: {readonly kind: 'histogram
           : 'Select a summary or outlier, then update its values. The box and outlier rings follow the same groups and outlier IDs.'}{' '}
         The table and details report the supplied values throughout the transition.
       </p>
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <InlineGroup gap="tight" wrap>
         <Button variant="secondary" onPress={() => setUpdated((value) => !value)}>
           Update values
@@ -105,7 +105,7 @@ export function DistributionDataMotionExample({kind}: {readonly kind: 'histogram
           Reset
         </Button>
       </InlineGroup>
-      <div style={{maxWidth: compact ? '20rem' : undefined, minWidth: 0}}>
+      <ChartFrame compact={compact}>
         {kind === 'histogram' ? (
           <Histogram
             {...common}
@@ -186,7 +186,7 @@ export function DistributionDataMotionExample({kind}: {readonly kind: 'histogram
             }}
           />
         )}
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

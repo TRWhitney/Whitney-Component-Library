@@ -1,3 +1,4 @@
+import {ChartFrame} from './chart-presentation.js';
 import {useState} from 'react';
 import {Button, LineChart, Stack, type ChartSelectionItem} from '../src/index.js';
 
@@ -30,29 +31,31 @@ export function ChartSelectionPresentationExample() {
         The panel and compact controls share the selection. Open the count in compact mode for
         selected readings and interaction help.
       </p>
-      <LineChart
-        title="Monthly energy review"
-        description="Select months for review or activate a reading to inspect its value."
-        dataTableLabel="Monthly readings"
-        data={readings}
-        series={[{id: 'energy', label: 'Energy', accessor: 'value', showPoints: true}]}
-        xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
-        yAxis={{label: 'Energy', unit: 'kWh/m²', scale: {type: 'linear'}}}
-        emptyState={{title: 'No readings', description: 'Add monthly readings.'}}
-        invalidData={{title: 'Invalid readings', description: 'Check the supplied values.'}}
-        interaction={{
-          target: 'point',
-          getRowId: (row) => row.id,
-          selection: {
-            presentation,
-            selectedItems: selected,
-            onSelectionChange: setSelected,
-            labels,
-          },
-          onActivate: (event) =>
-            setInspection(`${event.datum.month}: ${event.datum.value} kWh/m².`),
-        }}
-      />
+      <ChartFrame compact={false}>
+        <LineChart
+          title="Monthly energy review"
+          description="Select months for review or activate a reading to inspect its value."
+          dataTableLabel="Monthly readings"
+          data={readings}
+          series={[{id: 'energy', label: 'Energy', accessor: 'value', showPoints: true}]}
+          xAxis={{accessor: 'month', label: 'Month', scale: {type: 'categorical'}}}
+          yAxis={{label: 'Energy', unit: 'kWh/m²', scale: {type: 'linear'}}}
+          emptyState={{title: 'No readings', description: 'Add monthly readings.'}}
+          invalidData={{title: 'Invalid readings', description: 'Check the supplied values.'}}
+          interaction={{
+            target: 'point',
+            getRowId: (row) => row.id,
+            selection: {
+              presentation,
+              selectedItems: selected,
+              onSelectionChange: setSelected,
+              labels,
+            },
+            onActivate: (event) =>
+              setInspection(`${event.datum.month}: ${event.datum.value} kWh/m².`),
+          }}
+        />
+      </ChartFrame>
       <p role="status">{inspection}</p>
     </Stack>
   );

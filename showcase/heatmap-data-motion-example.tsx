@@ -1,3 +1,4 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
 import {Button, Heatmap, Stack, Switch} from '../src/index.js';
 
@@ -51,8 +52,8 @@ export function HeatmapDataMotionExample() {
         Update temperatures
       </Button>
       <Switch label="Dense grid, 24 rooms by 24 hours" isSelected={dense} onChange={setDense} />
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
-      <div style={{maxWidth: compact ? '22rem' : undefined}}>
+      <ChartSizeControl compact={compact} onChange={setCompact} />
+      <ChartFrame compact={compact}>
         <Heatmap
           rows={rows}
           columns={columns}
@@ -132,7 +133,7 @@ export function HeatmapDataMotionExample() {
             },
           }}
         />
-      </div>
+      </ChartFrame>
       {details ? <p role="status">{details}</p> : null}
     </Stack>
   );

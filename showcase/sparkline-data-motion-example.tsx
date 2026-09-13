@@ -1,5 +1,6 @@
+import {ChartFrame, ChartSizeControl} from './chart-presentation.js';
 import {useState} from 'react';
-import {Button, InlineGroup, Sparkline, Stack, Switch} from '../src/index.js';
+import {Button, InlineGroup, Sparkline, Stack} from '../src/index.js';
 const original = [42, 56, 48, 71, 59, 85, 66, 78, 52, 67, 73, 61];
 const updated = [63, 42, 56, 92, 45, 77, 87, 64, 60, 88, 59, 69];
 export function SparklineDataMotionExample() {
@@ -17,7 +18,7 @@ export function SparklineDataMotionExample() {
         Select a reading, then update the values. The minimum and maximum markers fade between
         readings when the extremes change.
       </p>
-      <Switch label="Compact container" isSelected={compact} onChange={setCompact} />
+      <ChartSizeControl compact={compact} onChange={setCompact} />
       <InlineGroup gap="tight" wrap>
         <Button
           variant="secondary"
@@ -38,7 +39,7 @@ export function SparklineDataMotionExample() {
           Reset data
         </Button>
       </InlineGroup>
-      <div style={{maxWidth: compact ? 360 : undefined}}>
+      <ChartFrame compact={compact}>
         <Sparkline<(typeof data)[number], string>
           data={data}
           title="Daily energy demand"
@@ -73,7 +74,7 @@ export function SparklineDataMotionExample() {
             },
           }}
         />
-      </div>
+      </ChartFrame>
       <p aria-live="polite">{details || 'Open a reading to see its current value here.'}</p>
     </Stack>
   );
