@@ -40,4 +40,4 @@ Whitney accepted the [Fieldnotes publication studio](../../markdown-authoring-de
 
 ## Markdown cleanup
 
-Read-only and locked editor styling is tracked in Ticket 30, alongside new library deficiencies found through this demo.
+The [recorded cleanup](../../authoring-cleanup/status.md), including read-only and locked editor styling, is complete and was accepted by Whitney on 2026-09-13.

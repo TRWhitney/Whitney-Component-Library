@@ -9,7 +9,7 @@ fixtures exist.
 [Markdown Authoring Integration Proof](27-markdown-authoring-prerelease.md),
 [Application Workbench Integration Proof](28-application-workbench-prerelease.md)
 
-**Status:** blocked for release-wide certification. The concrete authoring and showcase findings below are complete; see the [cleanup record](../../authoring-cleanup/status.md).
+**Status:** blocked for release-wide certification. The concrete authoring and showcase findings below are closed with Whitney's acceptance on 2026-09-13; see the [cleanup record](../../authoring-cleanup/status.md).
 
 - [ ] Chromium, Firefox, and WebKit pass representative behavior across every public family under
       the fixed Baseline 2023 contract.

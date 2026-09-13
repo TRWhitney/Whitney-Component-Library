@@ -6,12 +6,12 @@ Complete the [authorized findings](spec.md) following Ticket 27 delivery.
 
 ## Current state
 
-Complete. The requested rework is implemented, validated, and independently reviewed. Corrections are folded into the responsible unpublished commits. The ten [cleanup tickets](tickets/) contain outcome-specific evidence.
+Closed. Whitney accepted the final demo and showcase cleanup on 2026-09-13 and authorized closing the effort. The work is validated and independently reviewed, with corrections folded into the responsible unpublished commits. The ten [cleanup tickets](tickets/) contain outcome-specific evidence.
 
 ## Verification
 
 - `npm run check` passes formatting, lint, types, generated-document checks, 82 test files with 1,180 tests, TypeScript 5.9/6/7 compatibility, and import isolation.
-- After the final example placement and compact-control corrections, `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run check:generated`, and `npx vitest run tests/showcase.test.tsx` pass. The showcase suite has 18 tests.
+- After the final example placement and compact-control corrections, `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run check:generated`, and `npx vitest run tests/showcase.test.tsx` pass. The final showcase suite has 19 tests.
 - `npm run showcase:build`, `npm run prototype:markdown:build`, and `npm run verify:package` pass. Packed-consumer SSR and hydration checks pass for React 18.3.1 and 19.2.8.
 - Direct Chromium and Firefox Fieldnotes runs pass document switching, retained drafts and selections across modes, summary/link overlays without editor displacement, collection inclusion, review and combined export, review invalidation, new empty documents, attachments, and loading/empty/error/save-failure states at 1440×1000 and 390×844.
 - Geometry and screenshot inspection cover natural/fixed cards and rails, collapsed navigator outline with stable width/header/sidebar and sibling commands, top-border placement, compact/stable tables, editor access cues and bounded height, settings spacing, appearance/accent inheritance, chart hierarchy and sizing, pie explanations, and area hover. Nested Select pointer sequences and keyboard dismissal pass in both browsers. Native scrollbar rendering remains browser/OS controlled.
@@ -66,4 +66,4 @@ Branch `main`. The unpublished demo commit was amended to include exclusion of n
 - `0dd5bc6` [Fix] Clarify chart example hierarchy
 - `04417fd` [Tweak] Show representative chart sizes
 
-No accepted cleanup remains. Ticket 30 retains the release-wide certification work; see the foundation record for subsequent integration tickets.
+No accepted cleanup or delivery work remains. Ticket 30 retains the release-wide certification work; see the foundation record for subsequent integration tickets.
