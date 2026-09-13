@@ -9,6 +9,7 @@ import type {SegmentedControlProps} from './choice-types.js';
 export function SegmentedControl<const Value extends string>({
   defaultValue,
   description,
+  reserveSupportSpace = true,
   errorMessage,
   form,
   isDisabled = false,
@@ -67,6 +68,7 @@ export function SegmentedControl<const Value extends string>({
         ))}
       </div>
       <ChoiceSupport
+        reserveSupportSpace={reserveSupportSpace}
         description={description}
         descriptionId={ids.descriptionId}
         errorId={ids.errorId}

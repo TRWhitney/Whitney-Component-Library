@@ -52,6 +52,7 @@ CheckboxGroup selects several related values under one accessible question.
 ## Appearance and responsive behavior
 
 - CheckboxGroup aligns option rows and indicators in one vertical list.
+- Set reserveSupportSpace={false} for compact settings and command groups without empty help or error rows. The default reserves support space for stable validation; visible descriptions and errors remain available in either mode.
 - Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.
 
 ## Accent, forced colors, and reduced motion

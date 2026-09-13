@@ -14,7 +14,7 @@ import {
   Select,
   Skeleton,
   StatusIndicator,
-  ToggleButton,
+  Switch,
   TextArea,
   TextField,
   Toolbar,
@@ -802,15 +802,24 @@ export function App() {
                   ]}
                 />
                 <div className="settings-toggles" data-region="Demo switches">
-                  <ToggleButton size="compact" isSelected={failSave} onChange={setFailSave}>
-                    Saving unavailable
-                  </ToggleButton>
-                  <ToggleButton size="compact" isSelected={failAssets} onChange={setFailAssets}>
-                    Attachment service unavailable
-                  </ToggleButton>
-                  <ToggleButton size="compact" isSelected={identify} onChange={setIdentify}>
-                    Identify workspace regions
-                  </ToggleButton>
+                  <Switch
+                    label="Saving unavailable"
+                    reserveSupportSpace={false}
+                    isSelected={failSave}
+                    onChange={setFailSave}
+                  />
+                  <Switch
+                    label="Attachment service unavailable"
+                    reserveSupportSpace={false}
+                    isSelected={failAssets}
+                    onChange={setFailAssets}
+                  />
+                  <Switch
+                    label="Identify workspace regions"
+                    reserveSupportSpace={false}
+                    isSelected={identify}
+                    onChange={setIdentify}
+                  />
                 </div>
                 <p className="muted small-copy">
                   Demo data lives in this browser session. Reloading restores the sample documents.

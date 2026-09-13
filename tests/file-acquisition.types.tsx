@@ -7,6 +7,7 @@ function announce(result: FileAcquisitionResult): string {
 export const fileAcquisition = (
   <>
     <FileTrigger
+      reserveSupportSpace={false}
       acceptedFileTypes={['image/*', '.pdf']}
       allowsMultiple
       getAnnouncement={announce}

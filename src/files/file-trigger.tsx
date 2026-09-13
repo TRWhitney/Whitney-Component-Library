@@ -22,6 +22,7 @@ export function FileTrigger({
   maxFileSize,
   onFiles,
   pendingMessage,
+  reserveSupportSpace = true,
 }: FileTriggerProps): ReactElement {
   assertFileAcceptanceProps({
     ...(acceptedFileTypes === undefined ? {} : {acceptedFileTypes}),
@@ -77,7 +78,7 @@ export function FileTrigger({
           label={label}
         />
       </AriaFileTrigger>
-      <FileSupport {...support} />
+      <FileSupport {...support} reserveSupportSpace={reserveSupportSpace} />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import type {RadioGroupProps} from './choice-types.js';
 export function RadioGroup<const Value extends string>({
   defaultValue,
   description,
+  reserveSupportSpace = true,
   errorMessage,
   form,
   isDisabled = false,
@@ -76,6 +77,7 @@ export function RadioGroup<const Value extends string>({
         ))}
       </div>
       <ChoiceSupport
+        reserveSupportSpace={reserveSupportSpace}
         description={description}
         descriptionId={ids.descriptionId}
         errorId={ids.errorId}

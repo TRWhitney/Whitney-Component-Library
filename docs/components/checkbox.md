@@ -52,6 +52,7 @@ Checkbox selects one independent optional value with native form behavior.
 ## Appearance and responsive behavior
 
 - Checkbox uses a compact rounded square indicator beside neutral label text; selected and indeterminate marks do not change row geometry.
+- Set reserveSupportSpace={false} for compact settings and command groups without empty help or error rows. The default reserves support space for stable validation; visible descriptions and errors remain available in either mode.
 - Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.
 
 ## Accent, forced colors, and reduced motion

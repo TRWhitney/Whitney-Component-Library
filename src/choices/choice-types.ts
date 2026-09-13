@@ -24,6 +24,7 @@ export type SegmentedControlOptions<Value extends string = string> = readonly [
 ];
 
 export interface ChoiceStateProps {
+  readonly reserveSupportSpace?: boolean;
   readonly description?: string;
   readonly errorMessage?: string;
   readonly form?: string;

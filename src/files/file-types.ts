@@ -32,7 +32,8 @@ interface FileAcquisitionBaseProps extends FileAcceptanceProps {
   readonly onFiles: (result: FileAcquisitionResult) => void;
 }
 
-export type FileTriggerProps = FileAcquisitionBaseProps & FieldPendingProps;
+export type FileTriggerProps = FileAcquisitionBaseProps &
+  FieldPendingProps & {readonly reserveSupportSpace?: boolean};
 
 export type DropZoneProps = FileAcquisitionBaseProps &
   FieldPendingProps & {

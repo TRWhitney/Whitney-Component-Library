@@ -23,6 +23,7 @@ export function useChoiceIds(hasDescription: boolean, hasError: boolean): Choice
 }
 
 interface ChoiceSupportProps {
+  readonly reserveSupportSpace: boolean;
   readonly description?: string | undefined;
   readonly descriptionId: string;
   readonly errorId: string;
@@ -32,15 +33,21 @@ interface ChoiceSupportProps {
 
 export function ChoiceSupport({
   description,
+  reserveSupportSpace,
   descriptionId,
   errorId,
   errorMessage,
   isInvalid,
-}: ChoiceSupportProps): ReactElement {
+}: ChoiceSupportProps): ReactElement | null {
   const hasError = isInvalid && Boolean(errorMessage);
+  if (!reserveSupportSpace && !description && !hasError) return null;
 
   return (
-    <div data-has-error={hasError || undefined} data-wcl-choice-support="">
+    <div
+      data-has-error={hasError || undefined}
+      data-reserve-support={reserveSupportSpace || undefined}
+      data-wcl-choice-support=""
+    >
       {description ? (
         <span data-wcl-choice-description="" id={descriptionId}>
           {description}

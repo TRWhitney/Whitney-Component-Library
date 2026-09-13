@@ -1,6 +1,7 @@
 import type {ReactElement} from 'react';
 
 interface FileSupportProps {
+  readonly reserveSupportSpace?: boolean;
   readonly announcement: string | null;
   readonly description?: string | undefined;
   readonly descriptionId: string;
@@ -14,6 +15,7 @@ interface FileSupportProps {
 
 export function FileSupport({
   announcement,
+  reserveSupportSpace = true,
   description,
   descriptionId,
   errorId,
@@ -22,9 +24,16 @@ export function FileSupport({
   isPending,
   pendingMessage,
   statusId,
-}: FileSupportProps): ReactElement {
+}: FileSupportProps): ReactElement | null {
+  if (
+    !reserveSupportSpace &&
+    !description &&
+    !(isInvalid && errorMessage) &&
+    !(isPending ? pendingMessage : announcement)
+  )
+    return null;
   return (
-    <div data-wcl-file-support="">
+    <div data-reserve-support={reserveSupportSpace || undefined} data-wcl-file-support="">
       {description ? (
         <span data-wcl-file-description="" id={descriptionId}>
           {description}

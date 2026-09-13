@@ -12,6 +12,7 @@ import type {SwitchProps} from './choice-types.js';
 export function Switch({
   defaultSelected,
   description,
+  reserveSupportSpace = true,
   form,
   isDisabled = false,
   isReadOnly = false,
@@ -49,6 +50,7 @@ export function Switch({
         </ChoiceLabel>
       </AriaSwitchButton>
       <ChoiceSupport
+        reserveSupportSpace={reserveSupportSpace}
         description={description}
         descriptionId={ids.descriptionId}
         errorId={ids.errorId}

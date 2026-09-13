@@ -31,7 +31,7 @@ export const fileTriggerContract = {
     'FileTrigger exposes one correctly named button backed by a hidden native file input; generated description, invalid, pending, and result-announcement relationships require no consumer-authored ids.',
   ],
   appearance: [
-    'FileTrigger uses the standard secondary action and one fixed support area for guidance, errors, pending work, and results.',
+    'FileTrigger uses the standard secondary action and a support area for guidance, errors, pending work, and results. Set reserveSupportSpace={false} to omit the empty row; the default reserves space for feedback.',
   ],
   appropriateUses: [
     'files should be chosen through the native picker and a persistent drag or paste target would add unnecessary prominence',

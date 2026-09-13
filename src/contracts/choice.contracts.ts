@@ -21,6 +21,7 @@ const commonChoiceGuidance = {
     'Reduced motion removes indicator, switch-thumb, hover, and segmented-rail transitions while retaining the final state.',
   ],
   responsiveBehavior: [
+    'Set reserveSupportSpace={false} for compact settings and command groups without empty help or error rows. The default reserves support space for stable validation; visible descriptions and errors remain available in either mode.',
     'Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.',
   ],
   stylesheet: './styles.css',
@@ -297,7 +298,7 @@ export const switchContract = {
     'Switch renders a native checkbox with switch semantics, a persistent visible label, and an automatically referenced description.',
   ],
   appearance: [
-    'Switch uses a compact pill track and logical-direction thumb movement beside a neutral label without changing row geometry.',
+    'Switch uses a compact pill track and logical-direction thumb movement beside a neutral label without changing row geometry. Its total control height follows field density, including padding, so it aligns with adjacent form controls.',
   ],
   appropriateUses: ['a user turns one setting on or off and the change takes effect immediately'],
   composition: ['Render Switch inside AppearanceProvider and use the same label in both states.'],

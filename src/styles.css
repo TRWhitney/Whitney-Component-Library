@@ -2296,6 +2296,8 @@
   }
 
   [data-wcl-switch] {
+    box-sizing: border-box;
+    min-block-size: var(--wcl-field-control-size, 2.75rem);
     align-items: center;
   }
 
@@ -2852,6 +2854,12 @@
     color: var(--wcl-text-muted);
     font-size: 0.75rem;
     line-height: 1.45;
+  }
+
+  [data-wcl-choice-support]:not([data-reserve-support]),
+  [data-wcl-file-support]:not([data-reserve-support]) {
+    grid-template-rows: auto;
+    min-block-size: 0;
   }
 
   [data-wcl-drop-zone] > [data-wcl-file-support] {

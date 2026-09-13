@@ -12,6 +12,7 @@ import type {CheckboxProps} from './choice-types.js';
 export function Checkbox({
   defaultSelected,
   description,
+  reserveSupportSpace = true,
   errorMessage,
   form,
   isDisabled = false,
@@ -57,6 +58,7 @@ export function Checkbox({
         </ChoiceLabel>
       </AriaCheckboxButton>
       <ChoiceSupport
+        reserveSupportSpace={reserveSupportSpace}
         description={description}
         descriptionId={ids.descriptionId}
         errorId={ids.errorId}

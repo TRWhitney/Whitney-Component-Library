@@ -13,6 +13,7 @@ import type {CheckboxGroupProps} from './choice-types.js';
 export function CheckboxGroup<const Value extends string>({
   defaultValue,
   description,
+  reserveSupportSpace = true,
   errorMessage,
   form,
   isDisabled = false,
@@ -83,6 +84,7 @@ export function CheckboxGroup<const Value extends string>({
         ))}
       </div>
       <ChoiceSupport
+        reserveSupportSpace={reserveSupportSpace}
         description={description}
         descriptionId={ids.descriptionId}
         errorId={ids.errorId}

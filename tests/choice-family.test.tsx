@@ -27,6 +27,17 @@ const segmentModes = [
 ] as const;
 
 describe('choice family', () => {
+  it('omits optional empty support tracks and keeps real descriptions available', () => {
+    const {container, rerender} = render(<Switch label="Setting" reserveSupportSpace={false} />);
+    expect(container.querySelector('[data-wcl-choice-support]')).toBeNull();
+    rerender(
+      <Switch label="Setting" reserveSupportSpace={false} description="Applies immediately" />,
+    );
+    expect(container.querySelector('[data-wcl-choice-support]')?.textContent).toBe(
+      'Applies immediately',
+    );
+  });
+
   it('connects visible labels, descriptions, requirement, and errors to binary choices', () => {
     const {getByRole, getByText} = render(
       <AppearanceProvider accent="#2878ff" appearance="dark">

@@ -14,6 +14,22 @@ function announcement(result: FileAcquisitionResult): string {
 }
 
 describe('file acquisition', () => {
+  it('omits empty optional support but announces acquired files', () => {
+    const {container, getByRole} = render(
+      <FileTrigger
+        label="Choose"
+        reserveSupportSpace={false}
+        onFiles={() => undefined}
+        getAnnouncement={announcement}
+      />,
+    );
+    expect(container.querySelector('[data-wcl-file-support]')).toBeNull();
+    fireEvent.change(container.querySelector('input[type="file"]')!, {
+      target: {files: [new File(['text'], 'notes.txt', {type: 'text/plain'})]},
+    });
+    expect(getByRole('status').textContent).toBe('1 files accepted.');
+  });
+
   it('consumes native file drag eligibility once', () => {
     const preflight = createFileDragPreflight();
     preflight.capture({items: [{kind: 'file'}], types: []});

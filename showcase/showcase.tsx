@@ -1501,6 +1501,12 @@ function ChoiceSpecimens() {
         description="Turn one immediately applied setting on or off. Use Checkbox for optional inclusion or acknowledgement and ToggleButton for a retained command state."
         name="Switch"
       >
+        <Example label="Settings without reserved support rows">
+          <Stack gap="tight">
+            <Switch label="Autosave drafts" reserveSupportSpace={false} />
+            <Switch label="Show document outline" reserveSupportSpace={false} />
+          </Stack>
+        </Example>
         <InlineGroup align="start" gap="regular" wrap>
           <Example label="On Switch">
             <Switch defaultSelected label="Keep results synchronized" />
@@ -1801,6 +1807,12 @@ function FileSpecimens() {
         description="Open the native file picker from a compact labeled button. Use DropZone when drag and paste should work too. FileTrigger applies constraints and reports accepted or rejected files, then the application manages them."
         name="FileTrigger"
       >
+        <FileTrigger
+          label="Choose a document"
+          reserveSupportSpace={false}
+          onFiles={() => undefined}
+          getAnnouncement={({files}) => `${files.length} documents chosen`}
+        />
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
           <Example label="Multiple-image FileTrigger">
             <FileTrigger

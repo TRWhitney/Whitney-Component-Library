@@ -52,6 +52,7 @@ SegmentedControl selects one compact mode through equal adjacent radio segments.
 ## Appearance and responsive behavior
 
 - SegmentedControl places equal adjacent segments on a neutral background. One accent rail moves below the selection. Labels stay neutral, and selection adds no fill or shadow.
+- Set reserveSupportSpace={false} for compact settings and command groups without empty help or error rows. The default reserves support space for stable validation; visible descriptions and errors remain available in either mode.
 - Choice rows fill their parent and option text wraps. Segmented options stay equal when their labels wrap on narrow screens.
 
 ## Accent, forced colors, and reduced motion

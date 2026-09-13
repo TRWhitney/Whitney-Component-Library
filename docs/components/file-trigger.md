@@ -51,7 +51,7 @@ FileTrigger acquires application-managed files through a named native-picker act
 
 ## Appearance and responsive behavior
 
-- FileTrigger uses the standard secondary action and one fixed support area for guidance, errors, pending work, and results.
+- FileTrigger uses the standard secondary action and a support area for guidance, errors, pending work, and results. Set reserveSupportSpace={false} to omit the empty row; the default reserves space for feedback.
 - The control fills its parent, wraps guidance, and keeps the picker action usable without horizontal overflow on narrow screens.
 
 ## Accent, forced colors, and reduced motion
