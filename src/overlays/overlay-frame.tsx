@@ -76,10 +76,12 @@ export function OverlayTriggerBoundary({
   children,
   kind,
   onDirectionChange,
+  onPointerDown,
 }: {
   readonly children: ReactElement;
   readonly kind: OverlayTriggerKind;
   readonly onDirectionChange: (direction: OverlayDirection) => void;
+  readonly onPointerDown?: (event: PointerEvent) => void;
 }): ReactElement {
   const registrations = useRef(new Map<HTMLElement, ActionPartKind>());
   const isMounted = useRef(false);
@@ -116,6 +118,10 @@ export function OverlayTriggerBoundary({
   }, [kind, onDirectionChange]);
   const registerActionPart = useCallback(
     (element: HTMLElement, partKind: ActionPartKind, isRegistered: boolean) => {
+      if (partKind !== 'support' && onPointerDown) {
+        if (isRegistered) element.addEventListener('pointerdown', onPointerDown, true);
+        else element.removeEventListener('pointerdown', onPointerDown, true);
+      }
       if (isRegistered) registrations.current.set(element, partKind);
       else registrations.current.delete(element);
       if (validationQueued.current) return;
@@ -126,7 +132,7 @@ export function OverlayTriggerBoundary({
         if (isMounted.current) validateRegistrations();
       });
     },
-    [validateRegistrations],
+    [validateRegistrations, onPointerDown],
   );
 
   useIsomorphicLayoutEffect(() => {

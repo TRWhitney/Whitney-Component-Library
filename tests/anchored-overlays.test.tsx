@@ -13,6 +13,7 @@ import {
   Popover,
   Tooltip,
   ToggleButton,
+  Toolbar,
 } from '../src/index.js';
 
 if (globalThis.CSS === undefined) {
@@ -48,6 +49,71 @@ class AnchoredOverlayErrorBoundary extends Component<
 }
 
 describe('anchored overlays', () => {
+  it('does not select an item beneath the pointer when releasing the menu-opening press', async () => {
+    const onAction = vi.fn();
+    render(
+      <AnchoredOverlays>
+        <Toolbar label="Commands">
+          <Menu
+            trigger={
+              <IconButton label="Commands">
+                <span aria-hidden="true">…</span>
+              </IconButton>
+            }
+            items={[{id: 'action', type: 'action', label: 'Run action', onAction}]}
+          />
+        </Toolbar>
+      </AnchoredOverlays>,
+    );
+    const trigger = screen.getByRole('button', {name: 'Commands'});
+    fireEvent.pointerDown(trigger, {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 20,
+      clientY: 20,
+    });
+    const item = await screen.findByRole('menuitem', {name: 'Run action'});
+    fireEvent.pointerUp(item, {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 20,
+      clientY: 20,
+    });
+    expect(onAction).not.toHaveBeenCalled();
+    fireEvent.click(item);
+    expect(onAction).toHaveBeenCalledOnce();
+  });
+
+  it('retains deliberate dragging from a menu trigger onto an action', async () => {
+    const onAction = vi.fn();
+    render(
+      <AnchoredOverlays>
+        <Menu
+          trigger={<Button>Commands</Button>}
+          items={[{id: 'action', type: 'action', label: 'Run action', onAction}]}
+        />
+      </AnchoredOverlays>,
+    );
+    fireEvent.pointerDown(screen.getByRole('button', {name: 'Commands'}), {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 20,
+      clientY: 20,
+    });
+    const item = await screen.findByRole('menuitem', {name: 'Run action'});
+    fireEvent.pointerMove(item, {pointerId: 1, pointerType: 'mouse', clientX: 60, clientY: 60});
+    fireEvent.pointerUp(item, {
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+      clientX: 60,
+      clientY: 60,
+    });
+    expect(onAction).toHaveBeenCalledOnce();
+  });
   it('moves focus into an interactive popover and restores it after dismissal', async () => {
     render(
       <AnchoredOverlays>

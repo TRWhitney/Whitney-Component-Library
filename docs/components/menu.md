@@ -36,6 +36,7 @@ Menu presents a library-owned list of immediate commands from an explicit trigge
 ## Control, events, validation, and forms
 
 - Menu opens from press, dismisses after an enabled action, outside press, or Escape, and supports controlled isOpen with onOpenChange or uncontrolled defaultOpen.
+- Opening a menu does not activate an item that appears beneath a stationary pointer. Move the pointer to drag onto an action, or release and click the action separately.
 - An enabled action calls its onAction once and closes the complete menu path. onOpenChange reports root open-state transitions.
 - TypeScript requires discriminated library-owned item records and bounded placement, alignment, state, and tone choices. Runtime validation requires one rendered Button or IconButton trigger.
 - Menu actions do not submit forms implicitly. An onAction callback may perform explicit application or form work.

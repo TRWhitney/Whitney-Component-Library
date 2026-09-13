@@ -12,7 +12,7 @@ import {
 import {Popover as AriaPopover} from 'react-aria-components/Popover';
 import {Separator as AriaSeparator} from 'react-aria-components/Separator';
 import {Text} from 'react-aria-components/Text';
-import {useState, type ReactElement, type ReactNode} from 'react';
+import {useRef, useState, type ReactElement, type ReactNode} from 'react';
 
 import {
   AnchorArrow,
@@ -133,14 +133,41 @@ export function Menu({
   ...state
 }: MenuProps): ReactElement {
   const [direction, setDirection] = useState<OverlayDirection>();
+  const openingPointer = useRef<{id: number; x: number; y: number} | null>(null);
 
   return (
     <AnchoredOverlayDirectionProvider direction={direction}>
       <AriaMenuTrigger {...state}>
-        <OverlayTriggerBoundary kind="menu" onDirectionChange={setDirection}>
+        <OverlayTriggerBoundary
+          kind="menu"
+          onDirectionChange={setDirection}
+          onPointerDown={(event) => {
+            openingPointer.current =
+              event.pointerType === 'mouse'
+                ? {id: event.pointerId, x: event.clientX, y: event.clientY}
+                : null;
+          }}
+        >
           {trigger}
         </OverlayTriggerBoundary>
         <AriaPopover
+          onPointerDownCapture={() => {
+            openingPointer.current = null;
+          }}
+          onPointerUpCapture={(event) => {
+            const origin = openingPointer.current;
+            openingPointer.current = null;
+            // A menu may move beneath the opening click while its content is measured.
+            // Require pointer movement before accepting a drag from the trigger to an item.
+            if (
+              origin &&
+              origin.id === event.pointerId &&
+              Math.hypot(event.clientX - origin.x, event.clientY - origin.y) <= 4
+            ) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+          }}
           {...anchoredOverlayPositionProps}
           data-wcl-menu-popover=""
           dir={direction}

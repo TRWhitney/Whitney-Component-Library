@@ -536,6 +536,7 @@ export const menuContract = {
   ],
   controlBehavior: [
     'Menu opens from press, dismisses after an enabled action, outside press, or Escape, and supports controlled isOpen with onOpenChange or uncontrolled defaultOpen.',
+    'Opening a menu does not activate an item that appears beneath a stationary pointer. Move the pointer to drag onto an action, or release and click the action separately.',
   ],
   counterExamples: [
     {

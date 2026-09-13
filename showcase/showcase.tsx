@@ -4108,7 +4108,7 @@ function OverlaySpecimens() {
       </Specimen>
 
       <Specimen
-        description="Open a library-owned command list from an explicit action. Whole-row highlights identify hovered and focused commands without adding a separate entry rail."
+        description="Open a library-owned command list from an explicit action. Click a command to choose it, or hold the trigger and drag to a command before releasing. Whole-row highlights identify hovered and focused commands without adding a separate entry rail."
         name="Menu"
       >
         <Menu
