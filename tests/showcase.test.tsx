@@ -124,7 +124,12 @@ describe('component showcase', () => {
       ],
       IconButton: ['Secondary IconButton', 'Quiet IconButton', 'Disabled IconButton'],
       Link: ['Current-page Link', 'Destination Link', 'Disabled Link'],
-      ToggleButton: ['Selected ToggleButton', 'Quiet ToggleButton', 'Disabled ToggleButton'],
+      ToggleButton: [
+        'Selected ToggleButton',
+        'Icon ToggleButton',
+        'Quiet ToggleButton',
+        'Disabled ToggleButton',
+      ],
       ButtonGroup: ['2 secondary Buttons + IconButton'],
       Toolbar: ['2 quiet Buttons + ToggleButton + IconButton'],
     } as const;

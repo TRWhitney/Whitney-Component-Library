@@ -83,3 +83,9 @@ export const ambiguousToggle = ToggleButton({
   isSelected: true,
   onChange: () => undefined,
 });
+
+export const namedIconToggle = (
+  <ToggleButton label="Bold">
+    <span aria-hidden="true">B</span>
+  </ToggleButton>
+);

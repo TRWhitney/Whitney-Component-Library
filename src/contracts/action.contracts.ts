@@ -393,9 +393,12 @@ export const toggleButtonContract = {
   kind: 'component',
   labeling: [
     'Visible children provide the accessible name, while aria-pressed communicates selection without changing that label.',
+    'For an icon-only toggle, supply label for its accessible name and automatic tooltip on hover or keyboard focus, and hide the decorative icon from assistive technology.',
   ],
   name: 'ToggleButton',
-  parts: ['ToggleButton exposes one visible label region and one selection rail.'],
+  parts: [
+    'ToggleButton exposes visible label or icon content, one selection rail, and an automatic tooltip when label supplies an icon-only name.',
+  ],
   preferredAlternatives: [
     'Use Button for a one-time command, Link for navigation, and a future checkbox field for submitted binary data.',
   ],
@@ -412,6 +415,7 @@ export const toggleButtonContract = {
   ],
   responsiveBehavior: [
     'ToggleButton keeps its minimum regular or compact control height and wraps long labels instead of clipping them when its container narrows.',
+    'Supplying label selects square icon-only dimensions matching IconButton at the same size.',
   ],
   summary: 'Represent persistent binary selection with a rail-only pressed state.',
 } satisfies ComponentContract;

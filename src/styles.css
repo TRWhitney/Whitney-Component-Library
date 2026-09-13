@@ -2462,12 +2462,14 @@
     font-size: 0.8125rem;
   }
 
-  [data-wcl-icon-button] {
+  [data-wcl-icon-button],
+  [data-wcl-toggle-button][data-icon-only] {
     inline-size: 2.5rem;
     padding: 0;
   }
 
-  [data-wcl-icon-button][data-size='compact'] {
+  [data-wcl-icon-button][data-size='compact'],
+  [data-wcl-toggle-button][data-icon-only][data-size='compact'] {
     inline-size: 2.125rem;
     padding: 0;
   }

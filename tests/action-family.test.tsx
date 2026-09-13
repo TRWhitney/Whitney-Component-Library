@@ -32,6 +32,30 @@ class CompositeErrorBoundary extends Component<
 }
 
 describe('action family', () => {
+  it('names an icon toggle and shows its label on keyboard focus while retaining selection', async () => {
+    vi.useFakeTimers();
+    try {
+      const {getByRole, container} = render(
+        <AppearanceProvider appearance="dark" accent="#2474ff">
+          <ToggleButton label="Bold" defaultSelected>
+            <svg aria-hidden="true" viewBox="0 0 20 20">
+              <path d="M5 3v14" />
+            </svg>
+          </ToggleButton>
+        </AppearanceProvider>,
+      );
+      const button = getByRole('button', {name: 'Bold'});
+      expect(button.getAttribute('aria-pressed')).toBe('true');
+      act(() => button.focus());
+      fireEvent.focus(button);
+      await act(async () => vi.runAllTimersAsync());
+      expect(container.querySelector('[role="tooltip"]')?.textContent).toBe('Bold');
+      fireEvent.click(button);
+      expect(button.getAttribute('aria-pressed')).toBe('false');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('keeps commands and navigation as distinct native elements', () => {
     const onPress = vi.fn();
     const {getByRole} = render(

@@ -1,3 +1,4 @@
+import {MarkdownIcon} from './markdown-icons.js';
 import {ChartCommandCompositionExample} from './chart-command-composition-example.js';
 import {MarkdownSpecimen} from './markdown-specimen.js';
 import {ChartApplicationGeometryExample} from './chart-application-geometry-example.js';
@@ -835,6 +836,11 @@ function ActionSpecimens() {
           <Example label={`${isPinned ? 'Selected' : 'Unselected'} ToggleButton`}>
             <ToggleButton isSelected={isPinned} onChange={setPinned}>
               Pin result
+            </ToggleButton>
+          </Example>
+          <Example label="Icon ToggleButton">
+            <ToggleButton label="Bold" defaultSelected>
+              <MarkdownIcon name="bold" />
             </ToggleButton>
           </Example>
           <Example label="Quiet ToggleButton">

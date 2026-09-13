@@ -819,8 +819,8 @@ const view = React.createElement(
           ),
           React.createElement(
             ToggleButton,
-            {defaultSelected: true, variant: 'quiet'},
-            'Pin inspector',
+            {defaultSelected: true, variant: 'quiet', label: 'Pin inspector'},
+            React.createElement('span', {'aria-hidden': true}, 'P'),
           ),
         ),
       ),

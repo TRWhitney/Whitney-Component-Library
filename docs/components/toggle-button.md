@@ -17,7 +17,7 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 ## Composition and parts
 
 - Render ToggleButton inside AppearanceProvider and place related editor or tool toggles in Toolbar.
-- ToggleButton exposes one visible label region and one selection rail.
+- ToggleButton exposes visible label or icon content, one selection rail, and an automatic tooltip when label supplies an icon-only name.
 
 ## Preferred higher-level compositions
 
@@ -47,6 +47,7 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 
 - Enter and Space toggle the pressed state. Outside a Toolbar, the button keeps its tab stop. Inside one, it uses orientation-aware arrow navigation.
 - Visible children provide the accessible name, while aria-pressed communicates selection without changing that label.
+- For an icon-only toggle, supply label for its accessible name and automatic tooltip on hover or keyboard focus, and hide the decorative icon from assistive technology.
 - Supply all visible and accessible labels in the application locale and allow labels to grow without relying on a fixed text width.
 - Logical sizing and placement follow inherited writing direction; authored content remains in DOM reading order.
 
@@ -55,6 +56,7 @@ ToggleButton represents a persistent binary selection with pressed-button semant
 - Enabled ToggleButton uses a pointer cursor across its label and padding. Disabled ToggleButton uses not-allowed.
 - ToggleButton uses the library control height, rounded shape, type, and secondary or quiet style with a selection rail.
 - ToggleButton keeps its minimum regular or compact control height and wraps long labels instead of clipping them when its container narrows.
+- Supplying label selects square icon-only dimensions matching IconButton at the same size.
 
 ## Accent, forced colors, and reduced motion
 
