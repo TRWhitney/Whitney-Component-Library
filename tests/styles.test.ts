@@ -181,14 +181,6 @@ describe('static appearance styles', () => {
     expect(styles).toMatch(/\[data-wcl-sparkline-tooltip-extreme\]\s*\{[^}]*font-weight:/);
   });
 
-  it('keeps the large radial and heatmap examples compact in the showcase', async () => {
-    const styles = await readFile('showcase/styles.css', 'utf8');
-
-    expect(styles).toMatch(
-      /:is\(\s*\[data-showcase-component='PieChart'\],[\s\S]*?\[data-showcase-component='Heatmap'\]\s*\)\s+\.showcase-example\s*\{[^}]*inline-size:\s*min\(100%, 26rem\)/,
-    );
-  });
-
   it('contains document overflow and gives both showcase panes a transient scrollbar', async () => {
     const styles = await readFile('showcase/styles.css', 'utf8');
     const body = styles.match(/body\s*\{([^}]*)\}/)?.[1];
@@ -1185,7 +1177,7 @@ describe('static appearance styles', () => {
   it('does not decorate showcase specimens with an unexplained calibration tick', async () => {
     const styles = await readFile('showcase/styles.css', 'utf8');
     const stageRules = [...styles.matchAll(/\.showcase-specimen-stage\s*\{([^}]*)\}/g)];
-    const stage = stageRules.at(-1)?.[1];
+    const stage = stageRules.map((rule) => rule[1]).join('\n');
 
     expect(stage).toContain('background: var(--wcl-surface)');
     expect(stage).toContain('--wcl-accent-focus: var(--wcl-accent-focus-on-base)');

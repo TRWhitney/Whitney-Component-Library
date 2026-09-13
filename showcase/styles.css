@@ -438,13 +438,45 @@
     margin: 0;
   }
 
-  :is(
-      [data-showcase-component='PieChart'],
-      [data-showcase-component='DonutChart'],
-      [data-showcase-component='Heatmap']
-    )
-    .showcase-example {
-    inline-size: min(100%, 26rem);
+  .showcase-charts {
+    gap: 2.5rem;
+  }
+
+  .showcase-charts .showcase-specimen-stage {
+    align-content: start;
+    gap: 1.5rem;
+    background: var(--wcl-canvas);
+  }
+
+  .showcase-chart-example {
+    inline-size: 100%;
+    gap: 0;
+    justify-items: stretch;
+    border: 1px solid var(--wcl-border);
+    border-radius: var(--wcl-radius);
+    background: var(--wcl-surface);
+  }
+
+  .showcase-chart-example-body {
+    min-inline-size: 0;
+    padding: 1rem;
+  }
+
+  .showcase-chart-example-body
+    > [data-wcl-stack]
+    > :is([data-wcl-button], [data-wcl-field], [data-wcl-segmented-control]) {
+    align-self: start;
+    inline-size: fit-content;
+    max-inline-size: 100%;
+  }
+
+  .showcase-chart-example-body p,
+  .showcase-charts > .showcase-muted {
+    max-inline-size: 72ch;
+    margin-block: 0;
+    color: var(--wcl-text-muted);
+    font-size: 0.8125rem;
+    line-height: 1.6;
   }
 
   .showcase-example > figcaption {
@@ -455,6 +487,25 @@
     letter-spacing: 0.08em;
     line-height: 1.2;
     text-transform: uppercase;
+  }
+
+  .showcase-chart-example > figcaption {
+    padding: 1rem;
+    border-block-end: 1px solid var(--wcl-border);
+    border-start-start-radius: inherit;
+    border-start-end-radius: inherit;
+    background: var(--wcl-surface-subtle);
+    color: var(--wcl-text);
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .showcase-chart-example > figcaption h3 {
+    margin: 0;
+    font-family: var(--wcl-font-body);
+    font-size: 1.125rem;
+    font-weight: 680;
+    line-height: 1.4;
   }
 
   .showcase-skeleton-region {

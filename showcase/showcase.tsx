@@ -26,6 +26,7 @@ import {LineExplorationExample} from './line-exploration-examples.js';
 import {CompactAxisExample} from './compact-axis-examples.js';
 import {
   memo,
+  useId,
   useState,
   type CSSProperties,
   type KeyboardEvent,
@@ -450,6 +451,18 @@ function Example({children, label}: ExampleProps) {
     <figure className="showcase-example">
       <figcaption data-showcase-example-label="">{label}</figcaption>
       {children}
+    </figure>
+  );
+}
+
+function ChartExample({children, label}: {readonly children: ReactNode; readonly label: string}) {
+  const headingId = useId();
+  return (
+    <figure className="showcase-example showcase-chart-example" aria-labelledby={headingId}>
+      <figcaption data-showcase-example-label="">
+        <h3 id={headingId}>{label}</h3>
+      </figcaption>
+      <div className="showcase-chart-example-body">{children}</div>
     </figure>
   );
 }
@@ -3726,19 +3739,19 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
         description={`Show change over an ordered, numeric, logarithmic, or time domain. Move across the plot to read the nearest recorded category and target reference. Tab into the plot and use the arrow keys for keyboard readings; mouse readings clear when the pointer leaves the plot. ${visibilityGuidance} Explicit axis limits remain fixed; reduced motion makes scale changes immediate.`}
         name="LineChart"
       >
-        <Example label="Update chart data">
+        <ChartExample label="Update chart data">
           <CartesianDataMotionExample />
-        </Example>
-        <Example label="Pan, zoom and overview">
+        </ChartExample>
+        <ChartExample label="Pan, zoom and overview">
           <LineExplorationExample />
-        </Example>
-        <Example label="Explore areas, columns and bars">
+        </ChartExample>
+        <ChartExample label="Explore areas, columns and bars">
           <CartesianExplorationExample />
-        </Example>
-        <Example label="Coordinated date windows">
+        </ChartExample>
+        <ChartExample label="Coordinated date windows">
           <LineExplorationExample coordinated />
-        </Example>
-        <Example label="Two-series LineChart with selection and details">
+        </ChartExample>
+        <ChartExample label="Two-series LineChart with selection and details">
           <Stack gap="regular">
             <SegmentedControl
               label="Click target"
@@ -3836,226 +3849,196 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
               </Stack>
             ) : null}
           </Stack>
-        </Example>
-        <Example label="Crowded time labels and a long axis title">
+        </ChartExample>
+        <ChartExample label="Crowded time labels and a long axis title">
           <CompactAxisExample kind="time" />
-        </Example>
-        <Example label="Selection panel or compact chart controls">
+        </ChartExample>
+        <ChartExample label="Selection panel or compact chart controls">
           <ChartSelectionPresentationExample />
-        </Example>
-        <Example label="Plot proportions and retained activation feedback">
+        </ChartExample>
+        <ChartExample label="Plot proportions and retained activation feedback">
           <ChartApplicationGeometryExample kind="line" />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description={`Show magnitude or contribution across an ordered domain. Hiding a series recomputes the stack. Normalized areas and readings use visible shares, while the complete table retains shares of all supplied data. ${visibilityGuidance}`}
         name="AreaChart"
       >
-        <p>
-          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
-        </p>
-        <p>
-          <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
-        </p>
-        <Example label="AreaChart with selection and details">
+        <ChartExample label="AreaChart with selection and details">
           <AreaMixedInteractionExample kind="area" visibilityLabels={visibilityLabels} />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description={`Compare discrete categories with grouped, stacked, or normalized vertical columns. Columns retain a zero baseline as visibility changes. A touch reading stays open until another category or an outside press replaces it. ${visibilityGuidance}`}
         name="ColumnChart"
       >
-        <p>
-          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
-        </p>
-        <p>
-          <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
-        </p>
-        <Example label="ColumnChart with selection and details">
+        <ChartExample label="ColumnChart with selection and details">
           <BarInteractionExample orientation="vertical" visibilityLabels={visibilityLabels} />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description={`Compare discrete categories on a horizontal plot. Up and Down move through its vertical category axis when the plot has keyboard focus. Bars retain a zero baseline as visibility changes. ${visibilityGuidance}`}
         name="BarChart"
       >
-        <p>
-          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
-        </p>
-        <p>
-          <a href="#line-chart">Compare pan and zoom for areas, columns and bars.</a>
-        </p>
-        <Example label="BarChart with selection and details">
+        <ChartExample label="BarChart with selection and details">
           <BarInteractionExample orientation="horizontal" visibilityLabels={visibilityLabels} />
-        </Example>
-        <Example label="Twelve stations in a compact container">
+        </ChartExample>
+        <ChartExample label="Twelve stations in a compact container">
           <CompactAxisExample kind="bar" />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description="Show how categories make up one whole. More than eight positive categories use a proportional aggregate that opens the next page. Hover slices for readings, or use the legend to emphasize and pin a category without opening a tooltip. Tap or click a pinned legend name again to clear its highlight."
         name="PieChart"
       >
-        <Example label="Changing category shares">
+        <ChartExample label="Changing category shares">
           <RadialDataMotionExample kind="pie" />
-        </Example>
-        <Example label="Paged PieChart with category selection and details">
+        </ChartExample>
+        <ChartExample label="Paged PieChart with category selection and details">
           <PartToWholeInteractionExample kind="pie" />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description="Use the same part-to-whole and paging behavior with a derived total in the center. Tap or click a pinned legend name again to clear its highlight. Zero values remain in the generated table but do not create slices."
         name="DonutChart"
       >
-        <Example label="Changing category shares">
+        <ChartExample label="Changing category shares">
           <RadialDataMotionExample kind="donut" />
-        </Example>
-        <Example label="Paged DonutChart with category selection and details">
+        </ChartExample>
+        <ChartExample label="Paged DonutChart with category selection and details">
           <PartToWholeInteractionExample kind="donut" />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description="Compare a few subjects across ordered qualities that share one nonnegative scale. A dimension is one spoke; a series is one subject and one polygon. Hover near a profile point to isolate it and trace its axis. Its neutral reading fill meets the colored point border at every chart size. Labels keep a readable minimum size as the plot shrinks; shortened names remain complete in the data table. Missing dimensions read as zero, while small visual shoulders keep isolated values legible without changing their readings."
         name="RadarChart"
       >
-        <Example label="Updated profiles">
+        <ChartExample label="Updated profiles">
           <RadarDataMotionExample />
-        </Example>
-        <Example label="Comparable vehicle profiles with selection and details">
+        </ChartExample>
+        <ChartExample label="Comparable vehicle profiles with selection and details">
           <RadarInteractionExample visibilityLabels={statisticalVisibilityLabels} />
-        </Example>
-        <Example label="Sparse profiles with keyboard access to zero values">
+        </ChartExample>
+        <ChartExample label="Sparse profiles with keyboard access to zero values">
           <RadarInteractionExample sparse visibilityLabels={statisticalVisibilityLabels} />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description="Show one numeric measure across two ordered domains. Zero is colored as a real value; patterned cells have no data. Use a two-sided scale only when its midpoint has a clear meaning. Dense grids hide inline values before moving into a labeled local scroll region."
         name="Heatmap"
       >
-        <Example label="Updated readings">
+        <ChartExample label="Updated readings">
           <HeatmapDataMotionExample />
-        </Example>
-        <Example label="Explore rows and columns">
+        </ChartExample>
+        <ChartExample label="Explore rows and columns">
           <HeatmapExplorationExample />
-        </Example>
-        <Example label="Sequential Heatmap with zero and missing cells">
+        </ChartExample>
+        <ChartExample label="Sequential Heatmap with zero and missing cells">
           <HeatmapInteractionExample accent={accent} />
-        </Example>
-        <Example label="Two-sided Heatmap around target">
+        </ChartExample>
+        <ChartExample label="Two-sided Heatmap around target">
           <HeatmapInteractionExample accent={accent} deviation />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description="Show one compact ordered trend with a standard caption, honest gaps, exact current and observed-range cues, and a complete reading that names lows and highs. Use LineChart when visible axes or multiple series matter."
         name="Sparkline"
       >
-        <Example label="Updated readings">
+        <ChartExample label="Updated readings">
           <SparklineDataMotionExample />
-        </Example>
-        <Example label="Fixed-range Sparkline with selection, details, a gap and tied extremes">
+        </ChartExample>
+        <ChartExample label="Fixed-range Sparkline with selection, details, a gap and tied extremes">
           <SparklineInteractionExample />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description={`Combine compatible line, range, area, and column series only when they share one domain, numeric scale, and comparison question. Restored series keep their original colors and patterns. ${visibilityGuidance}`}
         name="CartesianChart"
       >
-        <p>
-          <a href="#line-chart">Compare data updates across lines, areas, columns and bars.</a>
-        </p>
-        <p>
-          <a href="#line-chart">Compare pan and zoom for mixed charts.</a>
-        </p>
-        <Example label="Line with a supplied range">
+        <ChartExample label="Line with a supplied range">
           <RangeChartExample />
-        </Example>
-        <Example label="Mixed CartesianChart with selection and details">
+        </ChartExample>
+        <ChartExample label="Mixed CartesianChart with selection and details">
           <AreaMixedInteractionExample kind="mixed" visibilityLabels={visibilityLabels} />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description={`Compare two quantitative measurements for distinct records. Hover a mark to read only that observation. Pin a legend group to give it priority where points overlap. ${statisticalVisibilityGuidance}`}
         name="ScatterChart"
       >
-        <Example label="Updated observations">
+        <ChartExample label="Updated observations">
           <StatisticalDataMotionExample kind="scatter" />
-        </Example>
-        <Example label="Scatter with a supplied line">
+        </ChartExample>
+        <ChartExample label="Scatter with a supplied line">
           <ScatterLineExample />
-        </Example>
-        <Example label="Explore scatter and bubble charts">
+        </ChartExample>
+        <ChartExample label="Explore scatter and bubble charts">
           <PointExplorationExample />
-        </Example>
-        <Example label="ScatterChart with group visibility, selection, and details">
+        </ChartExample>
+        <ChartExample label="ScatterChart with group visibility, selection, and details">
           <PointInteractionExample kind="scatter" visibilityLabels={statisticalVisibilityLabels} />
-        </Example>
-        <Example label="Crowded numeric labels">
+        </ChartExample>
+        <ChartExample label="Crowded numeric labels">
           <CompactAxisExample kind="numeric" />
-        </Example>
-        <Example label="Resize the plot and inspect a different building">
+        </ChartExample>
+        <ChartExample label="Resize the plot and inspect a different building">
           <ChartApplicationGeometryExample kind="scatter" />
-        </Example>
-        <Example label="Chart controls, panel, or application toolbar">
+        </ChartExample>
+        <ChartExample label="Chart controls, panel, or application toolbar">
           <ChartCommandCompositionExample />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description={`Add one positive measurement through proportional mark area. Bubble areas express magnitude within the visible dataset; tooltips and the full table retain exact source values. ${statisticalVisibilityGuidance}`}
         name="BubbleChart"
       >
-        <Example label="Updated observations">
+        <ChartExample label="Updated observations">
           <StatisticalDataMotionExample kind="bubble" />
-        </Example>
-        <p>
-          <a href="#scatter-chart">Compare pan and zoom for scatter and bubble charts.</a>
-        </p>
-        <Example label="BubbleChart with group visibility, selection, and details">
+        </ChartExample>
+        <ChartExample label="BubbleChart with group visibility, selection, and details">
           <PointInteractionExample kind="bubble" visibilityLabels={statisticalVisibilityLabels} />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description="Show a numeric distribution from raw observations or explicit pre-binned intervals. Directly reading one bin dims the others; blank plot space has no inferred reading."
         name="Histogram"
       >
-        <Example label="Updated distributions">
+        <ChartExample label="Updated distributions">
           <DistributionDataMotionExample kind="histogram" />
-        </Example>
-        <Example label="Explore histograms and box plots">
+        </ChartExample>
+        <ChartExample label="Explore histograms and box plots">
           <DistributionExplorationExample />
-        </Example>
-        <Example label="Histogram with bin selection and details">
+        </ChartExample>
+        <ChartExample label="Histogram with bin selection and details">
           <HistogramInteractionExample />
-        </Example>
+        </ChartExample>
       </Specimen>
 
       <Specimen
         description={`Compare group medians, quartiles, whiskers, and outliers. Select group summaries and individual outliers separately, and open the original observations through details. ${statisticalVisibilityGuidance}`}
         name="BoxPlot"
       >
-        <Example label="Updated distributions">
+        <ChartExample label="Updated distributions">
           <DistributionDataMotionExample kind="box" />
-        </Example>
-        <p>
-          <a href="#histogram">Compare pan and zoom for histograms and box plots.</a>
-        </p>
-        <Example label="BoxPlot with group visibility, summary and outlier selection, and details">
+        </ChartExample>
+        <ChartExample label="BoxPlot with group visibility, summary and outlier selection, and details">
           <BoxPlotInteractionExample visibilityLabels={statisticalVisibilityLabels} />
-        </Example>
-        <Example label="Crowded box group labels">
+        </ChartExample>
+        <ChartExample label="Crowded box group labels">
           <CompactAxisExample kind="box" />
-        </Example>
+        </ChartExample>
       </Specimen>
     </>
   );
@@ -4452,7 +4435,7 @@ export function Showcase() {
                 <StaticCollectionSpecimens />
               </section>
 
-              <section aria-labelledby="charts-heading" className="showcase-family">
+              <section aria-labelledby="charts-heading" className="showcase-family showcase-charts">
                 <header className="showcase-family-header">
                   <span>Charts</span>
                   <h2 id="charts-heading">
