@@ -1358,3 +1358,23 @@ kbd {
     padding: 10px 16px;
   }
 }
+
+.review-form-frame {
+  min-inline-size: 0;
+  block-size: 100%;
+  overflow: auto;
+  padding: 24px;
+  background: var(--wcl-canvas);
+}
+
+.review-form-frame .review-form {
+  block-size: auto;
+  padding: 0;
+  overflow: visible;
+}
+
+@media (width <= 650px) {
+  .review-form-frame {
+    padding: 16px;
+  }
+}

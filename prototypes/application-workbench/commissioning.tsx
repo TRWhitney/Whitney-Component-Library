@@ -1,6 +1,8 @@
 import {useEffect, useState} from 'react';
 import {
   Badge,
+  FocusField,
+  Surface,
   Button,
   CardCollection,
   CheckboxGroup,
@@ -243,83 +245,88 @@ export function Commissioning({
     </aside>
   );
   const form = (
-    <div className="review-form">
-      {' '}
-      {attempted && errors.length > 0 && (
-        <div className="review-errors" tabIndex={-1}>
-          <InlineAlert title="Review needs attention" tone="danger">
-            {errors.map((error) => (
-              <p key={error}>{error}</p>
-            ))}
-          </InlineAlert>
-        </div>
-      )}
-      <div className="review-form-fields">
-        <section className="review-checks">
-          <div className="review-section-heading">
-            <span className="step-number">01</span>
-            <h3>Verify the system</h3>
+    <div className="review-form-frame">
+      <FocusField isActive={!isRecorded}>
+        <Surface focusFieldAnchor padding="regular">
+          <div className="review-form">
+            {attempted && errors.length > 0 && (
+              <div className="review-errors" tabIndex={-1}>
+                <InlineAlert title="Review needs attention" tone="danger">
+                  {errors.map((error) => (
+                    <p key={error}>{error}</p>
+                  ))}
+                </InlineAlert>
+              </div>
+            )}
+            <div className="review-form-fields">
+              <section className="review-checks">
+                <div className="review-section-heading">
+                  <span className="step-number">01</span>
+                  <h3>Verify the system</h3>
+                </div>
+                <DatePicker
+                  label="Review date"
+                  calendar="gregory"
+                  locale="en-US"
+                  calendarButtonLabel="Choose review date"
+                  placeholderValue={{year: 2026, month: 9, day: 24}}
+                  value={review.date}
+                  onChange={(date) => change({date})}
+                  reserveSupportSpace={false}
+                />
+                <CheckboxGroup<string>
+                  label="Acceptance checkpoints"
+                  options={system.checks}
+                  value={review.checks}
+                  onChange={(checks) => change({checks})}
+                  reserveSupportSpace={false}
+                />
+              </section>
+              <section className="review-decision">
+                {' '}
+                <div className="review-section-heading">
+                  <span className="step-number">02</span>
+                  <h3>Record your decision</h3>
+                </div>
+                <RadioGroup
+                  label="Review decision"
+                  options={[
+                    {
+                      value: 'pass',
+                      label: 'Pass',
+                      description: 'All acceptance checkpoints are complete.',
+                    },
+                    {
+                      value: 'hold',
+                      label: 'Hold',
+                      description: 'Keep the system under review and record the remaining work.',
+                    },
+                  ]}
+                  value={review.decision}
+                  onChange={(decision) => change({decision})}
+                  reserveSupportSpace={false}
+                />
+              </section>
+            </div>
+            <TextArea
+              label="Review notes"
+              rows={3}
+              description={
+                review.decision === 'hold'
+                  ? 'Explain the remaining work before this system can pass.'
+                  : 'Record observations or instructions for the incoming team.'
+              }
+              value={review.notes}
+              onChange={(notes) => change({notes})}
+              isRequired={review.decision === 'hold'}
+              validationBehavior="aria"
+              isInvalid={attempted && review.decision === 'hold' && !review.notes.trim()}
+              errorMessage="Explain the remaining work before recording a hold."
+              reserveSupportSpace={false}
+            />
           </div>
-          <DatePicker
-            label="Review date"
-            calendar="gregory"
-            locale="en-US"
-            calendarButtonLabel="Choose review date"
-            placeholderValue={{year: 2026, month: 9, day: 24}}
-            value={review.date}
-            onChange={(date) => change({date})}
-            reserveSupportSpace={false}
-          />
-          <CheckboxGroup<string>
-            label="Acceptance checkpoints"
-            options={system.checks}
-            value={review.checks}
-            onChange={(checks) => change({checks})}
-            reserveSupportSpace={false}
-          />
-        </section>
-        <section className="review-decision">
-          {' '}
-          <div className="review-section-heading">
-            <span className="step-number">02</span>
-            <h3>Record your decision</h3>
-          </div>
-          <RadioGroup
-            label="Review decision"
-            options={[
-              {
-                value: 'pass',
-                label: 'Pass',
-                description: 'All acceptance checkpoints are complete.',
-              },
-              {
-                value: 'hold',
-                label: 'Hold',
-                description: 'Keep the system under review and record the remaining work.',
-              },
-            ]}
-            value={review.decision}
-            onChange={(decision) => change({decision})}
-            reserveSupportSpace={false}
-          />
-        </section>
-      </div>
-      <TextArea
-        label="Review notes"
-        rows={3}
-        description={
-          review.decision === 'hold'
-            ? 'Explain the remaining work before this system can pass.'
-            : 'Record observations or instructions for the incoming team.'
-        }
-        value={review.notes}
-        onChange={(notes) => change({notes})}
-        isRequired={review.decision === 'hold'}
-        validationBehavior="aria"
-        isInvalid={attempted && review.decision === 'hold' && !review.notes.trim()}
-        errorMessage="Explain the remaining work before recording a hold."
-        reserveSupportSpace={false}
-      />
+        </Surface>
+      </FocusField>
     </div>
   );
   return (
