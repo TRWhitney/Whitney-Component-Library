@@ -2,6 +2,8 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {
   AppearanceProvider,
+  FocusField,
+  Surface,
   Button,
   Dialog,
   Drawer,
@@ -474,93 +476,107 @@ export function App() {
     </div>
   );
   const analysis = (
-    <section className="analysis-bench" aria-label="Energy analysis" data-feedback="Analysis bench">
-      {active ? (
-        <>
-          <div className="working-object">
-            <div>
-              <p className="eyebrow">
-                {active.campus} campus / {active.kind}
-              </p>
-              <h1>{active.name}</h1>
-              <p className="working-reading">
-                <strong>{integer.format(active.intensity)}</strong> kWh/m²{' '}
-                <span>{differenceLabel(difference(active, available))} vs. same use</span>
-              </p>
-            </div>
-            <Toolbar label="Current building actions">
-              <ToggleButton
-                size="compact"
-                isSelected={Object.hasOwn(investigations, activeId)}
-                onChange={() => toggleInvestigation(activeId)}
-              >
-                Investigate
-              </ToggleButton>
-              <ToggleButton
-                size="compact"
-                isSelected={pins.includes(activeId)}
-                onChange={() => togglePin(activeId)}
-              >
-                Pin comparison
-              </ToggleButton>
-            </Toolbar>
-          </div>
-          <div className="comparison-tray" aria-label="Comparison pins">
-            <span className="eyebrow">COMPARE WITH</span>
-            {pins.length ? (
-              pins.map((id) => {
-                const record = buildings.find((item) => item.id === id)!;
-                return (
-                  <span className="comparison-pin" key={id}>
-                    <Button size="compact" variant="quiet" onPress={() => inspect(id)}>
-                      {record.name}
-                    </Button>
-                    <IconButton
-                      label={`Unpin ${record.name} from comparison`}
+    <div className="analysis-atmosphere">
+      <FocusField isActive={refreshing && Boolean(active)}>
+        <Surface focusFieldAnchor padding="regular">
+          <section
+            className="analysis-bench"
+            aria-label="Energy analysis"
+            data-feedback="Analysis bench"
+          >
+            {active ? (
+              <>
+                <div className="working-object">
+                  <div>
+                    <p className="eyebrow">
+                      {active.campus} campus / {active.kind}
+                    </p>
+                    <h1>{active.name}</h1>
+                    <p className="working-reading">
+                      <strong>{integer.format(active.intensity)}</strong> kWh/m²{' '}
+                      <span>{differenceLabel(difference(active, available))} vs. same use</span>
+                    </p>
+                  </div>
+                  <Toolbar label="Current building actions">
+                    <ToggleButton
                       size="compact"
-                      variant="quiet"
-                      onPress={() => togglePin(id)}
+                      isSelected={Object.hasOwn(investigations, activeId)}
+                      onChange={() => toggleInvestigation(activeId)}
                     >
-                      <Icon name="close" />
-                    </IconButton>
-                  </span>
-                );
-              })
+                      Investigate
+                    </ToggleButton>
+                    <ToggleButton
+                      size="compact"
+                      isSelected={pins.includes(activeId)}
+                      onChange={() => togglePin(activeId)}
+                    >
+                      Pin comparison
+                    </ToggleButton>
+                  </Toolbar>
+                </div>
+                <div className="comparison-tray" aria-label="Comparison pins">
+                  <span className="eyebrow">COMPARE WITH</span>
+                  {pins.length ? (
+                    pins.map((id) => {
+                      const record = buildings.find((item) => item.id === id)!;
+                      return (
+                        <span className="comparison-pin" key={id}>
+                          <Button size="compact" variant="quiet" onPress={() => inspect(id)}>
+                            {record.name}
+                          </Button>
+                          <IconButton
+                            label={`Unpin ${record.name} from comparison`}
+                            size="compact"
+                            variant="quiet"
+                            onPress={() => togglePin(id)}
+                          >
+                            <Icon name="close" />
+                          </IconButton>
+                        </span>
+                      );
+                    })
+                  ) : (
+                    <span className="muted">Pin buildings from the browser</span>
+                  )}
+                </div>
+                <div className="analysis-scroll">
+                  <Tabs
+                    ariaLabel="Analysis representation"
+                    selectedId={tab}
+                    onSelectionChange={setTab}
+                    items={[
+                      {
+                        id: 'distribution',
+                        label: 'Distribution',
+                        panel: (
+                          <Distribution records={filtered} active={active} onInspect={inspect} />
+                        ),
+                      },
+                      {
+                        id: 'monthly',
+                        label: 'Monthly',
+                        panel: <Monthly records={compared} onInspect={inspect} />,
+                      },
+                      {id: 'readings', label: 'Readings', panel: readings},
+                    ]}
+                  />
+                </div>
+              </>
             ) : (
-              <span className="muted">Pin buildings from the browser</span>
+              <EmptyState
+                kind={scenario === 'unavailable' ? 'unavailable' : 'no-data'}
+                title={
+                  scenario === 'loading' ? 'Loading readings' : 'Selected building unavailable'
+                }
+                description="Your pins and investigation notes are preserved."
+                actionLabel="Load readings"
+                onAction={refresh}
+              />
             )}
-          </div>
-          <div className="analysis-scroll">
-            <Tabs
-              ariaLabel="Analysis representation"
-              selectedId={tab}
-              onSelectionChange={setTab}
-              items={[
-                {
-                  id: 'distribution',
-                  label: 'Distribution',
-                  panel: <Distribution records={filtered} active={active} onInspect={inspect} />,
-                },
-                {
-                  id: 'monthly',
-                  label: 'Monthly',
-                  panel: <Monthly records={compared} onInspect={inspect} />,
-                },
-                {id: 'readings', label: 'Readings', panel: readings},
-              ]}
-            />
-          </div>
-        </>
-      ) : (
-        <EmptyState
-          kind={scenario === 'unavailable' ? 'unavailable' : 'no-data'}
-          title={scenario === 'loading' ? 'Loading readings' : 'Selected building unavailable'}
-          description="Your pins and investigation notes are preserved."
-          actionLabel="Load readings"
-          onAction={refresh}
-        />
-      )}
-    </section>
+          </section>
+        </Surface>
+      </FocusField>
+    </div>
   );
   const error = scenario === 'error' || scenario === 'unavailable';
   const identifyTarget = (target: EventTarget) => {

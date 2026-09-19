@@ -157,7 +157,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  block-size: calc(100cqh - 26px);
+  block-size: max(320px, calc(100cqh - 106px));
   min-block-size: 0;
   min-inline-size: 0;
 }
@@ -235,7 +235,7 @@ body {
 .investigation-queue {
   display: flex;
   flex-direction: column;
-  block-size: calc(100cqh - 26px);
+  block-size: max(320px, calc(100cqh - 106px));
   min-block-size: 0;
   min-inline-size: 0;
 }
@@ -298,13 +298,6 @@ body {
 }
 
 @media (width <= 1100px) {
-  .workbench-host > .analysis-bench {
-    padding: 12px;
-    background: var(--wcl-surface);
-    border: 1px solid var(--wcl-border);
-    border-radius: 8px;
-  }
-
   .investigation-queue {
     block-size: min(700px, 75dvh);
   }
@@ -387,4 +380,16 @@ body {
 
 .reading-inspector span {
   font-variant-numeric: tabular-nums;
+}
+
+.analysis-atmosphere {
+  padding: 24px;
+  min-inline-size: 0;
+  background: var(--wcl-canvas);
+}
+
+@media (width <= 650px) {
+  .analysis-atmosphere {
+    padding: 16px;
+  }
 }
