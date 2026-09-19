@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visual character study</title>
+    <link rel="stylesheet" href="./study.css" />
+  </head>
+  <body>
+    <header class="study-bar">
+      <div class="study-title">
+        <strong>Visual character</strong><span>Study 3 · Publication review</span>
+      </div>
+      <label
+        >Demo<select id="demo">
+          <option value="markdown-authoring">Fieldnotes review</option>
+        </select></label
+      >
+      <fieldset>
+        <legend>Treatment</legend>
+        <label><input type="radio" name="treatment" value="current" />Current</label
+        ><label><input type="radio" name="treatment" value="proposed" checked />Proposed</label>
+      </fieldset>
+      <label
+        >Appearance<select id="appearance">
+          <option value="light">Light</option>
+          <option value="dark" selected>Dark</option>
+        </select></label
+      >
+      <label
+        >Region<select id="emphasis">
+          <option value="idle">Idle</option>
+          <option value="active">Emphasized</option>
+        </select></label
+      >
+      <button id="pulse" type="button">Replay start pulse</button>
+      <label class="identify-control"
+        ><input id="identify" type="checkbox" />Identify elements</label
+      >
+    </header>
+    <p class="study-note" id="note">
+      Study 3: document review and publication status have separate space. The smaller publication
+      panel sits above the document surface.
+    </p>
+    <main class="study-preview"><iframe id="demo-frame" title="Docket visual study"></iframe></main>
+    <output id="element-name" aria-live="polite"
+      >Element names appear here when identification is enabled.</output
+    >
+    <script type="module" src="./study.js"></script>
+  </body>
+</html>

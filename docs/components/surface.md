@@ -18,11 +18,13 @@ Surface groups related content with neutral hierarchy, padding, and rounded corn
 
 - Render Surface inside AppearanceProvider to load its appearance and container tokens.
 - Choose base, raised, or subtle from actual hierarchy and compose content with layout primitives inside.
+- Leave space between major regions so their depth reads while keeping controls compact. Set focusFieldAnchor on exactly one Surface inside FocusField; choose the panel that deserves emphasis, not automatically a status or side panel.
 - Surface exposes one opaque children region and no named parts.
 
 ## Preferred higher-level compositions
 
 - Compose Section, Stack, ResponsiveGrid, or ScrollRegion inside one Surface when each adds a distinct relationship.
+- Use FocusField around the application-owned composition for responsive accent atmosphere behind a chosen opaque Surface. Emphasis never changes Surface elevation.
 
 ## Content
 
@@ -34,7 +36,7 @@ Surface groups related content with neutral hierarchy, padding, and rounded corn
 
 ## Control, events, validation, and forms
 
-- Preset props control variant and padding. Surface has no selection or expansion state.
+- Preset props control variant and padding. Optional focusFieldAnchor marks this panel as the single anchor inside its nearest FocusField. Surface has no selection or expansion state.
 - The primitive emits no callbacks and has no interactive state.
 - The TypeScript API rejects custom classes, inline styles, token values, and unsupported options.
 - The primitive does not submit values or participate in reset, validation, required, disabled, or read-only form state.
@@ -52,7 +54,7 @@ Surface groups related content with neutral hierarchy, padding, and rounded corn
 
 ## Appearance and responsive behavior
 
-- Surface uses the library shape, background, text, and border styles. The raised variant adds a small shadow.
+- Surface uses library shape, background, text, and border styles with an opaque, solid face. Base has a low downward shadow; raised has a stronger downward shadow; subtle remains flat. Light and dark appearances preserve this hierarchy.
 - Surface keeps its border and padding at every width. Descendants control their own reflow.
 
 ## Accent, forced colors, and reduced motion

@@ -1,3 +1,4 @@
+import {FocusFieldExample} from './focus-field-example.js';
 import {ChartPresentation} from './chart-presentation.js';
 import {MarkdownIcon} from './markdown-icons.js';
 import {ChartCommandCompositionExample} from './chart-command-composition-example.js';
@@ -628,7 +629,7 @@ function LayoutSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Give related content a shared background, padding, boundary, and elevation. Surface changes presentation but adds no heading or section semantics."
+        description="Contain related content with a solid face and readable depth. Base has a low shadow, raised has a stronger downward shadow, and subtle stays flat. Keep space between major regions; Surface adds no heading or section semantics."
         name="Surface"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -642,6 +643,13 @@ function LayoutSpecimens() {
             Raised
           </Surface>
         </ResponsiveGrid>
+      </Specimen>
+
+      <Specimen
+        name="FocusField"
+        description="Place responsive accent atmosphere behind a chosen Surface. The application owns layout and active state; the field owns spread, a small center offset toward open space, and one activation bloom. It does not represent keyboard focus or semantic status."
+      >
+        <FocusFieldExample />
       </Specimen>
 
       <Specimen

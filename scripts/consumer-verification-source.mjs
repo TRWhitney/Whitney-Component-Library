@@ -60,6 +60,7 @@ import {
   Stack,
   StatusIndicator,
   Surface,
+  FocusField,
   Switch,
   Table,
   TextArea,
@@ -281,6 +282,9 @@ function PackedOperationalProof() {
 const view = React.createElement(
   AppearanceProvider,
   {appearance: 'dark', accent: '#2474ff'},
+  React.createElement(FocusField, {isActive: true},
+    React.createElement(Surface, {focusFieldAnchor: true},
+      React.createElement(Section, {title: 'Review context'}, 'Three documents await review.'))),
   React.createElement(
     Surface,
     {variant: 'raised'},

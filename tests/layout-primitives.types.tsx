@@ -1,4 +1,12 @@
-import {InlineGroup, ResponsiveGrid, ScrollRegion, Section, Stack, Surface} from '../src/index.js';
+import {
+  FocusField,
+  InlineGroup,
+  ResponsiveGrid,
+  ScrollRegion,
+  Section,
+  Stack,
+  Surface,
+} from '../src/index.js';
 
 export const boundedLayout = (
   <Stack gap="tight" align="stretch">
@@ -38,4 +46,28 @@ export function DynamicEqualItems({shouldEqual}: {readonly shouldEqual: boolean}
 export const arbitraryGridWidth = (
   // @ts-expect-error Grid breakpoints are semantic rather than arbitrary CSS lengths.
   <ResponsiveGrid minimumItemWidth="18rem">Unsupported grid width</ResponsiveGrid>
+);
+
+export const focusField = (
+  <FocusField isActive>
+    <Surface focusFieldAnchor>Review</Surface>
+  </FocusField>
+);
+export const missingFieldState = (
+  // @ts-expect-error Activity is an explicit consumer decision.
+  <FocusField>
+    <Surface focusFieldAnchor>Review</Surface>
+  </FocusField>
+);
+export const customFieldOffset = (
+  // @ts-expect-error Effect geometry belongs to the library.
+  <FocusField isActive offset={24}>
+    <Surface>Review</Surface>
+  </FocusField>
+);
+export const customFieldStyle = (
+  // @ts-expect-error Custom CSS is outside the visual contract.
+  <FocusField isActive style={{color: 'red'}}>
+    <Surface>Review</Surface>
+  </FocusField>
 );

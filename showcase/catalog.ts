@@ -13,6 +13,7 @@ export const showcaseGroups = [
       'ResponsiveGrid',
       'Divider',
       'Surface',
+      'FocusField',
       'Section',
       'ScrollRegion',
     ],

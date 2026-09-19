@@ -438,6 +438,8 @@ export {
 } from './actions/index.js';
 export {
   Divider,
+  FocusField,
+  type FocusFieldProps,
   InlineGroup,
   ResponsiveGrid,
   ScrollRegion,

@@ -52,6 +52,9 @@
     --wcl-tree-padding: 5px;
     --wcl-tree-chevron-size: 1.75rem;
     --wcl-tree-leaf-size: 1.75rem;
+    --wcl-surface-shadow: 0 3px 8px rgb(23 32 39 / 12%);
+    --wcl-surface-raised-shadow:
+      0 18px 32px -8px rgb(23 32 39 / 28%), 0 3px 6px rgb(23 32 39 / 10%);
     --wcl-shadow: 0 18px 48px rgb(23 32 39 / 11%);
     --wcl-font-body: 'IBM Plex Sans', inter, ui-sans-serif, system-ui, sans-serif;
     --wcl-font-utility: 'IBM Plex Mono', 'SFMono-Regular', consolas, monospace;
@@ -98,6 +101,8 @@
     --wcl-success-surface: #173d2b;
     --wcl-warning: #ffd166;
     --wcl-warning-surface: #403413;
+    --wcl-surface-shadow: 0 3px 8px rgb(0 0 0 / 22%);
+    --wcl-surface-raised-shadow: 0 22px 36px -8px rgb(0 0 0 / 60%), 0 3px 6px rgb(0 0 0 / 28%);
     --wcl-shadow: 0 22px 62px rgb(0 0 0 / 35%);
 
     color-scheme: dark;
@@ -246,6 +251,7 @@
     --wcl-chart-series-6: var(--wcl-chart-series-6-on-base);
 
     background: var(--wcl-surface);
+    box-shadow: var(--wcl-surface-shadow);
   }
 
   [data-wcl-surface][data-variant='raised'] {
@@ -262,7 +268,7 @@
     --wcl-chart-series-6: var(--wcl-chart-series-6-on-raised);
 
     background: var(--wcl-surface-raised);
-    box-shadow: var(--wcl-shadow);
+    box-shadow: var(--wcl-surface-raised-shadow);
   }
 
   [data-wcl-surface][data-variant='subtle'] {
@@ -9639,5 +9645,68 @@
   [data-wcl-heatmap-visibility-control] > [data-wcl-chart-visibility],
   [data-wcl-heatmap][data-visibility] [data-wcl-heatmap-cell] {
     transition: none;
+  }
+}
+
+@layer wcl.components {
+  [data-wcl-focus-field] {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+    display: flow-root;
+  }
+
+  [data-wcl-focus-field]::before {
+    position: absolute;
+    z-index: -1;
+    inset: -24px 0;
+    background: radial-gradient(
+      ellipse var(--wcl-field-radius-x, 0) var(--wcl-field-radius-y, 0) at var(--wcl-field-x, 50%)
+        var(--wcl-field-y, 50%),
+      color-mix(in srgb, var(--wcl-accent) 30%, transparent),
+      color-mix(in srgb, var(--wcl-accent) 19%, transparent) 42%,
+      color-mix(in srgb, var(--wcl-accent) 7%, transparent) 67%,
+      transparent 90%
+    );
+    filter: blur(24px);
+    opacity: 0;
+    content: '';
+    pointer-events: none;
+  }
+
+  [data-wcl-focus-field][data-positioned][data-active='true']::before {
+    opacity: 1;
+  }
+
+  [data-wcl-focus-field][data-positioned][data-active='true'][data-pulse]::before {
+    animation: wcl-field-bloom 950ms ease-out both;
+  }
+
+  @keyframes wcl-field-bloom {
+    0% {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+
+    40% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-wcl-focus-field][data-positioned][data-active='true'][data-pulse]::before {
+      animation: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-wcl-focus-field]::before {
+      display: none;
+    }
   }
 }

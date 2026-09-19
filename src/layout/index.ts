@@ -15,3 +15,4 @@ export {
 export {Section, type SectionHeadingLevel, type SectionProps} from './section.js';
 export {Stack, type StackProps} from './stack.js';
 export {Surface, type SurfacePadding, type SurfaceProps, type SurfaceVariant} from './surface.js';
+export {FocusField, type FocusFieldProps} from './focus-field.js';

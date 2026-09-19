@@ -27,6 +27,7 @@ export {
 } from './action.contracts.js';
 export {
   dividerContract,
+  focusFieldContract,
   inlineGroupContract,
   responsiveGridContract,
   scrollRegionContract,
@@ -138,6 +139,7 @@ import {
 } from './action.contracts.js';
 import {
   dividerContract,
+  focusFieldContract,
   inlineGroupContract,
   responsiveGridContract,
   scrollRegionContract,
@@ -235,6 +237,7 @@ export const componentContracts = [
   datePickerContract,
   dateRangePickerContract,
   dividerContract,
+  focusFieldContract,
   dialogContract,
   descriptionListContract,
   disclosureContract,

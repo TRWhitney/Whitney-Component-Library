@@ -72,6 +72,7 @@ describe('canonical component contracts', () => {
       'FieldGroup',
       'FileTrigger',
       'FormSection',
+      'FocusField',
       'IconButton',
       'Histogram',
       'Heatmap',

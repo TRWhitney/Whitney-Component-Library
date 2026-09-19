@@ -360,7 +360,7 @@ export const dividerContract = {
 export const surfaceContract = {
   ...passiveLayoutGuidance,
   appearance: [
-    'Surface uses the library shape, background, text, and border styles. The raised variant adds a small shadow.',
+    'Surface uses library shape, background, text, and border styles with an opaque, solid face. Base has a low downward shadow; raised has a stronger downward shadow; subtle remains flat. Light and dark appearances preserve this hierarchy.',
   ],
   accentBehavior: ['Surface stays neutral. It does not apply accent, status, or selection colors.'],
   accessibility: [
@@ -372,12 +372,13 @@ export const surfaceContract = {
   composition: [
     'Render Surface inside AppearanceProvider to load its appearance and container tokens.',
     'Choose base, raised, or subtle from actual hierarchy and compose content with layout primitives inside.',
+    'Leave space between major regions so their depth reads while keeping controls compact. Set focusFieldAnchor on exactly one Surface inside FocusField; choose the panel that deserves emphasis, not automatically a status or side panel.',
   ],
   contentRules: [
     'Keep one related content region inside a Surface. Do not nest surfaces just to add space.',
   ],
   controlBehavior: [
-    'Preset props control variant and padding. Surface has no selection or expansion state.',
+    'Preset props control variant and padding. Optional focusFieldAnchor marks this panel as the single anchor inside its nearest FocusField. Surface has no selection or expansion state.',
   ],
   counterExamples: [
     {
@@ -413,9 +414,17 @@ export const surfaceContract = {
   ],
   preferredCompositions: [
     'Compose Section, Stack, ResponsiveGrid, or ScrollRegion inside one Surface when each adds a distinct relationship.',
+    'Use FocusField around the application-owned composition for responsive accent atmosphere behind a chosen opaque Surface. Emphasis never changes Surface elevation.',
   ],
   purpose: 'Surface groups related content with neutral hierarchy, padding, and rounded corners.',
-  relatedExports: ['AppearanceProvider', 'ResponsiveGrid', 'ScrollRegion', 'Section', 'Stack'],
+  relatedExports: [
+    'AppearanceProvider',
+    'FocusField',
+    'ResponsiveGrid',
+    'ScrollRegion',
+    'Section',
+    'Stack',
+  ],
   responsiveBehavior: [
     'Surface keeps its border and padding at every width. Descendants control their own reflow.',
   ],
@@ -608,6 +617,130 @@ export const scrollRegionContract = {
         '    <ScrollRegion label="Solver history" size="compact">',
         '      <pre>Iteration 0284: residual 0.0025 K</pre>',
         '    </ScrollRegion>',
+        '  );',
+        '}',
+      ]),
+    },
+  ],
+} satisfies ComponentContract;
+
+export const focusFieldContract = {
+  ...passiveLayoutGuidance,
+  name: 'FocusField',
+  exportName: 'FocusField',
+  importPath: '.',
+  kind: 'component',
+  summary: 'Emphasize a chosen opaque panel with a responsive surrounding accent field.',
+  purpose:
+    'FocusField owns atmosphere behind one chosen Surface while the application owns layout and meaningful active state.',
+  appropriateUses: [
+    'a meaningful active composite region needs accent atmosphere around one chosen opaque panel',
+  ],
+  inappropriateUses: [
+    'every card needs decoration, keyboard focus needs indication, or semantic success, warning, failure, or selection needs a signal',
+  ],
+  appearance: [
+    'A soft field surrounds the chosen Surface in every direction. Opaque panel faces, positions, and downward shadows remain identical between idle and active states.',
+  ],
+  accentBehavior: [
+    'Atmosphere uses the inherited application accent. It does not replace semantic status colors or tint the opaque Surface.',
+  ],
+  accessibility: [
+    'Atmosphere is decorative and never intercepts pointer events, changes reading order, adds announcements, or replaces visible status text.',
+  ],
+  labeling: [
+    'FocusField creates no named region. Use Section or application-owned semantic HTML for visible names. Focus refers to visual emphasis, not keyboard focus.',
+  ],
+  keyboardBehavior: [
+    'FocusField adds no focus target or keyboard behavior. Descendant controls keep their normal keyboard interaction and focus indication.',
+  ],
+  composition: [
+    'Render inside AppearanceProvider and place exactly one Surface with focusFieldAnchor inside each FocusField. Consumer layout wrappers may sit between them.',
+    'The application chooses the panel that deserves emphasis and supplies isActive from meaningful activity state. Do not always choose a status panel or apply atmosphere to every card.',
+    'The field wrapper fills available width and accepts normal-flow children. The application owns columns, gaps, height, scrolling, and responsive stacking. Give major regions enough surrounding space for glow and depth to read; keep controls compact.',
+    'Only Surfaces in the nearest FocusField participate in geometry. Other unnested Surfaces act as occupied space. Arbitrary content and portaled panels are not measured as obstacles. Nested fields own their own anchors.',
+    'Keep the field outside opaque panels. Ancestor overflow may clip atmosphere; reserve surrounding room. Do not style private data attributes or copy the effect into consumer CSS.',
+  ],
+  contentRules: [
+    'Place a coherent composite region inside the field and keep real controls and readable status in the foreground.',
+  ],
+  controlBehavior: [
+    'Required isActive controls emphasis. Surface focusFieldAnchor selects its anchor. Color, blur, radii, offset, timing, and panel selection heuristics are not customization props.',
+  ],
+  states: [
+    'Idle retains Surface depth without glow. Mounting active shows steady atmosphere. Each subsequent false-to-true transition blooms once. Deactivation immediately removes glow and cancels the bloom. Resizing does not replay motion.',
+  ],
+  events: [
+    'FocusField emits no callbacks. The application owns activity state and task completion.',
+  ],
+  responsiveBehavior: [
+    'Panel and frame dimensions determine spread. The center shifts slightly toward the largest measured open area, accounting for other Surfaces. Offset changes the center only; the radial falloff still extends in all directions. Resize and content reflow recalculate geometry.',
+  ],
+  directionality: [
+    'Placement follows actual panel geometry and available space, including RTL layouts; it does not assume a leading left edge.',
+  ],
+  reducedMotionBehavior: [
+    'Reduced motion suppresses the one-shot bloom while retaining steady active atmosphere. Idle never animates.',
+  ],
+  forcedColorBehavior: [
+    'Forced colors removes atmosphere. Surface borders and visible text preserve the content hierarchy.',
+  ],
+  validation: [
+    'Missing, multiple, or zero-size anchors suppress atmosphere without breaking content. Restore exactly one visible anchor to restore the field. An anchor outside a FocusField has no atmospheric effect.',
+    'TypeScript rejects style, className, custom offsets, colors, and timing props.',
+  ],
+  parts: [
+    'One noninteractive background field and unmodified consumer children. The anchor is selected through Surface focusFieldAnchor, not a selector or an extra focus target.',
+  ],
+  preferredAlternatives: [
+    'Use Surface alone for idle depth. Use StatusIndicator, ProcessTracker, or progress components for semantic state. Use normal control focus styles for keyboard focus.',
+  ],
+  preferredCompositions: [
+    'Wrap an application-owned arrangement of a base working Surface and raised supporting Surface. Mark the working Surface as the anchor and activate the field only when that region merits emphasis.',
+  ],
+  relatedExports: [
+    'AppearanceProvider',
+    'Surface',
+    'Section',
+    'ResponsiveGrid',
+    'StatusIndicator',
+    'ProcessTracker',
+  ],
+  examples: [
+    {
+      title: 'Emphasize document review',
+      description:
+        'The application chooses Included documents as its anchor and supplies review activity. The supporting panel remains opaque and raised.',
+      code: withinAppearanceProvider([
+        'export function ReviewRegions({isReviewing}: {isReviewing: boolean}) {',
+        '  return (',
+        '    <FocusField isActive={isReviewing}>',
+        '      <ResponsiveGrid gap="relaxed" minimumItemWidth="wide">',
+        '        <Surface focusFieldAnchor padding="spacious">',
+        '          <Section title="Included documents"><p>Review the saved field notes.</p></Section>',
+        '        </Surface>',
+        '        <Surface variant="raised" padding="spacious">',
+        '          <Section title="Publication"><p>Export after review.</p></Section>',
+        '        </Surface>',
+        '      </ResponsiveGrid>',
+        '    </FocusField>',
+        '  );',
+        '}',
+      ]),
+    },
+  ],
+  counterExamples: [
+    {
+      title: 'Do not give one field competing anchors',
+      description:
+        'Choose one panel for emphasis. Multiple marked Surfaces suppress atmosphere because the field has no unambiguous owner.',
+      code: withinAppearanceProvider([
+        'export function CompetingAnchors() {',
+        '  return (',
+        '    <FocusField isActive>',
+        '      <Surface focusFieldAnchor>Documents</Surface>',
+        '      <Surface focusFieldAnchor>Publication</Surface>',
+        '    </FocusField>',
         '  );',
         '}',
       ]),
