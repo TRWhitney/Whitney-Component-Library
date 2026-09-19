@@ -357,3 +357,162 @@ body {
   display: block;
   min-block-size: 2lh;
 }
+
+/* Major review regions retain room for library-owned depth and atmosphere. */
+.workspace-main:has(> div:not([hidden]) > .publication) {
+  padding: clamp(24px, 3vw, 48px);
+}
+
+.publication {
+  max-inline-size: 1240px;
+  inline-size: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-inline: auto;
+}
+
+.publication-review-heading {
+  margin-block-end: 24px;
+}
+
+.publication-caption {
+  color: var(--wcl-text-muted);
+  font: 11px/1.5 var(--wcl-font-utility);
+  letter-spacing: 0.06em;
+}
+
+.publication-review-heading h1 {
+  margin: 7px 0 9px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.publication-review-heading p {
+  margin: 0;
+  color: var(--wcl-text-muted);
+}
+
+.publication-atmosphere {
+  flex: 1;
+  display: grid;
+  min-inline-size: 0;
+}
+
+.publication-review-layout {
+  min-block-size: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  gap: 24px;
+  align-items: start;
+}
+
+.publication-documents {
+  min-inline-size: 0;
+  margin-block-start: 24px;
+}
+
+.publication-manuscripts > header {
+  margin-block-end: 24px;
+}
+
+.publication-manuscripts > header > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.publication-manuscripts h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.publication-manuscripts > header span {
+  color: var(--wcl-text-muted);
+  font: 11px var(--wcl-font-utility);
+}
+
+.publication-manuscripts > header p {
+  max-inline-size: 48ch;
+  margin: 12px 0 0;
+  color: var(--wcl-text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.publication-manuscripts .review-version {
+  width: auto;
+}
+
+.publication-field {
+  min-inline-size: 0;
+  padding: 24px 24px 40px;
+}
+
+.publication-summary h2 {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.publication-summary > header {
+  margin-block-end: 28px;
+}
+
+.publication-export {
+  margin-block-start: 24px;
+  padding-block-start: 20px;
+  border-block-start: 1px solid var(--wcl-border);
+}
+
+.publication-summary .publication-export p {
+  margin: 0 0 16px;
+  color: var(--wcl-text-muted);
+  font-size: 12px;
+}
+
+.workspace-main > div:not([hidden]):has(> .publication) {
+  display: flex;
+  min-block-size: 100%;
+}
+
+@media (width <= 1250px) {
+  .publication-review-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .publication-documents {
+    margin-block-start: 0;
+  }
+
+  .publication-field {
+    inline-size: min(100%, 440px);
+    justify-self: end;
+    box-sizing: border-box;
+  }
+}
+
+@media (width <= 650px) {
+  .workspace-main:has(> div:not([hidden]) > .publication) {
+    padding: 24px 16px;
+  }
+
+  .publication-review-heading h1 {
+    font-size: 25px;
+  }
+
+  .publication-field {
+    padding: 20px 16px 32px;
+  }
+
+  .publication-manuscripts .mobile-document-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}

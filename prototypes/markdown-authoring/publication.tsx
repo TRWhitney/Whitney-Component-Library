@@ -1,5 +1,7 @@
 import {
   List,
+  FocusField,
+  Surface,
   ToggleButton,
   Badge,
   Button,
@@ -172,147 +174,214 @@ export function ReviewDesk({
   const selected = documents.filter((doc) => included.includes(doc.id));
   const ready = selected.length > 0 && selected.every((doc) => reviewed[doc.id] === snapshot(doc));
   return (
-    <section className="review-desk" data-region="Collection review" aria-label="Collection review">
-      <div className="task-heading review-heading">
-        <h1>Review & export</h1>
-        <div className="review-export-action">
-          <Toolbar label="Export actions">
-            <Button size="compact" isDisabled={!ready} onPress={onExport}>
-              Export field guide
-            </Button>
-          </Toolbar>
-        </div>
-      </div>
-      <ProcessTracker
-        ariaLabel="Publication progress"
-        statusLabels={{
-          complete: 'Complete',
-          active: 'Current',
-          pending: 'Next',
-          warning: 'Needs attention',
-          failed: 'Failed',
-        }}
-        stages={[
-          {
-            id: 'assemble',
-            label: 'Assemble',
-            description: `${selected.length} documents included`,
-            status: 'complete',
-          },
-          {
-            id: 'review',
-            label: 'Review',
-            description: `${selected.filter((doc) => reviewed[doc.id] === snapshot(doc)).length} of ${selected.length} reviewed`,
-            status: ready ? 'complete' : 'active',
-          },
-          {
-            id: 'export',
-            label: 'Export',
-            description: exported ? 'Markdown downloaded' : 'One Markdown file',
-            status: exported ? 'complete' : ready ? 'active' : 'pending',
-          },
-        ]}
-      />
-      <p className="muted small-copy">
-        Review each saved version. Editing a reviewed document requires another review.
-      </p>
-      {small ? (
-        <List
-          ariaLabel="Document review"
-          marker="none"
-          emptyState={{
-            kind: 'no-data',
-            title: 'No documents included',
-            description: 'Select documents in Collection to prepare an export.',
-          }}
-          items={selected.map((doc) => {
-            const dirty = snapshot(doc) !== doc.saved,
-              checked = reviewed[doc.id] === snapshot(doc),
-              empty = !doc.title.trim() || !doc.value.trim();
-            return {
-              id: doc.id,
-              primary: (
-                <div className="mobile-document-row">
-                  <div className="mobile-document-copy">
-                    <Button variant="quiet" size="compact" onPress={() => onOpen(doc.id)}>
-                      {doc.title || 'New document'}
-                    </Button>
-                    <span className="muted small-copy">
-                      {dirty
-                        ? 'Save changes first'
-                        : empty
-                          ? 'Add title and content'
-                          : `${words(doc.value)} words`}
-                    </span>
+    <section
+      className="publication"
+      aria-labelledby="publication-review-title"
+      data-region="Publication review"
+    >
+      <header className="publication-review-heading" data-region="Review identity">
+        <span className="publication-caption">Riverside field guide</span>
+        <h1 id="publication-review-title">Review &amp; export</h1>
+        <p>Prepare the reviewed documents for publication.</p>
+      </header>
+      <div className="publication-atmosphere">
+        <FocusField isActive={selected.length > 0 && !ready}>
+          <div className="publication-review-layout">
+            <div className="publication-documents">
+              <Surface focusFieldAnchor padding={small ? 'regular' : 'spacious'}>
+                <section
+                  className="publication-manuscripts"
+                  aria-labelledby="publication-documents-title"
+                  data-region="Document review surface"
+                >
+                  <header>
+                    <div>
+                      <h2 id="publication-documents-title">Included documents</h2>
+                      <span>{selected.length} documents</span>
+                    </div>
+                    <p>
+                      Review each saved version. Editing a reviewed document requires another
+                      review.
+                    </p>
+                  </header>
+                  {small ? (
+                    <List
+                      ariaLabel="Document review"
+                      marker="none"
+                      emptyState={{
+                        kind: 'no-data',
+                        title: 'No documents included',
+                        description: 'Select documents in Collection to prepare an export.',
+                      }}
+                      items={selected.map((doc) => {
+                        const dirty = snapshot(doc) !== doc.saved,
+                          checked = reviewed[doc.id] === snapshot(doc),
+                          empty = !doc.title.trim() || !doc.value.trim();
+                        return {
+                          id: doc.id,
+                          primary: (
+                            <div className="mobile-document-row">
+                              <div className="mobile-document-copy">
+                                <Button
+                                  variant="quiet"
+                                  size="compact"
+                                  onPress={() => onOpen(doc.id)}
+                                >
+                                  {doc.title || 'New document'}
+                                </Button>
+                                <span className="muted small-copy">
+                                  {dirty
+                                    ? 'Save changes first'
+                                    : empty
+                                      ? 'Add title and content'
+                                      : `${words(doc.value)} words`}
+                                </span>
+                              </div>
+                              <Button
+                                size="compact"
+                                isDisabled={dirty || empty || checked}
+                                onPress={() => onApprove(doc.id)}
+                              >
+                                <span className="review-action-label">
+                                  {checked ? 'Reviewed' : 'Mark reviewed'}
+                                </span>
+                              </Button>
+                            </div>
+                          ),
+                        };
+                      })}
+                    />
+                  ) : (
+                    <Table<string, string>
+                      ariaLabel="Document review"
+                      selectionMode="none"
+                      columns={[
+                        {id: 'title', label: 'Document', isRowHeader: true},
+                        ...(!small ? [{id: 'status' as const, label: 'Version'}] : []),
+                        {id: 'actions', label: 'Review', kind: 'actions'},
+                      ]}
+                      emptyState={{
+                        kind: 'no-data',
+                        title: 'No documents included',
+                        description: 'Select documents in Collection to prepare an export.',
+                      }}
+                      rows={selected.map((doc) => {
+                        const dirty = snapshot(doc) !== doc.saved,
+                          checked = reviewed[doc.id] === snapshot(doc),
+                          empty = !doc.title.trim() || !doc.value.trim();
+                        const status = checked
+                          ? 'Reviewed'
+                          : dirty
+                            ? 'Save changes first'
+                            : empty
+                              ? 'Add title and content'
+                              : `${words(doc.value)} words · Ready for review`;
+                        return {
+                          id: doc.id,
+                          textValue: doc.title || 'New document',
+                          cells: {
+                            title: (
+                              <div className="review-title">
+                                <Button
+                                  variant="quiet"
+                                  size="compact"
+                                  onPress={() => onOpen(doc.id)}
+                                >
+                                  {doc.title || 'New document'}
+                                </Button>
+                                {small && <span className="muted small-copy">{status}</span>}
+                              </div>
+                            ),
+                            ...(!small
+                              ? {status: <span className="review-version">{status}</span>}
+                              : {}),
+                            actions: (
+                              <Button
+                                size="compact"
+                                isDisabled={dirty || empty || checked}
+                                onPress={() => onApprove(doc.id)}
+                              >
+                                <span className="review-action-label">
+                                  {checked ? 'Reviewed' : 'Mark reviewed'}
+                                </span>
+                              </Button>
+                            ),
+                          },
+                        };
+                      })}
+                    />
+                  )}
+                </section>
+              </Surface>
+            </div>
+            <aside
+              className="publication-field"
+              aria-labelledby="publication-title"
+              data-region="Publication spacing"
+            >
+              <Surface variant="raised" padding={small ? 'regular' : 'spacious'}>
+                <div className="publication-summary" data-region="Raised publication panel">
+                  <header>
+                    <span className="publication-caption">Publication</span>
+                    <h2 id="publication-title">
+                      {exported
+                        ? 'Guide exported'
+                        : ready
+                          ? 'Ready to export'
+                          : 'Review in progress'}
+                    </h2>
+                  </header>
+                  <ProcessTracker
+                    ariaLabel="Publication progress"
+                    statusLabels={{
+                      complete: 'Complete',
+                      active: 'Current',
+                      pending: 'Next',
+                      warning: 'Needs attention',
+                      failed: 'Failed',
+                    }}
+                    stages={[
+                      {
+                        id: 'assemble',
+                        label: 'Assemble',
+                        description: `${selected.length} documents included`,
+                        status: 'complete',
+                      },
+                      {
+                        id: 'review',
+                        label: 'Review',
+                        description: `${selected.filter((doc) => reviewed[doc.id] === snapshot(doc)).length} of ${selected.length} reviewed`,
+                        status: ready ? 'complete' : 'active',
+                      },
+                      {
+                        id: 'export',
+                        label: 'Export',
+                        description: exported ? 'Markdown downloaded' : 'One Markdown file',
+                        status: exported ? 'complete' : ready ? 'active' : 'pending',
+                      },
+                    ]}
+                  />
+
+                  <div className="publication-export">
+                    <p>
+                      {exported
+                        ? 'Your Markdown field guide has been downloaded.'
+                        : ready
+                          ? 'Every included document has been reviewed.'
+                          : 'Review the included documents to enable export.'}
+                    </p>
+                    <Toolbar label="Export actions">
+                      <Button size="compact" isDisabled={!ready} onPress={onExport}>
+                        Export field guide
+                      </Button>
+                    </Toolbar>
                   </div>
-                  <Button
-                    size="compact"
-                    isDisabled={dirty || empty || checked}
-                    onPress={() => onApprove(doc.id)}
-                  >
-                    <span className="review-action-label">
-                      {checked ? 'Reviewed' : 'Mark reviewed'}
-                    </span>
-                  </Button>
                 </div>
-              ),
-            };
-          })}
-        />
-      ) : (
-        <Table<string, string>
-          ariaLabel="Document review"
-          selectionMode="none"
-          columns={[
-            {id: 'title', label: 'Document', isRowHeader: true},
-            ...(!small ? [{id: 'status' as const, label: 'Version'}] : []),
-            {id: 'actions', label: 'Review', kind: 'actions'},
-          ]}
-          emptyState={{
-            kind: 'no-data',
-            title: 'No documents included',
-            description: 'Select documents in Collection to prepare an export.',
-          }}
-          rows={selected.map((doc) => {
-            const dirty = snapshot(doc) !== doc.saved,
-              checked = reviewed[doc.id] === snapshot(doc),
-              empty = !doc.title.trim() || !doc.value.trim();
-            const status = checked
-              ? 'Reviewed'
-              : dirty
-                ? 'Save changes first'
-                : empty
-                  ? 'Add title and content'
-                  : `${words(doc.value)} words · Ready for review`;
-            return {
-              id: doc.id,
-              textValue: doc.title || 'New document',
-              cells: {
-                title: (
-                  <div className="review-title">
-                    <Button variant="quiet" size="compact" onPress={() => onOpen(doc.id)}>
-                      {doc.title || 'New document'}
-                    </Button>
-                    {small && <span className="muted small-copy">{status}</span>}
-                  </div>
-                ),
-                ...(!small ? {status: <span className="review-version">{status}</span>} : {}),
-                actions: (
-                  <Button
-                    size="compact"
-                    isDisabled={dirty || empty || checked}
-                    onPress={() => onApprove(doc.id)}
-                  >
-                    <span className="review-action-label">
-                      {checked ? 'Reviewed' : 'Mark reviewed'}
-                    </span>
-                  </Button>
-                ),
-              },
-            };
-          })}
-        />
-      )}
+              </Surface>
+            </aside>
+          </div>
+        </FocusField>
+      </div>
     </section>
   );
 }
