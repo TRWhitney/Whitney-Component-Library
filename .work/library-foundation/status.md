@@ -14,6 +14,7 @@ Ticket 24 delivers Markdown source editing and safe preview with one retained ed
 Ticket 25 adds default in-place Live Preview with context-sensitive source reveal.
 Ticket 26 delivers commands, navigation, asset callbacks, and declared extensions, including stored RGBA text colors. See the [Markdown authoring effort](../markdown-authoring/status.md).
 Ticket 27 delivers the accepted [Markdown authoring demo](../markdown-authoring-demo/status.md). The recorded cleanup findings are complete; see the [cleanup evidence](../authoring-cleanup/status.md).
+Ticket 28 delivers the [Docket integration proof](../application-workbench-demo/status.md). Whitney ended critique and authorized closure with no outstanding library corrections or cleanup tasks. The demo design remains confusing to Whitney; this accepts the library proof, not the demo as a design reference.
 Ticket 23 delivers the accepted [Energy desk prototype](../data-analysis-prototype/status.md)
 and all thirteen library fixes verified in that packed-consumer application.
 Ticket 20 delivers scatter, bubble, histogram, and box-plot charts with explicit statistical data
@@ -299,6 +300,7 @@ in-place Markdown authoring, its canonical guidance and rendered example, and ve
 clipboard, composition, SSR/hydration, and large-document behavior. Its
 [verification record](../markdown-live-preview/verification.md) contains the completion evidence.
 [Ticket 27](tickets/27-markdown-authoring-prerelease.md) and its [recorded cleanup](../authoring-cleanup/status.md) are complete.
+[Ticket 28](tickets/28-application-workbench-prerelease.md) is complete with no follow-up library corrections.
 Ticket 30 retains the remaining release-wide certification requirements.
 
 ## Accepted sources
@@ -546,3 +548,5 @@ Ticket 30 retains the remaining release-wide certification requirements.
   remain in the [chart effort](../chart-interaction-composition/status.md).
 - Ticket 23 and all thirteen library fixes are complete. See the [delivery and verification record](../data-analysis-prototype/status.md).
 - Ticket 26 is complete. [Ticket 27](tickets/27-markdown-authoring-prerelease.md) is complete; the [recorded cleanup](../authoring-cleanup/status.md) is also complete.
+
+- Ticket 28 is complete. See the [application workbench delivery](../application-workbench-demo/status.md) for the retained fixture, evidence, and qualified final assessment.
