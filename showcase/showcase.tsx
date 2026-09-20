@@ -2125,6 +2125,7 @@ function FeedbackSpecimens() {
               aria-busy="true"
               aria-label="Loading result summary"
               className="showcase-skeleton-region"
+              role="region"
             >
               <Stack gap="regular">
                 <Skeleton shape="heading" width="half" />

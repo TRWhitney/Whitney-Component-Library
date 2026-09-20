@@ -514,7 +514,7 @@ export function App() {
                     </ToggleButton>
                   </Toolbar>
                 </div>
-                <div className="comparison-tray" aria-label="Comparison pins">
+                <div className="comparison-tray" role="group" aria-label="Comparison pins">
                   <span className="eyebrow">COMPARE WITH</span>
                   {pins.length ? (
                     pins.map((id) => {
