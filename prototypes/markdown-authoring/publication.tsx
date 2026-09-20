@@ -10,7 +10,7 @@ import {
   Table,
   Toolbar,
 } from '@trwhitney/component-library';
-import {useState} from 'react';
+import {useLayoutEffect, useRef, useState} from 'react';
 import {snapshot, type DocumentRecord} from './data.js';
 
 interface PublicationProps {
@@ -173,8 +173,35 @@ export function ReviewDesk({
 }: PublicationProps) {
   const selected = documents.filter((doc) => included.includes(doc.id));
   const ready = selected.length > 0 && selected.every((doc) => reviewed[doc.id] === snapshot(doc));
+  const reviewRoot = useRef<HTMLElement>(null);
+  const restoreReviewFocus = useRef(false);
+  const approve = (id: string) => {
+    restoreReviewFocus.current = Boolean(reviewRoot.current?.contains(document.activeElement));
+    onApprove(id);
+  };
+  useLayoutEffect(() => {
+    if (!restoreReviewFocus.current) return;
+    restoreReviewFocus.current = false;
+    // The table commits its updated collection after this parent render.
+    const frame = requestAnimationFrame(() => {
+      const commands = [
+        ...(reviewRoot.current?.querySelectorAll('.review-action-label') ?? []),
+      ].map((label) => label.closest('button'));
+      const next =
+        commands.find((button) => button && !button.disabled) ??
+        reviewRoot.current?.querySelector<HTMLButtonElement>(
+          '.publication-export button:not(:disabled)',
+        );
+      // Enter a table cell through its public grid semantics so keyboard focus
+      // advances the grid's active cell before it moves to the nested action.
+      const destination = next?.closest<HTMLElement>('[role="gridcell"]') ?? next;
+      destination?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [reviewed]);
   return (
     <section
+      ref={reviewRoot}
       className="publication"
       aria-labelledby="publication-review-title"
       data-region="Publication review"
@@ -240,7 +267,7 @@ export function ReviewDesk({
                               <Button
                                 size="compact"
                                 isDisabled={dirty || empty || checked}
-                                onPress={() => onApprove(doc.id)}
+                                onPress={() => approve(doc.id)}
                               >
                                 <span className="review-action-label">
                                   {checked ? 'Reviewed' : 'Mark reviewed'}
@@ -299,7 +326,7 @@ export function ReviewDesk({
                               <Button
                                 size="compact"
                                 isDisabled={dirty || empty || checked}
-                                onPress={() => onApprove(doc.id)}
+                                onPress={() => approve(doc.id)}
                               >
                                 <span className="review-action-label">
                                   {checked ? 'Reviewed' : 'Mark reviewed'}
