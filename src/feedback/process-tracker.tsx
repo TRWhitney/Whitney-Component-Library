@@ -109,9 +109,9 @@ export function ProcessTracker({
             <span data-wcl-process-stage-copy="">
               <span data-wcl-process-stage-label="">{stage.label}</span>
               {stage.description ? (
-                <span data-wcl-process-stage-description="">{stage.description}</span>
+                <span data-wcl-process-stage-description=""> {stage.description}</span>
               ) : null}
-              <span data-wcl-visually-hidden="">{statusLabels[stage.status]}</span>
+              <span data-wcl-visually-hidden=""> {statusLabels[stage.status]}</span>
             </span>
           </li>
         ))}

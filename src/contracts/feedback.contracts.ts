@@ -143,10 +143,10 @@ export const processTrackerContract = {
   ],
   composition: [
     'Render ProcessTracker inside AppearanceProvider wherever the consuming application needs staged status. The application owns the surrounding layout, actions, and state transitions.',
-    'Place a separate ProgressBar nearby when the active stage also has meaningful numeric or indeterminate progress.',
+    'Place a separate ProgressBar nearby when the active stage also has meaningful numeric or indeterminate progress. When a nearby StatusIndicator announces the overall transition, leave tracker announcements off to avoid repeating the full stage list.',
   ],
   contentRules: [
-    'Use concise stage labels, optional outcome or current-work descriptions, stable ids, and localized status labels. Keep stages ordered by the process they describe.',
+    'Use concise stage labels, optional outcome or current-work descriptions, stable ids, and localized status labels. Keep stages ordered by the process they describe. Stage labels name the work; omit status words already supplied by statusLabels so screen readers do not repeat them.',
   ],
   controlBehavior: [
     'ProcessTracker is status-only. It does not start work, navigate stages, retry failures, infer valid stage sequences, or coordinate other components.',
@@ -170,7 +170,7 @@ export const processTrackerContract = {
     {
       code: inProvider(
         'ThermalSolveTracker',
-        '<ProcessTracker\n  announcement="polite"\n  ariaLabel="Thermal solve stages"\n  stages={[\n    {id: "geometry", label: "Geometry validated", description: "12 surfaces, no open edges", status: "complete"},\n    {id: "boundary", label: "Boundary pass", description: "4 of 6 conditions resolved", status: "active"},\n    {id: "solve", label: "Solve pending", status: "pending"},\n  ]}\n  statusLabels={{active: "Active", complete: "Complete", failed: "Failed", pending: "Pending", warning: "Needs review"}}\n/>',
+        '<ProcessTracker\n  announcement="polite"\n  ariaLabel="Thermal solve stages"\n  stages={[\n    {id: "geometry", label: "Geometry validated", description: "12 surfaces, no open edges", status: "complete"},\n    {id: "boundary", label: "Boundary pass", description: "4 of 6 conditions resolved", status: "active"},\n    {id: "solve", label: "Solve", status: "pending"},\n  ]}\n  statusLabels={{active: "Active", complete: "Complete", failed: "Failed", pending: "Pending", warning: "Needs review"}}\n/>',
       ),
       description: 'Report ordered solve status without owning the surrounding workflow.',
       title: 'Active staged process',

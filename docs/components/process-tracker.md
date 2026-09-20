@@ -17,7 +17,7 @@ ProcessTracker reports the ordered status of a staged process without owning it.
 ## Composition and parts
 
 - Render ProcessTracker inside AppearanceProvider wherever the consuming application needs staged status. The application owns the surrounding layout, actions, and state transitions.
-- Place a separate ProgressBar nearby when the active stage also has meaningful numeric or indeterminate progress.
+- Place a separate ProgressBar nearby when the active stage also has meaningful numeric or indeterminate progress. When a nearby StatusIndicator announces the overall transition, leave tracker announcements off to avoid repeating the full stage list.
 - ProcessTracker includes one named ordered stage list, a relationship rail, one non-color marker per stage, visible labels and descriptions, and visually hidden localized status text.
 
 ## Preferred higher-level compositions
@@ -26,7 +26,7 @@ ProcessTracker reports the ordered status of a staged process without owning it.
 
 ## Content
 
-- Use concise stage labels, optional outcome or current-work descriptions, stable ids, and localized status labels. Keep stages ordered by the process they describe.
+- Use concise stage labels, optional outcome or current-work descriptions, stable ids, and localized status labels. Keep stages ordered by the process they describe. Stage labels name the work; omit status words already supplied by statusLabels so screen readers do not repeat them.
 
 ## States
 
@@ -83,7 +83,7 @@ export function ThermalSolveTracker() {
         stages={[
           {id: "geometry", label: "Geometry validated", description: "12 surfaces, no open edges", status: "complete"},
           {id: "boundary", label: "Boundary pass", description: "4 of 6 conditions resolved", status: "active"},
-          {id: "solve", label: "Solve pending", status: "pending"},
+          {id: "solve", label: "Solve", status: "pending"},
         ]}
         statusLabels={{active: "Active", complete: "Complete", failed: "Failed", pending: "Pending", warning: "Needs review"}}
       />

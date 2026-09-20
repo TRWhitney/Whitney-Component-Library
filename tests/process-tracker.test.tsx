@@ -31,7 +31,7 @@ const stages = [
   {
     description: 'Ready after validation',
     id: 'solve',
-    label: 'Solve pending',
+    label: 'Solve',
     status: 'pending',
   },
 ] as const satisfies readonly ProcessStage[];
@@ -52,11 +52,11 @@ describe('ProcessTracker', () => {
     expect(items).toHaveLength(3);
     expect(
       items.map((item) => item.querySelector('[data-wcl-process-stage-label]')?.textContent),
-    ).toEqual(['Geometry validated', 'Boundary pass', 'Solve pending']);
+    ).toEqual(['Geometry validated', 'Boundary pass', 'Solve']);
     expect(items[0]?.textContent).toContain('Complete');
     expect(items[1]?.getAttribute('aria-current')).toBe('step');
     expect(items[1]?.textContent).toContain('Active');
-    expect(items[2]?.textContent).toContain('Pending');
+    expect(items[2]?.textContent).toBe('Solve Ready after validation Pending');
     expect(items[1]?.querySelector('[data-wcl-process-stage-core]')).toBeTruthy();
     expect(items[2]?.querySelector('[data-wcl-process-stage-core]')).toBeNull();
     expect(container.querySelector('button, a, [tabindex]')).toBeNull();

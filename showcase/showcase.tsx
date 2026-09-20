@@ -1953,7 +1953,7 @@ function FeedbackSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Report the ordered status of a staged process without turning its stages into navigation or prescribing the surrounding workflow. Use ProgressBar when one stage also has measurable progress."
+        description="Report the ordered status of a staged process without turning its stages into navigation or prescribing the surrounding workflow. Use ProgressBar when one stage also has measurable progress. Keep status words out of stage names; the tracker supplies them for screen readers. When a nearby status message announces updates, leave tracker announcements off."
         name="ProcessTracker"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">
@@ -1973,7 +1973,7 @@ function FeedbackSpecimens() {
                   label: 'Boundary pass',
                   status: 'active',
                 },
-                {id: 'solve', label: 'Solve pending', status: 'pending'},
+                {id: 'solve', label: 'Solve', status: 'pending'},
               ]}
               statusLabels={{
                 active: 'Active',
