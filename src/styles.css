@@ -1081,9 +1081,11 @@
 
   [data-wcl-selection-popover] {
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     inline-size: var(--trigger-width);
     max-inline-size: calc(100vw - calc(var(--wcl-space) * 2));
-    max-block-size: min(20rem, var(--available-height));
+    max-block-size: 20rem;
     overflow: hidden;
     border: 1px solid var(--wcl-border-strong);
     border-radius: var(--wcl-control-radius);
@@ -1103,7 +1105,8 @@
 
   [data-wcl-selection-list] {
     box-sizing: border-box;
-    max-block-size: min(20rem, var(--available-height));
+    min-block-size: 0;
+    max-block-size: 20rem;
     padding: calc(var(--wcl-space) * 0.5);
     overflow: auto;
     outline: 0;

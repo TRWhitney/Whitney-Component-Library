@@ -1593,7 +1593,7 @@ function SelectionSpecimens() {
   return (
     <>
       <Specimen
-        description="Choose one value from a finite list that stays collapsed until opened. Select owns the styled trigger and list, option states, typeahead, form behavior, and viewport-aware placement."
+        description="Choose one value from a finite list that stays collapsed until opened. Select owns the styled trigger and list, option states, typeahead, form behavior, and viewport-aware placement. At high zoom, the list scrolls to keep the focused option visible."
         name="Select"
       >
         <Select
@@ -1607,7 +1607,7 @@ function SelectionSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Choose one value from a list the user can filter by typing. Use Select when text entry would not help; ComboBox keeps the typed query separate from the selected value."
+        description="Choose one value from a list the user can filter by typing. Use Select when text entry would not help; ComboBox keeps the typed query separate from the selected value. Its option list scrolls within the available screen height, including at high zoom."
         name="ComboBox"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">

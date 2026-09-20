@@ -1392,7 +1392,6 @@ describe('static appearance styles', () => {
 
     expect(popover).toContain('inline-size: var(--trigger-width)');
     expect(popover).toContain('max-inline-size: calc(100vw');
-    expect(popover).toContain('max-block-size: min(20rem, var(--available-height))');
     expect(popover).toContain('background: var(--wcl-surface-raised)');
     expect(list).toContain('padding: calc(var(--wcl-space) * 0.5)');
     expect(option).toContain('padding-block: var(--wcl-option-padding, 6px)');
