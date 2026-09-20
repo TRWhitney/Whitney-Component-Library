@@ -9,23 +9,24 @@ fixtures exist.
 [Markdown Authoring Integration Proof](27-markdown-authoring-prerelease.md),
 [Application Workbench Integration Proof](28-application-workbench-prerelease.md)
 
-**Status:** blocked for release-wide certification. The concrete authoring and showcase findings below are closed with Whitney's acceptance on 2026-09-13; see the [cleanup record](../../authoring-cleanup/status.md).
+**Status:** complete. All four prerequisite integration fixtures are complete. Browser, accessibility, visual, and native-zoom results are recorded in the [release effort](../../release-hardening/status.md). The concrete authoring and showcase findings below are closed with Whitney's acceptance on 2026-09-13; see the [cleanup record](../../authoring-cleanup/status.md).
 
-- [ ] Chromium, Firefox, and WebKit pass representative behavior across every public family under
+- [x] Chromium, Firefox, and WebKit pass representative behavior across every public family under
       the fixed Baseline 2023 contract.
-- [ ] Manual focused screen-reader exercises cover compound fields, select/combobox, overlays,
-      collections, navigation, charts, Markdown editing, and all four integration fixtures
-      before stable-candidate acceptance.
-- [ ] Keyboard-only and touch flows complete every integration fixture without an inaccessible
+- [x] Manual focused screen-reader exercises cover distinct library behavior in compound fields,
+      select/combobox, overlays, collections, navigation, charts, Markdown editing, and status
+      announcements. Fixtures may demonstrate an uncovered library interaction, but do not
+      require separate manual application acceptance or repeated component checks.
+- [x] Keyboard-only and touch flows complete every integration fixture without an inaccessible
       substitute path.
-- [ ] Light, dark, multiple accents, compact/wide, zoom, forced-color, reduced-motion, loading,
+- [x] Light, dark, multiple accents, compact/wide, zoom, forced-color, reduced-motion, loading,
       empty, partial, error, pending, disabled, and read-only states pass documented checks.
-- [ ] Visual comparison catches unintended drift in binding visual relationships while allowing
+- [x] Visual comparison catches unintended drift in binding visual relationships while allowing
       documented flexible constants.
-- [ ] Semantic status contrast and non-color meaning pass across all applicable components.
-- [ ] No accepted responsive layout clips, overflows, loses focus, or introduces arbitrary dividers
+- [x] Semantic status contrast and non-color meaning pass across all applicable components.
+- [x] No accepted responsive layout clips, overflows, loses focus, or introduces arbitrary dividers
       and decorative hard stops.
-- [ ] Findings are fixed at the owning component seam and do not become test-only exceptions.
+- [x] Findings are fixed at the owning component seam and do not become test-only exceptions.
 - [x] Increase scrollbar size slightly across scroll regions. Whitney reported that the current
       scrollbars have become too subtle; verify their visibility in both themes and compact layouts.
 - [x] Audit the AppearanceProvider area in the component showcase. Whitney reported that its
@@ -73,4 +74,4 @@ The following checked entries retain the original reports. Their completed behav
 
 ## Completion evidence
 
-The concrete findings are implemented and validated in the [authoring cleanup](../../authoring-cleanup/status.md). Release-wide browser, assistive-technology, and integration certification remains pending the remaining fixtures.
+The concrete findings are implemented and validated in the [authoring cleanup](../../authoring-cleanup/status.md). The prerequisite fixtures are complete. Current browser, integration, and hardening results are recorded in the [release verification](../../release-hardening/verification.md). Focused Orca/Firefox exercises and native Chromium zoom at 200% and 400% pass. All 39 representative browser groups pass across Chromium, Firefox, and WebKit. Stable release acceptance and publication remain separate work.

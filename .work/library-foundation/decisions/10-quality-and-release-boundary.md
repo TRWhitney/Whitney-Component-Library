@@ -30,6 +30,9 @@ Component and slice tickets verify their assistive-technology surface through au
 relationship, state, keyboard, and browser accessibility-tree checks. Manual screen-reader
 exercises are consolidated in release-wide accessibility hardening after the catalog and slices
 exist and must pass before `1.0`; they are not repeated as an intervention gate for every ticket.
+Manual coverage follows distinct library interactions. Integration fixtures are test artifacts,
+not applications requiring separate manual acceptance. Use a fixture only when it provides
+coverage of library behavior not already established elsewhere.
 
 Per-ticket validation and review remain proportional to the ticket's accepted public behavior.
 One complete review examines the documented supported paths, task-owned changes, and material

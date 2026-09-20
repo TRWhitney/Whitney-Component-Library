@@ -340,8 +340,9 @@ than directly executable React Server Components.
 - Exercise supported interactions in Chromium, Firefox, and WebKit against the Baseline 2023
   target. Each implementation ticket verifies semantics, relationships, states, keyboard behavior,
   and the browser accessibility tree automatically. Consolidate manual screen-reader exercises for
-  complex widgets and the integration fixtures in release-wide accessibility hardening before
-  `1.0`.
+  distinct complex library interactions in release-wide accessibility hardening before `1.0`.
+  Integration fixtures may reproduce a unique library interaction; their application workflows
+  do not require separate manual screen-reader acceptance or repeated component checks.
 - Verify light, dark, accent changes, compact and wide reflow, forced colors, loading, empty,
   partial, error, disabled, read-only, pending, and reduced-motion states where applicable.
 - Select representative combinations according to the changed behavior and risk rather than

@@ -51,7 +51,11 @@
     "prototype:markdown": "node ./scripts/markdown-authoring-prototype.mjs",
     "prototype:markdown:build": "node ./scripts/markdown-authoring-prototype.mjs --build",
     "prototype:workbench": "node ./scripts/application-workbench-prototype.mjs",
-    "prototype:workbench:build": "node ./scripts/application-workbench-prototype.mjs --build"
+    "prototype:workbench:build": "node ./scripts/application-workbench-prototype.mjs --build",
+    "verify:release:browser": "node ./scripts/verify-release-browser.mjs",
+    "verify:release:integrations": "node ./scripts/verify-release-integrations.mjs",
+    "verify:release:accessibility": "node ./scripts/verify-release-accessibility.mjs",
+    "prototype:operational": "node ./scripts/release-operational.mjs"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",
@@ -81,6 +85,7 @@
     "unified": "11.0.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "9.39.5",
     "@testing-library/react": "16.3.2",
     "@types/d3-array": "3.2.2",
@@ -95,6 +100,7 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.11.0",
     "jsdom": "27.0.0",
+    "playwright": "1.61.1",
     "prettier": "3.9.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",

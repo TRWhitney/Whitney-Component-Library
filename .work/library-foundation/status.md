@@ -31,6 +31,8 @@ catalog, the accepted Markdown editing surface, the accessible chart family incl
 radar, heatmap, and compact charts, and the final compatibility and quality gates are required
 before `1.0`.
 
+Ticket 30 is complete. Browser and integration checks, focused Orca/Firefox exercises, native browser zoom, and visual/contrast evidence pass. See the [release effort](../release-hardening/status.md). Stable release acceptance remains separate work.
+
 ## Accepted foundation
 
 - React and TypeScript are the public consumption model. React Aria is a private behavior
@@ -301,7 +303,7 @@ clipboard, composition, SSR/hydration, and large-document behavior. Its
 [verification record](../markdown-live-preview/verification.md) contains the completion evidence.
 [Ticket 27](tickets/27-markdown-authoring-prerelease.md) and its [recorded cleanup](../authoring-cleanup/status.md) are complete.
 [Ticket 28](tickets/28-application-workbench-prerelease.md) is complete with no follow-up library corrections.
-Ticket 30 retains the remaining release-wide certification requirements.
+Ticket 30 completes the release-wide browser, accessibility, and visual hardening requirements. The final stable-candidate decision remains separate work.
 
 ## Accepted sources
 
@@ -550,3 +552,5 @@ Ticket 30 retains the remaining release-wide certification requirements.
 - Ticket 26 is complete. [Ticket 27](tickets/27-markdown-authoring-prerelease.md) is complete; the [recorded cleanup](../authoring-cleanup/status.md) is also complete.
 
 - Ticket 28 is complete. See the [application workbench delivery](../application-workbench-demo/status.md) for the retained fixture, evidence, and qualified final assessment.
+
+- Ticket 30 is complete. See the [release hardening evidence](../release-hardening/verification.md) and [focused screen-reader checklist](../release-hardening/screen-reader.md).
