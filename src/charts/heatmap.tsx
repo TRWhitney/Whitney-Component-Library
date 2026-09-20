@@ -1373,6 +1373,7 @@ export function Heatmap<Datum extends object>(sourceProps: HeatmapProps<Datum>):
             </div>
             <div
               aria-label={props.labels.colorKey}
+              role="group"
               data-scale={props.scale.type}
               data-wcl-heatmap-key=""
               style={frameStyle}

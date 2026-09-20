@@ -43,6 +43,13 @@ const common: Omit<HeatmapProps<Reading>, 'data'> = {
 };
 
 describe('Heatmap', () => {
+  it('names the color scale as a group with the missing-value meaning', () => {
+    render(<Heatmap {...common} data={[{hour: 'morning', location: 'north', value: 12}]} />);
+    expect(screen.getByRole('group', {name: 'Temperature scale'}).textContent).toContain(
+      'No reading',
+    );
+  });
+
   it('uses the consumer colors declared by sequential and two-sided scales', () => {
     const {container, rerender} = render(
       <Heatmap

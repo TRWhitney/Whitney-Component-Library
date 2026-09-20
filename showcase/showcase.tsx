@@ -3588,7 +3588,7 @@ function HeatmapInteractionExample({
     selectionEnabled,
     detailsEnabled,
     'cells touched by the rectangle',
-  )} Use two fingers to pan and pinch to zoom.`;
+  )} Tab into the named plot before its hide buttons. Shift plus arrow keys reads cells; plain arrow keys pan the view. Use two fingers to pan and pinch to zoom.`;
   const itemLabel = (item: HeatmapSelectionItem) =>
     `${heatmapRows.find((row) => row.id === item.rowId)?.label ?? item.rowId}, ${heatmapColumns.find((column) => column.id === item.columnId)?.label ?? item.columnId}`;
   const interaction: HeatmapInteraction<RoomReading> = {
@@ -4003,7 +4003,7 @@ function ChartSpecimens({accent}: {readonly accent: AccentColor}) {
       </Specimen>
 
       <Specimen
-        description="Show one numeric measure across two ordered domains. Zero is colored as a real value; patterned cells have no data. Use a two-sided scale only when its midpoint has a clear meaning. Dense grids hide inline values before moving into a labeled local scroll region."
+        description="Show one numeric measure across two ordered domains. Zero is colored as a real value; patterned cells have no data. The named color-scale group includes the numeric range and missing-value meaning. Use a two-sided scale only when its midpoint has a clear meaning. Dense grids hide inline values before moving into a labeled local scroll region."
         name="Heatmap"
       >
         <ChartExample label="Updated readings">
