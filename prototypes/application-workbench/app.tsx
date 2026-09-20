@@ -828,10 +828,21 @@ function Workspace({
                   isOpen={detailsOpen}
                   onOpenChange={setDetailsOpen}
                   trigger={
-                    <Button size="compact" variant="quiet" isDisabled={!available}>
-                      <Icon name="details" />
-                      <span className="desktop-copy">Details</span>
-                    </Button>
+                    small ? (
+                      <IconButton
+                        label="Details"
+                        size="compact"
+                        variant="quiet"
+                        isDisabled={!available}
+                      >
+                        <Icon name="details" />
+                      </IconButton>
+                    ) : (
+                      <Button size="compact" variant="quiet" isDisabled={!available}>
+                        <Icon name="details" />
+                        Details
+                      </Button>
+                    )
                   }
                 >
                   {inspector}
