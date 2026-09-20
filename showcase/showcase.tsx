@@ -1882,7 +1882,7 @@ function FileSpecimens() {
       </Specimen>
 
       <Specimen
-        description="Use a large acquisition target when drag, focused paste, and browsing should all work. Use FileTrigger for a compact button-only flow. The file icon moves only while the target is enabled, and invalid hover stays in the danger family."
+        description="Use a large acquisition target when drag, focused paste, and browsing should all work. Use FileTrigger for a compact button-only flow. Disabled and pending groups expose their unavailable state to assistive technology. The file icon moves only while the target is enabled, and invalid hover stays in the danger family."
         name="DropZone"
       >
         <ResponsiveGrid equalItems gap="regular" minimumItemWidth="compact">

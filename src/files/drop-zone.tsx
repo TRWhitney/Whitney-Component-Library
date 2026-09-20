@@ -76,6 +76,7 @@ export function DropZone({
     <div
       {...(describedBy === undefined ? {} : {'aria-describedby': describedBy})}
       aria-label={label}
+      aria-disabled={isDisabled || isPending || undefined}
       aria-invalid={isInvalid || undefined}
       data-wcl-drop-zone-container=""
       onDragEnterCapture={(event) => {

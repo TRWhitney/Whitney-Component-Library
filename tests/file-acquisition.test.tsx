@@ -145,6 +145,9 @@ describe('file acquisition', () => {
     );
     let zone = screen.getByText('Evidence').closest('[data-wcl-drop-zone]')!;
     expect(zone.hasAttribute('data-disabled')).toBe(true);
+    expect(screen.getByRole('group', {name: 'Evidence'}).getAttribute('aria-disabled')).toBe(
+      'true',
+    );
     expect(zone.hasAttribute('data-invalid')).toBe(false);
 
     rerender(
