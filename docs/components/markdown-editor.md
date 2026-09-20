@@ -78,7 +78,7 @@ MarkdownEditor edits a Markdown string with in-place Live Preview, source editin
 
 ## Accessibility
 
-- One accessible document representation is exposed in each mode. Live Preview and source use one multiline textbox; Live Preview includes semantic document structure in place. Preview is a labeled region with semantic headings, lists, tables, links, and code.
+- One accessible document representation is exposed in each mode. Live Preview and source use one multiline textbox; Live Preview includes semantic document structure in place. Preview is a labeled, focusable document for screen-reader reading commands, with semantic headings, lists, tables, links, and code.
 - Server output includes source text for editing modes or semantic reading preview. Hydration preserves that markup before enhancing the retained editing session.
 - Mode and source cursor position are associated with the field alongside its description, validation, pending, and lock feedback.
 
@@ -93,7 +93,7 @@ MarkdownEditor edits a Markdown string with in-place Live Preview, source editin
 - label is required and visible. The field creates its own description, error, mode, and position relationships.
 - To localize asset feedback, supply complete assets.labels with pending(fileCount), rejected(files), failed, retry, and dismiss. Application-returned error strings are already localized by the application.
 - Localize label, description, errorMessage, pendingMessage, lockMessage, and any supplied toolbar labels in the application. English mode, position, empty-preview, required-validation, and footnote copy is built in.
-- To localize built-in copy, supply a complete labels object with livePreview, source, preview, emptyPreview, required, footnotes, footnoteBack, and position(line, column). Optional readOnly and locked override the access labels and default to English when omitted.
+- To localize built-in copy, supply a complete labels object with livePreview, source, preview, emptyPreview, required, footnotes, footnoteBack, and position(line, column). Optional readOnly and locked override the access labels. Optional emptyTask names a task checkbox without task text. These optional labels default to English when omitted.
 - The field inherits writing direction; source selection and reading order follow the document text.
 
 ## Appearance and responsive behavior

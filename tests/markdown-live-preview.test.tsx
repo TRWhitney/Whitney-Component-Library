@@ -19,6 +19,46 @@ async function selectText(editor: HTMLElement, text: string, from: number, to = 
 }
 
 describe('Markdown Live Preview', () => {
+  it('keeps nested lists inside their owning list items', () => {
+    const {getByRole} = render(
+      <MarkdownEditor
+        label="Document"
+        defaultValue={'- Parent\n  - Child\n    - Grandchild\n- Sibling'}
+      />,
+    );
+    const lists = within(getByRole('textbox')).getAllByRole('list');
+    expect(lists).toHaveLength(3);
+    for (const list of lists) {
+      expect([...list.children].every((child) => child.getAttribute('role') === 'listitem')).toBe(
+        true,
+      );
+    }
+    expect(lists[1]?.parentElement?.getAttribute('role')).toBe('listitem');
+    expect(lists[2]?.parentElement?.getAttribute('role')).toBe('listitem');
+  });
+
+  it.each(['live-preview', 'preview'] as const)(
+    'names task checkboxes with their task text in %s',
+    (mode) => {
+      const {getByRole} = render(
+        <MarkdownEditor
+          mode={mode}
+          label="Document"
+          defaultValue={'- [x] Confirm the **mesh**\n- [ ] Inspect the boundary'}
+        />,
+      );
+      const editor = within(
+        getByRole(mode === 'preview' ? 'document' : 'textbox', {name: 'Document'}),
+      );
+      expect(editor.getByRole('checkbox', {name: 'Confirm the mesh'})).toMatchObject({
+        checked: true,
+      });
+      expect(editor.getByRole('checkbox', {name: 'Inspect the boundary'})).toMatchObject({
+        checked: false,
+      });
+    },
+  );
+
   it('renders inactive footnotes as a labeled numbered section and restores it after editing', () => {
     const markdown = 'Note[^a].\n\n[^a]: Evidence with **weight**.';
     const onChange = vi.fn();

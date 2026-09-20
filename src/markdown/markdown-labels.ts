@@ -3,6 +3,7 @@ import type {MarkdownEditorLabels} from './markdown-types.js';
 export const englishLabels: MarkdownEditorLabels = {
   readOnly: 'Read-only',
   locked: 'Locked',
+  emptyTask: 'Task',
   livePreview: 'Live Preview',
   source: 'Markdown source',
   preview: 'Preview',

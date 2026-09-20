@@ -12,6 +12,7 @@ import {liveFocus} from './live-effects.js';
 import {safeUrl} from './markdown-url.js';
 import {validatedRgba} from './rgba-color.js';
 import {footnoteContent, type LiveDocument} from './live-document.js';
+import {labelTaskCheckboxes} from './task-labels.js';
 
 // Only the private parser supplies this tree. Raw HTML becomes a text node; URL properties
 // use the same allowlist as reading preview. No HTML string is inserted into the document.
@@ -146,24 +147,27 @@ export class LiveWidget extends WidgetType {
     }
     appendTree(
       element,
-      footnote ??
-        toHast(root, {
-          allowDangerousHtml: true,
-          handlers: {
-            footnoteReference: (_state, node: FootnoteReference) => ({
-              type: 'element',
-              tagName: 'sup',
-              properties: {},
-              children: [
-                {
-                  type: 'text',
-                  value: String(this.document.footnotes.get(node.identifier) ?? node.identifier),
-                },
-              ],
-              ...(node.position ? {position: node.position} : {}),
-            }),
-          },
-        }),
+      labelTaskCheckboxes(
+        footnote ??
+          toHast(root, {
+            allowDangerousHtml: true,
+            handlers: {
+              footnoteReference: (_state, node: FootnoteReference) => ({
+                type: 'element',
+                tagName: 'sup',
+                properties: {},
+                children: [
+                  {
+                    type: 'text',
+                    value: String(this.document.footnotes.get(node.identifier) ?? node.identifier),
+                  },
+                ],
+                ...(node.position ? {position: node.position} : {}),
+              }),
+            },
+          }),
+        this.labels.emptyTask ?? 'Task',
+      ),
       owner,
       this.from,
       this.wikiLinks,
@@ -278,6 +282,7 @@ export class MarkerWidget extends WidgetType {
     readonly text: string,
     readonly checked: boolean | null = null,
     readonly decorative = true,
+    readonly label = '',
   ) {
     super();
   }
@@ -285,7 +290,8 @@ export class MarkerWidget extends WidgetType {
     return (
       this.text === other.text &&
       this.checked === other.checked &&
-      this.decorative === other.decorative
+      this.decorative === other.decorative &&
+      this.label === other.label
     );
   }
   override toDOM(view: EditorView): HTMLElement {
@@ -294,6 +300,7 @@ export class MarkerWidget extends WidgetType {
       element.type = 'checkbox';
       element.checked = this.checked ?? false;
       element.disabled = true;
+      element.setAttribute('aria-label', this.label);
     } else {
       element.textContent = this.text;
       if (this.decorative) element.setAttribute('aria-hidden', 'true');

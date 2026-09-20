@@ -24,6 +24,12 @@ import {resolveWikiLink} from './wiki-resolution.js';
 
 import {liveFocus, liveComposition, liveLabels} from './live-effects.js';
 
+function taskText(node: Nodes): string {
+  if ('value' in node) return node.value;
+  if (node.type === 'image') return node.alt ?? '';
+  return 'children' in node ? node.children.map(taskText).join('') : '';
+}
+
 interface LiveState {
   readonly document: LiveDocument;
   readonly focused: boolean;
@@ -86,7 +92,7 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
     const editing = active(from, to);
     if (isLiveSourceBlock(node)) {
       if (!editing) replace(node as RootContent, true);
-      else wrap(from, to, 'div', 50, {'data-wcl-live-source-block': node.type});
+      else wrap(from, to, 'div', 100 / (depth + 1), {'data-wcl-live-source-block': node.type});
       return;
     }
     if (
@@ -100,7 +106,7 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
       return;
     }
     if (node.type === 'heading') {
-      wrap(from, to, 'div', 60, {
+      wrap(from, to, 'div', 100 / (depth + 1), {
         role: 'heading',
         'aria-level': String(node.depth),
         'data-wcl-live-heading': String(node.depth),
@@ -141,10 +147,10 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
         });
       }
     } else if (node.type === 'list') {
-      wrap(from, to, 'div', 90 - depth, {role: 'list', 'data-wcl-live-list': ''});
+      wrap(from, to, 'div', 100 / (depth + 1), {role: 'list', 'data-wcl-live-list': ''});
       node.children.forEach((item, index) => {
         const range = sourceRange(item);
-        wrap(range.from, range.to, 'div', 80 - depth, {role: 'listitem'});
+        wrap(range.from, range.to, 'div', 100 / (depth + 2), {role: 'listitem'});
         const line = state.doc.lineAt(range.from);
         const prefix = /^(?:[-+*]|\d+[.)])\s+(?:\[[ xX]\]\s+)?/.exec(
           value.slice(range.from, line.to),
@@ -154,14 +160,21 @@ function present(state: EditorState, document: LiveDocument, focused: boolean) {
           hide(
             range.from,
             range.from + prefix.length,
-            new MarkerWidget(bullet, item.checked ?? null),
+            new MarkerWidget(
+              bullet,
+              item.checked ?? null,
+              true,
+              (item.children[0] ? taskText(item.children[0]).trim() : '') ||
+                state.facet(liveLabels).emptyTask ||
+                'Task',
+            ),
           );
         }
         item.children.forEach((child) => visit(child, depth + 2));
       });
       return;
     } else if (node.type === 'blockquote') {
-      wrap(from, to, 'blockquote', 95 - depth, {'data-wcl-live-quote': ''});
+      wrap(from, to, 'blockquote', 100 / (depth + 1), {'data-wcl-live-quote': ''});
       const startLine = state.doc.lineAt(from).number;
       const endLine = state.doc.lineAt(to).number;
       for (let number = startLine; number <= endLine; number++) {

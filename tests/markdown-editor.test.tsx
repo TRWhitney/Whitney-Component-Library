@@ -68,7 +68,7 @@ describe('Markdown editing', () => {
         defaultValue="Text"
       />,
     );
-    const region = getByRole('region', {name: 'Document'});
+    const region = getByRole('document', {name: 'Document'});
     const describedBy = region.getAttribute('aria-describedby')?.split(' ');
     expect(describedBy).toContain(getByText('Verrouillé').id);
     expect(describedBy).toContain(getByText('Another author is editing.').id);
@@ -108,7 +108,9 @@ describe('Markdown editing', () => {
         }
       />,
     );
-    expect(getByRole('heading', {name: 'Review', level: 1})).toBeTruthy();
+    const readingDocument = getByRole('document', {name: 'Document'});
+    expect(readingDocument.tabIndex).toBe(0);
+    expect(within(readingDocument).getByRole('heading', {name: 'Review', level: 1})).toBeTruthy();
     expect(container.querySelector('strong')?.textContent).toBe('Ready');
     expect(getByRole('table')).toBeTruthy();
     expect(getByRole('checkbox')).toMatchObject({checked: true, disabled: true});
@@ -153,7 +155,7 @@ describe('Markdown editing', () => {
     );
     const ids = [...container.querySelectorAll('[id]')].map((node) => node.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const region of container.querySelectorAll('[role="region"]')) {
+    for (const region of container.querySelectorAll('[role="document"]')) {
       for (const anchor of region.querySelectorAll('a')) {
         const target = document.getElementById(anchor.getAttribute('href')!.slice(1));
         expect(region.contains(target)).toBe(true);
@@ -171,7 +173,7 @@ describe('Markdown editing', () => {
         defaultValue="Before [[First]] between [[Second]] after."
       />,
     );
-    expect(getByRole('region').textContent).toBe('Before First between Second after.');
+    expect(getByRole('document').textContent).toBe('Before First between Second after.');
   });
 
   it('preserves mixed line endings and incomplete markup in public change events', () => {
@@ -195,7 +197,7 @@ describe('Markdown editing', () => {
         defaultValue={'# Heading\n\n[Guide](https://example.com)'}
       />,
     );
-    expect(getByRole('region').getAttribute('aria-disabled')).toBe('true');
+    expect(getByRole('document').getAttribute('aria-disabled')).toBe('true');
     expect(getByRole('heading', {name: 'Heading'})).toBeTruthy();
     const link = getByRole('link', {name: 'Guide'});
     expect(link.getAttribute('href')).toBeNull();
@@ -218,7 +220,7 @@ describe('Markdown editing', () => {
         mode="preview"
       />,
     );
-    expect(within(getByRole('region')).getByText('**Changed')).toBeTruthy();
+    expect(within(getByRole('document')).getByText('**Changed')).toBeTruthy();
     rerender(
       <MarkdownEditor mode="source" defaultValue="Original" label="Document" onChange={onChange} />,
     );
@@ -389,7 +391,7 @@ describe('Markdown editing', () => {
       getByRole('textbox').focus();
     });
     rerender(<MarkdownEditor label="Document" defaultValue="# Reading" mode="preview" />);
-    expect(document.activeElement).toBe(getByRole('region'));
+    expect(document.activeElement).toBe(getByRole('document'));
     rerender(<MarkdownEditor mode="source" label="Document" defaultValue="# Reading" />);
     expect(document.activeElement).toBe(getByRole('textbox'));
   });

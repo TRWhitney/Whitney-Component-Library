@@ -89,6 +89,7 @@ export interface MarkdownEditorLabels {
   /** Defaults to English when omitted for compatibility with existing label sets. */
   readonly readOnly?: string;
   readonly locked?: string;
+  readonly emptyTask?: string;
   readonly livePreview: string;
   readonly source: string;
   readonly preview: string;

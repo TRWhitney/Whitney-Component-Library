@@ -364,7 +364,7 @@ export function MarkdownEditor({
           <div
             ref={preview}
             data-wcl-markdown-preview=""
-            role="region"
+            role="document"
             aria-labelledby={labelId}
             aria-describedby={describedBy}
             aria-disabled={disabled || undefined}

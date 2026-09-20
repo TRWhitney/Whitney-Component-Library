@@ -13,6 +13,7 @@ import {resolveWikiLink} from './wiki-resolution.js';
 
 import {safeUrl} from './markdown-url.js';
 import {validatedRgba} from './rgba-color.js';
+import {taskCheckboxLabels} from './task-labels.js';
 
 // mdast's footnote heading uses a fixed ID. Scope every generated ID and local fragment to
 // this mounted field so multiple documents and server hydration agree.
@@ -91,7 +92,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
         },
       }}
       remarkPlugins={[remarkGfm, remarkWikiLinks, [remarkExtensionSyntax, syntax]]}
-      rehypePlugins={[[scopeFootnotes, prefix]]}
+      rehypePlugins={[
+        [scopeFootnotes, prefix],
+        [taskCheckboxLabels, labels.emptyTask ?? 'Task'],
+      ]}
       remarkRehypeOptions={{
         clobberPrefix: prefix,
         footnoteLabel: labels.footnotes,

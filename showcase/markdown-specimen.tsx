@@ -27,7 +27,7 @@ const reviewNotes = [
   '',
   '## Review checklist',
   '',
-  '- [x] Confirm the mesh',
+  '- [x] Confirm the **mesh**',
   '- [ ] Inspect the north boundary',
   '  - Compare the last two runs',
   '',
@@ -213,7 +213,8 @@ export function MarkdownSpecimen() {
       </InlineGroup>
       <p>
         Read-only and locked documents have a distinct document background, dashed border, and lock
-        indicator.
+        indicator. In Preview, Tab to the document and use your screen reader's reading commands to
+        explore the text, headings, and tables. Tab moves onward to links.
       </p>
       <div style={{blockSize: fillHeight ? parentHeight : undefined}}>
         <MarkdownEditor
@@ -406,7 +407,9 @@ export function MarkdownSpecimen() {
         source. Fenced code also reveals its complete source. Move outside the construct to see its
         rendered form again. Inactive footnotes show the same heading and numbered entries as
         Preview; click a footnote to edit its Markdown definition. Switching modes retains the
-        Markdown, selection, and undo history.
+        Markdown, selection, and undo history. Nested lists retain their item hierarchy. Task
+        checkboxes announce the task text and checked state in Live Preview and Preview;
+        labels.emptyTask names an empty task.
       </p>
       <p>
         Select text and use the formatting toolbar, or press Ctrl/Cmd+B for bold, Ctrl/Cmd+I for
