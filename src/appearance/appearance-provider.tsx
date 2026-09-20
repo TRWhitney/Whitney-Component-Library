@@ -62,6 +62,7 @@ function surfaceRoleStyles(surface: AccentSurface, roles: SurfaceAccentRoles): P
     [`--wcl-accent-muted-on-${surface}`]: roles.muted,
     [`--wcl-accent-rail-on-${surface}`]: roles.rail,
     [`--wcl-accent-soft-on-${surface}`]: roles.soft,
+    [`--wcl-accent-text-on-${surface}`]: roles.text,
     ...Object.fromEntries(
       roles.chartSeries.map((color, index) => [
         `--wcl-chart-series-${index + 2}-on-${surface}`,

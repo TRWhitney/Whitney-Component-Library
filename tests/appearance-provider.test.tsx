@@ -154,6 +154,12 @@ describe('AppearanceProvider', () => {
         expect(contrastRatio(componentSurface, focus)).toBeGreaterThanOrEqual(3);
         expect(contrastRatio(componentSurface, rail)).toBeGreaterThanOrEqual(3);
         expect(contrastRatio(componentSurface, muted)).toBeGreaterThanOrEqual(3);
+        expect(
+          contrastRatio(
+            componentSurface,
+            provider.style.getPropertyValue(`--wcl-accent-text-on-${surfaceName}`),
+          ),
+        ).toBeGreaterThanOrEqual(4.5);
       }
       expect(provider.style.getPropertyValue('--wcl-accent-text')).toBe('');
     },

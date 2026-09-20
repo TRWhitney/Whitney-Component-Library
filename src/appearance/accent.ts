@@ -22,6 +22,7 @@ export interface SurfaceAccentRoles {
   readonly muted: string;
   readonly rail: string;
   readonly soft: string;
+  readonly text: string;
 }
 
 export interface AccentRoles {
@@ -114,6 +115,7 @@ function deriveSurfaceRoles(
         ? toHex(sourceRgb)
         : toHex(oklchToRgb(signal)),
     soft: toHex(softRgb),
+    text: toHex(oklchToRgb(vividContrast(source, [componentSurface], CONTENT_CONTRAST, direction))),
   };
 }
 

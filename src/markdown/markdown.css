@@ -497,7 +497,7 @@ div[data-wcl-live-widget] {
   }
 
   [data-wcl-markdown-treatment='accent'] {
-    color: var(--wcl-accent-focus);
+    color: var(--wcl-accent-text-on-base);
   }
 
   [data-wcl-markdown-treatment='muted'] {

@@ -409,7 +409,8 @@ export function MarkdownSpecimen() {
         Preview; click a footnote to edit its Markdown definition. Switching modes retains the
         Markdown, selection, and undo history. Nested lists retain their item hierarchy. Task
         checkboxes announce the task text and checked state in Live Preview and Preview;
-        labels.emptyTask names an empty task.
+        labels.emptyTask names an empty task. The TODO annotation uses a text-contrast accent color
+        across appearances.
       </p>
       <p>
         Select text and use the formatting toolbar, or press Ctrl/Cmd+B for bold, Ctrl/Cmd+I for
@@ -435,6 +436,8 @@ export function MarkdownSpecimen() {
         color and opacity. This extension also adds ==highlighted text==, a review-note fenced
         block, a TODO annotation in editing modes, and run: wiki destinations. Source keeps the
         exact Markdown. Applications register these declarations without parser plugins or HTML.
+        Authored colors stay exact across themes. Choose them for the backgrounds your application
+        supports; forced-colors mode uses system text colors.
       </p>
     </Stack>
   );
