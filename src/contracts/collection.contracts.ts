@@ -596,6 +596,7 @@ export const treeContract = {
     'Tree owns a labeled tree grid with hierarchical levels, positions, expansion state, disabled items, and optional selection.',
     'Every expandable item includes a named chevron control. Nested actions remain separate named controls.',
     'With no items, a named feedback group preserves the collection context without an empty tree grid.',
+    'When external SearchField filtering changes results, the application supplies a persistent role=status region with aria-atomic=true for its localized result count and no-results message. Keep that region mounted while results change, and leave focus in Search. Count matching records using application meaning rather than counting hierarchy containers.',
   ],
   appearance: sharedCollectionAppearance,
   appropriateUses: [

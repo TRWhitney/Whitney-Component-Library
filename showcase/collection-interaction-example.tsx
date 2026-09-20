@@ -28,9 +28,9 @@ export function SearchableTreeExample() {
   return (
     <Stack gap="tight">
       <p>
-        Search keeps focus through empty results. Right-click a campus for expansion commands or a
-        building for inspection. Shift+F10 opens the same row commands. Visible actions stay
-        independent.
+        Search announces matching buildings and keeps focus through empty results. Right-click a
+        campus for expansion commands or a building for inspection. Shift+F10 opens the same row
+        commands. Visible actions stay independent.
       </p>
       <SearchField
         clearLabel="Clear building search"
@@ -38,6 +38,11 @@ export function SearchableTreeExample() {
         onChange={setQuery}
         value={query}
       />
+      <p role="status" aria-label="Building search results" aria-atomic="true">
+        {matches.length === 0
+          ? 'No matching buildings.'
+          : `${matches.length} ${matches.length === 1 ? 'building' : 'buildings'} found.`}
+      </p>
       <Tree
         ariaLabel="Campus buildings"
         contextMenu={{

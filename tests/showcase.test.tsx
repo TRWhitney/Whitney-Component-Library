@@ -4,10 +4,31 @@ import {afterEach, describe, expect, it} from 'vitest';
 import {componentContracts} from '../src/contracts/index.js';
 import {showcasedComponentNames} from '../showcase/catalog.js';
 import {Showcase} from '../showcase/showcase.js';
+import {SearchableTreeExample} from '../showcase/collection-interaction-example.js';
 
 afterEach(cleanup);
 
 describe('component showcase', () => {
+  it('reports filtered building results without moving focus out of search', async () => {
+    render(<SearchableTreeExample />);
+    const search = screen.getByRole('searchbox', {name: 'Find a building'});
+    const status = screen.getByRole('status', {name: 'Building search results'});
+    expect(status.getAttribute('aria-atomic')).toBe('true');
+    expect(status.textContent).toMatch(/3 buildings/);
+    search.focus();
+    fireEvent.change(search, {target: {value: 'Elm'}});
+    await waitFor(() => expect(status.textContent).toMatch(/1 building/));
+    expect(document.activeElement).toBe(search);
+    fireEvent.change(search, {target: {value: 'zzzz'}});
+    await waitFor(() => expect(status.textContent).toMatch(/No matching buildings/));
+    expect(screen.queryByRole('treegrid')).toBeNull();
+    expect(document.activeElement).toBe(search);
+    fireEvent.click(screen.getByRole('button', {name: 'Clear building search'}));
+    await waitFor(() => expect(status.textContent).toMatch(/3 buildings/));
+    expect(screen.getByRole('treegrid', {name: 'Campus buildings'})).toBeTruthy();
+    expect(document.activeElement).toBe(search);
+  });
+
   it('keeps application appearance options together in the sidebar', () => {
     const {container} = render(<Showcase />);
     const sidebar = container.querySelector('aside')!;
