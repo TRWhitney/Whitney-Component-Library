@@ -174,9 +174,15 @@ it('opens touch context actions from a nested row without pressing unrelated row
     expect(container.querySelector('[data-pressed]')).toBeNull();
     fireEvent.pointerUp(document, {pointerType: 'touch', pointerId: 1, button: 0});
   } finally {
-    cleanup();
-    platform.mockRestore();
-    vi.unstubAllGlobals();
+    try {
+      cleanup();
+      // iOS restores text selection after the long-press delay and a frame.
+      // Let that work finish before removing the mocked platform or DOM.
+      await waitFor(() => expect(document.documentElement.style.webkitUserSelect).not.toBe('none'));
+    } finally {
+      platform.mockRestore();
+      vi.unstubAllGlobals();
+    }
   }
 });
 
