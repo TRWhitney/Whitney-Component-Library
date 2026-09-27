@@ -1,0 +1,23 @@
+Build a small React application called Trail kit in this existing repository. Use the dependencies already installed, native HTML and CSS as appropriate. Do not install packages, consult another app or repository, or use the internet. Application source belongs in src/. Run npm run check and verify the app with the installed Playwright Chromium at 390px and 1280px. Use the fixed port from npm run dev; do not kill other processes. Browser checks you write count as work, but keep them separate from application source. Finish with what works, verification, and any limitations.
+
+The initial data is:
+- item id shelter, name Alpine shelter, category Shelter, weight 1800 grams
+- item id stove, name Pocket stove, category Cooking, weight 240 grams
+- item id lamp, name Headlamp, category Lighting, weight 85 grams
+
+Show a page heading Trail kit, a brief useful description, an item count, and a list of these items. Each item must be an article with an accessible name equal to its current item name, a visible heading, category, weight in grams, and buttons named Edit and Delete. Use stable item identities. No persistence or network is needed.
+
+A field labeled Search items filters names case-insensitively as the value changes. Whitespace around the search is ignored. Show the visible and total counts using text such as 2 of 3 items. With no matches, show No items found and a Clear search button that restores all items.
+
+Edit opens a modal dialog named Edit item. It has a required text field labeled Item name, initialized to the current name, and Save and Cancel buttons. Save trims the value and rejects empty or all-whitespace names without closing. Save changes only that item. Cancel and Escape discard the draft. After any close, focus returns to that item's Edit button when it still exists. The modal must receive focus and contain Tab/Shift+Tab navigation.
+
+Delete opens a modal dialog named Delete item, identifies the target by name, and offers Delete item and Cancel buttons. Cancel and Escape preserve the item and return focus to its Delete button. Confirmation removes only the target, updates search/count results, closes, and focuses Search items. Confirmation must not happen on opening. The modal must receive focus and contain Tab/Shift+Tab navigation.
+
+Visual requirements, equally important as behavior:
+- A coherent light appearance with a pale neutral page, contrasting item surfaces, dark text, and a restrained green accent. Native and library controls are both valid; no exact component appearance is required.
+- Content centered with a maximum width between 900 and 1150px; generous outer space at 1280px, at least 16px side padding at 390px. Search appears above the item list. Items form a vertical list.
+- Clear heading/body/metadata hierarchy. Consistent control styling and spacing. Edit and Delete remain visually distinguishable. Controls have visible keyboard focus and accessible labels; normal text contrast must be at least 4.5:1 and large headings at least 3:1.
+- At both widths, page, articles and dialogs fit without horizontal clipping. Text and actions may wrap; nothing should overlap or become inaccessible. Dialog content may scroll vertically when necessary. Keep controls usable at the smaller width.
+- Do not override dependency-internal selectors or attributes to restyle package controls. Use supported public APIs and your own layout styles.
+
+Include a ?identify mode that reveals stable region names on hover/focus without changing normal layout. It is only a review aid.

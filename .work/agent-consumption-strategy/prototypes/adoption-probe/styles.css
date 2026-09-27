@@ -1,0 +1,247 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #173b36;
+  background: #f5f0e7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.page,
+.style-probe {
+  max-width: 1050px;
+  margin: auto;
+  padding: 48px 32px;
+}
+
+h1 {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  margin: 12px 0;
+}
+
+h2 {
+  font-size: 1.1rem;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+}
+
+.custom-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.editor {
+  padding: 24px;
+  border: 2px solid #173b36;
+  background: #fffdf7;
+}
+
+.summary {
+  padding: 8px 24px;
+  border-left: 3px solid #b9844d;
+}
+
+dt {
+  font-size: 0.8rem;
+  margin-top: 20px;
+}
+
+dd {
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.immediate {
+  margin-bottom: 24px;
+}
+
+form {
+  display: grid;
+  gap: 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.native-form .field {
+  display: grid;
+  gap: 8px;
+}
+
+.native-form fieldset {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #647970;
+}
+
+.native-form fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.native-form input[type='email'] {
+  width: 100%;
+  padding: 12px;
+  font: inherit;
+  border: 1px solid #647970;
+}
+
+.native-form button,
+.immediate > button {
+  font: inherit;
+  padding: 10px 16px;
+  border: 1px solid #173b36;
+  background: #fffdf7;
+  color: #173b36;
+}
+
+.native-form input:focus-visible,
+.native-form button:focus-visible,
+.immediate > button:focus-visible {
+  outline: 3px solid #b9844d;
+  outline-offset: 3px;
+}
+
+.bespoke-field {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.bespoke-label {
+  margin: 0;
+  font:
+    700 16px/24px system-ui,
+    sans-serif;
+  color: #173b36;
+}
+
+.bespoke-control {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid #173b36;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bespoke-input {
+  display: block;
+  width: 100%;
+  height: 46px;
+  min-height: 0;
+  border: 0;
+  padding: 10px 4px;
+  border-radius: 0;
+  background: transparent;
+  color: #173b36;
+  font:
+    16px/24px system-ui,
+    sans-serif;
+}
+
+.bespoke-input:focus-visible {
+  outline: 2px solid #b9844d;
+  outline-offset: 2px;
+}
+
+.bespoke-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  height: 46px;
+  padding: 10px 24px;
+  border: 2px solid #173b36;
+  border-radius: 0;
+  background: #173b36;
+  color: #fffdf7;
+  box-shadow: none;
+  font:
+    700 16px/22px system-ui,
+    sans-serif;
+}
+
+.bespoke-button:focus-visible {
+  outline: 2px solid #b9844d;
+  outline-offset: 3px;
+}
+
+[data-identify] [data-probe]:hover::before,
+[data-identify] [data-probe]:focus-within::before {
+  content: attr(data-probe);
+  position: absolute;
+  background: #111;
+  color: white;
+  font: 12px sans-serif;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@media (width <= 700px) {
+  .page,
+  .style-probe {
+    padding: 24px 20px;
+  }
+
+  .custom-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .editor {
+    padding: 16px;
+  }
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  aspect-ratio: 1;
+}
+
+.board-cell {
+  border: 1px solid #173b36;
+  background: #fffdf7;
+  color: #173b36;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.board-cell:nth-child(2n) {
+  background: #ded7c5;
+}
+
+.board-cell[data-legal] {
+  box-shadow: inset 0 0 0 3px #b9844d;
+}
+
+.board-cell:focus-visible {
+  outline: 3px solid #a23e19;
+  outline-offset: -5px;
+}
+
+.game-controls {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}

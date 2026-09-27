@@ -78,8 +78,9 @@ Every public export also has one canonical structured component contract. A cont
 
 Human documentation, `./manifest.json`, and `./agent-index.md` derive from these contracts.
 Verification rejects incomplete contracts, invalid references, generation drift, uncompilable
-examples, and public-type leakage. Agent-output evaluation is not part of the repository or a
-prescribed consumer workflow.
+examples, and public-type leakage. A small comparative agent-output evaluation is authorized for
+the [agent consumption strategy pass](../agent-consumption-strategy/status.md). It does not
+establish an ongoing evaluation suite, release gate, or prescribed consumer workflow.
 
 ### Style, theme, and visual behavior
 
@@ -356,7 +357,8 @@ than directly executable React Server Components.
 - Establish representative responsiveness budgets for large Markdown documents and chart data.
 - Treat canonical-contract completeness, generated output drift, invalid references, public type
   leakage, and uncompilable examples as build failures.
-- Do not add an agent-output evaluation suite.
+- Limit agent-output evaluation to the authorized small comparative strategy pass; do not add an
+  ongoing evaluation suite or release gate.
 
 ## Out of Scope
 
@@ -369,7 +371,8 @@ than directly executable React Server Components.
   transport, or plugin compatibility.
 - Geographic maps, network graphs, Sankey diagrams, treemaps, candlesticks, 3D charts, dashboard
   layout, rich-text document formats, media players, or spatial canvas manipulation.
-- Repository-owned or prescribed agent-output adherence evaluation.
+- Ongoing repository-owned or prescribed consumer agent-output evaluation beyond the authorized
+  small comparative strategy pass.
 
 ## Further Notes
 

@@ -13,6 +13,13 @@ The library is the product. Front-end design work applies to its reusable visual
 interaction contracts, composition rules, and agent-facing affordances rather than to one example
 application.
 
+## Active investigation
+
+[Agent consumption Ticket 01](../agent-consumption-strategy/tickets/01-reduce-agent-lifecycle-cost.md)
+continues the bounded efficiency investigation before Ticket 31. Read the
+[findings summary](../agent-consumption-strategy/research/findings-summary.md) for the measured effects
+and remaining native-comparison gap. This is research continuation, not a new release gate.
+
 ## Decisions so far
 
 - [Supported consumption model](decisions/01-consumption-model.md): Target web applications using
@@ -76,5 +83,6 @@ application.
 - General consumer customization of the library's visual token system in the first release.
 - Re-exporting React Aria components or adopting their complete prop types as this library's public
   interface.
-- Agent-output adherence evaluation as a repository responsibility or prescribed consumer
-  workflow.
+- Ongoing agent-output evaluation or a prescribed consumer evaluation workflow. The
+  [agent consumption strategy pass](../agent-consumption-strategy/status.md) has a limited
+  exception for a small comparative evaluation.

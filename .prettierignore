@@ -4,3 +4,6 @@ node_modules/
 .typecheck-*/
 docs/components/
 package-lock.json
+# Preserve agent-evaluation evidence exactly as captured.
+.work/agent-consumption-strategy/research/pilot/
+.work/agent-consumption-strategy/prototypes/maintenance-archive/proof/**/results.json

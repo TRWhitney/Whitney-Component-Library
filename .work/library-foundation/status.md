@@ -297,6 +297,11 @@ type, and contract conventions while adding only the behavior its data unit requ
 
 ## Frontier
 
+Before foundation Ticket 31, continue the agent-efficiency investigation through
+[Agent consumption Ticket 01](../agent-consumption-strategy/tickets/01-reduce-agent-lifecycle-cost.md).
+Its [findings summary](../agent-consumption-strategy/research/findings-summary.md) separates demonstrated
+code reductions from unresolved token savings. This bounded research does not add a release gate.
+
 See the [decision map](map.md). [Ticket 25](tickets/25-markdown-live-preview.md) delivers
 in-place Markdown authoring, its canonical guidance and rendered example, and verified keyboard,
 clipboard, composition, SSR/hydration, and large-document behavior. Its
@@ -328,7 +333,9 @@ Ticket 30 completes the release-wide browser, accessibility, and visual hardenin
 - Designing one application as the library's primary outcome.
 - General consumer customization of the internal visual-token system in the first release.
 - Re-exporting React Aria or adopting its complete prop types as the public API.
-- Repository-owned evaluation of agent output or a prescribed consumer evaluation workflow.
+- Ongoing evaluation of agent output or a prescribed consumer evaluation workflow. A small
+  comparative evaluation is authorized for the
+  [agent consumption strategy pass](../agent-consumption-strategy/status.md).
 
 ## Current verification
 
@@ -554,3 +561,6 @@ Ticket 30 completes the release-wide browser, accessibility, and visual hardenin
 - Ticket 28 is complete. See the [application workbench delivery](../application-workbench-demo/status.md) for the retained fixture, evidence, and qualified final assessment.
 
 - Ticket 30 is complete. See the [release hardening evidence](../release-hardening/verification.md) and [focused screen-reader checklist](../release-hardening/screen-reader.md).
+
+- Agent-efficiency continuation: [Ticket 01](../agent-consumption-strategy/tickets/01-reduce-agent-lifecycle-cost.md),
+  ready for planning. The ticket retains the next comparison, accepted scope and artifact recovery notes.

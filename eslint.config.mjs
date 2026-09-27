@@ -20,6 +20,8 @@ export default defineConfig(
     'node_modules/**',
     'coverage/**',
     '.typecheck-*/**',
+    // Captured evaluation outputs, not maintained application code.
+    '.work/agent-consumption-strategy/research/pilot/**',
   ]),
   {
     files: javascriptFiles,
@@ -29,7 +31,10 @@ export default defineConfig(
     },
   },
   {
-    files: ['.work/**/*.js'],
+    files: [
+      '.work/**/*.js',
+      '.work/agent-consumption-strategy/prototypes/maintenance-fixes/verification/{testing,verify}.mjs',
+    ],
     languageOptions: {
       globals: {
         ...globals.browser,

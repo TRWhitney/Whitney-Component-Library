@@ -1,0 +1,150 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #173b36;
+  background: #f5f0e7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 1050px;
+  margin: auto;
+  padding: 48px 32px;
+}
+
+h1 {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  margin: 12px 0;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+}
+
+.custom-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  aspect-ratio: 1;
+}
+
+.board-cell {
+  position: relative;
+  min-width: 0;
+  border: 1px solid #173b36;
+  background: #fffdf7;
+  color: #173b36;
+  cursor: pointer;
+  font: inherit;
+}
+
+.board-cell:nth-child(2n) {
+  background: #ded7c5;
+}
+
+.board-cell[data-legal] {
+  box-shadow: inset 0 0 0 3px #b9844d;
+}
+
+.board-cell[data-selected] {
+  border: 3px solid #173b36;
+}
+
+.board-cell:focus-visible {
+  outline: 3px solid #a23e19;
+  outline-offset: -5px;
+}
+
+.square-number {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  font-size: 11px;
+}
+
+.piece-mark {
+  display: block;
+  font-size: 2rem;
+}
+
+.piece-label {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.game-controls {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.reset-button {
+  padding: 12px;
+  border: 1px solid #173b36;
+  color: #173b36;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.reset-button:focus-visible {
+  outline: 3px solid #a23e19;
+  outline-offset: 3px;
+}
+
+.inspector-form {
+  display: grid;
+  gap: 16px;
+}
+
+.inspector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.inspector-form input {
+  font: inherit;
+  padding: 8px;
+}
+
+html[data-identify] [data-probe]:hover::before,
+html[data-identify] [data-probe]:focus-within::before {
+  content: attr(data-probe);
+  position: absolute;
+  background: #111;
+  color: white;
+  font: 12px sans-serif;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@media (width <= 700px) {
+  .page {
+    padding: 24px 20px;
+  }
+
+  .custom-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .piece-mark {
+    font-size: 1.5rem;
+  }
+}

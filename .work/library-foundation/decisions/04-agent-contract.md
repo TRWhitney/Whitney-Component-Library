@@ -32,8 +32,10 @@ Accepted boundary:
 - Reusable composites are supported exports when they own one recurring semantic or behavioral
   relationship. Contracts do not direct agents toward library-owned application arrangements.
 - Repository verification is deterministic: contract completeness and references, generated
-  artifact drift, example compilation, public types, and component behavior. Agent-output
-  adherence evaluation is neither owned here nor prescribed as a consumer workflow.
+  artifact drift, example compilation, public types, and component behavior. Whitney authorized a
+  small comparative agent-output evaluation for the
+  [agent consumption strategy pass](../../agent-consumption-strategy/status.md). This exception
+  does not establish an ongoing evaluation suite or prescribed consumer workflow.
 
 ## Evidence
 

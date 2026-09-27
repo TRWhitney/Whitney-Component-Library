@@ -19,7 +19,9 @@ compatibility decision.
       public surface.
 - [ ] The stable semantic-versioning boundary and default package tag are prepared but not applied
       without explicit authorization.
-- [ ] The evidence explicitly excludes agent-output evaluation and does not imply it was performed.
+- [ ] The evidence accurately distinguishes any completed small comparative agent evaluation from
+      deterministic release checks, states its limits, and does not imply broader evaluation or
+      make it an ongoing release gate.
 - [ ] Whitney receives the stable-candidate evidence and explicitly accepts or returns the work to
       the earliest responsible planning or implementation ticket.
 
