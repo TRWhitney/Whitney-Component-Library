@@ -1,47 +1,47 @@
 // Short guidance reviewed against canonical contracts. See docs/research/agent-guidance-proposal.md.
 export const essentials = {
   AppearanceProvider: [
-    'Wrap library components once. appearance is light or dark; accent is required and must be an exact six-digit hex color.',
-    'The provider supplies appearance, accent, and density. It adds no form or focus behavior.',
+    'Wrap library components once. appearance is light/dark; required accent is six-digit hex.',
+    'Supplies appearance, accent and density; no form or focus behavior.',
   ],
   Button: [
-    'Use onPress for activation. Disabled and pending buttons do not activate; pending requires pendingLabel.',
-    'type defaults to button. Set type="submit" or "reset" explicitly. form connects a button to a form by id.',
-    'Visible children name the button. Enter and Space activate it. Arbitrary className and style are unsupported.',
+    'Use onPress for activation. Disabled/pending buttons do not activate; pending requires pendingLabel.',
+    'type defaults to button; set submit/reset explicitly. form links the button to a form id.',
+    'Visible children name the button; Enter/Space activate it. Arbitrary className/style unsupported.',
   ],
   Dialog: [
-    'Use exactly one library Button or IconButton as trigger. title, description, and closeLabel are required.',
-    'Use isOpen plus onOpenChange for controlled state, or defaultOpen for uncontrolled state. Escape, backdrop press, close button, and actions calling close dismiss it.',
-    'The library labels the modal, hides background content from assistive technology, moves focus inside, contains Tab and Shift+Tab, and restores trigger focus. Initial focus is the close control.',
-    'Consumers own task data and validation. The overlay is not a form. Footer actions receive close; connect a submit button to a body form with matching form/id values.',
+    'Use exactly one library Button/IconButton as trigger. Require title, description, closeLabel.',
+    'Control with isOpen/onOpenChange, or use defaultOpen for uncontrolled state. Escape, backdrop press, close button and actions calling close dismiss.',
+    'Labels the modal, hides background from assistive technology, focuses the close control, contains Tab/Shift+Tab and restores trigger focus.',
+    'Consumers own data/validation. Dialog is not a form. Footer actions receive close; link a footer submit button to the body form with matching form/id.',
   ],
   TextField: [
-    'label is required and visible. value/onChange control the complete string; defaultValue allows uncontrolled use.',
-    'The library associates descriptions, required state, and errors with the native input. Set isInvalid and errorMessage for application errors.',
-    'validationBehavior defaults to native. Use "aria" with application validation to avoid native validation blocking custom feedback. name/form retain native serialization.',
-    'Pending is read-only. Native editing, composition, autofill, and input constraints remain available.',
+    'Provide visible label. value/onChange control the whole string; defaultValue initializes uncontrolled text.',
+    'Associates descriptions, required state and errors with the native input. Set isInvalid/errorMessage for application errors.',
+    'validationBehavior defaults to native; use aria for application validation so native checks cannot block custom feedback. name/form serialize natively.',
+    'Pending is read-only. Native editing, composition, autofill and constraints remain.',
   ],
   Checkbox: [
-    'label is visible and required. isSelected/onChange control a boolean; defaultSelected allows uncontrolled use. Space toggles.',
-    'isRequired supports acknowledgement. isInvalid/errorMessage show associated application errors; validationBehavior chooses native or ARIA validation.',
-    'Only checked controls submit name/value. Native reset restores defaultSelected. isIndeterminate changes appearance and announcement, not the submitted value.',
+    'Provide visible label. isSelected/onChange control a boolean; defaultSelected initializes uncontrolled state. Space toggles.',
+    'isRequired supports acknowledgement. isInvalid/errorMessage associate application errors; validationBehavior chooses native/aria.',
+    'Only checked controls submit name/value. Native reset restores defaultSelected. isIndeterminate affects appearance/announcement, not submission.',
   ],
   Tabs: [
-    'Supply ariaLabel and nonempty items with unique stable ids, labels, and matching panel content. Tabs select peer panels, not URL routes.',
-    'Use selectedId/onSelectionChange or defaultSelectedId. Arrow keys follow orientation; automatic activation selects on focus, manual activation waits for Enter or Space.',
-    'The library owns tab/panel relationships and focus. Selection is separate from form data; application state belongs outside panels when it must survive panel changes.',
+    'Require ariaLabel and nonempty items: unique stable ids, labels, matching panels. Peer panels, not URL routes.',
+    'Control with selectedId/onSelectionChange, or initialize with defaultSelectedId. Defaults: horizontal/automatic; without either id, first enabled item. Arrows follow orientation; automatic selects on focus, manual on Enter/Space.',
+    'Owns tab/panel relationships and focus. Selection is not form data. Keep application state outside panels to survive switches.',
   ],
   SearchField: [
-    'label and clearLabel are required. value/onChange control query text; defaultValue allows uncontrolled use.',
-    'The native search input exposes a clear command only for editable nonempty queries. Enter invokes onSubmit; Escape or clear invokes onClear. Consumers own filtering.',
-    'Descriptions and errors are associated automatically. Pending is read-only; name/form retain native string serialization.',
+    'Require label/clearLabel. value/onChange control query text; defaultValue initializes uncontrolled text.',
+    'Native search input shows a clear command only for editable nonempty queries. Enter invokes onSubmit; Escape/clear invokes onClear. Consumers filter.',
+    'Associates descriptions/errors. Pending is read-only; name/form serialize strings natively.',
   ],
   Table: [
-    'Supply ariaLabel, columns with unique ids, and stable keyed rows. Every row must have exactly one cell per column; at least one data column must be isRowHeader.',
-    'Set selectionMode explicitly. kind="actions" columns hold named controls; those controls do not select or activate rows.',
-    'Consumers filter and sort rows. Sortable columns require onSortChange; pass the active sort descriptor back and reorder rows yourself. The library does not mutate data.',
-    'Provide emptyState with no-data or no-results copy. minimumWidth="content" fits short tables; the default 38rem causes deliberate horizontal scrolling.',
-    'The library owns labeled grid/header/cell relationships and sort state. Enter sorts headers; arrows move through cells. Stable ids preserve focus during reordering.',
+    'Require ariaLabel, unique column ids, stable row keys, one cell per column and a data column with isRowHeader.',
+    'Set selectionMode explicitly. kind="actions" columns contain named controls; these never select/activate rows.',
+    'Consumers filter/sort. Sortable columns require onSortChange: pass the active descriptor back and reorder rows. Table never mutates data.',
+    'Provide emptyState with no-data/no-results copy. minimumWidth="content" fits short tables; default 38rem scrolls horizontally.',
+    'Owns labeled grid/header/cell relationships and sort state. Enter sorts headers; arrows navigate cells. Stable ids preserve focus on reorder.',
   ],
 };
 
@@ -62,7 +62,7 @@ export const examples = {
 export const layoutSupplements = {
   Table: `## Responsive composition
 
-Table renders its own horizontal scroll container. A numeric minimumWidth keeps columns wide inside that container; "content" lets cells wrap. Bound the surrounding layout instead of hiding page overflow. A consumer wrapper can provide an additional scroll boundary when a parent grid measures the wide content.
+Table owns a horizontal scroll container. Numeric minimumWidth keeps columns wide; "content" lets cells wrap. Bound surrounding layout; do not hide page overflow. Add a consumer scroll wrapper if a parent grid measures wide content.
 
 \`\`\`tsx
 <div className="table-frame">
@@ -84,21 +84,21 @@ Table renders its own horizontal scroll container. A numeric minimumWidth keeps 
 .table-frame { min-width: 0; max-width: 100%; overflow-x: auto; }
 \`\`\`
 
-These are application classes, not selectors into the component. Give enclosing flex/grid children min-width: 0; use minmax(0, 1fr) for a grid track that must shrink.
+Apply these classes to consumer wrappers. Enclosing flex/grid children need min-width: 0; shrinking grid tracks need minmax(0, 1fr).
 
 `,
   Tabs: `## Panel layout
 
-Tabs renders a tab list followed by the selected panel. The library panel supplies padding, border, and background. Style your supplied panel content for spacing and containment; Tabs accepts no className or style.
+Tabs renders the tab list, then the selected panel with padding, border and background. Style supplied content for spacing/containment; className/style unsupported.
 
-For a panel with search and a wide table, wrap its content in a div with className="panel-content", then wrap Table as shown on its usage page. Bound the application container around Tabs as well.
+For search/wide tables, use a panel-content div and Table's documented wrapper. Bound the container around Tabs.
 
 \`\`\`css
 .tabs-frame, .panel-content { min-width: 0; max-width: 100%; }
 .panel-content { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
 \`\`\`
 
-Use these classes on your own wrappers. Keep query, sort, and selected-record state in the parent component so replacing panel content does not reset them.
+Apply these classes to consumer wrappers. Parent-owned query, sort and selected-record state survives panel replacement.
 
 `,
 };

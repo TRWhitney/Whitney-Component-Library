@@ -1,9 +1,36 @@
 # Agent guidance integration proposal
 
-The tested guidance is integrated into the local package build. Whitney subsequently authorized
-committing completed work; the implementation below is unchanged from the validated proposal.
-All 85 usage pages, 85 full references, and 85 standalone props files match the measured layout
-prototype byte for byte. The complete repository and clean-package checks pass.
+The tested guidance is integrated into the local package build. The initial integration matched
+all 85 usage pages, 85 full references and 85 standalone props files from the measured layout
+prototype. The wording adoption below subsequently shortened eight usage pages.
+
+## Adopted wording improvements
+
+Whitney authorized adoption after clarifying the goal: reduce avoidable overhead while retaining
+the library's consistency and maintenance benefits. Matching native initial-authoring cost is
+not an adoption requirement. Longer-term maintenance savings remain to be measured.
+
+The eight short pages now use the [concise candidate](agent-guidance-concise.md), with precision
+edits for activation, form linkage, uncontrolled initialization and Tabs fallback. Compared with
+the pre-adoption build, prose words fall from 925 to 758, 18.1%; complete-page o200k_base reference
+tokens fall from 5,018 to 4,882, 2.7%. Every affected page shrinks. These are document-size savings;
+the benchmark's mixed completed-cost results remain unchanged.
+
+Exact props, examples, full contracts, metadata, index, runtime and CSS remain identical. Tabs
+states its existing horizontal/automatic defaults and first-enabled fallback. Responsive notes
+retain their wrapper examples and state-preservation advice. No public component behavior or
+rendered showcase changes are needed.
+
+The original implementation used 22.6% fewer prose words; this adopted wording spends a few words
+to clarify who activates a button, what form links, and how uncontrolled values initialize.
+No fresh authoring study was run for those precision edits. The earlier expanded SearchField
+example remains a prototype; it did not reduce reference size or completed total tokens.
+
+Verification passes the four guidance tests, code lint, generated links, all 85 props closures
+and nine examples, and actual archive installs, SSR, hydration, types and browser builds with
+React 18.3.1 and 19.2.8. The build comparison finds only eight changed usage pages among 1,043
+dist files. [Integrity evidence](../../.work/agent-guidance-cost/adoption-evidence/integrity.json)
+and [review](../../.work/agent-guidance-cost/adoption-evidence/review.md).
 
 ## Proposed change
 
