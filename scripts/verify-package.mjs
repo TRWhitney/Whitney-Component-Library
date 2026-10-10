@@ -9,6 +9,7 @@ import {
   findStyleImports,
 } from './package-safety.mjs';
 import {createConsumerVerificationSource} from './consumer-verification-source.mjs';
+import {inspectPackedAgentGuidance} from './packed-agent-guidance.mjs';
 
 const projectRoot = resolve(import.meta.dirname, '..');
 const packageJson = JSON.parse(await readFile(resolve(projectRoot, 'package.json'), 'utf8'));
@@ -130,6 +131,14 @@ async function verifyConsumer({
     cwd: workspace,
     stdio: 'inherit',
   });
+  const guidance = await inspectPackedAgentGuidance(
+    resolve(workspace, 'node_modules', packageName),
+  );
+  await writeFile(resolve(workspace, 'guidance-examples.tsx'), guidance.examples);
+  const configPath = resolve(workspace, 'tsconfig.json');
+  const config = JSON.parse(await readFile(configPath, 'utf8'));
+  config.files.push('./guidance-examples.tsx', ...guidance.types);
+  await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
   execFileSync(process.execPath, ['verify.mjs'], {cwd: workspace, stdio: 'inherit'});
   execFileSync(process.execPath, ['node_modules/typescript/bin/tsc', '-p', 'tsconfig.json'], {
     cwd: workspace,

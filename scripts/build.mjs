@@ -4,6 +4,7 @@ import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 
 import {findUnexpectedGeneratedDocumentation} from './generated-documentation.mjs';
+import {writeAgentGuidance} from './agent-guidance.mjs';
 
 const projectRoot = resolve(import.meta.dirname, '..');
 const distributionDirectory = resolve(projectRoot, 'dist');
@@ -51,10 +52,12 @@ await writeFile(
   resolve(distributionDirectory, 'manifest.json'),
   `${JSON.stringify(contractModule.toComponentManifest(contracts), null, 2)}\n`,
 );
-await writeFile(
-  resolve(distributionDirectory, 'agent-index.md'),
-  contractModule.renderAgentIndex(contracts),
-);
+await writeAgentGuidance({
+  dist: distributionDirectory,
+  contracts,
+  packageName: packageJson.name,
+  renderFull: contractModule.renderContractDocumentation,
+});
 
 await mkdir(documentationDirectory, {recursive: true});
 const expectedDocumentationNames = contracts.map((contract) => `${toKebabCase(contract.name)}.md`);
