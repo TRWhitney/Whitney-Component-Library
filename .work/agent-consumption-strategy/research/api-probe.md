@@ -33,9 +33,9 @@ the same package name to `dist/index.js` and loads `dist/styles.css`. It does no
 component implementations or modify production code. It starts Vite on an available local port,
 uses installed Playwright Chromium, then closes both processes.
 
-The [recorded result](../prototypes/api-probe/results.json) contains 53 expected positive or
-negative type checks under TypeScript 5.9.3 with strict checking and exact optional properties.
-All expectations passed. The [browser fixture](../prototypes/api-probe/fixture.jsx) deliberately
+The historical probe passed 53 expected positive or negative type checks under TypeScript 5.9.3
+with strict checking and exact optional properties. Its raw result was removed; rerunning the
+retained probe measures the current build. The [browser fixture](../prototypes/api-probe/fixture.jsx) deliberately
 uses JavaScript to observe unsupported props after bypassing the type boundary. Its negative
 native-trigger case intentionally logs a React error caught by its own error boundary.
 
@@ -95,19 +95,22 @@ composition and participation in owned behavior.
 
 ## What the pilot actually demonstrates
 
+These observations came from the historical pilot traces, which were removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md).
+
 I inspected all completed command failures and repair commands in the six library traces.
 No trace showed an `onClick` to `onPress` repair or an event-shaped to value-shaped `onChange`
 repair. That absence does not prove those APIs are free to learn. It means these traces cannot
 support a claim that these spellings caused the measured cost.
 
-| Trial evidence                                                      | Observed mistake or repair                                                                                 | Supported interpretation                                                                                                                                                              |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [baseline-3](pilot/baseline-3/events.jsonl), repair at line 22      | Named accent color rejected, chart formatter assumed a string, Spinner omitted `isActive`                  | These APIs required correction. The chart formatter type and Spinner state are distinct costs.                                                                                        |
-| [improved-3](pilot/improved-3/events.jsonl), repair at line 22      | Mapped segmented options lost tuple shape and useful value inference; Spinner again omitted `isActive`     | Tuple construction and the required Spinner flag caused concrete rework.                                                                                                              |
-| [baseline-1](pilot/baseline-1/events.jsonl), repair at line 22      | Browser check expected `aria-checked`; changed to native checked-state inspection                          | Test author assumed the wrong DOM representation. This was not a component-prop repair.                                                                                               |
-| [improved-1](pilot/improved-1/events.jsonl)                         | Playwright's radio `.check()` could not click through the rendered label                                   | Automation interaction cost, with no demonstrated `onChange` misunderstanding.                                                                                                        |
-| [improved-2](pilot/improved-2/events.jsonl), replacement at line 33 | Nested edit activation failed during keyboard checks; agent replaced the library Table with a native table | Actual fallback happened. The trace alone does not isolate the table defect or prove a general API naming problem.                                                                    |
-| [improved-2](pilot/improved-2/events.jsonl)                         | Added a native wrapper ref, queried its second button, and focused it after closing the alert              | Concrete use of DOM traversal to restore focus. A public control ref could avoid that selector, but the trace does not establish that missing refs caused the original focus failure. |
+| Trial evidence                     | Observed mistake or repair                                                                                 | Supported interpretation                                                                                                                                                              |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baseline-3`, recorded repair      | Named accent color rejected, chart formatter assumed a string, Spinner omitted `isActive`                  | These APIs required correction. The chart formatter type and Spinner state are distinct costs.                                                                                        |
+| `improved-3`, recorded repair      | Mapped segmented options lost tuple shape and useful value inference; Spinner again omitted `isActive`     | Tuple construction and the required Spinner flag caused concrete rework.                                                                                                              |
+| `baseline-1`, recorded repair      | Browser check expected `aria-checked`; changed to native checked-state inspection                          | Test author assumed the wrong DOM representation. This was not a component-prop repair.                                                                                               |
+| `improved-1`                       | Playwright's radio `.check()` could not click through the rendered label                                   | Automation interaction cost, with no demonstrated `onChange` misunderstanding.                                                                                                        |
+| `improved-2`, recorded replacement | Nested edit activation failed during keyboard checks; agent replaced the library Table with a native table | Actual fallback happened. The trace alone does not isolate the table defect or prove a general API naming problem.                                                                    |
+| `improved-2`                       | Added a native wrapper ref, queried its second button, and focused it after closing the alert              | Concrete use of DOM traversal to restore focus. A public control ref could avoid that selector, but the trace does not establish that missing refs caused the original focus failure. |
 
 ## Implications and boundaries
 

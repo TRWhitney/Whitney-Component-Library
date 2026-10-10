@@ -39,33 +39,29 @@ disabled controls, placeholders, generated content, SVG and canvas are outside t
 Screenshots and computed focus styles are evidence, not a complete visible-focus verdict.
 Human style and feel acceptance remains unmeasured.
 
-`proof/reference/` is a disposable native implementation made only to validate this checker.
-Its deliberate mutations are selected by VITE_ARCHIVE_PROOF. The proof driver runs the complete
-positive reference, positive tab/radio view variants, and targeted negative scenarios. The
+The removed proof reference was a disposable native implementation made only to validate this
+checker. Its proof driver ran the complete positive reference, positive tab/radio view variants,
+and targeted negative scenarios. Only the checker and these written findings remain. The
 negative cases cover missing selected state, reset search, incorrect counts, Clear switching
 view, reordered moves, Restore duplicating, incorrect neighbor focus, delayed focus theft,
 wrong copy state, tied same-name copies, clipped names and insufficient contrast.
 
 The exploratory native reference passed 44/48 before its explicit modal Tab trap was added.
-Chromium moved focus to BODY at a modal navigation boundary. The four failures remain under
-`proof/exploratory-before-trap/`. The reference was corrected to satisfy the existing modal
+Chromium moved focus to BODY at a modal navigation boundary. The four failures were recorded before the reference was corrected. The reference was corrected to satisfy the existing modal
 requirement; the checker was not loosened. Filtered focus coverage was completed before the
 final proof by using three matching rows separated from one nonmatching row, testing both
 next and previous destinations. No authored archive output informed either change.
 
-Proof output is captured evidence. Formatting and lint apply to maintained checker/proof source,
-not to captured results or logs. `proof/proof-summary.json` records each case and its failures.
+The raw proof output, driver and reference fixture were removed under the
+[retention policy](../../../../docs/research/agent-evidence-retention.md). The results below are
+historical observations; the original proof cannot be rerun from this tree.
 
 ## Frozen result
 
-The checker SHA-256 is
-`c93e2982fbf6a675e69932fd96063c163874e8a8092270e66534eff6f673aa58`.
 The complete native reference passes 48/48. Positive tab and radio variants each pass 4/4.
 All twelve negative mutations produce the intended failure at both widths and appearances,
 for 48 detected negative cases. All fifteen proof-driver cases are marked proven. Syntax,
 ESLint and Prettier checks pass for the maintained checker and JavaScript proof sources.
-The existing lifecycle checker remains
-`9efc649eefce0bf87fd8395c1f4c7227f521c01ae5e9337cdbd4d219e983403a`.
 The checker was frozen before any authored archive result was inspected.
 
 After freezing, the coordinator normalized only the native reference stylesheet's whitespace and

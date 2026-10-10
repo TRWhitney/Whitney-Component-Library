@@ -1,5 +1,8 @@
 # Maintenance cost with explicit use
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Question
 
 Does using the proposed event and testing APIs reduce maintenance cost? Whitney has explicitly
@@ -11,8 +14,8 @@ question. Its measurements remain valid only for that earlier treatment.
 
 Two fresh runs per condition, paired current A/fixed B then fixed C/current D. Reuse the same
 initial Trail app and the exact current/fixed package variants from the maintenance-fix experiment.
-No helper implementation, guide, component or checker changes. Use the existing prepare script
-with base port 4500, existing runner with explicit prompt path, and existing measurements script.
+No helper implementation, guide, component or checker changes. Preparation, authoring and measurement
+used scripts that were later removed with the raw trial fixtures.
 Freeze the prompt files and package hashes before reading any new authoring output.
 
 Both prompts contain the original maintenance brief and identical direct paths to relevant

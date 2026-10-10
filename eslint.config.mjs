@@ -20,8 +20,6 @@ export default defineConfig(
     'node_modules/**',
     'coverage/**',
     '.typecheck-*/**',
-    // Captured evaluation outputs, not maintained application code.
-    '.work/agent-consumption-strategy/research/pilot/**',
   ]),
   {
     files: javascriptFiles,

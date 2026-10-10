@@ -9,7 +9,7 @@ checks, provider costs, reading routes, and a reviewable conclusion.
 
 - [x] Only two usage pages differ; size budget and clean-package preflights pass.
 - [x] Six fresh neutral authors complete the same directory brief in frozen order.
-- [x] Retain initial/final source, sanitized traces, counters, failures, and repairs.
+- [x] Account for initial/final source, sanitized traces, counters, failures and repairs.
 - [x] All independent behavior checks complete without altered assertions.
 - [x] Report aggregates and each repetition without attributing reference sizes to provider cost.
 - [x] Independent review and appropriate checks pass; commit the completed experimental outcome.
@@ -20,9 +20,10 @@ checks, provider costs, reading routes, and a reviewable conclusion.
 - [Protocol](../../../docs/research/agent-guidance-wording-protocol.md)
 - [Runtime investigation](../../../docs/research/agent-guidance-runtime-reads.md)
 
-## Completion evidence
+## Completion findings
 
-[Measured report](../../../docs/research/agent-guidance-wording.md) and
-[experiment evidence](../../agent-guidance-cost/wording-evidence/experiment.json).
-All 288 primary assertions pass without app repairs. Both independent review axes pass with no findings.
-[Review record](../../agent-guidance-cost/wording-evidence/review.md). This ticket is retained with the completed experimental commit.
+The [measured report](../../../docs/research/agent-guidance-wording.md) records all 288 primary
+assertions passing without app repairs and both review axes passing with no findings. Raw captures,
+comparison HTML and replay tooling were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). The ticket preserves the
+historical outcome; production adoption remains a separate decision.

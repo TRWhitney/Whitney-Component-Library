@@ -1,41 +1,30 @@
-# Explicit wording pilot
+# Explicit wording results
 
-The group with explicit Tabs defaults and a controlled SearchField example used different
-reading routes, but this pilot does not establish completed token savings. None of the three explicit authors
-returned runtime or CSS, compared with two of three controls. Total input plus output rose 3.9%;
-uncached input plus output fell 12.7%. All six apps passed 288 independent behavior assertions.
-Keep the wording as a tested prototype for review; do not adopt it as a measured cost improvement.
+Explicit Tabs defaults and a controlled SearchField example coincided with different read
+routes but did not establish completed token savings. None of three explicit authors returned
+runtime/CSS, compared with two of three controls. Total rose 3.9%; uncached input plus output
+fell 12.7%. All six apps passed 288 primary assertions. The original decision retained the
+candidate for review.
 
-## Setup and package integrity
+## Design and reference size
 
-Whitney authorized this test with "Please test", following the
-[runtime investigation](agent-guidance-runtime-reads.md). The [frozen protocol](agent-guidance-wording-protocol.md)
-specified three attempts per condition and the same directory brief, scaffold, model/effort,
-and independent checker. Order was current/explicit, explicit/current, current/explicit.
-Fresh gpt-6.1-sol/high authors received no parent history, condition labels, guidance hints,
-or direction to avoid runtime. They could inspect their app and installed dependencies and
-edit only its app source and CSS. All reading routes and failed author checks remain in totals.
+The [protocol](agent-guidance-wording-protocol.md) followed the
+[runtime investigation](agent-guidance-runtime-reads.md). Three fresh gpt-6.1-sol/high directory
+authors per condition used alternating order, neutral prompts and matching type/build checks.
+No reading-route instruction or directive to avoid runtime was supplied. Authors edited app/CSS.
 
-Only dist/usage/tabs.md and dist/usage/search-field.md differ. Tabs states horizontal/automatic
-defaults and first-enabled fallback while preserving selection, state and layout advice.
-SearchField shows parent useState setup and controlled value/onChange/onClear. The two pages
-grow from 1,122 to 1,184 o200k_base reference tokens, +62 or 5.5%, within the 80-token/10% budget.
-[Exact diff](../../.work/agent-guidance-cost/wording-evidence/wording.diff).
+Only Tabs/SearchField usage differed. Tabs stated horizontal/automatic defaults and first-enabled
+fallback. SearchField showed parent useState with value/onChange/onClear. Combined reference
+size rose from 1,122 to 1,184 `o200k_base` tokens, +62 or 5.5%, within the 80-token/10% budget.
+All 1,043 other files and inline props matched. Both archives clean-installed with React 19.2.8;
+links, 85 prop closures, nine examples, consumer types/builds and installed-tree parity passed.
+SearchField preflight supplied state for both fragments outside the author package.
 
-All 1,043 other files match, including metadata, runtime/CSS, declarations, exact standalone
-props, full contracts, other usage pages, manifest, README and exports. The changed pages retain
-identical inline props. Both actual archives clean-installed with React 19.2.8; their installed
-trees match frozen variants. Links, all 85 props closures, nine examples, types, and production
-consumer builds pass. Preflight supplies query/setQuery/useState for the SearchField fragment
-in both conditions; that compile support is outside author packages.
+A setup failure at an existing evidence directory was resolved before launch. An unused agent
+name was rejected without launching an author. Neutral names/assignments were refrozen before
+launch without package or prompt changes. These were preparation issues, not discarded attempts.
 
-The first preparation completed package checks but failed at an already-existing evidence
-directory. Regenerating the owned disposable tree with an idempotent evidence-directory creation
-resolved that setup issue before authors launched. A rejected unused sample_01 name also launched
-no author. Date-qualified neutral names, actual assignments, prompts and source/protocol hashes
-were refrozen before the first launch; package and prompt bytes stayed unchanged by that rename.
-
-## Completed authoring cost
+## Completed authoring
 
 | Sum across three authors       | Current | Explicit | Change |
 | ------------------------------ | ------: | -------: | -----: |
@@ -50,10 +39,10 @@ were refrozen before the first launch; package and prompt bytes stayed unchanged
 | App/CSS reference estimate     |   3,742 |    3,823 |  +2.2% |
 | Active author seconds          |  181.80 |   196.02 |  +7.8% |
 
-Cached input is a subset of input; reasoning is a subset of output. Uncached input plus output
-is a diagnostic, not a price. Reference estimates use o200k_base and are separate from provider
-counters. Coordinator preparation, browser evaluation, capture and analysis are excluded.
-Author reading, implementation, failed checks and fixes are included.
+Provider totals include cache and reasoning once. Uncached input plus output is diagnostic,
+not a price. Reference estimates use `o200k_base` and cannot explain provider differences by
+subtraction. Preparation/evaluation/analysis are excluded; author reads, failures and fixes
+are included.
 
 | Repetition | Current attempt/total | Explicit attempt/total | Total change | Uncached change |
 | ---------- | --------------------- | ---------------------- | -----------: | --------------: |
@@ -61,32 +50,10 @@ Author reading, implementation, failed checks and fixes are included.
 | 2          | 04 / 238,206          | 03 / 251,826           |        +5.7% |          -30.0% |
 | 3          | 05 / 206,422          | 06 / 144,118           |       -30.2% |          -48.4% |
 
-Two repetitions cost more total tokens with explicit guidance; two favor it on uncached input
-plus output. One explicit author used only five outer requests; two used eight and fixed invalid
-Button sizes. Aggregate means conceal those routes. Three pairs cannot establish causation or
-general improvement, and no fresh native React/CSS condition was run.
+Two pairs cost more total with explicit guidance; two favored it on uncached tokens. Three
+pairs cannot establish causation or general improvement. No fresh native condition ran.
 
-## Correctness, builds and browser tooling
-
-All six required author builds eventually passed. Current attempt 04 had one failed TypeScript invocation
-with invalid accent "blue" and Button size "small". Explicit attempts 02 and 03 each had one failed invocation
-for "small", then read ActionSize and corrected it. The current group has one failed invocation
-and two diagnostics; explicit has two failed invocations and two diagnostics. These costs are
-included. [Author-check evidence](../../.work/agent-guidance-cost/wording-evidence/author-checks.json).
-
-All 48 assertions per app pass at 390px/1280px, 288 unique primary assertions. No app repairs were
-requested. Initial/final sources, traces and counters are identical. The final browser ledger
-reuses initial passing results; it does not claim a second browser execution.
-
-Three partial browser tool runs are retained separately: trial 02's header click was interrupted
-by human input, trial 05's evaluate timed out, and trial 06's evaluate reported a disconnected
-client. They recorded eight, six and zero passing assertions before interruption. Inspecting
-the preview and replaying the unchanged checker completed each app. No assertion, source or
-counter changed, and no narrow click recovery was used. The owned 5205 host was stopped.
-[Partial tool runs](../../.work/agent-guidance-cost/wording-evidence/browser-partial.json),
-[run accounting](../../.work/agent-guidance-cost/wording-evidence/browser-run-notes.json).
-
-## What agents read
+## Uptake, correctness and limits
 
 | Returned content, number of authors | Current | Explicit |
 | ----------------------------------- | ------: | -------: |
@@ -97,38 +64,26 @@ counter changed, and no narrow click recovery was used. The owned 5205 host was 
 | Component runtime                   |       2 |        0 |
 | CSS inspection                      |       2 |        0 |
 
-All three explicit authors received both complete changed pages before writing the app. They
-returned no runtime/CSS excerpts or queries. Current attempt 01 also implemented successfully without
-runtime or CSS. Current attempt 04 read Tabs/SearchField runtime before usage, then Table runtime/CSS
-after its failed build. Current attempt 05 read standalone props and runtime/CSS without usage pages.
-Thus the control routes include inspection before guidance and a route that never encountered
-the intervention's entry point. The differences do not demonstrate that the new wording alone
-caused agents to stop reading implementation.
+All explicit authors read both changed pages before writing. Current01 also succeeded without
+runtime/CSS. Current04 read runtime before usage, then inspected Table runtime/CSS after a
+failed build; Current05 never read usage. The comparison includes controls that did not reach
+the intervention, so wording alone cannot explain the route difference.
 
-Explicit attempts 02/03 did not read the Button usage page before their invalid size choice. The changed
-Tabs/SearchField guidance covers a subset of the app; other component discovery and type errors
-remain relevant to complete cost. No missing-file reads were observed.
-[Content audit](../../.work/agent-guidance-cost/wording-evidence/read-audit.json),
-[ordering](../../.work/agent-guidance-cost/wording-evidence/ordering.json).
+All builds eventually passed. Current04 corrected accent "blue" and size "small" in one failed
+TypeScript invocation. Explicit02/03 each corrected "small" after reading ActionSize; neither
+had read Button usage. These costs remained included. No missing-file reads occurred.
 
-## Evidence and implication
+All six apps passed 48 checks each at 390px/1280px, 288 unique primary assertions, with no app
+repairs. Final checks reused initial results. Three partial tool runs stopped after eight,
+six and zero assertions because of human interruption, timeout or disconnected client. The
+unchanged checker completed after inspecting/reopening previews. Partial runs were excluded
+from primary counts; no assertion, app source or counter changed.
 
-The [experiment record](../../.work/agent-guidance-cost/wording-evidence/experiment.json) freezes
-packages, source hashes, actual assignments/prompts and preflight. The
-[counters](../../.work/agent-guidance-cost/wording-evidence/metrics.json) retain source/trace hashes,
-model/effort, lifecycles and initial/final captures. The
-[summary](../../.work/agent-guidance-cost/wording-evidence/summary.json) contains every attempt and
-matched repetition. [Preparation](../../prototypes/agent-guidance-cost/prepare-wording.mjs),
-[capture](../../prototypes/agent-guidance-cost/capture-wording.py), and
-[analysis](../../prototypes/agent-guidance-cost/analyze-wording.py) preserve the reproducible work.
+Historical analysis passed package/prompt/source integrity, model/effort, provider identities,
+builds, size budget and primary checks. The read-route result is promising but cost is mixed.
+No runtime prohibition or general token optimization follows. Later
+[adoption](agent-guidance-proposal.md) retained Tabs facts in shorter wording; the expanded
+SearchField example remained a prototype.
 
-The frozen analyzer passes package/prompt/source/trace integrity, provider-counter identities,
-six installed variants, model/effort, successful builds, the size budget and primary behavior
-checks. Previous evidence remains unchanged. The modified pages are disposable prototype files;
-production wording has not changed. [Independent review](../../.work/agent-guidance-cost/wording-evidence/review.md).
-
-This is a promising reading-route observation with mixed cost evidence. Further confirmation
-should retain natural discovery, complete-cost accounting, both conditions and unfavorable
-attempts. Do not mandate avoiding runtime or claim a token optimization from this pass. The
-remaining decision is whether Whitney wants confirmation or a separate usability change based
-on clearer examples; neither is performed by this experiment.
+Raw captures and one-off study tooling were removed. Exact historical replay is unavailable.
+See the [evidence retention policy](agent-evidence-retention.md).

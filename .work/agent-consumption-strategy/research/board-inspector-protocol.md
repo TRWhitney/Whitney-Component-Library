@@ -1,5 +1,8 @@
 # Board inspector comparison protocol
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Question
 
 Does a small extension to existing Dialog remove integration work when consumer-owned board

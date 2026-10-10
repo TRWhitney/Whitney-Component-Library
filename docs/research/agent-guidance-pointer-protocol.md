@@ -1,50 +1,36 @@
-# Declaration pointer experiment
+# Declaration pointer experiment protocol
 
-Freeze before authors run. Test whether a short link encountered in original declaration
-files leads agents to bundled guidance and lowers completed authoring tokens.
+This is a historical study design, not an instruction to run another experiment. Results are
+in the [study report](agent-guidance-pointer.md).
 
-Stop after 18 fresh attempts: three tasks, three conditions, two repetitions each. Conditions
-are React/CSS, bundled pages without pointers, and identical bundled pages with pointers.
-Rotate condition order across task/repetition blocks. Use the inherited same model and effort,
-fresh contexts without parent history, and neutral prompts with no guidance paths or hints.
-The saved task briefs/scaffold/checks match the preceding bundled experiment. Authors may
-inspect their app and installed dependencies only, edit app/CSS only, and run the same
-TypeScript/build check. No network, Git mutations, other fixtures, tests, or author browser runs.
-Research procedure authorizes independent fresh-context agents for these bounded experiments.
+## Design
 
-Both library variants have identical runtime, package metadata, README, guidance pages,
-extracted props, and complete contracts. Only nine declaration comments differ: one public
-entry-point link to the existing index, and one link to the matching bundled usage page at
-the top of each of the eight tested component declaration files. No inline behavior advice
-or instructions to follow the link are added. Relative links resolve from declaration files.
-Strip comments through the TypeScript printer to verify declaration semantics match. Validate
-all pointer targets, all 85 bundled prop/full fallbacks, and the eight minimal examples before
-launch. Freeze sources, protocol, checkers, package trees, and prompts.
+Eighteen fresh attempts across dialog, form and directory: React/CSS, bundled pages and
+identical pages plus declaration links, two repetitions each. Rotate order. Only nine comments
+differ: public-entry link to index and eight component links to usage. Runtime, metadata,
+README, props and full contracts match.
 
-Measure pointer exposure from actual returned declaration text, and page use from actual
-returned page content. Keep their order, the route from entry/leaf declarations, skipped links,
-original-declaration/implementation/full-contract reads, repeated reads, failed reads/builds,
-component choices, active time, and all provider input/output/cache counters. Do not infer
-exposure or uptake from filenames alone. Report uptake among all assigned agents and among
-agents actually exposed to pointers, without treating either small sample as a general rate.
+## Boundaries and checks
 
-Use the same independent T3 browser checks at 390px and 1280px. Overlay checks are unchanged.
-The form/directory checker incorporates the preceding pass's documented error-association
-correction before freezing. Use named textbox/searchbox locators through the established
-transport adapter and click a nested sort button where present. Record all evaluator errors
-or interruptions separately. Each app may receive at most one objective repair, without
-documentation hints. Capture initial source/counters/traces/checks before repair, then retain
-all repair costs and final results. Do not change acceptance to favor an app.
+Before freezing, validate relative targets, identical declarations after removing comments,
+all 85 props/fallbacks and eight examples. Neutral tasks have no guidance hints. Matching fresh
+model/effort authors edit app/CSS and run type/build; no author browser runs, other fixtures or
+network. Stop after 18 attempts and at most one objective repair per app.
 
-Compare per-attempt, per-task/repetition, and aggregate initial/completed totals, uncached
-input plus output, source tokens, tool outputs/requests, active time, and sampled behavior.
-Total equals input plus output and includes cached input; reasoning is already in output.
-Uncached input plus output is a diagnostic, not a price. Coordinator work is outside author
-totals. Cache state, overlap/order, inherited instruction overhead, agent route choices, and
-repair size limit attribution. Historical results are context only, not same-run controls.
+## Measures and decision
 
-Preserve previous artifacts. New evidence belongs in
-`.work/agent-guidance-cost/pointer-evidence/`, including prompts, hashes, scoped traces,
-initial/final sources and counters, audits, and evaluations. Produce a report and checked
-interactive comparison for review. No production changes, README/AGENTS edits, publication,
-commits, or expansion beyond the 18 attempts and one repair each.
+Use independent 390px/1280px checks, 48 per overlay/directory and 40 per form, 816 primary
+assertions. The preceding field-error association correction is incorporated before freeze.
+Count visible pointer text as exposure and returned page content as uptake, keeping read order
+and independent discovery. Compare all assigned agents, matched task pairs and totals. Cache,
+overlap, inherited context and route choices limit causal inference; historical studies are context.
+
+Provider total counts input plus output, including cached input and reasoning once. Uncached
+input plus output is a diagnostic, not a price. Reference/source estimates are separate from
+provider accounting and cannot be subtracted to attribute savings. Include author reads,
+failures, checks and repairs; exclude coordinator preparation, evaluation and analysis.
+Inherited instruction costs remain in author totals. Study inputs were frozen before
+authoring; raw captures are no longer retained.
+
+Raw captures and one-off study tooling were removed. Exact historical replay is unavailable.
+See the [evidence retention policy](agent-evidence-retention.md).

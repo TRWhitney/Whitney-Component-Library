@@ -1,36 +1,23 @@
-# Metadata cleanup experiment
+# Metadata cleanup results
 
-Omitting author-tooling fields makes package metadata 62.0% smaller in reference tokens, but this six-attempt pilot
-does not establish authoring savings. The trimmed group used 7.0% more completed total tokens
-and 13.2% more uncached input plus output. All 288 independent behavior assertions pass.
-Keep production metadata unchanged on the strength of this result.
+Omitting scripts/devDependencies reduced metadata reference tokens by 62.0%, but this six-attempt
+pilot did not establish authoring savings. Trimmed used 7.0% more completed total and 13.2% more
+uncached input plus output. All 288 behavior assertions passed. Production metadata stayed unchanged.
 
-## Scope and setup
+## Design
 
-Whitney authorized the [frozen protocol](agent-guidance-metadata-protocol.md) with
-"Alright, lets do that next." Three fresh attempts per condition used the same people directory
-brief, app scaffold, model/effort, and independent checks. Conditions alternated full/trimmed,
-trimmed/full, full/trimmed. Actual prompts/assignments are retained and contain no condition labels
-or guidance instructions. Agent names were neutral attempt_01 through attempt_06.
+The [protocol](agent-guidance-metadata-protocol.md) specified three fresh gpt-6.1-sol/high
+directory authors per condition, alternating full/trimmed order. Neutral prompts/names contained
+no guidance hints. Full used the [integrated guidance](agent-guidance-proposal.md); Trimmed
+omitted only scripts/devDependencies. All 1,044 other files matched, including runtime,
+declarations, 255 guidance files and four exports. No native condition ran.
 
-Full metadata is the current local [guidance integration proposal](agent-guidance-proposal.md).
-Trimmed omits only scripts and devDependencies. All 1,044 other package files are identical,
-including runtime/CSS, declarations, 255 guidance files, README, manifest, and four public exports.
-This tests the integrated proposal rather than the earlier seven-entry-point research package.
-No native condition was run; older native measurements remain historical context.
+Both actual archives clean-installed with React 19.2.8 and matched frozen installed trees.
+Historical preflight passed guidance links, 85 prop closures, eight examples, the Table wrapper,
+types and consumer builds. Fixture relocation before launch changed paths/hashes but no package
+bytes. Authors could edit only app/CSS; inherited instruction costs remained included.
 
-Both actual archives clean-installed with React 19.2.8. Installed package trees matched their
-frozen variants. All guidance links, 85 props closures, eight minimal examples, the Table wrapper
-example, TypeScript checks, and consumer production builds passed. Author apps used the same
-React/tooling via shared dependency links and their own copied library package.
-
-The fixture tree was relocated to a neutral path before authors launched. Package bytes were
-unchanged; prompt/assignment paths and hashes were refreshed before freezing. Six fresh
-gpt-6.1-sol/high contexts received no parent history. Only each app's source/CSS was writable.
-No source repositories, other fixtures, network, Git changes, browser self-checks, or delegation
-were authorized for authors. The current inherited instruction costs stay in their totals.
-
-## Completed authoring results
+## Completed results
 
 | Measure, sums across 3 authors | Full metadata | Trimmed metadata | Change |
 | ------------------------------ | ------------: | ---------------: | -----: |
@@ -45,10 +32,9 @@ were authorized for authors. The current inherited instruction costs stay in the
 | App/CSS reference estimate     |         3,686 |            3,706 |  +0.5% |
 | Active author seconds          |        197.31 |           181.06 |  -8.2% |
 
-Total means input plus output. Cached input is part of input; reasoning is part of output.
-Uncached input plus output is a diagnostic rather than a price. Tool-output and source estimates
-use o200k_base, separate from provider counters. Coordinator setup, preflight, evaluation, and
-analysis are excluded. The complete author sequence, including failed checks and fixes, is included.
+Total is input plus output, including cache/reasoning once. Uncached input plus output is a
+diagnostic, not a price. Source/tool-output estimates use `o200k_base`, separate from provider
+counters. Preparation/evaluation/analysis are excluded; author failures and fixes are included.
 
 | Repetition | Full attempt | Full total | Trimmed attempt | Trimmed total | Total change | Uncached change |
 | ---------- | ------------ | ---------: | --------------- | ------------: | -----------: | --------------: |
@@ -56,35 +42,13 @@ analysis are excluded. The complete author sequence, including failed checks and
 | 2          | 04           |    209,497 | 03              |       190,332 |        -9.1% |          +36.8% |
 | 3          | 05           |    207,560 | 06              |       184,319 |       -11.2% |          +39.5% |
 
-Two repetitions favor trimming on total tokens and two favor full metadata on uncached input
-plus output. The large first-pair total difference reverses the aggregate. Treat these as noisy
-small-sample observations, not proof that metadata trimming itself increases cost.
+Two repetitions favored trimming on total; two favored full on uncached tokens. The first
+pair reversed the aggregate. These noisy observations do not prove trimming increases cost.
 
-## Correctness and author failures
+## Reading and correctness
 
-All six apps passed all 48 independent assertions at 390px/1280px, 288/288 total.
-The checks cover responsive containment, labeled tabs/panels, sorting, filtering/clearing,
-keyboard activation, row actions/live status, empty results, and state surviving tab changes.
-No app interaction repairs were needed. Trial01's Summary-tab click reported a browser tool
-failure. A separate DOM read confirmed the exact requested selected-tab postcondition, the
-narrow recovery allowed by the protocol. The [tooling ledger](../../.work/agent-guidance-cost/metadata-evidence/browser-tooling.json)
-retains that failure. No assertion or app source changed during evaluation.
-
-Final app sources, author traces, and counters equal their initial captures. The final browser
-ledger copies the passing initial results because no repairs occurred; it does not record a
-second browser execution. The 288 assertions count each app check once.
-
-During authoring, attempt02 used unsupported button size "small" and corrected one failed
-TypeScript invocation. Attempt04 used that size and an invalid literal "blue" accent, then
-corrected one failed invocation with two diagnostics. Both then built successfully before initial
-behavior checks. These fixes are already included in completed counters. Four authors passed
-their first check. [Author-check evidence](../../.work/agent-guidance-cost/metadata-evidence/author-checks.json).
-
-## Reading routes
-
-All six authors received complete metadata once, 1,444 reference tokens for Full and 548 for
-Trimmed. That saves 896 tokens per whole metadata body, 2,688 across three authors. Other returned
-references varied substantially.
+All six authors received whole metadata once: 1,444 reference tokens Full and 548 Trimmed,
+saving 896 per body or 2,688 across three authors. Other routes varied.
 
 | Observed route                   | Full, 3 authors | Trimmed, 3 authors |
 | -------------------------------- | --------------: | -----------------: |
@@ -95,50 +59,29 @@ references varied substantially.
 | Component runtime returned       |               3 |                  3 |
 | CSS query returned               |               0 |                  0 |
 
-Whole-file counts omit partial reads and do not prove that the other authors never inspected
-the index. Attempt02 requested its first 80 lines and received a partial index. Some index searches
-used type names or headings the component selection index does not contain. Attempt05 read full
-contracts instead of bundled usage pages. All authors read Tabs runtime; other runtime reads were
-SearchField or Table. Returned bodies, not filenames alone, establish these observations.
+Full returned 4,332 metadata, zero whole-index and 2,172 whole-root-declaration tokens; Trimmed
+returned 1,644, 3,168 and 6,516. Whole-file counts omit partial reads. They cannot be added to
+or subtracted from provider counters to explain cost. Attempt02 read a partial index; 05 used
+full contracts rather than usage. All six read Tabs runtime, unlike the earlier layout sample.
+Cross-study differences cannot establish that metadata caused this route change.
 
-The Full group received 4,332 metadata, zero whole-index, and 2,172 whole-root-declaration reference
-tokens. Trimmed received 1,644, 3,168, and 6,516 respectively. These are visible file-body estimates,
-not additive attribution to provider totals. Full attempts01 and05 also had truncated directory
-listing outputs. No missing-file reads were observed.
+All six builds and 288 primary browser assertions passed at 390px/1280px. No app repairs were
+needed; final results reused initial checks without a second execution. A failed Summary click
+was accepted only after a separate DOM read confirmed the selected-tab postcondition. Author02
+corrected Button size "small"; 04 corrected that size and accent "blue". Their failed TypeScript
+invocations remain in costs. No missing-file reads occurred.
 
-The earlier responsive study's three supplemented authors avoided runtime/CSS reads. Here,
-all six inspected runtime despite identical usage-page text. Transfer of that reading pattern
-remains uncertain. New attempts, the integrated package entry points/index/maps, and context
-variation prevent attributing this cross-study difference to metadata.
+The first analyzer rejected "trimmed substring" in the neutral search brief as a condition cue.
+A corrected check distinguished search semantics from variant labels. Prompt, author source,
+assertions and counters stayed unchanged. Corrected historical analysis passed integrity,
+installed-package, model/effort, counter/build and primary assertion checks.
 
-## Evidence and analysis correction
+## Decision and limits
 
-- [Frozen experiment and preflight](../../.work/agent-guidance-cost/metadata-evidence/experiment.json)
-- [Provider counters and source/trace hashes](../../.work/agent-guidance-cost/metadata-evidence/metrics.json)
-- [Summary and repetitions](../../.work/agent-guidance-cost/metadata-evidence/summary.json)
-- [Content-based reading audit](../../.work/agent-guidance-cost/metadata-evidence/read-audit.json)
-- [Initial behavior checks](../../.work/agent-guidance-cost/metadata-evidence/browser-initial.json)
-- [Independent evidence review and correction](../../.work/agent-guidance-cost/metadata-evidence/review.md)
-- [Preparation](../../prototypes/agent-guidance-cost/prepare-metadata.mjs),
-  [capture](../../prototypes/agent-guidance-cost/capture-metadata.py), and
-  [corrected analyzer](../../prototypes/agent-guidance-cost/analyze-metadata-v2.py)
+Do not treat metadata trimming as measured authoring savings. It reduced a consistently read
+file and worked in sampled builds, but complete costs did not improve consistently. Three
+pairs, one task/model and varying routes/cache limit attribution. The subsequent
+[runtime investigation](agent-guidance-runtime-reads.md) examined inspection motives.
 
-The first analysis rejected the neutral task brief because its filtering requirement says
-"trimmed substring". That word describes search semantics, not a condition label. The original
-frozen analyzer is retained; a second version narrows this hint check, with original/corrected
-hashes in the [amendment](../../.work/agent-guidance-cost/metadata-evidence/analysis-amendment.json).
-No prompt, author source, browser assertion, or provider counter changed. The corrected analysis
-verifies original frozen hashes, six installed packages, assignments, initial/final sources,
-sanitized traces, model/effort, counters, positive builds, and all primary behavior assertions.
-
-The owned 5204 evaluation host was stopped after the checks. Previous evidence and the local
-production proposal remain intact. No production metadata edit, adoption, commit, or publication
-was made.
-
-## Implication
-
-Do not adopt metadata trimming as a measured token-cost improvement. It reduces one consistently
-read reference and appears compatible with the sampled consumer build, but complete authoring
-costs did not improve consistently. The next useful decision is whether to test stronger guidance
-discovery or investigate why agents verify component runtime after reading guidance. This pass
-does not select or authorize another experiment.
+Raw captures and one-off study tooling were removed. Exact historical replay is unavailable.
+See the [evidence retention policy](agent-evidence-retention.md).

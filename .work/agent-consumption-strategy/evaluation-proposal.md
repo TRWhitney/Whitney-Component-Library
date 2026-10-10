@@ -1,5 +1,8 @@
 # Small comparative evaluation
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Accepted boundaries
 
 Whitney authorized a small comparative evaluation. Optimize for a coding agent working in a
@@ -70,14 +73,14 @@ for missed suitable library components; the baseline is assessed for equivalent 
 ## Execution and results
 
 All nine trials completed. The [pilot report](research/pilot-results.md) records the fixed runner,
-model, eight-minute per-run limit, environment, independent checks, usage, and retained outputs.
+model, eight-minute per-run limit, environment, independent checks and observed usage. Raw outputs were removed.
 The improved condition tested a documentation prototype with unchanged runtime JavaScript and
 CSS. No mid-run coaching or reviewer repairs were supplied.
 
 The prototype improved guidance discovery and reduced final consumer source overall. It did not
-reduce total tokens or establish better semantic correctness across the tasks. Input, output, cached input, and reasoning output fields are retained. The reported total is
+reduce total tokens or establish better semantic correctness across the tasks. Input, output, cached input and reasoning output fields were recorded during the study. The reported total is
 input plus output; it does not add the separate reasoning field again. Discovery observations
-and repair attempts are retained in traces, not reduced to a causal latency metric.
+and repair attempts were recorded in traces, without establishing a causal latency metric. Those traces were removed.
 
 Final size counts app and CSS content, including authored data literals. It excludes unchanged
 bootstrap code, dependency files, evaluator scripts, and modified HTML titles. The pilot did not

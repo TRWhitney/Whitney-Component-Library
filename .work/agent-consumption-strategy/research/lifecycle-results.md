@@ -27,8 +27,8 @@ controls. The library app used AppearanceProvider, Button and TextField; it reta
 search, modal rendering and focus handling. Maintenance kept those imports and used the provider's
 appearance/accent props. Applications still owned layout, data, copies and custom styling.
 
-Inputs, model configuration, package hash, stage snapshots, traces and results are in
-[retained evidence](pilot/lifecycle/). The [protocol](lifecycle-protocol.md) fixes the staged
+Raw package records, stage snapshots and traces were removed. This report preserves the
+observed costs and checks, without independently replayable consumer apps. The [protocol](lifecycle-protocol.md) fixes the staged
 comparison and correction limits. Model and environment match the preceding comparison:
 Codex CLI 0.157.1, gpt-6-astra with medium reasoning, Node 24.21.0, React 19.2.8, TypeScript 5.9.3,
 Vite 8.2.1 and Playwright 1.61.1. Each initial/maintenance run had an eight-minute limit.
@@ -70,8 +70,8 @@ No elapsed-time figure includes human review or represents end-to-end project de
 Source counts normalize formatting. App counts include all runtime TSX and CSS, including
 bootstrap and authored icons. Verification source left in each app is separate. These are final sizes, not all code written:
 maintenance agents also authored temporary checks, including one outside the app and one later
-removed from src. Their commands and revisions remain in the traces and their token costs are
-included. Raw source is unchanged. Both conditions began with the same runtime scaffold.
+removed from src. Their commands and revisions were captured at execution and their token costs are
+included. The raw traces and source snapshots were later removed. Both conditions began with the same runtime scaffold.
 
 ## Where effort went
 
@@ -115,8 +115,8 @@ no additional requirement defect needing a correction round. It does not establi
 design quality. Human style/feel revision costs remain unmeasured, but are not part of this
 evaluation method and are not assumed to offset token overhead.
 
-The [rendering evidence](lifecycle-previews.md) retains matched states and run instructions.
-It documents the checked outputs; no subjective score or human-directed revision round is
+The [rendering findings](lifecycle-previews.md) summarize the inspected states and explain the replay limit.
+They document the checked outputs; no subjective score or human-directed revision round is
 proposed. The evaluation should improve general agent usage through objective checks across
 representative tasks.
 
@@ -124,7 +124,7 @@ representative tasks.
 
 The first installed-package attempt used only native controls. Whitney clarified that a one-time
 instruction to use the library is assumed, and adoption is outside this evaluation. That attempt
-is retained as `library-initial` but excluded from the native-versus-library comparison. It used
+was recorded as `library-initial` but excluded from the native-versus-library comparison. It used
 154,610 total tokens, 41,714 uncached input plus output, and 219.72 seconds. No maintenance run was
 performed on it. The replacement library run began from the original blank scaffold; its prompt
 adds only the library-use instruction. This was a user-directed correction, not a rerun selected
@@ -132,7 +132,7 @@ for a better score.
 
 The evaluator initially compared rendered category labels case-sensitively and treated a decorative
 period in the page heading as a prerequisite for all scenarios. Those assumptions were corrected
-uniformly and documented, with previous results retained. Before inspecting maintenance outputs,
+uniformly and documented, with previous results recorded at execution. Before inspecting maintenance outputs,
 the checker was also corrected to accept disabled Save as valid rejection and to toggle either
 native or styled checkboxes/switches through keyboard activation. These are evaluator repairs,
 not app defects or charged authoring corrections. See the
@@ -163,14 +163,9 @@ The earlier custom board experiment remains separate evidence about application 
 Prototype scripts pass ESLint and Prettier. The runner parses as valid Python. Local report
 links and `git diff --check` pass. Raw evidence is excluded from formatting and linting.
 
-## Reproduction
+## Retained tooling
 
-The runnable scripts are in [prototypes/lifecycle](../prototypes/lifecycle/). Run
-`npm run check:generated`, then `node .work/agent-consumption-strategy/prototypes/lifecycle/prepare.mjs`.
-It prints a temporary root with installed app scaffolds. Use `run.py <root> native initial` and
-`run.py <root> library-required initial --prompt .work/agent-consumption-strategy/prototypes/lifecycle/library-initial.txt`.
-After checking and any recorded corrections, run each condition's `maintenance` stage without
-a prompt override. `check.mjs <app> <evidence> <free-port> initial|maintenance` assesses the untouched
-app, and `measure.mjs <root>` measures completed stages. An authenticated Codex CLI is required;
-authoring runs consume tokens. Do not overwrite existing evidence or rerun to improve results.
-The unused `library` scaffold exists only to reproduce the excluded attempt.
+The [lifecycle briefs and checker](../prototypes/lifecycle/) remain for future work with fresh
+consumer apps. The preparer, authoring runner, measurement script and stage snapshots were removed.
+The excluded attempt and included comparisons survive as the observations above. Exact historical
+replay is unavailable.

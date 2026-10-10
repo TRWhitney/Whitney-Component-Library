@@ -4,3 +4,13 @@ dist/
 coverage/
 *.tgz
 .typecheck-*/
+# Keep disposable experiment output out of repository history.
+.work/**/*.png
+.work/agent-guidance-cost/evidence/
+.work/agent-guidance-cost/*-evidence/
+.work/agent-consumption-strategy/research/pilot/
+.work/agent-consumption-strategy/prototypes/maintenance-archive/proof/
+.work/agent-consumption-strategy/prototypes/**/evidence.json
+.work/agent-consumption-strategy/prototypes/**/results.json
+.work/agent-consumption-strategy/prototypes/**/snapshot-evidence.json
+.work/agent-consumption-strategy/prototypes/**/source-sizes.json

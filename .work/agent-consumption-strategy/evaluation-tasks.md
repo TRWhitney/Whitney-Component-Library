@@ -1,5 +1,8 @@
 # Comparative task briefs and assessment
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 Protocol used for the authorized small pilot. Task requirements were fixed across all three
 conditions. Each condition received the same data requirements and empty React scaffold. The only dependency
 difference is whether this library is installed, and which version of it is installed.

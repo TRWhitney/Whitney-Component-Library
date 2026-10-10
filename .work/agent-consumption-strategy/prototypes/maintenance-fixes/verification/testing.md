@@ -1,7 +1,8 @@
 # Browser checks
 
-Optional helpers for checks using your existing `playwright` installation. Import the testing
-subpath from a Node check script. It does not import Playwright, add a test runner, or change
+This experimental guide describes helpers in a disposable prototype package using your existing
+`playwright` installation. The production package does not expose this testing subpath. Import
+the subpath only after installing the prototype package. It does not import Playwright, add a test runner, or change
 component behavior.
 
 ```js

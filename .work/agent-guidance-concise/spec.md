@@ -1,5 +1,8 @@
 # Measure shorter guidance against native authoring
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Problem Statement
 
 Whitney's aim is clearer phrasing that needs fewer words and reduces agent token cost. The previous

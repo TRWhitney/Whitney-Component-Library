@@ -30,15 +30,11 @@ in a fresh app directory and agent context. No application instructions named th
   loopback interface. They were excluded and restarted from unchanged app fixtures using the
   same filesystem access as the coordinating session. Smoke/preflight usage is not task usage.
 
-The [runner](../prototypes/evaluate.py) and [guide generator](../prototypes/generate-guide.mjs)
-are experimental artifacts, not production tooling or release checks. The
-[recorded runner flags](pilot/runner-flags-unrestricted.json) preserve the configuration used.
-The [current](pilot/baseline.json) and [prototype](pilot/improved.json) package records include
-artifact hashes. Raw events, prompts, app outputs, starting files, and checks are under
-`pilot/<condition>-<task>/`.
+The retained [guide generator](../prototypes/generate-guide.mjs) is experimental tooling.
+The historical runner, package records, prompts, app outputs and raw events were removed.
 
 Codex reports usage on completed turns through its JSONL output. Counts below use reported input
-plus output tokens, with cached input included once. Cached input and reasoning output fields are retained separately; the total does not add those
+plus output tokens, with cached input included once. Cached input and reasoning output fields were recorded separately; the total does not add those
 fields again.
 [Official non-interactive-mode documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
 
@@ -47,7 +43,7 @@ fields again.
 These are observed single-run totals across the three tasks, not expected savings or reliability
 estimates. Source size includes each final app's `src/app.tsx` and `src/styles.css`, including
 authored data literals and decorative content. It excludes the identical bootstrap, dependency
-source, tests, and changed HTML titles. Formatting-normalized line counts are retained separately
+source, tests, and changed HTML titles. Formatting-normalized line counts were recorded separately
 because some agents wrote CSS on one line.
 
 | Condition       | App and CSS characters | Input + output tokens | Uncached input + output |
@@ -67,8 +63,7 @@ last measure is neither total tokens nor dollar cost.
 | Equipment register |                 33% smaller |                         311% more |
 | Usage report       |                   5% larger |           Approximately unchanged |
 
-See [per-run measurements](pilot/metrics.json), the individual `run-summary.json` files, and the
-[measurement script](../prototypes/measure.mjs). Evaluator usage is separate from trial usage.
+Evaluator usage is separate from trial usage. The raw measurements and measurement script were removed.
 
 ## Discovery and use
 
@@ -107,8 +102,7 @@ Both library preferences builds emitted about 46,000 characters, mostly repeated
 A separate temporary-package experiment removed 66 internal duplicate directives and retained
 the root public client boundary. The same preferences app built successfully with one warning
 and about 1,000 output characters. Production JavaScript and CSS were byte-identical to the
-prototype app's original build. See [result](pilot/build-noise/result.json) and
-[changed internal files](pilot/build-noise/change.json).
+prototype app's original build. The raw build comparison was removed.
 
 This is evidence for investigating a quieter distribution. It is not server/client-boundary
 compatibility proof, and no production build change was made.
@@ -119,8 +113,8 @@ The prototype register first used Table. Two authoring checks failed to open its
 editor. The agent inspected its own rendered Table, replaced it with a native table, and later
 added delayed DOM queries for cancellation and post-deletion focus. Its repeated reads and checks
 account for much of the high token count. The trace establishes repair effort and an abandoned
-composition, not the cause of a library defect. See the
-[trace](pilot/improved-2/events.jsonl) and [final app](pilot/improved-2/src/app.tsx).
+composition, not the cause of a library defect. The trace and final app were removed;
+these remain recorded observations.
 
 This reinforces the need to investigate focus composition, alongside the pre-existing workbench
 examples with hidden dummy dialog triggers. A minimal reproduction must distinguish a library
@@ -157,21 +151,9 @@ vary despite identical behavior requirements. The prototype combines several doc
 changes and targets task families known to the coordinator, so this is not a held-out test of
 generalization. Do not turn these nine runs into a claim that the user's three goals are achieved.
 
-## Reproduction
+## Retained tooling
 
-Use a clean checkout of `2488a0e` to build and pack the baseline, retaining the recorded dependency
-versions. The runner's `prepare` action packs its current repository build, so do not use a later
-working tree as the old-library baseline. The retained app package manifests reference the
-original temporary tarballs; replace those file references with the reconstructed tarballs before
-installing. No credentials are included in the retained artifacts.
-
-`generate-guide.mjs <output-directory>` regenerates the prototype references from this baseline's
-built declarations and contracts. The tested package also included the approved README, a package
-description pointing to `./agent-index.md`, and a matching comment at the top of `dist/index.d.ts`.
-The runtime was unchanged. Do not fold the separate build-noise experiment into the guide
-condition when reproducing this comparison.
-
-Use `inspect-preferences.mjs`, `inspect-register.mjs`, or `inspect-report.mjs` with a trial path,
-evidence directory, and unused port to check outputs. The scripts start and stop their own server.
-The flags and original trial prompts are recorded with each result; each authoring trial used a
-fresh `codex exec` context. Exact stochastic outputs are not reproducible from a fixed prompt.
+[generate-guide.mjs](../prototypes/generate-guide.mjs) retains the guide-generation experiment.
+The task briefs and independent inspectors also remain. They need a fresh consumer app and
+appropriate built declarations; the historical runner, app snapshots and measurements were removed.
+This report preserves the recorded observations, not an independently replayable nine-run study.

@@ -6,7 +6,7 @@ code for the temporary package comparison, not an accepted production change.
 
 ## Evidence behind the scope
 
-The initial trial's `item_11` command failed a single immediate focus assertion. Its retained
+The initial trial's `item_11` command failed a single immediate focus assertion. Its historical
 `checks/browser.mjs` changed to `waitForFunction` over one captured `elementHandle`. The maintenance
 trace then recorded these failures in completed command output:
 
@@ -19,15 +19,15 @@ trace then recorded these failures in completed command output:
 - `item_14` and `item_16` measured a Delete label at 1.087:1 during a theme transition. The
   subsequent script added a 300ms delay. Steady state passes at a minimum of 4.81:1.
 
-The exact command IDs are indexes into the retained JSONL traces, not independent causal proof
+The exact command IDs refer to the removed historical JSONL traces, not independent causal proof
 for every timeout. In particular, the traces show captured handles but do not establish that a
 detached handle caused a particular consumer failure. A replacement-target fixture establishes
 that the proposed helper handles that failure mode. The focused-sample fixture establishes that
 a transient initial match cannot immediately advance the check into the next action.
 
-Sources are the `library-required-initial` and `library-required-maintenance` traces and final
-snapshots under `research/pilot/lifecycle/`, and the independent `prototypes/lifecycle/check.mjs`
-and `checker-notes.md`. No independent checker or recorded trial input was changed.
+The historical sources were the `library-required-initial` and `library-required-maintenance`
+traces and snapshots. Those were removed. The independent lifecycle checker and notes remain.
+No independent checker or recorded trial input was changed during the experiment.
 
 ## Result
 
@@ -43,42 +43,43 @@ window holds. Polls have a 4-second default deadline and do not suppress evaluat
 Infinite animations fail instead of being disabled. The contrast assertion owns its check and
 can be imported without dynamic function extraction or an external assertion closure.
 
-`evidence.json` records 12 passing positive/negative checks. Delayed replacement focus and
+The historical standalone verifier passed 12 positive/negative checks; its raw output was removed. Delayed replacement focus and
 finite or newly queued animations succeed. Missing, wrong, briefly correct then stolen focus,
 ambiguous locators, permanent low contrast, continuous animation, unsupported rendering,
 empty roots and translucent low contrast fail as expected.
 
-`snapshot-evidence.json` records six passing consumer scenarios. Both final snapshots pass at
+The historical snapshot verifier passed six consumer scenarios. Both final snapshots passed at
 390px and 1280px; maintenance also runs its alternate appearance. There are 68 stable focus
 checks across editing, validation, Cancel, Escape, deletion fallback and repeated keyboard and
 pointer duplication. Minimum computed contrast is 4.86:1 initially and 4.81:1 after maintenance.
 The snapshot script checks SHA-256 equality for every source file and index.html before and
 after execution and for the copies it serves. No app or control change was needed for these
 final snapshots. This does not establish that earlier consumer implementation patches were
-unnecessary; those patches are already present in the retained final snapshot.
+unnecessary; those patches were already present in the now-removed final snapshots.
 
 ## Discovery
 
 Ship `testing.md` alongside package guidance and expose the subpath in the export map. One
 sentence in the package's normal agent index and type entry can point agents writing browser
-checks to the guide. The trial prompts and existing consumer checks should remain unchanged so
-the repeat measures whether ordinary package discovery reaches the optional helper. No helper
+checks to the guide. The original optional-use study kept trial prompts and consumer checks unchanged to measure
+ordinary package discovery. Those historical consumer checks were later removed. No helper
 is imported from the production runtime entry.
 
-## Reproduction
+## Standalone checks
 
-From the repository root, with the already installed dependencies and Chromium:
+From the repository root, with the installed dependencies and Chromium:
 
 ```sh
 node .work/agent-consumption-strategy/prototypes/maintenance-fixes/verification/verify.mjs
 node node_modules/typescript/bin/tsc --strict --noEmit --target es2022 --module nodenext .work/agent-consumption-strategy/prototypes/maintenance-fixes/verification/typecheck.mts
-node .work/agent-consumption-strategy/prototypes/maintenance-fixes/verification/verify-snapshots.mjs /tmp/wcl-lifecycle-LTHbbR/library-required/node_modules .work/agent-consumption-strategy/research/pilot/lifecycle/library-required-initial/after .work/agent-consumption-strategy/research/pilot/lifecycle/library-required-maintenance/after
 ```
 
-The last command accepts an existing consumer dependency directory as its first argument. It
-copies and serves the supplied snapshots under this prototype, uses ports 4493 and 4494, and
-removes those temporary copies afterward. Reconstruct that dependency directory from the
-retained consumer package if the original temporary experiment has been removed.
+The verifier creates fresh helper fixtures and writes ignored `evidence.json` beside its source;
+inspect and delete that file after use. The retained
+`verify-snapshots.mjs` requires caller-supplied consumer snapshots and dependencies. Its original
+Trail apps were removed. It writes ignored `snapshot-evidence.json` beside its source; delete it
+after inspection. The six historical consumer scenarios are written observations,
+not runnable historical fixtures.
 
 ## Limits
 

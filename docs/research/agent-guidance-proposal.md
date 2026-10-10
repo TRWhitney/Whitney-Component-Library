@@ -1,150 +1,97 @@
-# Agent guidance integration proposal
+# Agent guidance integration and adopted wording
 
-The tested guidance is integrated into the local package build. The initial integration matched
-all 85 usage pages, 85 full references and 85 standalone props files from the measured layout
-prototype. The wording adoption below subsequently shortened eight usage pages.
+The tested guidance is integrated into the package build. Initial integration matched the
+layout prototype's 85 usage pages, 85 full references and 85 standalone props files. Adoption
+later shortened eight usage pages with precision edits. Component runtime behavior did not change.
 
-## Adopted wording improvements
+## Adopted wording
 
-Whitney authorized adoption after clarifying the goal: reduce avoidable overhead while retaining
-the library's consistency and maintenance benefits. Matching native initial-authoring cost is
-not an adoption requirement. Longer-term maintenance savings remain to be measured.
+Whitney authorized adoption to reduce avoidable overhead while retaining consistency and
+maintenance benefits. Matching native initial-authoring cost was not required; longer-term
+maintenance savings remain unmeasured.
 
-The eight short pages now use the [concise candidate](agent-guidance-concise.md), with precision
-edits for activation, form linkage, uncontrolled initialization and Tabs fallback. Compared with
-the pre-adoption build, prose words fall from 925 to 758, 18.1%; complete-page o200k_base reference
-tokens fall from 5,018 to 4,882, 2.7%. Every affected page shrinks. These are document-size savings;
-the benchmark's mixed completed-cost results remain unchanged.
+The eight pages use the [concise candidate](agent-guidance-concise.md) with edits for activation,
+form linkage, uncontrolled initialization and Tabs fallback. Against the pre-adoption build,
+prose words fell from 925 to 758, 18.1%; complete-page `o200k_base` reference tokens fell from
+5,018 to 4,882, 2.7%. Every page shrank. The original candidate saved 22.6% prose and 3.3%
+whole-page tokens. Adopted precision edits used more words; no new authoring study measured
+their cost. Original mixed benchmark results remain unchanged.
 
-Exact props, examples, full contracts, metadata, index, runtime and CSS remain identical. Tabs
-states its existing horizontal/automatic defaults and first-enabled fallback. Responsive notes
-retain their wrapper examples and state-preservation advice. No public component behavior or
-rendered showcase changes are needed.
+Exact props, examples, full contracts, metadata, index, runtime and CSS matched pre-adoption.
+Tabs states horizontal/automatic defaults and first-enabled fallback. Responsive wrapper/state
+advice remains. The earlier expanded SearchField example stayed a prototype.
 
-The original implementation used 22.6% fewer prose words; this adopted wording spends a few words
-to clarify who activates a button, what form links, and how uncontrolled values initialize.
-No fresh authoring study was run for those precision edits. The earlier expanded SearchField
-example remains a prototype; it did not reduce reference size or completed total tokens.
+## Build and maintenance
 
-Verification passes the four guidance tests, code lint, generated links, all 85 props closures
-and nine examples, and actual archive installs, SSR, hydration, types and browser builds with
-React 18.3.1 and 19.2.8. The build comparison finds only eight changed usage pages among 1,043
-dist files. [Integrity evidence](../../.work/agent-guidance-cost/adoption-evidence/integrity.json)
-and [review](../../.work/agent-guidance-cost/adoption-evidence/review.md).
+The [build](../../scripts/build.mjs) and [guidance generator](../../scripts/agent-guidance.mjs)
+emit a linked index, bundled usage/props and full canonical references. Eight components have
+reviewed [editorial text](../../scripts/agent-guidance/editorial.mjs); the other 77 derive usage
+from contracts. Table/Tabs include responsive notes. Nine declaration comments link the public
+entry and eight leaves to guidance. Generated [Table](../../dist/usage/table.md) and
+[Tabs](../../dist/usage/tabs.md) pages are available after a build.
 
-## Proposed change
-
-The build emits a linked component index, bundled usage and exact props, and complete canonical
-references. Eight components use the reviewed short behavior/examples; the other 77 derive
-their usage guidance directly from canonical contracts. Table and Tabs include the tested
-responsive wrapper notes. The public declaration entry and eight component declarations link
-to the guidance through the nine tested comments.
-
-Review the [build integration](../../scripts/build.mjs),
-[guidance generator](../../scripts/agent-guidance.mjs),
-[editorial text](../../scripts/agent-guidance/editorial.mjs), and
-[short summaries](../../scripts/agent-guidance/summaries.json).
-The generated [Table page](../../dist/usage/table.md) and [Tabs page](../../dist/usage/tabs.md)
-show the responsive examples in context after a build.
-
-Editorial guidance lives in the build tooling. Canonical contracts remain the source for the
-manifest, full references, human documentation, and examples. A changed canonical summary
-requires review of its short summary; a changed contract for any of the eight short pages
-requires review of that page. Build-time coverage and source fingerprints reject stale text.
-After reviewing the affected text, update the corresponding SHA-256 fingerprint in
-[sources.json](../../scripts/agent-guidance/sources.json). Fingerprints hash
-`JSON.stringify(contract.summary)` for summaries and `JSON.stringify(contract)` for short pages.
+Canonical contracts remain the source for manifest/full references/human docs/examples. A
+changed summary requires review of its [short summary](../../scripts/agent-guidance/summaries.json);
+a changed contract for an editorial page requires page review. Coverage/fingerprints reject
+stale text. After review, update the corresponding SHA-256 in
+[sources.json](../../scripts/agent-guidance/sources.json). Summary fingerprints hash
+`JSON.stringify(contract.summary)`; page fingerprints hash `JSON.stringify(contract)`.
 The build does not refresh them automatically.
 
-The root index is 1,584 reference tokens, versus 4,867 in the baseline, a 67.5% reduction.
-This measures text size with `o200k_base`, not provider billing or total authoring savings.
-The [layout study](agent-guidance-layout.md) measured 29.6% fewer total tokens and 17.5% fewer
-uncached input plus output tokens against the earlier bundled guidance for the sampled directory
-task. It still used 1.92 times the completed native React/CSS total. Savings over native remain
-unproven, and the declaration pointers have no established independent cost benefit.
+## Measured tradeoffs and integration differences
 
-## Integration differences from the measured prototype
+The integrated index is 1,584 reference tokens versus baseline 4,867, 67.5% smaller. One sentence
+was shortened from the prototype's 1,593 tokens. These are `o200k_base` text sizes, not billing
+or total authoring savings. The [layout study](agent-guidance-layout.md) observed 29.6% fewer
+total and 17.5% fewer uncached tokens than prior bundled guidance on directory, but still
+1.92 times native completed total. Pointer cost benefit remains unestablished.
 
-- The production package keeps its four existing public entry points. Relative guidance links
-  work inside the installed package without the prototype's three wildcard exports. Node package
-  resolution of the new usage/full/types paths remains unsupported.
-- One index sentence is shorter, reducing the measured index from 1,593 to 1,584 reference tokens.
-- Nine declaration source maps shift their mappings one line to account for the pointer comments.
-  The prototypes left those maps unchanged. Original mappings and declaration semantics survive.
-- The build checks source drift. Formatting excludes captured evidence directories so their hashes
-  remain stable. The package verifier now checks installed guidance and compiles its props/examples.
+Production keeps four public entry points; relative guidance links work inside the package
+without the prototype's three wildcard exports. Node resolution of usage/full/types subpaths
+remains unsupported. Nine declaration source maps shift one line for comments, preserving
+original mappings/semantics. Package verification checks installed guidance and compiles props/examples.
 
-All 201 JavaScript/CSS files match both the baseline and measured package. All 195 declarations
-match the measured package, and removing the nine pointer lines recovers baseline declaration
-text. The manifest, source components, human documentation, README, and package exports are
-unchanged. There is no component behavior change requiring new rendered examples.
+Historical integration comparison matched all 201 runtime JS/CSS files to baseline/prototype
+and all 195 declarations to prototype. Removing pointer lines recovered baseline declaration
+text. Manifest, source components, human docs, README and exports stayed unchanged. Three
+guidance directories added 1,345,640 uncompressed bytes. Files cost context only when returned
+by tools; standalone props duplicate inline props to match the tested distribution.
 
-The three new guidance directories add 1,345,640 uncompressed bytes. That is a package-size tradeoff,
-not an automatic context cost. Agents receive those files only when their tools return them.
-The standalone props duplicate the inline props and are retained to match the tested package.
+## Historical verification
 
-## Verification
+Integration `npm run check` passed formatting, linters, types, 1,205 tests across 86 files,
+generated docs, TypeScript 5/6/7 and chart/editor isolation. `npm run verify:package` passed
+actual archive installs with React 18.3.1/19.2.8, all 85 prop closures, eight minimal examples,
+the wrapper, SSR/hydration and browser builds. Focused guidance tests rejected missing content,
+source drift and coverage changes. Byte/map/entry-point review passed. These are recorded
+historical results, not new validation during evidence cleanup.
 
-- `npm run check` passes formatting, both linters, type checking, all 1,205 tests across 86 files,
-  generated-documentation checks, TypeScript 5/6/7 checks, and chart/editor isolation.
-- `npm run verify:package` passes with React 18.3.1 and 19.2.8. It validates the actual installed
-  archive's guide coverage, links, inline/standalone props equality, all 85 props closures, eight
-  minimal examples, and the Table wrapper example, alongside SSR, hydration, and browser builds.
-- The focused guidance suite initially failed for missing links/files/pointers, then passed.
-  It also rejects changed canonical behavior, summaries, and component coverage.
-- The [integration audit](../../prototypes/agent-guidance-cost/audit-proposal.py) verifies
-  byte parity, map corrections, baseline recovery, and existing entry points. Run with the
-  experiment tokenizer environment after builds have completed, since builds replace `dist`.
-  [Integrity evidence](../../.work/agent-guidance-cost/proposal-evidence/integrity.json).
-- Prior responsive behavior evidence remains applicable because the usage example text and
-  component runtime are identical. No fresh authoring study was run for this integration.
-- [Independent review](../../.work/agent-guidance-cost/review.md) passes both intent and engineering
-  axes with no findings. Later commit authorization does not change that reviewed implementation.
+Adoption verification passed four guidance tests, lint, generated links, props/examples and
+React 18/19 archive install/SSR/hydration/types/browser checks. Only eight usage pages changed
+among 1,043 dist files. No fresh authoring study ran for integration or precision edits.
 
-The first full check stopped on formatting in 122 frozen evidence files. Excluding captured
-evidence resolved it without rewriting those files. The first integration audit overlapped a
-build and saw a temporarily absent file; rerunning after builds completed resolved that setup
-failure. Existing browser builds emit sourcemap and module-directive warnings and complete.
+Initial full-check formatting failures came from 122 captured files; excluding them preserved
+original hashes. An audit overlapping a build temporarily missed a dist file and passed after
+build completion. Existing browser builds completed with sourcemap/module-directive warnings.
 
-## Remaining overhead and next test
+## Remaining overhead and subsequent studies
 
-The latest six library traces all contain the complete package metadata and guide. Four contain
-the entire root declaration file. The control and layout groups have the same whole-file counts
-for these three references, so the layout improvements left this reading overhead in place.
+All six layout library authors returned full metadata/index, and four returned whole root
+declarations. Each control/layout group returned 4,425 metadata, 4,779 index and 4,344 root
+declaration reference tokens. Partial reads are omitted; these cannot be subtracted from provider
+totals to predict savings because cache/context/tool sequencing matters.
 
-| Whole reference returned | Control, 3 attempts | Layout, 3 attempts |
-| ------------------------ | ------------------: | -----------------: |
-| Package metadata         |               4,425 |              4,425 |
-| Component index          |               4,779 |              4,779 |
-| Root declarations        |               4,344 |              4,344 |
+Integrated metadata cost 1,444 reference tokens. Omitting scripts/devDependencies reduced an
+illustrative copy to 548, 62.0% smaller. Earlier prototype metadata was 1,475 because of wildcard
+exports. Root declarations were 2,172, including 593 chart and 127 Markdown export tokens
+unrelated to directory but still public API.
 
-These are exact file-body reference estimates in saved tool outputs. Partial reads are omitted.
-They cannot be added to or subtracted from provider totals to predict authoring savings. Repeated
-context, caching, and tool sequencing matter. [Audit evidence](../../.work/agent-guidance-cost/proposal-evidence/overhead.json).
+The proposed [metadata pilot](agent-guidance-metadata.md) later completed six attempts without
+establishing savings, so metadata stayed unchanged. The
+[runtime investigation](agent-guidance-runtime-reads.md) led to the
+[explicit wording pilot](agent-guidance-wording.md), then the
+[concise benchmark](agent-guidance-concise.md). Those reports retain original experiment
+findings; this document records the adopted implementation.
 
-The current metadata is 1,444 reference tokens. An illustrative copy omitting `scripts` and
-`devDependencies`, while keeping every other field, is 548 tokens, 62.0% smaller. The study
-metadata was 1,475 tokens because it included the three wildcard exports. The root declarations
-are 2,172 tokens; chart exports account for 593, and Markdown exports another 127. Those
-720 tokens are unrelated to the tested directory task but remain part of the public root API.
-
-The next bounded experiment should vary only installed package metadata: current guidance with
-the complete metadata versus identical guidance with the two author-tooling fields omitted.
-Use three neutral directory attempts per condition, alternating order, with the same model,
-brief, app checks, and repair accounting. Freeze assignments and all nonmetadata package files.
-Measure whole metadata reads, reading routes, completed total and uncached input plus output,
-and all behavior checks. Require no quality regression and examine each repetition before
-claiming savings. Prototype clean install/type/build behavior before the author runs.
-
-This isolates a small, consistently encountered target. It does not require a new public API or
-additional agent instructions. Leave root declaration restructuring and selective index groups
-for a later experiment; changing them together would obscure attribution. Metadata changes and
-the proposed author trials have not been performed or adopted in this pass.
-
-## Subsequent results
-
-The [metadata pilot](agent-guidance-metadata.md) completed the six proposed trials and did not
-establish completed authoring savings. Production metadata remains unchanged. The
-[runtime-read investigation](agent-guidance-runtime-reads.md) audits those saved traces and
-recommends a focused wording experiment. These later reports preserve the proposal's original
-measurements and distinguish each pass from its subsequent work.
+Raw captures and one-off study tooling were removed. Exact historical replay is unavailable.
+See the [evidence retention policy](agent-evidence-retention.md).

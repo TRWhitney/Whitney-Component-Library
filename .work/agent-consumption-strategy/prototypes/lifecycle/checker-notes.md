@@ -40,12 +40,10 @@ Any evaluator correction after freezing must be recorded here and applied to bot
 
 ## Evaluator corrections
 
-The initial frozen script hash was
-`6816fa566517c8a6e78e5ad557a2d0f014ef435df86499d50d107c42f418a8fc`.
 The first native run exposed a case-sensitive category check against `innerText`. CSS uppercase
 rendering changed `Shelter` to `SHELTER`, which meets the brief. Category comparisons, including
 copied metadata, now ignore case. This is an evaluator correction and applies to every condition.
-No app source changed. Original evidence remains under its original evidence path.
+No app source changed. The original raw evidence was later removed.
 
 The excluded installed-library attempt rendered the heading `Trail kit.`. An exact heading
 match in every scenario's setup prevented unrelated behavior checks. Setup now waits for the
@@ -64,6 +62,4 @@ press Space, then verify that checked state changes. These changes apply to both
 The earlier native initial run used an enabled Save and did not test appearance switching, so
 its existing results are unaffected. No new trial output informed these corrections.
 
-The corrected checker SHA-256 is
-`9efc649eefce0bf87fd8395c1f4c7227f521c01ae5e9337cdbd4d219e983403a`.
 Syntax, ESLint and Prettier checks pass.

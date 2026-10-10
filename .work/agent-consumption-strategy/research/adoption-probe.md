@@ -45,19 +45,16 @@ Add `&identify` to reveal stable region names on hover or focus. Those names are
 `summary`, `form`, `game`, `board`, `game-controls`, and `style-probe`. Controls also have accessible
 names. Stop the server with Ctrl+C.
 
-With the server running, reproduce browser observations in another terminal:
+With the server running, collect fresh browser observations in another terminal:
 
 ```sh
 node .work/agent-consumption-strategy/prototypes/adoption-probe/check.mjs http://127.0.0.1:4391 /tmp/wcl-adoption-evidence
 ```
 
-The checker writes JSON results and screenshots to the supplied directory. Retained observations
-are in [results.json](../prototypes/adoption-probe/results.json). Representative screenshots show
-[native preferences](../prototypes/adoption-probe/images/native-1280.png),
-[library preferences](../prototypes/adoption-probe/images/library-1280.png),
-[compact preferences](../prototypes/adoption-probe/images/library-390.png), and the board at
-[1280px](../prototypes/adoption-probe/images/board-1280.png) and
-[390px](../prototypes/adoption-probe/images/board-390.png).
+The checker writes new JSON results and screenshots to the supplied temporary directory.
+Historical results and images were removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). The findings below remain;
+a rerun measures the current built package rather than reproducing the old captures.
 
 ## Preferences
 
@@ -76,7 +73,7 @@ The outer grid is identical: one 350px column at 390px, and columns of approxima
 364px within a 986px grid at 1280px. Controls retain their respective native/custom CSS or library
 appearance. This is not a pixel-equivalent comparison of control styling.
 
-[Source counts](../prototypes/adoption-probe/source-sizes.json) use Prettier-formatted characters:
+Recorded source counts use Prettier-formatted characters:
 
 | File                              | Characters | Nonblank lines |
 | --------------------------------- | ---------: | -------------: |

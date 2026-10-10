@@ -1,5 +1,8 @@
 # Maintenance fixes comparison
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Question and boundary
 
 Whitney authorized trying fixes for the press-event callback limitation, repeated build warnings,
@@ -38,7 +41,8 @@ Do not use the prior native app or the prior 904,127-token outlier as the primar
 
 Use eight-minute limits with no reruns to improve a score and no coordinator repairs. Preserve
 interruptions, timeouts and missing telemetry. Run current/fixed in pairs on distinct ports.
-Separate subprocess sessions, source snapshots, prompts, raw JSONL and usage summaries are retained.
+Separate subprocess sessions, source snapshots, prompts, raw JSONL and usage summaries were captured
+at execution and later removed.
 Report both individual runs and totals, including all authoring and self-verification. Evaluator
 work and prototype construction are outside task token totals, not free implementation work.
 

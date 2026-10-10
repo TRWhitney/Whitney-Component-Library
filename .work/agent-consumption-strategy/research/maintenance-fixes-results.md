@@ -37,11 +37,9 @@ installed versions, including Vite 8.2.1, Rolldown 1.2.11, React 19.2.8 and Play
 The current library was selected once when creating the original app; unprompted adoption was
 not tested. No native comparison was repeated in this maintenance-only experiment.
 
-[Environment and package hashes](pilot/maintenance-fixes/environment.json),
-[measurements](pilot/maintenance-fixes/measurements.json) and
-[aggregate totals](pilot/maintenance-fixes/aggregate.json) retain exact values. Per-run directories
-retain untouched before/after source, prompts, command traces, usage and exit status. Evaluator
-and prototype-construction work is outside these authoring totals, not free development work.
+The raw environment records, before/after apps, command traces and measurement files were removed.
+The tables below preserve the reported values. Evaluator and prototype-construction work is outside
+these authoring totals, not free development work.
 
 ## Maintenance cost
 
@@ -118,10 +116,10 @@ All four independent type/build checks passed. The frozen browser checker report
 | Current D |   64 |    0 |           0 |
 
 The same checker tests both widths and appearances. Source hashes remained unchanged during
-evaluation. Its SHA-256 is
-`9efc649eefce0bf87fd8395c1f4c7227f521c01ae5e9337cdbd4d219e983403a`.
-The [evaluation evidence](pilot/maintenance-fixes/evaluation/) retains all primary results,
-screenshots and build logs.
+evaluation.
+Primary captures and build logs were removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). The failure scores below
+remain recorded observations.
 
 All four failures occur when the checker closes a dialog and immediately focuses and activates
 the appearance checkbox. Fixed B's failures are at 390px/light delete propagation and
@@ -134,7 +132,7 @@ A bounded read-only diagnostic on B sampled twelve post-dismissal toggles immedi
 twelve after two animation frames. All toggles changed appearance in that diagnostic. Six of
 the immediate toggles subsequently lost focus back to a dialog trigger; none of the waited
 ones did. It did not reproduce the primary unchanged-checkbox failures and does not replace
-those scores. See [the diagnosis](pilot/maintenance-fixes/evaluation/run-b/findings.md).
+those scores. The detailed raw diagnosis was removed.
 No application or checker was repaired. The comparison therefore also lacks equal measured
 correctness, independently of its unfavorable usage result. Human style/feel remains unmeasured.
 

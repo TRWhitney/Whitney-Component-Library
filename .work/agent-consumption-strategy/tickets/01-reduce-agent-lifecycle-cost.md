@@ -8,11 +8,11 @@ This is a research continuation ticket, not approval to ship the experimental pa
 
 **Status:** ready-for-agent
 
-- [ ] Recover the retained prototype and evidence without relying on temporary directories;
+- [ ] Build fresh fixtures from the retained prototype source;
       record source/package hashes and the exact comparison environment.
 - [ ] Freeze matched creation and maintenance briefs, objective checks, actual-use requirements,
       run limits and accounting before authoring. Use a small repeated comparison with React/CSS.
-- [ ] Run the bounded comparison with the existing improvement bundle, retaining all attempts,
+- [ ] Run the bounded comparison with the existing improvement bundle, accounting for all attempts,
       failures and repair costs. Verify actual proposed API/helper use and equivalent requirements.
 - [ ] Report cumulative and per-stage tokens, cached input, uncached input plus output, time,
       app source and retained verification source. Separate creation cost from maintenance cost.
@@ -81,38 +81,26 @@ causes or preapproved API designs. Keep broader claims proportional to the narro
   Production component changes require matching canonical guidance and showcase updates.
   The client-directive candidate still needs actual RSC framework compiler verification.
 
-## Recoverable artifacts
+## Retained source and reconstruction limits
 
-- [Package preparer](../prototypes/maintenance-fixes/prepare.mjs) builds current/fixed disposable
-  packages. [Package patch](../prototypes/maintenance-fixes/package/patch-package.mjs) owns the
-  temporary event-type and directive changes. Never run it against the repository root.
-- [Testing helpers and proofs](../prototypes/maintenance-fixes/verification/) include their
-  supported scope and negative cases. Read `testing.md` and `findings.md` before reusing them.
-- [Original lifecycle tools](../prototypes/lifecycle/), [explicit-use prompts](../prototypes/maintenance-use/),
-  and [archive continuation tools](../prototypes/maintenance-archive/) retain the briefs and checks.
-- [Lifecycle evidence](../research/pilot/lifecycle/), [explicit-use evidence](../research/pilot/maintenance-use/),
-  and [archive evidence](../research/pilot/maintenance-archive/) retain app snapshots, events,
-  summaries, package/environment hashes and independent results. These are the durable sources.
+- [Package patch](../prototypes/maintenance-fixes/package/patch-package.mjs) owns temporary event-type
+  and directive changes. Apply it only to a disposable package directory.
+- [Testing helpers and standalone checks](../prototypes/maintenance-fixes/verification/) retain their
+  supported scope and negative cases. Read `testing.md` and `findings.md` before reuse.
+- [Lifecycle briefs/checker](../prototypes/lifecycle/), [explicit-use prompts](../prototypes/maintenance-use/)
+  and [archive briefs/checker](../prototypes/maintenance-archive/) support a fresh experiment.
 
-Old preparers and lockfiles can reference tarballs under `/tmp`. The archive preparer reads an
-absolute artifact path from earlier environment metadata. Inspect and reconstruct those inputs
-from retained sources in a fresh workspace; do not assume the old temporary roots survive.
-Verify reconstructed artifacts against recorded hashes, or document any changed baseline before
-using it. The runner refuses to overwrite an existing stage. Keep new evidence separate and
-leave captured files unformatted and unchanged.
+Raw app snapshots, traces, package records and exact-replay scripts were removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). Reconstruct fresh consumer
+fixtures and validate the candidate; do not claim byte-identical recovery or reuse removed captures.
+Future runs should preserve concise findings and account for failures while keeping raw outputs
+outside version control.
 
-Recorded environment: Codex CLI 0.157.1, gpt-6-astra medium, Node 24.21.0, React 19.2.8,
-TypeScript 5.9.3, Vite 8.2.1, Rolldown 1.2.11, Playwright 1.61.1. The repository's local
-Rolldown 1.2.4 did not reproduce the warning output. Pin transitive versions or record an
-intentional new baseline; do not mistake toolchain differences for a package improvement.
-Preserve the recorded isolated agent configuration and equal run limits across conditions.
-
-The research baseline is `2488a0e1c0f6422b77e1791ea1e5e7aef27e0a29` on branch `main`. The handoff
-delivery commits the research and supporting changes listed in the effort status. Inspect the
-current tree and subsequent history before continuing; do not reset it.
-No production component, build or showcase change was made by this pass. Source counts should
-normalize formatting and count final app/check files once, with unchanged original checks labeled
-separately. Total tokens are input plus output; do not add cached input again.
+The historical environment was Codex CLI 0.157.1, gpt-6-astra medium, Node 24.21.0, React 19.2.8,
+TypeScript 5.9.3, Vite 8.2.1, Rolldown 1.2.11 and Playwright 1.61.1. Rolldown 1.2.4 did not emit
+the recorded warnings. Freeze the actual toolchain and an explicit baseline before comparing.
+Inspect the current tree without resetting it. Normalize formatting when counting final app/check
+source, label unchanged checks separately and count cached input only once in total tokens.
 
 ## Completion evidence
 

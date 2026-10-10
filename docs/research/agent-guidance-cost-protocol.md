@@ -1,31 +1,35 @@
-# Guidance cost experiment
+# Guidance cost experiment protocol
 
-Frozen before authoring on 2026-10-09. This is a bounded research prototype, not a release gate.
+This is a historical study design, not an instruction to run another experiment. Results are
+in the [study report](agent-guidance-cost.md).
 
-Compare one fresh-context authoring attempt each using React/CSS, current full guidance, and
-selective prototype guidance. Each receives the same [profile-editor brief](../../prototypes/agent-guidance-cost/brief.txt),
-scaffold, dependencies, and objective behavior requirements. The library conditions use the
-same unchanged package and must use its Dialog. They receive direct references, so discovery
-is excluded. Supply full pages to the control although the installed package omits them.
-This gives the control a better reading path than its current distribution.
+## Design
 
-Use the inherited model and effort equally. Allow one attempt and one bounded correction
-message per condition after independent checks. Retain failures and all correction costs;
-do not rerun for a preferred result. No subjective style scoring or new API/helper experiments.
+One fresh profile-editor attempt each with React/CSS, full library guidance and selective
+prototype guidance. The identical library package was required to use Dialog; full control
+received pages/props absent from its distribution. Direct references excluded discovery.
+The protocol was frozen before authoring on 2026-10-09.
 
-Check initial rendering, opening, accessible name/description, initial input, focus entry,
-empty/whitespace validation, valid trimmed save, cancellation, Escape, reopened state, focus
-return, and Tab containment. Type/build checks belong to authoring cost. Evaluate behavior
-independently with the shared T3 browser at 390px and 1280px and record any unavailable check.
+## Boundaries and checks
 
-Measure available total input, output, cached input, uncached input plus output, elapsed time,
-reference tokens, tool reads, and final app/CSS source tokens. Never infer agent usage from
-reference size. If the provider exposes no usage, mark total usage unavailable. Tokenizer counts
-use tiktoken 0.12.0, o200k_base and cl100k_base; neither is claimed as this model's billing encoding.
-Keep coordinator, prototype construction, and evaluator usage outside authoring totals.
+Allow one attempt and at most one bounded correction per condition, retaining failures and
+repair costs. Use matching model/effort/scaffold and type/build checks. Independently check
+modal naming, validation, trimmed save, dismissal/reopening, focus return/containment and
+fit at 390px/1280px. Exclude maintenance, subjective style and new APIs.
 
-Separate the wording effect from selection of fewer fields in the static measurement. Verify
-every canonical guidance field has a topic, full contracts are unchanged, all examples remain
-reachable, and every nonempty extracted prop reference compiles. Test duplicate/invalid names
-and unknown topics. Baseline, prompts, source, hashes, and measurements must be retained without
-changing older captured evidence. One trial per condition cannot establish expected savings.
+## Measures and decision
+
+Separate shorter wording from reduced default content in reference budgets. Verify topic
+coverage, unchanged full contracts, reachable examples and compiling nonempty prop references.
+Use tiktoken 0.12.0 with o200k_base/cl100k_base for reference size, without claiming billing
+tokenization. One attempt per condition cannot establish expected savings.
+
+Provider total counts input plus output, including cached input and reasoning once. Uncached
+input plus output is a diagnostic, not a price. Reference/source estimates are separate from
+provider accounting and cannot be subtracted to attribute savings. Include author reads,
+failures, checks and repairs; exclude coordinator preparation, evaluation and analysis.
+Inherited instruction costs remain in author totals. Study inputs were frozen before
+authoring; raw captures are no longer retained.
+
+Raw captures and one-off study tooling were removed. Exact historical replay is unavailable.
+See the [evidence retention policy](agent-evidence-retention.md).

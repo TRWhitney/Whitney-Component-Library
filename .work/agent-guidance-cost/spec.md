@@ -25,7 +25,7 @@ from existing traces separately from measured authoring savings.
 
 - Preserve the [canonical contract model](../../docs/adr/0004-publish-canonical-component-contracts.md),
   manifest, generated human documentation, runtime, and four public package entry points.
-- Reuse the frozen prototypes' wording and examples. Keep editorial summaries in build-owned
+- Reuse the tested wording and examples recorded in the study reports. Keep editorial summaries in build-owned
   data, validated for coverage and source drift. Derive full references and exact props from
   canonical contracts and emitted declarations.
 - Include the eight tested short behavior pages, canonical fallback guidance for the other
@@ -41,7 +41,7 @@ Verify all guidance links and 85 exact props closures in an actual packed packag
 the short examples and layout example. Check canonical reference equality and runtime/declaration
 parity against the frozen baseline, allowing only the nine comments and index replacement.
 Run repository checks and existing package verification. Exercise drift rejection with a changed
-canonical contract. Retain previous experiment sources and evidence unchanged.
+canonical contract. Keep measured findings and reusable source; raw captures follow the [retention policy](../../docs/research/agent-evidence-retention.md).
 
 ## Out of Scope
 

@@ -10,7 +10,9 @@ on the second change. No improved-package comparison with React/CSS has been run
 ## What changed
 
 The repository gained the approved short package README and planning changes allowing this
-bounded evaluation. Formatting and linting exclude captured evidence so it stays unchanged.
+bounded evaluation. Raw captures and historical replay fixtures were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). Measurements below remain
+written observations; the old trials cannot be replayed from this tree.
 Public components, production build behavior, and the showcase have not changed. The following
 candidates exist only in isolated prototypes:
 
@@ -91,8 +93,8 @@ comparison or claim a library-versus-React/CSS advantage.
   the helpers. Its higher token use does not measure helper utility. Do not repeat optional-use
   testing as the next step.
 - [Explicit-use round one](maintenance-use-results.md) and [archive/restore round two](maintenance-archive-results.md):
-  the valid actual-use comparisons summarized above. Reports link frozen protocols, prompts,
-  snapshots, traces, package hashes, independent checks and measurements.
+  the valid actual-use comparisons summarized above. Reports retain the measured findings,
+  protocols and useful prototype source. Raw snapshots, traces and captures were removed.
 
 Total tokens mean input plus output; cached input is already included. Uncached input plus output
 is a separate count, not a price estimate. Authoring totals include reading, implementation,

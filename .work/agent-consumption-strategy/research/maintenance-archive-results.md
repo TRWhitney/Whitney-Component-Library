@@ -39,11 +39,9 @@ without timeout, external correction or retries. This models a new agent returni
 project, not a resumed conversation. All reference reads, implementation, tests, self-repairs and
 final messages count. Evaluator and prototype-construction work is outside those authoring totals.
 
-[Freeze metadata](pilot/maintenance-archive/freeze.json),
-[measurements](pilot/maintenance-archive/measurements.json) and
-[combined results](pilot/maintenance-archive/combined.json) retain the exact evidence. Previous
-round costs come from the [explicit-use comparison](maintenance-use-results.md), never from the
-older optional-use runs.
+The raw freeze records, measurements and combined files were removed. The tables preserve the
+reported counts. Previous round costs come from the
+[explicit-use comparison](maintenance-use-results.md), never from the older optional-use runs.
 
 ## Incremental usage
 
@@ -126,12 +124,11 @@ Read-only source review confirmed that archive/restore only toggle state for the
 the ordered array. Duplication creates a fresh UUID, inherits archive state, and inserts next to
 the source. Actual new-case utility reuse passed for all four. C's existing keyboard traversal
 was extended to include the added view controls while retaining its final target assertion.
-The [evaluation evidence](pilot/maintenance-archive/evaluation/) retains per-run summaries,
-source reviews, reuse reviews, hashes, screenshots and build logs.
+Per-run captures, source/reuse review output and build logs were removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md).
 
-The [archive checker notes](../prototypes/maintenance-archive/checker-notes.md) and
-[proof summary](../prototypes/maintenance-archive/proof/proof-summary.json) record the pre-authoring
-proof. Its complete native reference passed 48/48. Tab and radio view variants passed, and all
+The [archive checker notes](../prototypes/maintenance-archive/checker-notes.md) preserve the
+pre-authoring proof findings; its reference fixture, driver and raw summary were removed. Its complete native reference passed 48/48. Tab and radio view variants passed, and all
 12 targeted negative mutations failed as intended across both widths and appearances. The
 reference's earlier 44/48 result remains recorded; its missing modal Tab trap was corrected
 without weakening the checker.
@@ -140,11 +137,6 @@ The no-focus-theft stress case performs click and Search.focus() in one browser 
 is stronger than separate physical events and is reported as such. Computed geometry/contrast
 and sampled focus do not establish subjective style quality or every accessibility property.
 No subjective score or human revision cost is introduced.
-
-The frozen checker hashes are:
-
-- Archive: `c93e2982fbf6a675e69932fd96063c163874e8a8092270e66534eff6f673aa58`.
-- Regression: `9efc649eefce0bf87fd8395c1f4c7227f521c01ae5e9337cdbd4d219e983403a`.
 
 ## Implication
 

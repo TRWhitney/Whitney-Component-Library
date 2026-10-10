@@ -1,5 +1,8 @@
 # Cumulative authoring and maintenance comparison
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Question and stopping rule
 
 Does the installed library repay its discovery cost through less styling, repair and maintenance
@@ -86,8 +89,8 @@ correction, not a rerun selected for a better score.
 Whitney notes that agent review underrepresents the style and feel issues they would find and
 request changes for. Treat automated checks and coordinator visual review as requirement checks,
 not human acceptance or equivalent design quality. Human review time, design judgment, revision
-requests and the resulting agent tokens are unmeasured, not zero. Preserve paired screenshots
-and runnable apps for review. Do not declare lifecycle superiority from agent-only totals or
+requests and the resulting agent tokens are unmeasured, not zero. Paired screenshots and runnable
+apps were available at execution; those historical fixtures were later removed. Do not declare lifecycle superiority from agent-only totals or
 assume the missing human cost favors either condition. Whitney subsequently clarified that subjective feedback should not be operationalized. No
 human-directed revision round is planned. General-case usage reduction remains the goal, tested
 through repeatable tasks and objective correctness/layout requirements.

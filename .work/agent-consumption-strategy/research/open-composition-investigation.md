@@ -62,7 +62,7 @@ need explicit decisions.
 The pilot recorded actual repairs for mapped SegmentedControl options losing tuple shape and
 Spinner requiring `isActive`. These are better simplification candidates than renaming callbacks.
 Minimum-option guarantees and Spinner's persistent inactive state must be understood before
-changing either API. See the probe report for the trace locations and source declarations.
+changing either API. The probe report preserves the observed repairs and links source declarations; raw traces were removed.
 
 ## Reference implementation and novel application
 

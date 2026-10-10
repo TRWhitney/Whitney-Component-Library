@@ -20,10 +20,10 @@ complete references and a stale-source check, ready for Whitney's adoption revie
 - [Bundled study](../../../docs/research/agent-guidance-bundled.md)
 - [Pointer study](../../../docs/research/agent-guidance-pointer.md)
 - [Layout study](../../../docs/research/agent-guidance-layout.md)
-- [Frozen prototypes](../../../prototypes/agent-guidance-cost/)
+- [Retained task briefs](../../../prototypes/agent-guidance-cost/); old experiment/replay tooling was removed.
 
 ## Completion evidence
 
 [Proposal and verification](../../../docs/research/agent-guidance-proposal.md).
 All accepted checks pass. Whitney subsequently authorized committing completed outcomes; release
-publication remains excluded. The implementation and evidence are unchanged from the review.
+publication remains excluded. The implementation retains its reviewed behavior. Raw audit captures were subsequently removed under the [retention policy](../../../docs/research/agent-evidence-retention.md).

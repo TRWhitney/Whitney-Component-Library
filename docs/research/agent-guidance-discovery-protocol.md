@@ -1,48 +1,36 @@
-# Natural guidance discovery test
+# Natural discovery experiment protocol
 
-Frozen before authoring. Question: with only an instruction to use the installed library, do
-agents discover and use its static references or optional batch lookup, and does that reduce
-total authoring usage?
+This is a historical study design, not an instruction to run another experiment. Results are
+in the [study report](agent-guidance-discovery.md).
 
-Run two fresh attempts per condition on the existing profile-editor task: React/CSS, current
-package, compact static references, and compact references plus installed lookup. Runtime JS,
-CSS, component APIs, dependencies, and the package README are identical across library conditions.
-The static variants replace the index and install usage/full/prop pages inside the package.
-The lookup variant adds a package bin, generated topic data, and a short command description
-in the package index. These are disposable package variants, not production changes.
+## Design
 
-Prompts identify only the installed library, with no documentation paths, command hints, forced
-component choice, or explanation of the variants. Fixture names and agent task names are neutral.
-Agents may inspect installed dependencies. They must not inspect the source repository, another
-trial, or retained evidence. All use the same inherited model and effort. Disable parent-history
-forking. Use normal package README discovery, without custom agent instructions in the fixtures.
+Eight fresh profile-editor attempts, two each with React/CSS, current package, compact static
+references and those references with installed lookup. Library runtime/CSS/APIs/README match.
+Static adds usage/full/props pages; lookup adds a package command and description. Rotate
+condition order between batches.
 
-Use the same brief and scaffold in all eight attempts. Require `npm run check`; prohibit extra
-authored test files or browser self-checks equally, since the independent evaluator supplies
-interaction checks. Count discovery, implementation, type/build checks, failures, and repairs.
-After independent checks, allow one objective repair message per failed attempt. Never tell an
-agent which documentation or command to use in a repair. Retain all attempts and failures.
-Stop after eight attempts and at most one repair per attempt. No maintenance stage or subjective
-style scoring. Two repetitions of one task cannot establish a general success probability.
+## Boundaries and checks
 
-Preflight the installed runtime/peer resolution and lookup before authoring, including unknown
-names/options. Freeze prompt, package, and checker hashes. Run in two batches with rotated
-condition order to reduce simple cache/order effects. Keep cache accounting explicit; no price
-claims. Capture provider input, output, cached input, uncached input plus output, tool requests,
-elapsed time, consumer source tokens, and discovery/usage evidence from the scoped child logs.
-Do not infer usage from a self-report or from a path merely appearing in a file listing.
+Briefs identify only the installed library, with no documentation/command hints or forced
+components. Fresh matching model/effort contexts have no parent history. Authors inspect their
+app/dependencies, edit app/CSS, run the same type/build check and have no browser self-checks.
+Preflight peer resolution/lookup; freeze package/prompt/checker before launch. Stop after eight
+attempts and at most one objective repair per failing app.
 
-Distinguish guide read, usage page read, prop-reference read, full-contract read, lookup discovery,
-successful lookup execution, relevant lookup output, and actual library component use. Log the
-route and unnecessary broad reads. A current guide read is not prototype uptake. A lookup name
-in package metadata is discovery opportunity, not execution. Confirm imports and rendered
-controls separately. Report both per-attempt results and condition totals; don't conceal failures.
+## Measures and decision
 
-Reuse the corrected T3 browser checker at 390px and 1280px. For this experiment, check the first
-and last modal tab boundaries directly with trusted Tab/Shift+Tab rather than six arbitrary
-cycles each. Keep all other behavior checks and wait for modal visibility before interacting.
-Record tooling/evaluator failures separately and retry corrected evaluation without repairing
-app code. Browser checks and prototype construction stay outside authoring token totals.
+Independent checks run at 390px/1280px, testing both modal Tab boundaries directly. Tooling
+corrections preserve acceptance and apply consistently. Count guide/usage/props/full reads,
+lookup discovery, execution and relevant output separately, requiring returned content rather
+than listings. Two repetitions of one task cannot establish general adoption or causal savings.
 
-Retain all source as text, sanitized tool traces, prompts, usage timelines, hashes, and results
-under `.work/agent-guidance-cost/discovery-evidence/`. Older evidence stays unchanged.
+Provider total counts input plus output, including cached input and reasoning once. Uncached
+input plus output is a diagnostic, not a price. Reference/source estimates are separate from
+provider accounting and cannot be subtracted to attribute savings. Include author reads,
+failures, checks and repairs; exclude coordinator preparation, evaluation and analysis.
+Inherited instruction costs remain in author totals. Study inputs were frozen before
+authoring; raw captures are no longer retained.
+
+Raw captures and one-off study tooling were removed. Exact historical replay is unavailable.
+See the [evidence retention policy](agent-evidence-retention.md).

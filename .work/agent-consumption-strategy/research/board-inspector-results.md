@@ -20,8 +20,8 @@ named neither the new API nor its guide. Each attempt had an eight-minute limit 
 model and runner configuration. This tests related-task transfer, not general application support.
 
 The [protocol](board-inspector-protocol.md), [prototype](../prototypes/board-inspector/prepare.mjs),
-[task](../prototypes/board-inspector/task.txt), and
-[raw evidence](pilot/board-inspector/) retain the inputs and outputs.
+and [task](../prototypes/board-inspector/task.txt) retain the experimental setup.
+The raw trial evidence was removed.
 
 ## Interruption and follow-up
 
@@ -32,7 +32,7 @@ checks. Do not count the termination as an application correctness failure.
 
 A fresh current-package follow-up used the original files, package, prompt, model, and limit.
 The CLI ran in a separate process session. This departs from the protocol's original rule allowing
-restarts only before editing. Both attempts are retained. Missing usage from the first attempt
+restarts only before editing. Both attempts are described here; their raw outputs were removed. Missing usage from the first attempt
 prevents comparing aggregate effort across all attempts. Neither the API nor guidance was tuned
 after seeing trial output.
 
@@ -59,8 +59,8 @@ study or complete accessibility audit was performed.
 ## Source and agent effort
 
 All source counts normalize formatting with Prettier and include `app.tsx`, bootstrap and CSS.
-They exclude dependency source and author-written browser test scripts. The latter remain in
-the evidence, and their authoring/debugging contributes to the token totals.
+They exclude dependency source and author-written browser test scripts. Those scripts were
+removed, but their authoring/debugging contributes to the recorded token totals.
 
 | Output                                    | Current API | Experimental API |       Change |
 | ----------------------------------------- | ----------: | ---------------: | -----------: |
@@ -92,7 +92,7 @@ tried clicking the Switch's visually hidden input in their own browser scripts. 
 the locator after one failure; experimental repeated the failing script once before changing
 it to the visible label. These were test-authoring failures, not failures in the app's Switch.
 Both also tried `git status` in the disposable non-git app. The experimental run issued an
-unsuccessful process-cleanup command. Traces retain these incidental costs.
+unsuccessful process-cleanup command. The recorded token totals include these incidental costs.
 
 The result does not demonstrate fewer total tokens. It demonstrates less consumer code and
 working library reuse in one custom application, with a modest saving in the concise reference.
@@ -129,13 +129,10 @@ a generator or lookup tool. No further authoring runs are scheduled by this repo
 The prototype scripts pass ESLint and Prettier; the seed stylesheet passes style lint. The
 runner passes Python syntax parsing. `git diff --check` passes.
 
-## Reproduction
+## Retained tooling
 
-Run `npm run check:generated` before packing. Run
-`node .work/agent-consumption-strategy/prototypes/board-inspector/prepare.mjs` and use its printed
-temporary root with `reference.mjs`, `run-trial.py`, and `measure.mjs` in the same directory.
-`check.mjs <app> <evidence> <free-port> --single` checks a reference; omit `--single` for the
-two-piece agent task. Run `extension/verify.mjs` for the isolated compatibility proof.
-Each trial requires an authenticated Codex CLI and consumes tokens. Do not overwrite existing
-evidence. The retained invocation, flags, package hashes, source snapshots, and checks identify
-this run.
+[prepare.mjs](../prototypes/board-inspector/prepare.mjs) and the reference/checker source remain
+for building a fresh demonstration from the current package. The historical trial runner,
+measurements and app snapshots were removed, so this comparison cannot be replayed from the tree.
+The standalone [extension proof](../prototypes/board-inspector/extension/findings.md) remains useful
+for its bounded compatibility cases.

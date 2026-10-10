@@ -16,7 +16,7 @@ The helper reads the current [manifest](../../../dist/manifest.json). Its select
 
 The exact fragment follows [choice types](../../../src/choices/choice-types.ts). RadioGroup options form a nonempty tuple, controlled selection may be a value or null, and its callback returns a value. SegmentedControl requires at least two options and disallows descriptions. [Selection types](../../../src/selection/selection-types.ts) separately require an empty message for Select and ComboBox, allow null in selection callbacks, and separate ComboBox input text from selection. Those differences limit how far a generic fragment emitter can go without component-specific knowledge.
 
-The experiment uses repository commit `2488a0e1c0f6422b77e1791ea1e5e7aef27e0a29`, installed Node and TypeScript, and the existing built package declarations. [Evidence](../prototypes/tooling-probe/evidence.json) records runtime versions and SHA-256 hashes for inspected build inputs. It uses no network service or LLM call. No new dependency was installed. The runner uses the existing Prettier dependency to keep its saved evidence formatted and checks that the emitter itself returns formatted TypeScript. The prototype currently imports the repository's TypeScript development dependency even for selection. A shipped helper's dependency and distribution boundary remains an open implementation choice.
+The experiment uses repository commit `2488a0e1c0f6422b77e1791ea1e5e7aef27e0a29`, installed Node and TypeScript, and the existing built package declarations. The raw version/hash record was removed; the findings here describe the historical build. It uses no network service or LLM call. No new dependency was installed. The former runner used Prettier and checked the emitter's TypeScript formatting; that runner was removed with its pilot-app dependencies. The prototype currently imports the repository's TypeScript development dependency even for selection. A shipped helper's dependency and distribution boundary remains an open implementation choice.
 
 The stopping condition was a runnable selector, one emitted and compiled fragment, audits of the six library pilot apps, and cases exposing false positives, missed errors, and abstention. All are complete. This was a CLI question, so the artifact has no visual layout or interactive UI to evaluate.
 
@@ -31,20 +31,14 @@ The stopping condition was a runnable selector, one emitted and compiled fragmen
 
 Stable feedback identifiers are the command names, result `status`, selected `export`, and diagnostic `code`. This allows discussion of CLI behavior without adding a UI solely for the experiment.
 
-Run from the repository root with existing dependencies installed:
-
-```sh
-node .work/agent-consumption-strategy/prototypes/tooling-probe/run.mjs
-```
-
-The runner exercises 16 selection cases through the CLI, writes the fragment and evidence inside the prototype directory, compiles four files, and audits all six library pilot apps. It finishes in roughly five seconds in the current environment. It does not invoke package builds or mutate pilot source.
-
-Individual commands:
+Run individual commands from the repository root with existing dependencies and built `dist/`
+installed. The historical runner and six pilot apps were removed. The selector, fragment emitter
+and synthetic audit fixtures remain:
 
 ```sh
 node .work/agent-consumption-strategy/prototypes/tooling-probe/probe.mjs choose '{"intent":"value","cardinality":"one","display":"visible","details":true}'
 node .work/agent-consumption-strategy/prototypes/tooling-probe/probe.mjs choose '{"intent":"value","cardinality":"one","display":"visible","details":true}' --fragment
-node .work/agent-consumption-strategy/prototypes/tooling-probe/probe.mjs audit .work/agent-consumption-strategy/research/pilot/baseline-1/src/app.tsx .work/agent-consumption-strategy/research/pilot/baseline-1/src/styles.css
+node .work/agent-consumption-strategy/prototypes/tooling-probe/probe.mjs audit .work/agent-consumption-strategy/prototypes/tooling-probe/fixtures/negative.tsx
 node .work/agent-consumption-strategy/prototypes/tooling-probe/probe.mjs choose '{"intent":"board-game-move-target","cardinality":"one","display":"visible"}'
 ```
 
@@ -66,7 +60,7 @@ Character counts use JavaScript string length and include the printed newline. T
 
 All 741 generated characters count as consumer code. Generation changes who writes them; it does not remove them. No source-size saving was measured against an agent-written equivalent. The 1,349-character output is about 88% smaller than the guide index, but the guide covers the package while this answer covers one declared choice. Finding the tool, learning the schema, command inputs, repeated queries, tool source inspection, and follow-up documentation can erase some or all of that advantage. The example fragment command itself is 166 characters. There was no fresh agent trial of tool discovery or total task cost.
 
-The generated fragment and all three synthetic fixtures compile under strict TypeScript with `exactOptionalPropertyTypes` and `noUncheckedIndexedAccess`, using actual package declarations. Repository Prettier and ESLint checks pass for the owned artifact files. The runner regenerates formatted evidence and source. Zero compile diagnostics is evidence for API compatibility of the inspected example. The semantically wrong fixtures also compile.
+The generated fragment and all three synthetic fixtures compile under strict TypeScript with `exactOptionalPropertyTypes` and `noUncheckedIndexedAccess`, using actual package declarations. Repository Prettier and ESLint checks pass for the owned artifact files. The removed runner generated formatted evidence and source at execution. Zero compile diagnostics is evidence for API compatibility of the inspected example. The semantically wrong fixtures also compile.
 
 ## Actual pilot audits
 
@@ -79,7 +73,7 @@ The generated fragment and all three synthetic fixtures compile under strict Typ
 | Improved register    |                320 | No findings in the checked categories                                            |
 | Improved report      |                320 | No findings in the checked categories                                            |
 
-The [baseline preferences source](pilot/baseline-1/src/app.tsx) writes `data-wcl-provider` on a div. That does not instantiate AppearanceProvider. Its [CSS](pilot/baseline-1/src/styles.css) targets private component attributes. The audit observes both. A `provider-unverified` result only says no provider JSX appears in that file. It does not prove the rendered component lacks an ancestor provider.
+The historical baseline preferences source wrote `data-wcl-provider` on a div. That does not instantiate AppearanceProvider. Its CSS targeted private component attributes. The audit observes both. A `provider-unverified` result only says no provider JSX appears in that file. It does not prove the rendered component lacks an ancestor provider.
 
 The improved register's focus restoration uses delayed DOM queries. The audit returns no findings for it. This tool does not assess whether its focus behavior is correct, solve the earlier Table interaction difficulty, or detect unnecessary native reimplementation. Those questions require separate investigation and interaction checks.
 

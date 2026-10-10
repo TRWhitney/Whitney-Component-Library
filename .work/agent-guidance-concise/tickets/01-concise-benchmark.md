@@ -10,7 +10,7 @@ full cost accounting, reading-route evidence and a reviewable conclusion.
 - [x] Candidate preserves needed guidance and reduces prose words and complete-page tokens.
 - [x] Actual archives pass props, examples, links, types, builds and installed parity.
 - [x] Eighteen fresh authors complete the frozen briefs in balanced order.
-- [x] Initial/final source, traces, counters, failures and repairs are retained.
+- [x] Initial/final source, traces, counters, failures and repairs were accounted for at execution.
 - [x] All independent browser checks pass or unresolved failures are reported without hiding cost.
 - [x] Report every condition/task/repetition, both reference size and completed cost.
 - [x] Independent intent/engineering review passes and the completed outcome is committed.
@@ -21,12 +21,10 @@ full cost accounting, reading-route evidence and a reviewable conclusion.
 [previous wording report](../../../docs/research/agent-guidance-wording.md), and
 [existing task briefs](../../../prototypes/agent-guidance-cost/bundled-tasks.json).
 
-## Completion evidence
+## Completion findings
 
-[Measured report](../../../docs/research/agent-guidance-concise.md),
-[experiment](../../agent-guidance-cost/concise-evidence/experiment.json),
-[summary](../../agent-guidance-cost/concise-evidence/summary.json), and
-[review](../../agent-guidance-cost/concise-evidence/review.md).
-All 816 primary assertions pass without app repairs. Independent intent and engineering review
-pass with no findings. The evidence, candidate, tooling and report travel together in the
-completed benchmark commit.
+The [measured report](../../../docs/research/agent-guidance-concise.md) records all 816 primary
+assertions passing without app repairs and both review axes passing with no findings. Raw captures,
+comparison HTML and replay tooling were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). These remain historical
+findings; production adoption was not authorized by this benchmark.

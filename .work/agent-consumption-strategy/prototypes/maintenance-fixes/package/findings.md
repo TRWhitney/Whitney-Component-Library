@@ -31,9 +31,9 @@ contract change.
 
 ## Checks
 
-[verify.mjs](verify.mjs) produced [evidence.json](evidence.json).
+The historical package verifier produced the observations below. Its raw result and snapshot-dependent verifier were removed.
 
-- The unchanged retained initial Trail app passes typechecking and production builds with both
+- The unchanged historical initial Trail app passes typechecking and production builds with both
   packages. Its generated JavaScript and CSS have identical filenames and SHA-256 hashes.
 - Strict TypeScript with `skipLibCheck: false` and `exactOptionalPropertyTypes: true` accepts
   inferred and explicitly typed event targets and existing no-argument callbacks. It rejects a
@@ -69,14 +69,8 @@ This prototype patches generated declarations directly. Production work must upd
 contract, regenerate declarations and declaration maps, update the human-facing component
 examples, and run the production checks. The copied declaration maps are not regenerated here.
 
-Run from the repository root:
-
-```sh
-node .work/agent-consumption-strategy/prototypes/maintenance-fixes/package/verify.mjs /tmp/wcl-lifecycle-LTHbbR/library-required/node_modules
-```
-
-The optional argument selects an installed tooling/dependency directory. Omitting it uses the
-repository's `node_modules`, which currently contains Rolldown 1.2.4 and cannot reproduce the
-historical warnings. The script uses repository JSDOM if the chosen authoring dependencies omit
-it. It creates disposable consumers under `/tmp`, preserves their complete build logs, and writes
-the result to `evidence.json`. ESLint, Prettier and `git diff --check` passed for this prototype.
+The reusable [patch-package.mjs](patch-package.mjs) remains. Import `patchPackage` and apply it
+only to a disposable package directory containing `package.json` and `dist/`. The historical
+verifier and Trail app snapshots were removed; its original warning and bundle comparisons
+cannot be replayed. A new compatibility study must supply its own consumer fixture and record
+the actual transitive toolchain.

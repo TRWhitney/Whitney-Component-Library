@@ -16,7 +16,7 @@ package structure, including metadata, whole-index reads, and unrelated type dec
 
 - [Specification](../spec.md)
 - [Trace audit](../../../docs/research/agent-guidance-detours.md)
-- [Layout evidence](../layout-evidence/summary.json)
+- [Layout findings](../../../docs/research/agent-guidance-layout.md)
 
 ## Completion evidence
 

@@ -36,8 +36,8 @@ step and self-repair counts in authoring usage. Prototype construction and indep
 are separate engineering work outside these authoring totals.
 
 The prompts are [current](../prototypes/maintenance-use/current.txt) and
-[experimental](../prototypes/maintenance-use/fixed.txt). Exact package/prompt hashes, model and
-versions are in [freeze.json](pilot/maintenance-use/freeze.json). The runner uses CLI 0.157.1,
+[experimental](../prototypes/maintenance-use/fixed.txt). The raw freeze records were removed.
+The historical runner used CLI 0.157.1,
 gpt-6-astra medium, Vite 8.2.1, Rolldown 1.2.11, React 19.2.8 and Playwright 1.61.1.
 
 ## Usage
@@ -59,8 +59,7 @@ these totals cannot assign exact savings to individual helper calls or package c
 Total token savings were 22.7% in pair 1 and 14.2% in pair 2. Uncached input plus output was higher
 in both experimental runs, by 8.3% and 1.5%. This distinction matters when interpreting the result.
 Command output fell from 128,427 to 79,563 characters overall, and commands fell from 25 to 19.
-[Measurements](pilot/maintenance-use/measurements.json) and
-[aggregate totals](pilot/maintenance-use/aggregate.json) retain the exact counts.
+The raw measurement and aggregate files were removed; the table preserves the reported counts.
 
 ## Evidence of actual use and repair
 
@@ -110,14 +109,13 @@ behavior themselves. A synchronization helper does not repair app behavior.
 
 All four runs passed 64/64 scenarios, with no failed or unverified scenario and no page errors.
 All independent type/build checks passed. Source/fixture hashes stayed unchanged during
-evaluation, and the checker SHA-256 remains
-`9efc649eefce0bf87fd8395c1f4c7227f521c01ae5e9337cdbd4d219e983403a`.
+evaluation.
 
-The evaluator separately verified actual use in both experimental runs. See
-[B treatment validation](pilot/maintenance-use/evaluation/run-b/treatment-validation.json) and
-[C treatment validation](pilot/maintenance-use/evaluation/run-c/treatment-validation.json).
-The [evaluation evidence](pilot/maintenance-use/evaluation/) retains summaries, hashes,
-screenshots and build logs. No repairs, replacement scores or subjective style review.
+The evaluator separately verified actual use in both experimental runs. Treatment-validation
+captures, summaries and build logs were removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). These findings cannot now
+be independently checked against the historical apps. No repairs, replacement scores or
+subjective style review occurred.
 
 ## Interpretation and next boundary
 

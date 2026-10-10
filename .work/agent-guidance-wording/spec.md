@@ -1,5 +1,8 @@
 # Test explicit component guidance
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Problem Statement
 
 Six prior authors read runtime before coding despite guidance covering most required behavior.
@@ -19,7 +22,7 @@ controlled SearchField example. Present measured cost, reading routes, correctne
 
 Use the [frozen protocol](../../docs/research/agent-guidance-wording-protocol.md). Change only two
 usage pages in disposable packages. Keep production guidance, metadata, runtime/types and public
-interfaces unchanged. No instruction to avoid runtime. Retain all six attempts and repair costs.
+interfaces unchanged. No instruction to avoid runtime. Report all six attempts and repair costs.
 
 ## Testing Decisions
 

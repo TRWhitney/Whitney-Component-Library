@@ -1,5 +1,8 @@
 # Second maintenance round
 
+Historical study plan. Raw captures and obsolete replay setups were later removed under the
+[retention policy](../../../docs/research/agent-evidence-retention.md). Capture instructions below describe execution, not a retention requirement.
+
 ## Question
 
 Does the benefit persist when the same apps receive another change and both sides can reuse the
@@ -44,16 +47,15 @@ the helper being evaluated. Build final sources independently, preserve hashes, 
 primary failures. Evaluation uses ports 4531..4534 and writes only its evidence. No subjective
 style score or discovery outcome.
 
-Run the existing prepare/runner/measurement approach; retain separate round-two snapshots,
-prompts, JSONL, usage, screenshots and checker evidence. Per-run directories keep the runner's
-existing `maintenance` stage label. The enclosing experiment directory identifies round two.
+The study used the earlier preparation/runner/measurement approach and recorded separate round-two
+snapshots and counters. Those scripts and captures were later removed.
 
 ## Interpretation and stopping condition
 
 Report this round's totals, cached input, uncached input plus output, output tokens, command
 counts/output/failures, elapsed time, and retained source growth. Sum first and second round
-usage for the same condition and pair. First-round totals come from the retained explicit-use
-measurements, never the older optional-use trials. Cumulative cost covers these two maintenance
+usage for the same condition and pair. First-round totals come from the explicit-use
+measurements recorded at execution, never the older optional-use trials. Cumulative cost covers these two maintenance
 changes only, not initial creation, prototype construction, evaluation or a project lifetime.
 Source totals describe the final apps once; do not double-count snapshots as cumulative code.
 
